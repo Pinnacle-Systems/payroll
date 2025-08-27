@@ -20,6 +20,7 @@ import {
   machineMasterApi,
   sampleEntryApi,
   designationMasterApi,
+  hrTemplateMasterApi,
 
 } from "./services"
 import projectPaymentFormApi from "./services/ProjectPaymentService";
@@ -151,7 +152,8 @@ const commonReducers = {
   [purchaseInwardEntryApi.reducerPath]: purchaseInwardEntryApi.reducer,
   [partyMasterNewApi.reducerPath]: partyMasterNewApi.reducer,
   [sampleEntryApi.reducerPath]:sampleEntryApi.reducer,
-  [designationMasterApi.reducerPath]:designationMasterApi.reducer
+  [designationMasterApi.reducerPath]:designationMasterApi.reducer,
+  [hrTemplateMasterApi.reducerPath]:hrTemplateMasterApi.reducer
 
 
 
@@ -244,7 +246,9 @@ UnitOfMeasurementMasterApi.middleware,
 purchaseInwardEntryApi.middleware,
 partyMasterNewApi.middleware,
 sampleEntryApi.middleware,
-designationMasterApi.middleware
+designationMasterApi.middleware,
+hrTemplateMasterApi.middleware,
+
 ];
 
 

@@ -32,7 +32,8 @@ import {
   purchaseInwardEntry,
   partyMasterNew,
   sampleEntry,
-  designation
+  designation,
+  hrTemplate
 
 } from './src/routes/index.js';
 
@@ -119,7 +120,7 @@ app.use("/sampleEntry",sampleEntry)
   })
 
 app.use('/uploads', express.static('uploads'));
-
+app.use('/hrTemplate',hrTemplate)
 app.use("/sendMail", sendMail)
 app.use("/designation",designation)
 
