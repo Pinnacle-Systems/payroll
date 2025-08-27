@@ -28,6 +28,7 @@ async function getOne(id) {
 async function getPageId(pageId) {
     const pageDatas = await prisma.page.findMany({
         where: {
+            
             active: true,
         }
     });
@@ -38,6 +39,9 @@ async function getPageId(pageId) {
 async function getPermissions(req) {
 
     const { roleId, pageId } = req.params
+
+    console.log(roleId, pageId ,"roleId, pageId");
+    
 
     let pageData = await getPageId(pageId);
 

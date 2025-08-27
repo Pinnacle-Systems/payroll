@@ -37,6 +37,7 @@ export { default as uom } from './uom.route.js'
 export {default as purchaseInwardEntry} from './purchaseInwardEntry.route.js'
 export {default as partyMasterNew} from './partyMasterNew.route.js'
 export {default as sampleEntry} from './sampleEntry.route.js'
+export {default as designation} from './designation.route.js'
 
 
 

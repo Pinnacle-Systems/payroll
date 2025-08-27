@@ -57,6 +57,7 @@ model Company {
   Color              Color[]
   unitOfMeasurement  UnitOfMeasurement[]
   PartyMasterNew     PartyMasterNew[]
+  Designation        Designation[]
 }
 
 model Subscription {
@@ -145,7 +146,7 @@ model User {
   roleId                       Int?
   otp                          String?
   active                       Boolean?              @default(true)
-  isAdmin                      Boolean?       @default(false)
+  isAdmin                      Boolean?              @default(false)
   UserOnBranch                 UserOnBranch[]
   employeeId                   Int?
   partyType                    String?
@@ -190,6 +191,8 @@ model Employee {
   chamberNo          String?
   department         Department?       @relation(fields: [departmentId], references: [id])
   departmentId       Int?
+  designation         Designation?     @relation(fields: [designationId],references: [id])     
+  designationId        Int?
   joiningDate        DateTime?
   fatherName         String?
   dob                DateTime?
@@ -289,13 +292,14 @@ model City {
 }
 
 model Department {
-  id        Int        @id @default(autoincrement())
-  name      String
-  code      String
-  active    Boolean    @default(true)
-  doctor    Employee[] @relation()
-  Company   Company    @relation(fields: [companyId], references: [id])
-  companyId Int
+  id          Int           @id @default(autoincrement())
+  name        String
+  code        String
+  active      Boolean       @default(true)
+  doctor      Employee[]    @relation()
+  Company     Company       @relation(fields: [companyId], references: [id])
+  companyId   Int
+  Designation Designation[]
 }
 
 enum PageType {
@@ -706,7 +710,7 @@ model Po {
   poGrid              poGrid[]
   proformaImage       Json?
   purchaseInwardEntry purchaseInwardEntry[]
-  attachments       poAttachments[]
+  attachments         poAttachments[]
 }
 
 model poGrid {
@@ -1107,5 +1111,19 @@ model poAttachments {
   fileName    String?
   filePath    String?
 
-  log         String? @db.LongText
+  log String? @db.LongText
 }
+
+model Designation {
+  id            Int          @id @default(autoincrement())
+  name          String?
+  code          String?
+  active        Boolean?     @default(true)
+  departmentId  Int?        
+  companyId     Int?     
+
+  department    Department?  @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  company       Company?     @relation(fields: [companyId], references: [id])
+  Employee      Employee[]
+}
+

@@ -31,7 +31,8 @@ import {
   uom,
   purchaseInwardEntry,
   partyMasterNew,
-  sampleEntry
+  sampleEntry,
+  designation
 
 } from './src/routes/index.js';
 
@@ -120,6 +121,7 @@ app.use("/sampleEntry",sampleEntry)
 app.use('/uploads', express.static('uploads'));
 
 app.use("/sendMail", sendMail)
+app.use("/designation",designation)
 
 
 const httpServer = createServer(app);

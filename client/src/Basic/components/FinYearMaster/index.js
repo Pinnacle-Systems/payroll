@@ -1,218 +1,426 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import secureLocalStorage from 'react-secure-storage';
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import secureLocalStorage from "react-secure-storage";
 import {
-    useGetFinYearQuery,
-    useGetFinYearByIdQuery,
-    useAddFinYearMutation,
-    useUpdateFinYearMutation,
-    useDeleteFinYearMutation
-} from '../../../redux/services/FinYearMasterService';
-import FormHeader from '../FormHeader';
+  useGetFinYearQuery,
+  useGetFinYearByIdQuery,
+  useAddFinYearMutation,
+  useUpdateFinYearMutation,
+  useDeleteFinYearMutation,
+} from "../../../redux/services/FinYearMasterService";
+import FormHeader from "../FormHeader";
 import FormReport from "../FormReportTemplate";
-import { toast } from "react-toastify"
-import { DateInput, CheckBox, DisabledInput, Modal, ToggleButton } from "../../../Inputs"
-import ReportTemplate from '../ReportTemplate';
-import { getYearShortCode } from '../../../Utils/helper';
+import { toast } from "react-toastify";
+import {
+  DateInput,
+  CheckBox,
+  DisabledInput,
+  ToggleButton,
+  ReusableTable,
+  
+} from "../../../Inputs";
+import ReportTemplate from "../ReportTemplate";
+import { getYearShortCode } from "../../../Utils/helper";
 
-import Mastertable from '../MasterTable/Mastertable';
-import MastersForm from '../MastersForm/MastersForm';
-import { statusDropdown } from '../../../Utils/DropdownData';
-import moment from 'moment';
+import Mastertable from "../MasterTable/Mastertable";
+import MastersForm from "../MastersForm/MastersForm";
+import { statusDropdown } from "../../../Utils/DropdownData";
+import moment from "moment";
 
-
+import { Check } from "lucide-react";
+import Modal from "../../../UiComponents/Modal";
+import { ReusableInput } from "../../../Uniform/Components/styleesheet/CommonInput";
 
 const MODEL = "Fin Year Master";
 
 export default function Form() {
-    const [form, setForm] = useState(false);
-    const [readOnly, setReadOnly] = useState(false);
-    const [id, setId] = useState("")
-    const [from, setFrom] = useState("");
-    const [to, setTo] = useState("");
-    const [active, setActive] = useState(true);
-    const [searchValue, setSearchValue] = useState("");
-    const [code, setCode] = useState();
-    const childRecord = useRef(0);
-    const [errors, setErrors] = useState({});
-   console.log(id,"id")    
+  const [form, setForm] = useState(false);
+  const [readOnly, setReadOnly] = useState(false);
+  const [id, setId] = useState("");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [active, setActive] = useState(true);
+  const [searchValue, setSearchValue] = useState("");
+  const [code, setCode] = useState("");
+  const childRecord = useRef(0);
+  const [errors, setErrors] = useState({});
+  console.log(id, "id");
 
-   
+  const params = {
+    companyId: secureLocalStorage.getItem(
+      sessionStorage.getItem("sessionId") + "userCompanyId"
+    ),
+  };
+  const {
+    data: allData,
+    isLoading,
+    isFetching,
+  } = useGetFinYearQuery({ params, searchParams: searchValue });
+  const {
+    data: singleData,
+    isFetching: isSingleFetching,
+    isLoading: isSingleLoading,
+  } = useGetFinYearByIdQuery(id, { skip: !id });
 
+  const [addData] = useAddFinYearMutation();
+  const [updateData] = useUpdateFinYearMutation();
+  const [removeData] = useDeleteFinYearMutation();
 
-    const params = { companyId: secureLocalStorage.getItem(sessionStorage.getItem("sessionId") + "userCompanyId") }
-    const { data: allData, isLoading, isFetching } = useGetFinYearQuery({ params, searchParams: searchValue });
-    const { data: singleData, isFetching: isSingleFetching, isLoading: isSingleLoading } = useGetFinYearByIdQuery(id, { skip: !id });
+  const syncFormWithDb = useCallback(
+    (data) => {
+      if (id) {
+        setReadOnly(true);
+        setTo(data?.to ? moment.utc(data.to).format("YYYY-MM-DD") : "");
+        setFrom(data?.from ? moment.utc(data.from).format("YYYY-MM-DD") : "");
+        setActive(id ? (data?.active ? data.active : false) : true);
+        setCode(data?.code);
+      }
+    },
+    [id]
+  );
 
-    const [addData] = useAddFinYearMutation();
-    const [updateData] = useUpdateFinYearMutation();
-    const [removeData] = useDeleteFinYearMutation();
+  useEffect(() => {
+    syncFormWithDb(singleData?.data);
+  }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
 
-    const syncFormWithDb = useCallback(
-        (data) => {
-            if (id) {
-                setReadOnly(true);
-                setTo(data?.to ? moment.utc(data.to).format('YYYY-MM-DD') : "");
-                setFrom(data?.from ? moment.utc(data.from).format('YYYY-MM-DD') : "");
-                setActive(id ? (data?.active ? data.active : false) : true);
-                setCode("")
-            }
-        }, [id])
+  const data = {
+    from,
+    to,
+    active,
+    companyId: secureLocalStorage.getItem(
+      sessionStorage.getItem("sessionId") + "userCompanyId"
+    ),
+    id,
+    code,
+  };
 
-
-    useEffect(() => {
-        syncFormWithDb(singleData?.data);
-    }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData])
-
-
-    const data = {
-        from, to, active,
-        companyId: secureLocalStorage.getItem(sessionStorage.getItem("sessionId") + "userCompanyId"), id
+  const validateData = (data) => {
+    if (data.from && data.to) {
+      return true;
     }
+    return false;
+  };
 
-    const validateData = (data) => {
-        if (data.from && data.to) {
-            return true;
-        }
-        return false;
+  const validateOneActiveFinYear = (active) => {
+    if (Boolean(active)) {
+      return !allData.data.some((finYear) =>
+        id === finYear.id ? false : Boolean(finYear.active)
+      );
     }
+    return true;
+  };
 
-    const validateOneActiveFinYear = (active) => {
-        if (Boolean(active)) {
-            return !allData.data.some((finYear) => id === finYear.id ? false : Boolean(finYear.active))
-        }
-        return true
+  const handleSubmitCustom = async (callback, data, text) => {
+    try {
+      let returnData = await callback(data).unwrap();
+      setId(returnData.data.id);
+      syncFormWithDb(undefined);
+      toast.success(text + "Successfully");
+    } catch (error) {
+      console.log("handle");
     }
+  };
 
-    const handleSubmitCustom = async (callback, data, text) => {
-        try {
-            let returnData = await callback(data).unwrap();
-            setId(returnData.data.id)
-            syncFormWithDb(undefined)
-            toast.success(text + "Successfully");
-
-        } catch (error) {
-            console.log("handle")
-        }
+  const saveData = () => {
+    if (!validateOneActiveFinYear(data.active)) {
+      toast.error("Only one Fin year can be active...!", {
+        position: "top-center",
+      });
+      return;
     }
-
-    const saveData = () => {
-        if (!validateOneActiveFinYear(data.active)) {
-            toast.error("Only one Fin year can be active...!", { position: "top-center" })
-            return
-        }
-        if (!validateData(data)) {
-            toast.error("Please fill all required fields...!", { position: "top-center" })
-            return
-        }
-        if (!window.confirm("Are you sure save the details ...?")) {
-            return
-        }
-        if (id) {
-            handleSubmitCustom(updateData, data, "Updated")
-        } else {
-            handleSubmitCustom(addData, data, "Added")
-        }
+    if (!validateData(data)) {
+      toast.error("Please fill all required fields...!", {
+        position: "top-center",
+      });
+      return;
     }
+    if (!window.confirm("Are you sure save the details ...?")) {
+      return;
+    }
+    if (id) {
+      handleSubmitCustom(updateData, data, "Updated");
+    } else {
+      handleSubmitCustom(addData, data, "Added");
+    }
+  };
 
-    const deleteData = async () => {
-        if (id) {
-            if (!window.confirm("Are you sure to delete...?")) {
-                return
-            }
-            try {
-                let deldata = await removeData(id).unwrap();
-                if (deldata?.statusCode == 1) {
-                    toast.error(deldata?.message)
-                    return
-                }
-                setId("");
-                toast.success("Deleted Successfully");
-                setForm(false)
-            } catch (error) {
-                toast.error("something went wrong")
-            }
-            ;
+  const deleteData = async () => {
+    if (id) {
+      if (!window.confirm("Are you sure to delete...?")) {
+        return;
+      }
+      try {
+        let deldata = await removeData(id).unwrap();
+        if (deldata?.statusCode == 1) {
+          toast.error(deldata?.message);
+          return;
         }
+        setId("");
+        toast.success("Deleted Successfully");
+        setForm(false);
+      } catch (error) {
+        toast.error("something went wrong");
+      }
     }
+  };
 
-    const handleKeyDown = (event) => {
-        let charCode = String.fromCharCode(event.which).toLowerCase();
-        if ((event.ctrlKey || event.metaKey) && charCode === 's') {
-            event.preventDefault();
-            saveData();
-        }
+  const handleKeyDown = (event) => {
+    let charCode = String.fromCharCode(event.which).toLowerCase();
+    if ((event.ctrlKey || event.metaKey) && charCode === "s") {
+      event.preventDefault();
+      saveData();
     }
+  };
 
-    const onNew = () => { setId(""); setReadOnly(false); setForm(true); setSearchValue("") }
+  const onNew = () => {
+    setId("");
+    setReadOnly(false);
+    setForm(true);
+    setSearchValue("");
+    setTo("")
+    setFrom("")
+  };
 
-    function onDataClick(id) {
-        setId(id);
-        setForm(true);
-    }
-    const tableHeaders = ["S.NO", "from", "to", "Status", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
-    const tableDataNames = ["index+1", "dataObj.from","dataObj.to", 'dataObj.active ? ACTIVE : INACTIVE', " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " "]
-    return (
-        <div onKeyDown={handleKeyDown}>
-            <div className='w-full flex justify-between mb-2 items-center px-0.5'>
-                <h5 className='my-1'>Fin Year Master</h5>
-                <div className='flex items-center'>
-                    <button onClick={() => { setForm(true); onNew() }} className='bg-green-500 text-white px-3 py-1 button rounded shadow-md'>+ New</button>
-                </div>
-            </div>
-            <div className='w-full flex items-start'>
-                <Mastertable
-                    header={'Fin Year list'}
-                    searchValue={searchValue}
-                    setSearchValue={setSearchValue}
-                    onDataClick={onDataClick}
-                    // setOpenTable={setOpenTable}
-                    tableHeaders={tableHeaders}
-                    tableDataNames={tableDataNames}
-                    data={allData?.data}
-                    loading={
-                        isLoading || isFetching
-                    } />
-            </div>
-            {form === true && <Modal isOpen={form} form={form} widthClass={"w-[40%] h-[50%]"} onClose={() => { setForm(false); setErrors({}); }}>
-                <MastersForm
-                    onNew={onNew}
-                    onClose={() => {
+  function onDataClick(id) {
+    setId(id);
+    setForm(true);
+  }
+  const tableHeaders = [
+    "S.NO",
+    "From",
+    "To",
+    "Status",
+    " ",
+    " ",
+    " ",
+    " ",
+    " ",
+    " ",
+    " ",
+    " ",
+    " ",
+    " ",
+    " ",
+  ];
+  const tableDataNames = [
+    "index+1",
+    "dataObj.from",
+    "dataObj.to",
+    "dataObj.active ? ACTIVE : INACTIVE",
+    " ",
+    " ",
+    " ",
+    " ",
+    " ",
+    " ",
+    " ",
+    " ",
+    " ",
+    " ",
+    " ",
+  ];
+  const handleView = (id) => {
+    setId(id);
+    setForm(true);
+    setReadOnly(true);
+      console.log("view");
+    
+  };
+  const handleEdit = (id) => {
+    setId(id);
+    setForm(true);
+    setReadOnly(false);
+    console.log("Edit");
+    
+  };
+  const columns = [
+    {
+      header: "S.No",
+      accessor: (item, index) => index + 1,
+      className: "font-medium text-gray-900 w-12  text-center",
+    },
+
+    {
+      header: "From",
+      accessor: (item) =>
+        item.from ? new Date(item.from).toISOString().split("T")[0] : "",
+      //   cellClass: () => "font-medium  text-gray-900",
+      className: "font-medium text-gray-900 text-center uppercase w-36",
+    },
+    {
+      header: "To",
+      accessor: (item) =>
+        item.to ? new Date(item.to).toISOString().split("T")[0] : "",
+      //   cellClass: () => "font-medium text-gray-900",
+      className: "font-medium text-gray-900 text-center uppercase w-36",
+    },
+    {
+      header: "Code",
+      accessor: (item) => item?.code,
+      //   cellClass: () => "font-medium text-gray-900",
+      className: "font-medium text-gray-900 text-center uppercase w-36",
+    },
+    {
+      header: "",
+      accessor: (item) => "",
+      //   cellClass: () => "font-medium text-gray-900",
+      className: "font-medium text-gray-900 uppercase w-[65%]",
+    },
+  ];
+  return (
+    <div onKeyDown={handleKeyDown} className="p-1 ">
+      <div className="w-full flex bg-white p-1 justify-between  items-center">
+        <h1 className="text-2xl font-bold text-gray-800">Fin Year Master</h1>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => {
+              setForm(true);
+              onNew();
+            }}
+            className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+          >
+            + Add New Fin Year
+          </button>
+        </div>
+      </div>
+      {/* <div className="w-full flex items-start">
+        <Mastertable
+          header={"Fin Year list"}
+          searchValue={searchValue}
+          setSearchValue={setSearchValue}
+          onDataClick={onDataClick}
+          // setOpenTable={setOpenTable}
+          tableHeaders={tableHeaders}
+          tableDataNames={tableDataNames}
+          data={allData?.data}
+          loading={isLoading || isFetching}
+        />
+      </div> */}
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-3">
+        <ReusableTable
+          columns={columns}
+          data={allData?.data}
+          onView={handleView}
+          onEdit={handleEdit}
+          onDelete={deleteData}
+          itemsPerPage={10}
+        />
+      </div>
+      {form === true && (
+        <Modal
+          isOpen={form}
+          form={form}
+          widthClass={"w-[40%] h-[60%]"}
+          onClose={() => {
+            setForm(false);
+            setErrors({});
+          }}
+        >
+        
+          <div className="h-full flex flex-col bg-[f1f1f0]">
+            <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
+              <div className="flex items-center gap-2">
+                <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
+                  {id
+                    ? !readOnly
+                      ? "Edit Fin year Master"
+                      : "Fin year Master"
+                    : "Add New Fin year"}
+                </h2>
+              </div>
+              <div className="flex gap-2">
+                <div>
+                  {readOnly && (
+                    <button
+                      type="button"
+                      onClick={() => {
                         setForm(false);
                         setSearchValue("");
                         setId(false);
-                    }}
-                    model={MODEL}
-                    childRecord={childRecord.current}
-                    saveData={saveData}
-                    setReadOnly={setReadOnly}
-                    deleteData={deleteData}
-                    readOnly={readOnly}
-                    emptyErrors={() => setErrors({})}
-                >
-                    <fieldset className=' rounded mt-2'>
-                        <div className=''>
-                            <div className="flex flex-wrap justify-between">
-                                <div className='mb-3 w-[48%]'>
-                                    <DateInput name="From" value={from} setValue={setFrom} required={true} readOnly={readOnly} disabled={(childRecord.current > 0)} />
-                                </div>
-                                <div className='mb-3 w-[48%]'>
-                                    <DateInput name="To" value={to} setValue={setTo} required={true} readOnly={readOnly} disabled={(childRecord.current > 0)} />
-                                </div>
-                            </div>
-                            <div className='mb-3 w-[48%]'>
-                                <DisabledInput name="Short Code" value={code} disabled={(childRecord.current > 0)} />
-                            </div>
+                      }}
+                      className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </div>
+                <div className="flex gap-2">
+                  {!readOnly && (
+                    <button
+                      type="button"
+                      onClick={saveData}
+                      className="px-3 py-1 hover:bg-green-600 hover:text-white rounded text-green-600 
+                  border border-green-600 flex items-center gap-1 text-xs"
+                    >
+                      <Check size={14} />
+                      {id ? "Update" : "Save"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
 
-                            <div className='mb-5'>
-                                {/* <CheckBox name="Active" readOnly={readOnly} value={active} setValue={setActive} /> */}
-                                <ToggleButton name="Status" options={statusDropdown} value={active} setActive={setActive} required={true} readOnly={readOnly} />
-                            </div>
+            <div className="flex-1 overflow-auto p-3">
+              <div className="grid grid-cols-1  gap-3  h-full">
+                <div className="lg:col-span- space-y-3">
+                  <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
+                    <div className="space-y-2 w-[50%]">
+                     
+                      <DateInput
+                        name="From"
+                        value={from}
+                        setValue={setFrom}
+                        required={true}
+                        readOnly={readOnly}
+                        disabled={childRecord.current > 0}
+                      />
 
-                        </div>
-                    </fieldset>
-                </MastersForm>
-            </Modal>}
+                      {errors.name && (
+                        <span className="text-red-500 text-xs ml-1">
+                          {errors.name}
+                        </span>
+                      )}
 
-        </div>
-    )
+                      <div className="">
+                        <DateInput
+                          name="To"
+                          value={to}
+                          setValue={setTo}
+                          required={true}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                        />
+                      </div>
+                      <div>
+                        <ReusableInput
+                          name="Short Code"
+                          label="Short Code"
+                          value={code}
+                          setCode={setCode}
+                          disabled={childRecord.current > 0}
+                        />
+                      </div>
+
+                      <div>
+                        <ToggleButton
+                          name="Status"
+                          options={statusDropdown}
+                          value={active}
+                          setActive={setActive}
+                          required={true}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* </MastersForm> */}
+        </Modal>
+      )}
+    </div>
+  );
 }

@@ -40,3 +40,6 @@ export { default as PartyMaster } from './PartyMaster'
 export { default as UomMaster } from "./UomMaster";
 export { default as PartyMasterNew } from './PartyMasterNew';
 export {default as SampleEntry} from './SampleEntry'
+export {default as BuyerSuffling} from './BuyerSuffling'
+export {default as Designation} from './DesignationMaster'
+export {default as PayFrequency} from './PayFrequency'

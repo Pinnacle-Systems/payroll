@@ -134,9 +134,15 @@ const Header = ({ profile, setProfile, setLogout, logout }) => {
   // const masters = allowedPages.filter((page) => page.type === "Masters")
   
   const masters = allowedPages.filter((page) => page.type === "Masters" && page.active === true)
+
+
+  
  
   
   const mastersGroup = [...new Set(masters.map(page => page.pageGroupId))].map(pageId => { return { id: pageId, name: findElement(pageId, pageGroup?.data) } }).filter(group => group.name);
+  console.log( mastersGroup,"mastersGroup");
+   
+
   
   const transactions = allowedPages.filter((page) => page.type === "Transactions")
   const transactionsGroup = [...new Set(transactions.map(page => page.pageGroupId))].map(pageId => { return { id: pageId, name: findElement(pageId, pageGroup?.data) } })

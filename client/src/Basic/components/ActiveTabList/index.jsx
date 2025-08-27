@@ -23,6 +23,10 @@ import {
   PartyMasterNew,
   PartyMaster,
   SampleEntry,
+  BuyerSuffling,
+  Designation,
+  PayFrequency,
+ 
 
 } from "../../components";
 
@@ -84,8 +88,10 @@ const ActiveTabList = () => {
     "CUSTOMER / SUPPLIER  MASTER" : <PartyMasterNew/>,
     "LAB DIP" : <LabDip/>,
     "SHIPPED QUANTITY" : <NewPurchaseInward/>,
-    "SAMPLE ENTRY" : <SampleEntry/>
-
+    "SAMPLE ENTRY" : <SampleEntry/>,
+    "BUYER SUFFLING" : <BuyerSuffling/>,
+    "DESIGNATION MASTER":<Designation/>,
+    "PAY FREQUENCY" : <PayFrequency/>
 
 
 

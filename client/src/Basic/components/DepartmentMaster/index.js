@@ -15,6 +15,7 @@ import ReportTemplate from "../ReportTemplate";
 import Mastertable from "../MasterTable/Mastertable";
 import MastersForm from "../MastersForm/MastersForm";
 import { statusDropdown } from "../../../Utils/DropdownData";
+import { useGetdesignationByIdQuery } from "../../../redux/services/DesignationMasterService";
 
 const MODEL = "Department Master";
 
@@ -44,7 +45,7 @@ export default function Form() {
         data: singleData,
         isFetching: isSingleFetching,
         isLoading: isSingleLoading,
-    } = useGetDepartmentByIdQuery(id, { skip: !id });
+    } = useGetdesignationByIdQuery(id, { skip: !id });
 
 
     const [addData] = useAddDepartmentMutation();

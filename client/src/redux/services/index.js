@@ -42,7 +42,7 @@ export { default as machineMasterApi } from "./MachineMasterService"
 export { default as CertificateMaster } from './CertificateMasterService'
 export {default as partyMasterNewApi} from './PartyMasterNewService'
 export {default as sampleEntryApi} from './sampleEntryService'
-
+export {default as designationMasterApi} from  './DesignationMasterService'
 
 
 

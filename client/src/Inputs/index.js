@@ -2217,7 +2217,7 @@ console.log(data,"commonTable")
               </th>
             ))}
             {rowActions && (
-              <th className="px-4 py-2 text-center font-medium text-[13px] justify-end">Actions</th>
+              <th className="px-4 py-2 text-center  font-medium text-[13px] justify-end">Actions</th>
             )}
           </tr>
         </thead>
@@ -2244,11 +2244,11 @@ console.log(data,"commonTable")
                   </td>
                 ))}
                 {rowActions && (
-                  <td className=" w-[30px] border-gray-200 gap-1   h-8 justify-end">
+                  <td className=" w-[40px]  border-gray-200 gap-1 border-l p-2  h-8 justify-end">
                     <div className="flex">
                       {onView && (
                         <button
-                          className="text-blue-600  flex items-center   px-1  bg-blue-50 rounded"
+                          className="text-blue-600  flex items-center   px-2 mr-2  bg-blue-50 rounded"
                           onClick={() => onView(item.id)}
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -2259,7 +2259,7 @@ console.log(data,"commonTable")
                       )}
                       {onEdit && (
                         <button
-                          className="text-green-600 gap-1 px-1   bg-green-50 rounded"
+                          className="text-green-600 gap-1 px-1 mr-2   bg-green-50 rounded"
                           onClick={() => onEdit(item.id)}
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">

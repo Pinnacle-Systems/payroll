@@ -93,8 +93,8 @@ const Home = () => {
               <div className="p-2">
                 <ActiveTabList />
               </div>
-              {/* {openTabs.tabs.length === 0 && <HomePage setProfile={setProfile} />} */}
-              {openTabs.tabs.length === 0 &&  <UserRoles />}
+              {openTabs.tabs.length === 0 && <HomePage setProfile={setProfile} />}
+              {/* {openTabs.tabs.length === 0 &&  <UserRoles />} */}
             </div>
           )}
         </div>
