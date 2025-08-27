@@ -42,6 +42,8 @@ import PurchaseOrders from "../../../Uniform/Components/styleesheet";
 import PoForm from "../../../Uniform/Components/PurchaseOrder";
 import PartyDetailModal from "../../../Uniform/Components/styleesheet/partyMaster";
 
+import HRTemplateMaster from "../HRTemplateMaster";
+
 const ActiveTabList = () => {
   const openTabs = useSelector((state) => state.openTabs);
 
@@ -91,7 +93,8 @@ const ActiveTabList = () => {
     "SAMPLE ENTRY" : <SampleEntry/>,
     "BUYER SUFFLING" : <BuyerSuffling/>,
     "DESIGNATION MASTER":<Designation/>,
-    "PAY FREQUENCY" : <PayFrequency/>
+    "PAY FREQUENCY" : <PayFrequency/>,
+    "HR TEMPLATE MASTER" :<HRTemplateMaster/>
 
 
 

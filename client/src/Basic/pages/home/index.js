@@ -86,15 +86,15 @@ const Home = () => {
                 setProfile={setProfile}
                 setLogout={setLogout}
               />
-              {/* <Sidebar isOpen={isOpen} setIsOpen={setIsOpen}
+              <Sidebar isOpen={isOpen} setIsOpen={setIsOpen}
                 isMainDropdownOpen={isMainDropdownOpen}
-                setIsMainDropdownOpen={setIsMainDropdownOpen} /> */}
+                setIsMainDropdownOpen={setIsMainDropdownOpen} />
 
               <div className="p-2">
                 <ActiveTabList />
               </div>
               {openTabs.tabs.length === 0 && <HomePage setProfile={setProfile} />}
-              {/* {openTabs.tabs.length === 0 &&  <UserRoles />} */}
+             
             </div>
           )}
         </div>

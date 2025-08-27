@@ -93,6 +93,6 @@ export const PARTY_MASTER_NEW_API = "purchaseInwardEntry"
 export const SAMPLE_ENTRY_API = "sampleEntry"
 export const DESIGNATION_API = "designation"
 export const PAYFREQUENCY_API = "payfrequency"
-
+export const HRTEMPLATE_API = "hrTemplate"
 
 

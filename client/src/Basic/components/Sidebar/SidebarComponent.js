@@ -6,7 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { Search } from "lucide-react";
 
 
-
+import designation from './images/designation.png'
+import pay from './images/money.png'
 import country from './images/flag.png';
 import employee from "./images/employee.png";
 import state from "./images/map.png";
@@ -122,6 +123,15 @@ const SidebarComponent = ({ logo, groups, pages, isMainDropdownOpen, setIsMainDr
         "LOOP LENGTH MASTER": <img />,
         "DESIGN MASTER": <img />,
 
+
+        "DESIGNATION MASTER" : <span className="w-[23px]  flex justify-center items-center bg-white border-2 border-white rounded shadow">
+                <img src={designation} alt="designation" className="w-[23px]  flex justify-center items-center bg-white border-2 border-white rounded shadow"/>
+            </span>,
+
+            "PAY FREQUENCY" :<span className="w-[23px]  flex justify-center items-center bg-white border-2 border-white rounded shadow">
+                <img src={pay} alt="designation" className="w-[23px]  flex justify-center items-center bg-white border-2 border-white rounded shadow"/>
+            </span>
+
     }
 
 
@@ -142,7 +152,8 @@ const SidebarComponent = ({ logo, groups, pages, isMainDropdownOpen, setIsMainDr
             {isMainDropdownOpen === true && (
                 <div className=" "  >
 
-                    <div className=" bg-white p-4 rounded-lg shadow-2xl outline outline-1 outline-gray-300 h-[650px] overflow-y-auto w-[400px] transition-all duration-200 space-y-">
+                    <div className=" bg-white p-4 rounded-lg shadow-2xl outline outline-1 outline-gray-300 h-[650px] overflow-y-auto w-[400px] transition-all duration-200 space-y-4">
+                        <h1 className="text-lg font-bold">Masters</h1>
                         <div className='relative'>
                             <input className=' w-full pl-3 pr-10 py-2 text-sm text-gray-700 bg-gray-100 rounded-full outline-none focus:ring-2 focus:ring-blue-500'
                                 placeholder='search'
@@ -167,7 +178,7 @@ const SidebarComponent = ({ logo, groups, pages, isMainDropdownOpen, setIsMainDr
                                     <div className={`w-full text-[11px] text-left  items-center  rounded cursor-default`} >
                                         {search.length > 0 ? "" :
                                             <div className="text-[14px] font-semibold ml-2.5 text-gray-800 mt-2">
-                                                {(group?.name + " MODULE").toLowerCase().replace(/\b[a-z]/g, char => char.toUpperCase())}
+                                                {(group?.name + " MASTER").toLowerCase().replace(/\b[a-z]/g, char => char.toUpperCase())}
                                             </div>}
 
                                         <ul className=" grid grid-cols-4 gap-2 pt-1">

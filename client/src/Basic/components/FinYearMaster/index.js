@@ -16,7 +16,7 @@ import {
   DisabledInput,
   ToggleButton,
   ReusableTable,
-  
+  TextInput,
 } from "../../../Inputs";
 import ReportTemplate from "../ReportTemplate";
 import { getYearShortCode } from "../../../Utils/helper";
@@ -26,7 +26,7 @@ import MastersForm from "../MastersForm/MastersForm";
 import { statusDropdown } from "../../../Utils/DropdownData";
 import moment from "moment";
 
-import { Check } from "lucide-react";
+import { Check, Power } from "lucide-react";
 import Modal from "../../../UiComponents/Modal";
 import { ReusableInput } from "../../../Uniform/Components/styleesheet/CommonInput";
 
@@ -43,7 +43,7 @@ export default function Form() {
   const [code, setCode] = useState("");
   const childRecord = useRef(0);
   const [errors, setErrors] = useState({});
-  console.log(id, "id");
+
 
   const params = {
     companyId: secureLocalStorage.getItem(
@@ -68,10 +68,10 @@ export default function Form() {
   const syncFormWithDb = useCallback(
     (data) => {
       if (id) {
-        setReadOnly(true);
+        // setReadOnly(true);
         setTo(data?.to ? moment.utc(data.to).format("YYYY-MM-DD") : "");
         setFrom(data?.from ? moment.utc(data.from).format("YYYY-MM-DD") : "");
-        setActive(id ? (data?.active ? data.active : false) : true);
+         setActive(data?.active);
         setCode(data?.code);
       }
     },
@@ -176,8 +176,9 @@ export default function Form() {
     setReadOnly(false);
     setForm(true);
     setSearchValue("");
-    setTo("")
-    setFrom("")
+    setTo("");
+    setFrom("");
+    setCode('')
   };
 
   function onDataClick(id) {
@@ -222,16 +223,25 @@ export default function Form() {
     setId(id);
     setForm(true);
     setReadOnly(true);
-      console.log("view");
-    
+    console.log("view");
   };
   const handleEdit = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(false);
     console.log("Edit");
-    
   };
+ 
+  const ACTIVE = (
+    <div className="bg-gradient-to-r from-green-200 to-green-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-green-500 shadow-lg text-white hover:scale-110 transition-transform duration-300">
+      <Power size={10} />
+    </div>
+  );
+  const INACTIVE = (
+    <div className="bg-gradient-to-r from-red-200 to-red-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-red-500 shadow-lg text-white hover:scale-110 transition-transform duration-300">
+      <Power size={10} />
+    </div>
+  );
   const columns = [
     {
       header: "S.No",
@@ -255,7 +265,13 @@ export default function Form() {
     },
     {
       header: "Code",
-      accessor: (item) => item?.code,
+      accessor: (item) => item.code,
+      //   cellClass: () => "font-medium text-gray-900",
+      className: "font-medium text-gray-900 text-center uppercase w-36",
+    },
+     {
+      header: "Status",
+      accessor:  (item) => item.active ? ACTIVE : INACTIVE,
       //   cellClass: () => "font-medium text-gray-900",
       className: "font-medium text-gray-900 text-center uppercase w-36",
     },
@@ -263,7 +279,7 @@ export default function Form() {
       header: "",
       accessor: (item) => "",
       //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 uppercase w-[65%]",
+      className: "font-medium text-gray-900 uppercase w-[60%]",
     },
   ];
   return (
@@ -305,6 +321,8 @@ export default function Form() {
           itemsPerPage={10}
         />
       </div>
+      {console.log(readOnly,"con")
+      }
       {form === true && (
         <Modal
           isOpen={form}
@@ -313,9 +331,9 @@ export default function Form() {
           onClose={() => {
             setForm(false);
             setErrors({});
+            
           }}
         >
-        
           <div className="h-full flex flex-col bg-[f1f1f0]">
             <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
               <div className="flex items-center gap-2">
@@ -364,13 +382,13 @@ export default function Form() {
                 <div className="lg:col-span- space-y-3">
                   <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
                     <div className="space-y-2 w-[50%]">
-                     
                       <DateInput
                         name="From"
                         value={from}
                         setValue={setFrom}
                         required={true}
                         readOnly={readOnly}
+                        
                         disabled={childRecord.current > 0}
                       />
 
@@ -391,13 +409,20 @@ export default function Form() {
                         />
                       </div>
                       <div>
-                        <ReusableInput
-                          name="Short Code"
-                          label="Short Code"
+                        <label className="block text-xs text-black mb-1">
+                            Short Code
+                        <input
+                          name="code"
+                           className={`w-full px-2  py-1 mt-2 text-xs border border-gray-300 rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm`}
                           value={code}
-                          setCode={setCode}
+                          
+                          onChange={(e) =>setCode(e.target.value)}
+                          readOnly={readOnly}
                           disabled={childRecord.current > 0}
                         />
+                        </label>
                       </div>
 
                       <div>
