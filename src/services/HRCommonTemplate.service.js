@@ -15,7 +15,14 @@ async function getNextDocId(
   endTime,
   isTaxBill
 ) {
-  console.log("argumnts : ", branchId, shortCode, startTime, endTime, isTaxBill);
+  console.log(
+    "argumnts : ",
+    branchId,
+    shortCode,
+    startTime,
+    endTime,
+    isTaxBill
+  );
 
   let lastObject = await prisma.hRCommonTemplate.findFirst({
     where: {
@@ -29,41 +36,45 @@ async function getNextDocId(
   const code = (
     typeof isTaxBill === "undefined" ? undefined : JSON.parse(isTaxBill)
   )
-    ? "COM/TEM"
-    : "COM/TEM";
+    ? "TEM"
+    : "TEM";
   const branchObj = await getTableRecordWithId(branchId, "branch");
   // let newDocId = `${branchObj.branchCode}/${shortCode}/${code}/1`;
-  let newDocId = `${code}/1`;
+  let newDocId = `${branchObj.branchCode}/${code}/1`;
   if (lastObject) {
-    newDocId = `${code}/${
-      parseInt(lastObject.docId.split("/").at(-1)) + 1
-    }`;
+    newDocId = `${branchObj.branchCode}/${code}/${parseInt(lastObject.docId.split("/").at(-1)) + 1}`;
   }
-
 
   return newDocId;
 }
 
 async function get(req) {
-  const { companyId, active,branchId, finYearId,searchDocId, } = req.query;
+  const { companyId, active, branchId, finYearId, searchDocId } = req.query;
 
-  console.log(companyId, active, finYearId,"received");
-  
+  console.log(companyId, active, finYearId, "received");
+
   const data = await prisma.hRCommonTemplate.findMany({
     where: {
-    //   companyId: companyId ? parseInt(companyId) : undefined,
-    //   active: active ? Boolean(active) : undefined,
-       docId: Boolean(searchDocId)
+      //   companyId: companyId ? parseInt(companyId) : undefined,
+      //   active: active ? Boolean(active) : undefined,
+      docId: Boolean(searchDocId)
         ? {
             contains: searchDocId,
           }
         : undefined,
     },
+    include: {
+      employeeCategory: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
   });
   let finYearDate = await getFinYearStartTimeEndTime(finYearId);
- 
-   console.log(finYearDate,"finyear--");
-   
+
+  console.log(finYearDate, "finyear--");
 
   const shortCode = finYearDate
     ? getYearShortCodeForFinYear(
@@ -76,7 +87,7 @@ async function get(req) {
         branchId,
         shortCode,
         finYearDate?.startDateStartTime,
-        finYearDate?.endDateEndTime,
+        finYearDate?.endDateEndTime
         // isTaxBill
       )
     : "";
@@ -89,6 +100,14 @@ async function getOne(id) {
   const data = await prisma.hRCommonTemplate.findUnique({
     where: {
       id: parseInt(id),
+    },
+    include: {
+      employeeCategory: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
   });
   if (!data) return NoRecordFound("hRCommonTemplate");
@@ -120,14 +139,13 @@ async function getSearch(req) {
 }
 
 async function create(body) {
-  const { name, branchId, companyId, active, description, docId } = await body;
+  const { branchId, companyId, active, docId, employeeCategoryId } = await body;
   const data = await prisma.hRCommonTemplate.create({
     data: {
-      name,
       companyId: parseInt(companyId),
       active,
       branchId: parseInt(branchId),
-      description,
+      employeeCategoryId: parseInt(employeeCategoryId),
       docId,
     },
   });
@@ -135,7 +153,7 @@ async function create(body) {
 }
 
 async function update(id, body) {
-  const { name, branchId, companyId, active, description, docId } = await body;
+  const { branchId, companyId, active, docId, employeeCategoryId } = await body;
   const dataFound = await prisma.hRCommonTemplate.findUnique({
     where: {
       id: parseInt(id),
@@ -147,11 +165,10 @@ async function update(id, body) {
       id: parseInt(id),
     },
     data: {
-      name,
       active,
       companyId: parseInt(companyId),
       branchId: parseInt(branchId),
-      description,
+      employeeCategoryId: parseInt(employeeCategoryId),
       docId,
     },
   });

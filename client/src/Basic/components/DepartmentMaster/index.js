@@ -46,14 +46,13 @@ export default function Form() {
   };
   const {
     data: allData,
-    isLoading,
-    isFetching,
+    
   } = useGetDepartmentQuery({ params, searchParams: searchValue });
   const {
     data: singleData,
     isFetching: isSingleFetching,
     isLoading: isSingleLoading,
-  } = useGetdesignationByIdQuery(id, { skip: !id });
+  } = useGetDepartmentByIdQuery(id, { skip: !id });
 
   const [addData] = useAddDepartmentMutation();
   const [updateData] = useUpdateDepartmentMutation();
@@ -61,18 +60,12 @@ export default function Form() {
 
   const syncFormWithDb = useCallback(
     (data) => {
-      if (!id) {
-        setReadOnly(false);
-        setName("");
-        setCode("");
-        setActive(true);
-        // setActive(id ? data?.active ?? true : false);
-      } else {
-        setReadOnly(true);
+   
+        // setReadOnly(true);
         setName(data?.name || "");
         setCode(data?.code || "");
         setActive(id ? data?.active ?? false : true);
-      }
+      
     },
     [id]
   );
@@ -80,6 +73,9 @@ export default function Form() {
   useEffect(() => {
     syncFormWithDb(singleData?.data);
   }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
+
+  console.log(singleData?.data,"singleData?.data");
+  
 
   const data = {
     name,
@@ -125,7 +121,7 @@ export default function Form() {
     }
   };
 
-  const deleteData = async () => {
+  const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
         return;
@@ -250,9 +246,9 @@ export default function Form() {
     console.log("Edit");
   };
   return (
-    <div onKeyDown={handleKeyDown} className="p-1 ">
-      <div className="w-full flex bg-white p-1 justify-between  items-cente">
-        <h1 className="my-1">Department Master</h1>
+    <div onKeyDown={handleKeyDown} className="p-1">
+      <div className="w-full flex bg-white p-1 justify-between  items-center">
+        <h1 className="text-2xl font-bold text-gray-800">Department Master</h1>
         <div className="flex items-center">
           <button
             onClick={() => {

@@ -34,7 +34,7 @@ import {
 } from "../../../redux/services/HrTemplateService";
 import { getCommonParams } from "../../../Utils/helper";
 
-const HRTemplateMaster = () => {
+const ShiftMaster = () => {
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
 
@@ -57,8 +57,8 @@ const HRTemplateMaster = () => {
   const { branchId } = params;
 
   const { data: company } = useGetCompanyQuery({ params });
-  const [companyName, setCompanyName] = useState(company.data[0].name);
-  const [companyCode, setCompanyCode] = useState(company.data[0].code);
+  const [companyName, setCompanyName] = useState(company?.data[0]?.name);
+  const [companyCode, setCompanyCode] = useState(company?.data[0]?.code);
   const {
     data: allData,
     isLoading,
@@ -95,8 +95,8 @@ const HRTemplateMaster = () => {
         setName("");
         setDescription("");
         setActive(true);
-        setCompanyName(company.data[0].name);
-        setCompanyCode(company.data[0].code);
+        setCompanyName(company?.data[0].name);
+        setCompanyCode(company?.data[0].code);
       } else {
         // setReadOnly(true);
         setName(data?.name || "");
@@ -158,7 +158,7 @@ const HRTemplateMaster = () => {
     }
   };
 
-  const deleteData = async () => {
+  const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
         return;
@@ -225,23 +225,23 @@ const HRTemplateMaster = () => {
     },
 
     {
-      header: "Template Name",
+      header: "Shift Name",
       accessor: (item) => item?.name,
       //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-72",
+      className: "font-medium text-gray-900 text-center uppercase w-32",
     },
 
     {
       header: "Status",
       accessor: (item) => (item.active ? ACTIVE : INACTIVE),
       //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-36",
+      className: "font-medium text-gray-900 text-center uppercase w-16",
     },
     {
       header: "",
       accessor: (item) => "",
       //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 uppercase w-[65%]",
+      className: "font-medium text-gray-900 uppercase w-[75%]",
     },
   ];
   function onDataClick(id) {
@@ -254,7 +254,7 @@ const HRTemplateMaster = () => {
       <div onKeyDown={handleKeyDown} className="p-1 ">
         <div className="w-full flex bg-white p-1 justify-between  items-center">
           <h1 className="text-2xl font-bold text-gray-800">
-            HR Template Master
+            Shift Master
           </h1>
           <div className="flex items-center gap-4">
             <button
@@ -264,7 +264,7 @@ const HRTemplateMaster = () => {
               }}
               className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
             >
-              + Add New HR Template
+              + Add New Shift Template
             </button>
           </div>
         </div>
@@ -283,7 +283,7 @@ const HRTemplateMaster = () => {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[45%]  h-[70%]"}
+            widthClass={"w-[45%]  h-[65%]"}
             onClose={() => {
               setForm(false);
               setErrors({});
@@ -295,9 +295,9 @@ const HRTemplateMaster = () => {
                   <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
                     {id
                       ? !readOnly
-                        ? "Edit HR Template Master"
-                        : "HR Template Master"
-                      : "Add New HR Template"}
+                        ? "Edit Shift Master"
+                        : "Shift Master"
+                      : "Add New Shift"}
                   </h2>
                 </div>
                 <div className="flex gap-2">
@@ -336,19 +336,9 @@ const HRTemplateMaster = () => {
                 <div className="grid grid-cols-1  gap-3  h-full">
                   <div className="lg:col-span- space-y-3">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
-                      <div className="space-y-4 ">
-                        <div className="flex  gap-x-8">
-                          <div className="w-72">
-                            <TextInput
-                              name="Company Name"
-                              type="text"
-                              value={companyName}
-                              setValue={setCompanyName}
-                              required={true}
-                              // readOnly={readOnly}
-                              disabled={true}
-                            />
-                          </div>
+                      <div className="space-y-4 w-[50%]">
+                     
+                         
 
                           <TextInput
                             name="Company Code"
@@ -359,22 +349,22 @@ const HRTemplateMaster = () => {
                             // readOnly={readOnly}
                             disabled={true}
                           />
-                        </div>
-                        <div className="flex gap-x-8">
+                       
+                      
                           <div className="w-42">
                             <TextInput
-                              name="Template Code"
+                              name="Shift Code"
                               type="text"
                               value={docId}
-                              setValue={setDocId}
+                              // setValue={setDocId}
                               required={true}
                               readOnly={readOnly}
                               disabled={childRecord.current > 0}
                             />
                           </div>
-                          <div className="w-72">
+                        
                             <TextInput
-                              name="Template Name"
+                              name="Shift Name"
                               type="text"
                               value={name}
                               setValue={setName}
@@ -382,22 +372,9 @@ const HRTemplateMaster = () => {
                               readOnly={readOnly}
                               disabled={childRecord.current > 0}
                             />
-                          </div>
-                        </div>
-                        <div className="w-60">
-                          <label className="block text-xs text-black mb-1">
-                            Template Description
-                          </label>
-                          <TextAreaInput
-                            name=""
-                            type="text"
-                            value={description}
-                            setValue={setDescription}
-                            // required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                          />
-                        </div>
+                          
+                        
+                  
 
                         <div className="mt-5">
                           <ToggleButton
@@ -422,4 +399,4 @@ const HRTemplateMaster = () => {
   );
 };
 
-export default HRTemplateMaster;
+export default ShiftMaster;

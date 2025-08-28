@@ -186,16 +186,7 @@ const Header = ({ profile, setProfile, setLogout, logout }) => {
 
       {/* Center Search Bar */}
       <div className="flex items-center gap-3 ml-[420px]  rounded-md">
-        <div className='relative'>
-          {/* <input
-            className='pl-3 pr-8 py-1 w-60 text-sm rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400'
-            placeholder='Search'
-            type='text'
-          /> */}
-          {/* <Search className='absolute right-2 top-1.5 text-neutral-500' size={16} />
-           */}
-               <PageSearch pageList={allowedPages} />
-        </div>
+      
 
         {/* Party Icon */}
         {/* <button
@@ -219,7 +210,11 @@ const Header = ({ profile, setProfile, setLogout, logout }) => {
       </div>
 
       {/* Right Side */}
-      <div className="flex items-center text-white space-x-4 text-sm">
+      <div className="flex items-center text-white space-x-6 text-sm">
+          <div className='relative'>
+         
+               <PageSearch pageList={allowedPages} />
+        </div>
          <p>WELCOME</p> &nbsp;{" "}
         <div className="text-white">{userName?.toUpperCase()}</div>
         <img

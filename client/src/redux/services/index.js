@@ -44,7 +44,7 @@ export {default as partyMasterNewApi} from './PartyMasterNewService'
 export {default as sampleEntryApi} from './sampleEntryService'
 export {default as designationMasterApi} from  './DesignationMasterService'
 export {default as hrTemplateMasterApi} from './HrTemplateService'
-export {default as HRCommonTemplateMasterAPi} from  './HRCommonTemplateservice'
+export {default as HRCommonTemplateMasterAPi} from  './HRCommonTemplate.service'
 export {default as ShiftTemplateMasterApi} from  './ShiftTemplateMaster'
 
 

@@ -19,7 +19,7 @@ import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
 
 import { getCommonParams } from "../../../Utils/helper";
-import { useAddHRCommonTemplateMutation, useDeleteHRCommonTemplateMutation, useGetHRCommonTemplateByIdQuery, useGetHRCommonTemplateQuery, useUpdateHRCommonTemplateMutation } from "../../../redux/services/HRCommonTemplateservice";
+import { useAddHRCommonTemplateMutation, useDeleteHRCommonTemplateMutation, useGetHRCommonTemplateByIdQuery, useGetHRCommonTemplateQuery, useUpdateHRCommonTemplateMutation } from "../../../redux/services/HRCommonTemplate.service";
 
 const ShiftTemplateMaster = () => {
     const [readOnly, setReadOnly] = useState(false);
