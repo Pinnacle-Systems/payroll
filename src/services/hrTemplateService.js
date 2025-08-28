@@ -32,11 +32,9 @@ async function getNextDocId(
     ? "SHF"
     : "SHF";
   const branchObj = await getTableRecordWithId(branchId, "branch");
-  let newDocId = `${code}/1`;
+    let newDocId = `${branchObj.branchCode}/${code}/1`;
   if (lastObject) {
-    newDocId = `${code}/${
-      parseInt(lastObject.docId.split("/").at(-1)) + 1
-    }`;
+     newDocId = `${branchObj.branchCode}/${code}/${parseInt(lastObject.docId.split("/").at(-1)) + 1}`;
   }
   console.log(newDocId, "newDocId");
 
