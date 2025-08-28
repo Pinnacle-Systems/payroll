@@ -30,8 +30,6 @@ const ShiftCommonTemplateMaster = () => {
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
 
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
   const [docId, setDocId] = useState("");
   const [active, setActive] = useState(true);
   const [errors, setErrors] = useState({});
@@ -80,16 +78,16 @@ const ShiftCommonTemplateMaster = () => {
     (data) => {
       if (!id) {
         // setReadOnly(false);
-        setName("");
-        setDescription("");
+     
         setActive(true);
+        setEmployeeCategoryId("");
         setCompanyName(company?.data[0].name);
         setCompanyCode(company?.data[0].code);
       } else {
         // setReadOnly(true);
-        setName(data?.name || "");
+       
         setDocId(data?.docId || "");
-        setDescription(data?.description || "");
+        
         setEmployeeCategoryId(data?.employeeCategoryId || "");
         setActive(id ? data?.active ?? false : true);
       }
@@ -101,9 +99,10 @@ const ShiftCommonTemplateMaster = () => {
     syncFormWithDb(singleData?.data);
   }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
 
+  console.log(singleData?.data,"singleData?.data");
+  
+
   const data = {
-    name,
-    description,
     docId,
     employeeCategoryId,
     active,
@@ -148,7 +147,7 @@ const ShiftCommonTemplateMaster = () => {
     }
   };
 
-  const deleteData = async () => {
+  const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
         return;
@@ -216,7 +215,7 @@ const ShiftCommonTemplateMaster = () => {
 
     {
       header: "Common Template Name",
-      accessor: (item) => item?.name,
+      accessor: (item) => item?.employeeCategory.name,
       //   cellClass: () => "font-medium  text-gray-900",
       className: "font-medium text-gray-900 text-center uppercase w-72",
     },
@@ -273,7 +272,7 @@ const ShiftCommonTemplateMaster = () => {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[45%]  h-[60%]"}
+            widthClass={"w-[45%]  h-[65%]"}
             onClose={() => {
               setForm(false);
               setErrors({});
@@ -374,7 +373,7 @@ const ShiftCommonTemplateMaster = () => {
                         </div> */}
                         <div className="w-42">
                           <label className="block text-xs text-black mb-1">
-                            Category
+                            Choose Template
                           </label>
                           <select
                             className="w-full px-2 h-[26px] text-[12px] border border-slate-300 rounded-md 

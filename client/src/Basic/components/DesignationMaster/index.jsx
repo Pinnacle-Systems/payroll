@@ -139,7 +139,7 @@ const Designation = () => {
     }
   };
 
-  const deleteData = async () => {
+  const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
         return;
@@ -363,31 +363,9 @@ const Designation = () => {
                   <div className="lg:col-span- space-y-3">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
                       <div className="space-y-4 w-[50%]">
-                        {/* <label className="block text-xs text-black mb-1">
-                      Department <span className="text-red-500">*</span>
-                      <select
-                        value={departmentId}
-                        onChange={(e) => setDepartmentId(e.target.value)}
-                        required
-                        className="w-full border p-1 rounded"
-                      >
-                        <option value="">-- Select Department --</option>
-                        {department?.data?.map((dept) => (
-                          <option key={dept.id} value={dept.id}>
-                            {dept.name}
-                          </option>
-                        ))}
-                      </select>
-                    </label> */}
+                    
 
-                        <TextInput
-                          name="Company Name"
-                          type="text"
-                          value={companyName}
-                          setValue={setCompanyName}
-                          required={true}
-                         disabled={true}
-                        />
+                        
 
                         <TextInput
                           name="Company Code"
