@@ -95,5 +95,6 @@ export const DESIGNATION_API = "designation"
 export const PAYFREQUENCY_API = "payfrequency"
 export const HRTEMPLATE_API = "hrTemplate"
 export const HRCommonTemplate_API = "HRCommonTemplate"
+export const SHIFT_TEMPLATE_API = "ShiftTemplate"
 
 

@@ -27,6 +27,7 @@ import {
   Designation,
   PayFrequency,
   HRCommomTemplateMaster,
+  ShiftTemplateMaster,
  
 
 } from "../../components";
@@ -96,8 +97,8 @@ const ActiveTabList = () => {
     "DESIGNATION MASTER":<Designation/>,
     "PAY FREQUENCY" : <PayFrequency/>,
     "HR TEMPLATE MASTER" :<HRTemplateMaster/>,
-    "HR COMMON TEMPLATE MASTER" :<HRCommomTemplateMaster/>
-
+    "HR COMMON TEMPLATE MASTER" :<HRCommomTemplateMaster/> ,
+    "SHIFT TEMPLATE MASTER" : <ShiftTemplateMaster/>
 
 
 

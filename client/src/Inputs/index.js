@@ -1218,7 +1218,8 @@ export const TextInput = ({
           ${readOnly || disabled
             ? "bg-gray-100 text-gray-500 cursor-not-allowed"
             : "bg-white hover:border-gray-400"}
-          ${className}`}
+          ${className}`
+        }
 
       />
     </div>
