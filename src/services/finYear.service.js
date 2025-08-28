@@ -41,19 +41,20 @@ async function getSearch(req) {
 }
 
 async function create(body) {
-    const { companyId, from, to, active } = await body
+    const { companyId, from, to, active,code } = await body
     const data = await prisma.finYear.create({
         data: {
             companyId: companyId ? parseInt(companyId) : null,
             from: new Date(from), to: new Date(to),
-            active
+            active,
+            code
         },
     });
     return { statusCode: 0, data };
 }
 
 async function update(id, body) {
-    const { companyId, from, to, active } = await body
+    const { companyId, from, to, active,code } = await body
     const dataFound = await prisma.finYear.findUnique({
         where: {
             id: parseInt(id)
@@ -67,7 +68,8 @@ async function update(id, body) {
         data: {
             companyId: parseInt(companyId),
             active: active,
-            from: new Date(from), to: new Date(to)
+            from: new Date(from), to: new Date(to),
+            code
         },
     })
     return { statusCode: 0, data };

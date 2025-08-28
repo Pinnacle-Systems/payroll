@@ -158,11 +158,13 @@ const Header = ({ profile, setProfile, setLogout, logout }) => {
     <div className='py-1 w-full flex justify-between items-center bg-black shadow-sm fixed z-50 px-4'>
       {/* Logo */}
      
-        <img className="rounded-lg h-8 w-32" src={logo3}   alt="peenics logo" />
+        {/* <img className="rounded-lg h-8 w-32" src={logo3}   alt="peenics logo" /> */}
+        <h1 className="text-white">PAY ROLL</h1>
+
 
 
       {/* dropdown  */}
-         <div className="drop">
+         {/* <div className="drop">
             <div
               className={`block mt-4 lg:inline-block lg:mt-0  mr-4 ${navBatItemsStyle}`}
             >
@@ -180,10 +182,10 @@ const Header = ({ profile, setProfile, setLogout, logout }) => {
             </div>
 
 
-          </div>
+          </div> */}
 
       {/* Center Search Bar */}
-      <div className="flex items-center gap-3  rounded-md">
+      <div className="flex items-center gap-3 ml-[420px]  rounded-md">
         <div className='relative'>
           {/* <input
             className='pl-3 pr-8 py-1 w-60 text-sm rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400'

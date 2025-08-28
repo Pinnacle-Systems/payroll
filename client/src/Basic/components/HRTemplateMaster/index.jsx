@@ -9,6 +9,7 @@ import {
   CheckBox,
   ToggleButton,
   ReusableTable,
+  TextAreaInput,
 } from "../../../Inputs";
 import ReportTemplate from "../ReportTemplate";
 import Mastertable from "../MasterTable/Mastertable";
@@ -20,75 +21,91 @@ import {
   useGetdesignQuery,
   useUpdatedesignMutation,
 } from "../../../redux/uniformService/DesignMasterServices";
-import {
-  useAdddesignationMutation,
-  useDeletedesignationMutation,
-  useGetdesignationByIdQuery,
-  useGetdesignationQuery,
-  useUpdatedesignationMutation,
-} from "../../../redux/services/DesignationMasterService";
+
 import { useGetCompanyQuery } from "../../../redux/services/CompanyMasterService";
 import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
-const Designation = () => {
+import {
+  useAddhrTemplateMutation,
+  useDeletehrTemplateMutation,
+  useGethrTemplateByIdQuery,
+  useGethrTemplateQuery,
+  useUpdatehrTemplateMutation,
+} from "../../../redux/services/HrTemplateService";
+import { getCommonParams } from "../../../Utils/helper";
+
+const HRTemplateMaster = () => {
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
 
   const [name, setName] = useState("");
-
+  const [description, setDescription] = useState("");
+  const [docId, setDocId] = useState("");
   const [active, setActive] = useState(true);
   const [errors, setErrors] = useState({});
   const [form, setForm] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
-  const [companyName, setCompanyName] = useState("");
-  const [companyCode, setCompanyCode] = useState("");
+
   const MODEL = "DESIGNATION";
   console.log(form, "form");
-  const params = {
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
-  };
+
+  const params = getCommonParams();
+
+  console.log(params, "params");
+
+  const { branchId } = params;
 
   const { data: company } = useGetCompanyQuery({ params });
+  const [companyName, setCompanyName] = useState(company.data[0].name);
+  const [companyCode, setCompanyCode] = useState(company.data[0].code);
   const {
     data: allData,
     isLoading,
     isFetching,
-  } = useGetdesignationQuery({ params, searchParams: searchValue });
+  } = useGethrTemplateQuery({ params, searchParams: searchValue });
   const {
     data: singleData,
     isFetching: isSingleFetching,
     isLoading: isSingleLoading,
-  } = useGetdesignationByIdQuery(id, { skip: !id });
+  } = useGethrTemplateByIdQuery(id, { skip: !id });
 
-  useEffect(() => {
-    if (company?.data?.length > 0) {
-      setCompanyName(company.data[0].name);
-      setCompanyCode(company.data[0].code);
+  // useEffect(() => {
+  //   if (company?.data?.length > 0) {
+  //     setCompanyName(company.data[0].name);
+  //     setCompanyCode(company.data[0].code);
+  //   }
+  // }, [company]);
+
+  const [addData] = useAddhrTemplateMutation();
+  const [updateData] = useUpdatehrTemplateMutation();
+  const [removeData] = useDeletehrTemplateMutation();
+  const getNextDocId = useCallback(() => {
+    if (id) return;
+    if (allData?.nextDocId) {
+      setDocId(allData?.nextDocId);
     }
-  }, [company]);
+  }, [allData, id]);
 
-  const [addData] = useAdddesignationMutation();
-  const [updateData] = useUpdatedesignationMutation();
-  const [removeData] = useDeletedesignationMutation();
-
+  useEffect(getNextDocId, [getNextDocId]);
   const syncFormWithDb = useCallback(
     (data) => {
       if (!id) {
         // setReadOnly(false);
         setName("");
-
+        setDescription("");
         setActive(true);
+        setCompanyName(company.data[0].name);
+        setCompanyCode(company.data[0].code);
       } else {
         // setReadOnly(true);
         setName(data?.name || "");
-
+        setDocId(data?.docId || "");
+        setDescription(data?.description || "");
         setActive(id ? data?.active ?? false : true);
       }
     },
-    [id]
+    [id, company]
   );
 
   useEffect(() => {
@@ -97,12 +114,14 @@ const Designation = () => {
 
   const data = {
     name,
-
+    description,
+    docId,
     active,
     companyId: secureLocalStorage.getItem(
       sessionStorage.getItem("sessionId") + "userCompanyId"
     ),
     id,
+    branchId,
   };
 
   const validateData = (data) => {
@@ -173,6 +192,8 @@ const Designation = () => {
     setReadOnly(false);
     setForm(true);
     setSearchValue("");
+    setCompanyName(company.data[0].name);
+    setCompanyCode(company.data[0].code);
   };
   const handleView = (id) => {
     setId(id);
@@ -186,7 +207,7 @@ const Designation = () => {
     setReadOnly(false);
     console.log("Edit");
   };
-    const ACTIVE = (
+  const ACTIVE = (
     <div className="bg-gradient-to-r from-green-200 to-green-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-green-500 shadow-lg text-white hover:scale-110 transition-transform duration-300">
       <Power size={10} />
     </div>
@@ -204,7 +225,7 @@ const Designation = () => {
     },
 
     {
-      header: "Designation",
+      header: "Template Name",
       accessor: (item) => item?.name,
       //   cellClass: () => "font-medium  text-gray-900",
       className: "font-medium text-gray-900 text-center uppercase w-72",
@@ -212,7 +233,7 @@ const Designation = () => {
 
     {
       header: "Status",
-      accessor: (item) =>  item.active ? ACTIVE : INACTIVE,
+      accessor: (item) => (item.active ? ACTIVE : INACTIVE),
       //   cellClass: () => "font-medium text-gray-900",
       className: "font-medium text-gray-900 text-center uppercase w-36",
     },
@@ -228,46 +249,12 @@ const Designation = () => {
     setForm(true);
   }
 
-  const tableHeaders = [
-    "S.NO",
-    "Code",
-    "Name",
-    "Status",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-  ];
-  const tableDataNames = [
-    "index+1",
-    "dataObj.code",
-    "dataObj.name",
-    "dataObj.active ? ACTIVE : INACTIVE",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-  ];
   return (
     <div>
       <div onKeyDown={handleKeyDown} className="p-1 ">
         <div className="w-full flex bg-white p-1 justify-between  items-center">
           <h1 className="text-2xl font-bold text-gray-800">
-            Designation Master
+            HR Template Master
           </h1>
           <div className="flex items-center gap-4">
             <button
@@ -277,24 +264,11 @@ const Designation = () => {
               }}
               className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
             >
-              +Add New Designation
+              + Add New HR Template
             </button>
           </div>
         </div>
-        {/* <div className="w-full flex items-start">
-          <Mastertable
-            header={"Designation list"}
-            searchValue={searchValue}
-            setSearchValue={setSearchValue}
-            onDataClick={onDataClick}
-            // setOpenTable={setOpenTable}
-            tableHeaders={tableHeaders}
-            tableDataNames={tableDataNames}
-            data={allData?.data}
-            loading={isLoading || isFetching}
-            setReadOnly={setReadOnly}
-          />
-        </div> */}
+
         <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-3">
           <ReusableTable
             columns={columns}
@@ -309,7 +283,7 @@ const Designation = () => {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[45%]  h-[60%]"}
+            widthClass={"w-[45%]  h-[70%]"}
             onClose={() => {
               setForm(false);
               setErrors({});
@@ -321,9 +295,9 @@ const Designation = () => {
                   <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
                     {id
                       ? !readOnly
-                        ? "Edit Designation Master"
-                        : "Designation Master"
-                      : "Add New Designation"}
+                        ? "Edit HR Template Master"
+                        : "HR Template Master"
+                      : "Add New HR Template"}
                   </h2>
                 </div>
                 <div className="flex gap-2">
@@ -348,7 +322,7 @@ const Designation = () => {
                         type="button"
                         onClick={saveData}
                         className="px-3 py-1 hover:bg-green-600 hover:text-white rounded text-green-600 
-                  border border-green-600 flex items-center gap-1 text-xs"
+                     border border-green-600 flex items-center gap-1 text-xs"
                       >
                         <Check size={14} />
                         {id ? "Update" : "Save"}
@@ -362,51 +336,69 @@ const Designation = () => {
                 <div className="grid grid-cols-1  gap-3  h-full">
                   <div className="lg:col-span- space-y-3">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
-                      <div className="space-y-4 w-[50%]">
-                        {/* <label className="block text-xs text-black mb-1">
-                      Department <span className="text-red-500">*</span>
-                      <select
-                        value={departmentId}
-                        onChange={(e) => setDepartmentId(e.target.value)}
-                        required
-                        className="w-full border p-1 rounded"
-                      >
-                        <option value="">-- Select Department --</option>
-                        {department?.data?.map((dept) => (
-                          <option key={dept.id} value={dept.id}>
-                            {dept.name}
-                          </option>
-                        ))}
-                      </select>
-                    </label> */}
+                      <div className="space-y-4 ">
+                        <div className="flex  gap-x-8">
+                          <div className="w-72">
+                            <TextInput
+                              name="Company Name"
+                              type="text"
+                              value={companyName}
+                              setValue={setCompanyName}
+                              required={true}
+                              // readOnly={readOnly}
+                              disabled={true}
+                            />
+                          </div>
 
-                        <TextInput
-                          name="Company Name"
-                          type="text"
-                          value={companyName}
-                          setValue={setCompanyName}
-                          required={true}
-                         disabled={true}
-                        />
+                          <TextInput
+                            name="Company Code"
+                            type="text"
+                            value={companyCode}
+                            setValue={setCompanyCode}
+                            required={true}
+                            // readOnly={readOnly}
+                            disabled={true}
+                          />
+                        </div>
+                        <div className="flex gap-x-8">
+                          <div className="w-42">
+                            <TextInput
+                              name="Template Code"
+                              type="text"
+                              value={docId}
+                              setValue={setDocId}
+                              required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                          </div>
+                          <div className="w-72">
+                            <TextInput
+                              name="Template Name"
+                              type="text"
+                              value={name}
+                              setValue={setName}
+                              required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                          </div>
+                        </div>
+                        <div className="w-60">
+                          <label className="block text-xs text-black mb-1">
+                            Template Description
+                          </label>
+                          <TextAreaInput
+                            name=""
+                            type="text"
+                            value={description}
+                            setValue={setDescription}
+                            // required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                          />
+                        </div>
 
-                        <TextInput
-                          name="Company Code"
-                          type="text"
-                          value={companyCode}
-                          setValue={setCompanyCode}
-                          required={true}
-                          disabled={true}
-                        />
-
-                        <TextInput
-                          name="Designation Name"
-                          type="text"
-                          value={name}
-                          setValue={setName}
-                          required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                        />
                         <div className="mt-5">
                           <ToggleButton
                             name="Status"
@@ -430,4 +422,4 @@ const Designation = () => {
   );
 };
 
-export default Designation;
+export default HRTemplateMaster;

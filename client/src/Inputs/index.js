@@ -1003,13 +1003,14 @@ import { FormControl, MenuItem, TextField } from "@mui/material";
 import { push } from "../redux/features/opentabs";
 import { useDispatch } from "react-redux";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { Power } from "lucide-react";
 
 export const handleOnChange = (event, setValue) => {
   const inputValue = event.target.value;
   const inputSelectionStart = event.target.selectionStart;
   const inputSelectionEnd = event.target.selectionEnd;
 
-  const upperCaseValue = inputValue;
+  const upperCaseValue = inputValue.toUpperCase();
 
   const valueBeforeCursor = upperCaseValue.slice(0, inputSelectionStart);
   const valueAfterCursor = upperCaseValue.slice(inputSelectionEnd);
@@ -2094,7 +2095,16 @@ const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
 export function isValidPAN(pan) {
   return panRegex.test(pan.toUpperCase());
 }
-
+const ACTIVE = (
+  <div className="bg-gradient-to-r from-green-200 to-green-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-green-500 shadow-lg text-white hover:scale-110 transition-transform duration-300">
+    <Power size={10} />
+  </div>
+);
+const INACTIVE = (
+  <div className="bg-gradient-to-r from-red-200 to-red-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-red-500 shadow-lg text-white hover:scale-110 transition-transform duration-300">
+    <Power size={10} />
+  </div>
+);
 
 export const ReusableTable = ({
   columns,
@@ -2113,7 +2123,7 @@ export const ReusableTable = ({
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = data?.slice(indexOfFirstItem, indexOfLastItem);
 
-  console.log(data, "commonTable")
+
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {

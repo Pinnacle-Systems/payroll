@@ -58,6 +58,8 @@ model Company {
   unitOfMeasurement  UnitOfMeasurement[]
   PartyMasterNew     PartyMasterNew[]
   Designation        Designation[]
+  HRTemplate         HRTemplate[]
+  HRCommonTemplate   HRCommonTemplate[]
 }
 
 model Subscription {
@@ -97,6 +99,8 @@ model Branch {
   purchaseInwardEntry purchaseInwardEntry[]
   SampleEntry         SampleEntry[]
   poAttachments       poAttachments[]
+  HRTemplate          HRTemplate[]
+  HRCommonTemplate    HRCommonTemplate[]
 }
 
 model UserOnBranch {
@@ -181,6 +185,10 @@ model User {
   SampleEntryUpdatedBy         SampleEntry[]         @relation(name: "updatedBy")
   poAttachementsCreatedBy      poAttachments[]       @relation(name: "createdBy")
   poAttachementsupdatedBy      poAttachments[]       @relation(name: "updatedBy")
+  HRTemplateCreatedBy          HRTemplate[]          @relation(name: "createdBy")
+  HRTemplateupdatedBy          HRTemplate[]          @relation(name: "updatedBy")
+  HRCommonTemplateCreatedBy    HRCommonTemplate[]    @relation(name: "createdBy")
+  HRCommonTemplateupdatedBy    HRCommonTemplate[]    @relation(name: "updatedBy")
 }
 
 model Employee {
@@ -191,8 +199,8 @@ model Employee {
   chamberNo          String?
   department         Department?       @relation(fields: [departmentId], references: [id])
   departmentId       Int?
-  designation         Designation?     @relation(fields: [designationId],references: [id])     
-  designationId        Int?
+  designation        Designation?      @relation(fields: [designationId], references: [id])
+  designationId      Int?
   joiningDate        DateTime?
   fatherName         String?
   dob                DateTime?
@@ -244,6 +252,7 @@ model FinYear {
   Company   Company? @relation(fields: [companyId], references: [id])
   companyId Int?
   active    Boolean  @default(true)
+  code      String?
 }
 
 model EmployeeCategory {
@@ -1115,15 +1124,50 @@ model poAttachments {
 }
 
 model Designation {
-  id            Int          @id @default(autoincrement())
-  name          String?
-  code          String?
-  active        Boolean?     @default(true)
-  departmentId  Int?        
-  companyId     Int?     
+  id           Int      @id @default(autoincrement())
+  name         String?
+  code         String?
+  active       Boolean? @default(true)
+  departmentId Int?
+  companyId    Int?
 
-  department    Department?  @relation(fields: [departmentId], references: [id], onDelete: Cascade)
-  company       Company?     @relation(fields: [companyId], references: [id])
-  Employee      Employee[]
+  department Department? @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  company    Company?    @relation(fields: [companyId], references: [id])
+  Employee   Employee[]
 }
 
+model HRTemplate {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation("createdBy", fields: [createdById], references: [id])
+  createdById Int?
+  updatedBy   User?    @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById Int?
+  companyId   Int?
+  company     Company? @relation(fields: [companyId], references: [id])
+  branch      Branch?  @relation(fields: [branchId], references: [id])
+  branchId    Int?
+  name        String?
+  description String?
+  docId       String?
+  active      Boolean? @default(true)
+}
+
+model HRCommonTemplate {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation("createdBy", fields: [createdById], references: [id])
+  createdById Int?
+  updatedBy   User?    @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById Int?
+  companyId   Int?
+  company     Company? @relation(fields: [companyId], references: [id])
+  branch      Branch?  @relation(fields: [branchId], references: [id])
+  branchId    Int?
+  name        String?
+  description String?
+  docId       String?
+  active      Boolean? @default(true)
+}
