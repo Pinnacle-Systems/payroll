@@ -1,30 +1,43 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import secureLocalStorage from "react-secure-storage";
-
+import { useGetDepartmentQuery } from "../../../redux/services/DepartmentMasterService";
+import FormHeader from "../FormHeader";
+import FormReport from "../FormReportTemplate";
 import { toast } from "react-toastify";
 import {
   TextInput,
-  
+  CheckBox,
   ToggleButton,
   ReusableTable,
   TextAreaInput,
 } from "../../../Inputs";
-
+import ReportTemplate from "../ReportTemplate";
+import Mastertable from "../MasterTable/Mastertable";
+import MastersForm from "../MastersForm/MastersForm";
 import { statusDropdown } from "../../../Utils/DropdownData";
-
-
+import {
+  useAdddesignMutation,
+  useGetdesignByIdQuery,
+  useGetdesignQuery,
+  useUpdatedesignMutation,
+} from "../../../redux/uniformService/DesignMasterServices";
 
 import { useGetCompanyQuery } from "../../../redux/services/CompanyMasterService";
 import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
-
+import {
+  useAddhrTemplateMutation,
+  useDeletehrTemplateMutation,
+  useGethrTemplateByIdQuery,
+  useGethrTemplateQuery,
+  useUpdatehrTemplateMutation,
+} from "../../../redux/services/HrTemplateService";
 import { getCommonParams } from "../../../Utils/helper";
-import { useAddHRCommonTemplateMutation, useDeleteHRCommonTemplateMutation, useGetHRCommonTemplateByIdQuery, useGetHRCommonTemplateQuery, useUpdateHRCommonTemplateMutation } from "../../../redux/services/HRCommonTemplateservice";
 
-const HRCommonTemplateMaster = () => {
+const ShiftMaster = () => {
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
-  
+
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [docId, setDocId] = useState("");
@@ -33,27 +46,29 @@ const HRCommonTemplateMaster = () => {
   const [form, setForm] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
- 
-  
 
+  const MODEL = "DESIGNATION";
+  console.log(form, "form");
 
-  const  params  = getCommonParams();
+  const params = getCommonParams();
 
+  console.log(params, "params");
 
-  const{ branchId} = params
+  const { branchId } = params;
 
   const { data: company } = useGetCompanyQuery({ params });
-   const [companyName, setCompanyName] = useState(company?.data[0].name);
-  const [companyCode, setCompanyCode] = useState(company?.data[0].code);
+  const [companyName, setCompanyName] = useState(company?.data[0]?.name);
+  const [companyCode, setCompanyCode] = useState(company?.data[0]?.code);
   const {
     data: allData,
- 
-  } = useGetHRCommonTemplateQuery({ params, searchParams: searchValue });
+    isLoading,
+    isFetching,
+  } = useGethrTemplateQuery({ params, searchParams: searchValue });
   const {
     data: singleData,
     isFetching: isSingleFetching,
     isLoading: isSingleLoading,
-  } = useGetHRCommonTemplateByIdQuery(id, { skip: !id });
+  } = useGethrTemplateByIdQuery(id, { skip: !id });
 
   // useEffect(() => {
   //   if (company?.data?.length > 0) {
@@ -62,9 +77,9 @@ const HRCommonTemplateMaster = () => {
   //   }
   // }, [company]);
 
-  const [addData] = useAddHRCommonTemplateMutation();
-  const [updateData] = useUpdateHRCommonTemplateMutation();
-  const [removeData] = useDeleteHRCommonTemplateMutation();
+  const [addData] = useAddhrTemplateMutation();
+  const [updateData] = useUpdatehrTemplateMutation();
+  const [removeData] = useDeletehrTemplateMutation();
   const getNextDocId = useCallback(() => {
     if (id) return;
     if (allData?.nextDocId) {
@@ -78,19 +93,19 @@ const HRCommonTemplateMaster = () => {
       if (!id) {
         // setReadOnly(false);
         setName("");
-        setDescription("")
+        setDescription("");
         setActive(true);
-          setCompanyName(company?.data[0].name);
-       setCompanyCode(company?.data[0].code);
+        setCompanyName(company?.data[0].name);
+        setCompanyCode(company?.data[0].code);
       } else {
         // setReadOnly(true);
         setName(data?.name || "");
-        setDocId(data?.docId || "")
+        setDocId(data?.docId || "");
         setDescription(data?.description || "");
         setActive(id ? data?.active ?? false : true);
       }
     },
-    [id,company]
+    [id, company]
   );
 
   useEffect(() => {
@@ -177,9 +192,8 @@ const HRCommonTemplateMaster = () => {
     setReadOnly(false);
     setForm(true);
     setSearchValue("");
-      setCompanyName(company.data[0].name);
-      setCompanyCode(company.data[0].code);
-
+    setCompanyName(company.data[0].name);
+    setCompanyCode(company.data[0].code);
   };
   const handleView = (id) => {
     setId(id);
@@ -211,7 +225,7 @@ const HRCommonTemplateMaster = () => {
     },
 
     {
-      header: "Common Template Name",
+      header: "Template Name",
       accessor: (item) => item?.name,
       //   cellClass: () => "font-medium  text-gray-900",
       className: "font-medium text-gray-900 text-center uppercase w-72",
@@ -240,7 +254,7 @@ const HRCommonTemplateMaster = () => {
       <div onKeyDown={handleKeyDown} className="p-1 ">
         <div className="w-full flex bg-white p-1 justify-between  items-center">
           <h1 className="text-2xl font-bold text-gray-800">
-            HR  Common Template Master
+            Shift Master
           </h1>
           <div className="flex items-center gap-4">
             <button
@@ -250,7 +264,7 @@ const HRCommonTemplateMaster = () => {
               }}
               className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
             >
-              + Add New HR Common Template
+              + Shift Template
             </button>
           </div>
         </div>
@@ -281,9 +295,9 @@ const HRCommonTemplateMaster = () => {
                   <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
                     {id
                       ? !readOnly
-                        ? "Edit HR Common Template Master"
-                        : "HR Common Template Master"
-                      : "Add HR New Common  Template"}
+                        ? "Edit Shift Master"
+                        : "Shift Master"
+                      : "Add New Shift"}
                   </h2>
                 </div>
                 <div className="flex gap-2">
@@ -325,61 +339,64 @@ const HRCommonTemplateMaster = () => {
                       <div className="space-y-4 ">
                         <div className="flex  gap-x-8">
                           <div className="w-72">
-                        <TextInput
-                          name="Company Name"
-                          type="text"
-                          value={companyName}
-                          setValue={setCompanyName}
-                          required={true}
-                          // readOnly={readOnly}
-                          disabled={true}
-                        /></div>
+                            <TextInput
+                              name="Company Name"
+                              type="text"
+                              value={companyName}
+                              setValue={setCompanyName}
+                              required={true}
+                              // readOnly={readOnly}
+                              disabled={true}
+                            />
+                          </div>
 
-                        <TextInput
-                          name="Company Code"
-                          type="text"
-                          value={companyCode}
-                          setValue={setCompanyCode}
-                          required={true}
-                          // readOnly={readOnly}
-                         disabled={true}
-                        />
+                          <TextInput
+                            name="Company Code"
+                            type="text"
+                            value={companyCode}
+                            setValue={setCompanyCode}
+                            required={true}
+                            // readOnly={readOnly}
+                            disabled={true}
+                          />
                         </div>
                         <div className="flex gap-x-8">
                           <div className="w-42">
-                        <TextInput
-                          name="Common Template Code"
-                          type="text"
-                          value={docId}
-                          setValue={setDocId}
-                          required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                        />
-                        </div>
+                            <TextInput
+                              name="Template Code"
+                              type="text"
+                              value={docId}
+                              setValue={setDocId}
+                              required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                          </div>
                           <div className="w-72">
-                        <TextInput
-                          name="Common Template Name"
-                          type="text"
-                          value={name}
-                          setValue={setName}
-                          required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                        />
-                        </div>
+                            <TextInput
+                              name="Template Name"
+                              type="text"
+                              value={name}
+                              setValue={setName}
+                              required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                          </div>
                         </div>
                         <div className="w-60">
-                          <label className="block text-xs text-black mb-1">Common Template Description</label>
-                        <TextAreaInput
-                            name =""
-                          type="text"
-                          value={description}
-                          setValue={setDescription}
-                          // required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                        />
+                          <label className="block text-xs text-black mb-1">
+                            Template Description
+                          </label>
+                          <TextAreaInput
+                            name=""
+                            type="text"
+                            value={description}
+                            setValue={setDescription}
+                            // required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                          />
                         </div>
 
                         <div className="mt-5">
@@ -405,4 +422,4 @@ const HRCommonTemplateMaster = () => {
   );
 };
 
-export default HRCommonTemplateMaster;
+export default ShiftMaster;

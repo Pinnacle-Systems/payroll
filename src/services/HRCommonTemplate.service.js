@@ -29,11 +29,11 @@ async function getNextDocId(
   const code = (
     typeof isTaxBill === "undefined" ? undefined : JSON.parse(isTaxBill)
   )
-    ? "COM/TEM"
-    : "COM/TEM";
+    ? "TEM"
+    : "TEM";
   const branchObj = await getTableRecordWithId(branchId, "branch");
   // let newDocId = `${branchObj.branchCode}/${shortCode}/${code}/1`;
-  let newDocId = `${code}/1`;
+  let newDocId = `${branchObj.branchCode}/${code}/1`;
   if (lastObject) {
     newDocId = `${code}/${
       parseInt(lastObject.docId.split("/").at(-1)) + 1
