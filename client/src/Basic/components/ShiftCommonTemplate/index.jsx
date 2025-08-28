@@ -22,7 +22,7 @@ import {
   useGetHRCommonTemplateByIdQuery,
   useGetHRCommonTemplateQuery,
   useUpdateHRCommonTemplateMutation,
-} from "../../../redux/services/HRCommonTemplateservice";
+} from "../../../redux/services/HRCommonTemplate.service";
 import { useGetPartyCategoryMasterQuery } from "../../../redux/services/PartyCategoryServices";
 import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCategoryMasterService";
 

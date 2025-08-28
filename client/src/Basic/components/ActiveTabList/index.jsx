@@ -26,8 +26,10 @@ import {
   BuyerSuffling,
   Designation,
   PayFrequency,
+
+ 
   
-  ShiftMaster,
+ 
   // ShiftCommonTemplate,
  
 
@@ -45,8 +47,9 @@ import PurchaseOrders from "../../../Uniform/Components/styleesheet";
 import PoForm from "../../../Uniform/Components/PurchaseOrder";
 import PartyDetailModal from "../../../Uniform/Components/styleesheet/partyMaster";
 
-import HRTemplateMaster from "../ShiftMaster";
-import ShiftCommonTemplateMaster from "../ShiftCommonTemplateMaster";
+// import HRTemplateMaster from "../Shift Master";
+import ShiftCommonTemplateMaster from "../ShiftCommonTemplate";
+import ShiftMaster from "../ShiftMaster";
 
 const ActiveTabList = () => {
   const openTabs = useSelector((state) => state.openTabs);
@@ -98,8 +101,8 @@ const ActiveTabList = () => {
     "BUYER SUFFLING" : <BuyerSuffling/>,
     "DESIGNATION MASTER":<Designation/>,
     "PAY FREQUENCY" : <PayFrequency/>,
-    "SHIFT  MASTER" : <ShiftMaster/>,
-    "SHIFT COMMON TEMPLATE MASTER" :<ShiftCommonTemplateMaster/>
+    "SHIFT COMMON TEMPLATE MASTER" :<ShiftCommonTemplateMaster/>,
+    "SHIFT  MASTER":<ShiftMaster/>
 
 
 
