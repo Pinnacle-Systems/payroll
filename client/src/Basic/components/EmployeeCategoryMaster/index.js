@@ -245,7 +245,7 @@ export default function Form() {
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
       <div className="w-full flex bg-white p-1 justify-between  items-center">
-        <h5 className="my-1">Employee Category Master</h5>
+        <h1 className="text-2xl font-bold text-gray-800">Employee Category Master</h1>
         <div className="flex items-center">
           <button
             onClick={() => {

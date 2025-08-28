@@ -248,7 +248,7 @@ export default function Form() {
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
       <div className="w-full flex bg-white p-1 justify-between  items-center">
-        <h1 className="my-1">Department Master</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Department Master</h1>
         <div className="flex items-center">
           <button
             onClick={() => {
