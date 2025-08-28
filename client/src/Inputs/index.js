@@ -1010,7 +1010,7 @@ export const handleOnChange = (event, setValue) => {
   const inputSelectionStart = event.target.selectionStart;
   const inputSelectionEnd = event.target.selectionEnd;
 
-  const upperCaseValue = inputValue;
+  const upperCaseValue = inputValue.toUpperCase();
 
   const valueBeforeCursor = upperCaseValue.slice(0, inputSelectionStart);
   const valueAfterCursor = upperCaseValue.slice(inputSelectionEnd);
@@ -1212,7 +1212,7 @@ export const TextInput = ({
         disabled={disabled}
         tabIndex={tabIndex ?? undefined}
           
-        className={`w-full px-3 py-0 text-xs border border-gray-300 rounded-lg
+        className={`w-full px-3  text-xs border py-1 border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
           ${readOnly || disabled
@@ -2327,7 +2327,11 @@ export const TextAreaInput = ({
                 rows={rows}
                 className={`w-full px-2 py-1 text-sm border border-slate-300 rounded-md 
           focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all duration-200 
-          hover:border-slate-400 resize-none ${className}`}
+          hover:border-slate-400 resize-none
+          ${readOnly || disabled
+            ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+            : "bg-white hover:border-gray-400"}
+          ${className}`}
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 readOnly={readOnly}

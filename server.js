@@ -33,7 +33,8 @@ import {
   partyMasterNew,
   sampleEntry,
   designation,
-  hrTemplate
+  hrTemplate,
+  HRCommonTemplate
 
 } from './src/routes/index.js';
 
@@ -123,6 +124,7 @@ app.use('/uploads', express.static('uploads'));
 app.use('/hrTemplate',hrTemplate)
 app.use("/sendMail", sendMail)
 app.use("/designation",designation)
+app.use('/HRCommonTemplate',HRCommonTemplate)
 
 
 const httpServer = createServer(app);

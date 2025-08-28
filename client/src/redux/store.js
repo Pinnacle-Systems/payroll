@@ -21,6 +21,7 @@ import {
   sampleEntryApi,
   designationMasterApi,
   hrTemplateMasterApi,
+  HRCommonTemplateMasterAPi,
 
 } from "./services"
 import projectPaymentFormApi from "./services/ProjectPaymentService";
@@ -153,7 +154,8 @@ const commonReducers = {
   [partyMasterNewApi.reducerPath]: partyMasterNewApi.reducer,
   [sampleEntryApi.reducerPath]:sampleEntryApi.reducer,
   [designationMasterApi.reducerPath]:designationMasterApi.reducer,
-  [hrTemplateMasterApi.reducerPath]:hrTemplateMasterApi.reducer
+  [hrTemplateMasterApi.reducerPath]:hrTemplateMasterApi.reducer,
+  [HRCommonTemplateMasterAPi.reducerPath]:HRCommonTemplateMasterAPi.reducer,
 
 
 
@@ -248,7 +250,7 @@ partyMasterNewApi.middleware,
 sampleEntryApi.middleware,
 designationMasterApi.middleware,
 hrTemplateMasterApi.middleware,
-
+HRCommonTemplateMasterAPi.middleware,
 ];
 
 

@@ -309,7 +309,7 @@ const Designation = () => {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[55%]  h-[60%]"}
+            widthClass={"w-[45%]  h-[60%]"}
             onClose={() => {
               setForm(false);
               setErrors({});
@@ -386,8 +386,7 @@ const Designation = () => {
                           value={companyName}
                           setValue={setCompanyName}
                           required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
+                         disabled={true}
                         />
 
                         <TextInput
@@ -396,8 +395,7 @@ const Designation = () => {
                           value={companyCode}
                           setValue={setCompanyCode}
                           required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
+                          disabled={true}
                         />
 
                         <TextInput
