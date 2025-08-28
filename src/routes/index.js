@@ -40,6 +40,7 @@ export {default as sampleEntry} from './sampleEntry.route.js'
 export {default as designation} from './designation.route.js'
 export {default as hrTemplate} from './hrTemplate.route.js'
 export {default as HRCommonTemplate} from './HRCommontemplate.route.js'
+export {default as ShiftTemplate} from './shiftTemplate.route.js'
 
 
 

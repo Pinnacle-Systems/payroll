@@ -910,7 +910,7 @@
 //               <th
 //                 key={index}
 //                 className={` ${column.className ? column.className  : "" } py-2  font-medium   ${ column.header  !== "" ? 'border-r border-white/50' : ''} text-[13px]`}
-             
+
 //               >
 //                 {column.header}
 //               </th>
@@ -1089,88 +1089,88 @@ export const MultiSelectDropdown = ({
   inputClass,
 }) => {
   console.log(options, "options");
-    console.log(selected, "selected");
+  console.log(selected, "selected");
 
- const customSelectStyles = {
-  control: (provided, state) => ({
-    ...provided,
-    minHeight: '22px',
-    height: '22px',
-    fontSize: '12px',
-    borderRadius: '0.5rem', // rounded-lg
-    outline: 'none',
-    transition: 'all 150ms', // transition-all duration-150
-    boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', // shadow-sm
-    padding: '0.25rem', // p-1
-    borderColor: state.isFocused ? '' : '#cbd5e1', // focus:border-blue-500
-    boxShadow: state.isFocused ? '0 0 0 1px #3b82f6' : undefined, // focus:ring-1 focus:ring-blue-500
-    '&:hover': {
-      borderColor: '#94a3b8'
-    }
-  }),
-  valueContainer: (provided) => ({
-    ...provided,
-    height: '22px',
-    padding: '0 8px'
-  }),
-  input: (provided) => ({
-    ...provided,
-    margin: '0px',
-  }),
-  indicatorsContainer: (provided) => ({
-    ...provided,
-    height: '22px',
-  }),
-  option: (provided) => ({
-    ...provided,
-    fontSize: '14px',
-    padding: '8px 12px'
-  }),
-};
+  const customSelectStyles = {
+    control: (provided, state) => ({
+      ...provided,
+      minHeight: '22px',
+      height: '22px',
+      fontSize: '12px',
+      borderRadius: '0.5rem', // rounded-lg
+      outline: 'none',
+      transition: 'all 150ms', // transition-all duration-150
+      boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', // shadow-sm
+      padding: '0.25rem', // p-1
+      borderColor: state.isFocused ? '' : '#cbd5e1', // focus:border-blue-500
+      boxShadow: state.isFocused ? '0 0 0 1px #3b82f6' : undefined, // focus:ring-1 focus:ring-blue-500
+      '&:hover': {
+        borderColor: '#94a3b8'
+      }
+    }),
+    valueContainer: (provided) => ({
+      ...provided,
+      height: '22px',
+      padding: '0 8px'
+    }),
+    input: (provided) => ({
+      ...provided,
+      margin: '0px',
+    }),
+    indicatorsContainer: (provided) => ({
+      ...provided,
+      height: '22px',
+    }),
+    option: (provided) => ({
+      ...provided,
+      fontSize: '14px',
+      padding: '8px 12px'
+    }),
+  };
 
   return (
     <div
       className={`m-1  md:grid-cols-2 items-center z-0 data  ${className}`}
     >
       <label className={`md:text-start   block text-xs font-bold text-slate-700 mb-1${labelName}`}>{name}</label>
-     <MultiSelect
-  options={options}
-  value={selected}
-  onChange={readOnly ? () => {} : setSelected}
-  labelledBy="Select"
-  hasSelectAll={false}
-  styles={{
-    container: (base) => ({
-      ...base,
-      fontSize: "12px",
-      minHeight: "28px",
-    }),
-    control: (base) => ({
-      ...base,
-      padding: "2px",
-      borderRadius: "10px",
-      boxShadow: "none",
-      border: "1px solid #ccc",
-      minHeight: "28px",
-    }),
-    option: (base, state) => ({
-      ...base,
-      fontSize: "12px",
-      backgroundColor: state.isSelected ? "#e0e7ff" : "#fff",
-      padding: "4px 8px",
-    }),
-    chips: (base) => ({
-      ...base,
-      fontSize: "12px",
-      padding: "2px 4px",
-    }),
-    searchBox: (base) => ({
-      ...base,
-      fontSize: "12px",
-      padding: "2px",
-    }),
-  }}
-/>
+      <MultiSelect
+        options={options}
+        value={selected}
+        onChange={readOnly ? () => { } : setSelected}
+        labelledBy="Select"
+        hasSelectAll={false}
+        styles={{
+          container: (base) => ({
+            ...base,
+            fontSize: "12px",
+            minHeight: "28px",
+          }),
+          control: (base) => ({
+            ...base,
+            padding: "2px",
+            borderRadius: "10px",
+            boxShadow: "none",
+            border: "1px solid #ccc",
+            minHeight: "28px",
+          }),
+          option: (base, state) => ({
+            ...base,
+            fontSize: "12px",
+            backgroundColor: state.isSelected ? "#e0e7ff" : "#fff",
+            padding: "4px 8px",
+          }),
+          chips: (base) => ({
+            ...base,
+            fontSize: "12px",
+            padding: "2px 4px",
+          }),
+          searchBox: (base) => ({
+            ...base,
+            fontSize: "12px",
+            padding: "2px",
+          }),
+        }}
+      />
 
 
     </div>
@@ -1189,13 +1189,13 @@ export const TextInput = ({
   tabIndex = null,
   onBlur = null,
   width = "full",
-   
+
 }) => {
   return (
     <div className={`mb-2 ${width}`}>
       {name && (
-        <label className="block text-xs text-black mb-1">
-          {required ? <RequiredLabel name={ label ? label  :  name} /> : name}
+        <label className="block text-xs font-bold text-slate-700 mb-2">
+          {required ? <RequiredLabel name={label ? label : name} /> : name}
         </label>
       )}
       <input
@@ -1211,15 +1211,16 @@ export const TextInput = ({
         readOnly={readOnly}
         disabled={disabled}
         tabIndex={tabIndex ?? undefined}
-          
-        className={`w-full px-3  text-xs border py-1 border-gray-300 rounded-lg
+
+        className={`w-full px-1 py-1.5 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
           ${readOnly || disabled
             ? "bg-gray-100 text-gray-500 cursor-not-allowed"
             : "bg-white hover:border-gray-400"}
-          ${className}`}
-        
+          ${className}`
+        }
+
       />
     </div>
   );
@@ -1237,7 +1238,7 @@ export const PasswordTextInput = ({
   tabIndex = null,
   onBlur = null,
   width,
-  
+
 }) => {
   return (
     <>
@@ -1464,7 +1465,7 @@ export const TextArea = ({
         required={required}
         readOnly={readOnly}
         value={value}
-        onChange={(e) => handleOnChange(e,setValue)}
+        onChange={(e) => handleOnChange(e, setValue)}
         onBlur={onBlur}
         placeholder={name}
         className={`w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg
@@ -1503,8 +1504,8 @@ export const DropdownInput = ({
   };
 
   const isDisabled = readOnly || disabled;
- 
-  
+
+
 
   return (
     <div className={`mb-2 ${width}`}>
@@ -1764,11 +1765,8 @@ export const DateInput = ({
 }) => {
   return (
     <div className="flex flex-col gap-1 w-full">
-      <label
-        htmlFor={name}
-        className={`text-xs font-medium text-gray-700 ${required ? 'after:content-["*"] after:ml-0.5 after:text-red-500' : ""
-          }`}
-      >
+      <label className="block text-xs font-bold text-slate-700 mb-1">
+
         {inputHead ?? name}
       </label>
 
@@ -1982,7 +1980,7 @@ export const DropdownWithSearch = ({
     <div id={`dropdown${currentIndex}`} className={`${className} mb-2`}>
       {label && (
         <label className="block text-xs font-bold text-slate-700 mb-1">
-                 {required ? <RequiredLabel name={label} /> : `${label}`}
+          {required ? <RequiredLabel name={label} /> : `${label}`}
 
         </label>
       )}
@@ -1992,7 +1990,7 @@ export const DropdownWithSearch = ({
           focus:border-indigo-300 focus:outline-none transition-all duration-200
           hover:border-slate-400 ${readOnly || disabled ? "bg-slate-100" : ""
           } ${className}`}
-        
+
         disabled={disabled}
         readOnly={readOnly}
         value={value || ""}
@@ -2119,7 +2117,7 @@ export const ReusableTable = ({
   emptyStateMessage = 'No data available',
   rowActions = true,
   width
-})  => {
+}) => {
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math?.ceil(data?.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -2220,8 +2218,8 @@ export const ReusableTable = ({
             {columns?.map((column, index) => (
               <th
                 key={index}
-                className={` ${column.className ? column.className  : "" } py-2  font-medium   ${ column.header  !== "" ? 'border-r border-white/50' : ''} text-[13px]`}
-             
+                className={` ${column.className ? column.className : ""} py-2  font-medium   ${column.header !== "" ? 'border-r border-white/50' : ''} text-[13px]`}
+
               >
                 {column.header}
               </th>
@@ -2243,12 +2241,12 @@ export const ReusableTable = ({
               <tr
                 key={item.id}
                 className={`hover:bg-gray-50 transition-colors border-b   border-gray-200 text-[12px] ${index % 2 === 0 ? "bg-white" : "bg-gray-100"
-                  }` }
+                  }`}
               >
                 {columns?.map((column, colIndex) => (
                   <td
                     key={colIndex}
-                    className={` ${column.className ? column.className  : ""  } ${ column.header  !== "" ? 'border-r border-white/50' : ''} h-8 ` }
+                    className={` ${column.className ? column.className : ""} ${column.header !== "" ? 'border-r border-white/50' : ''} h-8 `}
                   >
                     {column.accessor(item, index)}
                   </td>
@@ -2304,40 +2302,36 @@ export const ReusableTable = ({
 };
 
 export const TextAreaInput = ({
-    name,
-    value,
-    setValue,
-    readOnly = false,
-    required = false,
-    disabled = false,
-    tabIndex = null,
-    rows = 2,
-    className = ""
+  name,
+  value,
+  setValue,
+  readOnly = false,
+  required = false,
+  disabled = false,
+  tabIndex = null,
+  rows = 2,
+  className = ""
 }) => {
-    return (
-        <div className="group input-group text-md">
-            <label htmlFor={name} className="input-label group-hover:text-blue-600 font-weight: 100">
-                <span className="flex items-center gap-2 font-weight: 100">
-                    {required ? <RequiredLabel name={name} /> : `${name}`}
-                </span>
-            </label>
-            <textarea
-                id={name}
-                name={name}
-                rows={rows}
-                className={`w-full px-2 py-1 text-sm border border-slate-300 rounded-md 
+  return (
+    <div className="group input-group text-md">
+      <label htmlFor={name} className="input-label group-hover:text-blue-600 font-weight: 100">
+        <span className="flex items-center gap-2 font-weight: 100">
+          {required ? <RequiredLabel name={name} /> : `${name}`}
+        </span>
+      </label>
+      <textarea
+        id={name}
+        name={name}
+        rows={rows}
+        className={`w-full px-2 py-1 text-sm border border-slate-300 rounded-md 
           focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all duration-200 
-          hover:border-slate-400 resize-none
-          ${readOnly || disabled
-            ? "bg-gray-100 text-gray-500 cursor-not-allowed"
-            : "bg-white hover:border-gray-400"}
-          ${className}`}
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                readOnly={readOnly}
-                disabled={disabled}
-                tabIndex={tabIndex ?? undefined}
-            />
-        </div>
-    );
+          hover:border-slate-400 resize-none ${className}`}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        readOnly={readOnly}
+        disabled={disabled}
+        tabIndex={tabIndex ?? undefined}
+      />
+    </div>
+  );
 };

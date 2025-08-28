@@ -60,6 +60,7 @@ model Company {
   Designation        Designation[]
   HRTemplate         HRTemplate[]
   HRCommonTemplate   HRCommonTemplate[]
+  ShiftTemplate      ShiftTemplate[]
 }
 
 model Subscription {
@@ -101,6 +102,7 @@ model Branch {
   poAttachments       poAttachments[]
   HRTemplate          HRTemplate[]
   HRCommonTemplate    HRCommonTemplate[]
+  ShiftTemplate       ShiftTemplate[]
 }
 
 model UserOnBranch {
@@ -189,6 +191,8 @@ model User {
   HRTemplateupdatedBy          HRTemplate[]          @relation(name: "updatedBy")
   HRCommonTemplateCreatedBy    HRCommonTemplate[]    @relation(name: "createdBy")
   HRCommonTemplateupdatedBy    HRCommonTemplate[]    @relation(name: "updatedBy")
+  ShiftTemplateCreatedBy       ShiftTemplate[]       @relation(name: "createdBy")
+  ShiftTemplateupdatedBy       ShiftTemplate[]       @relation(name: "updatedBy")
 }
 
 model Employee {
@@ -1155,6 +1159,24 @@ model HRTemplate {
 }
 
 model HRCommonTemplate {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation("createdBy", fields: [createdById], references: [id])
+  createdById Int?
+  updatedBy   User?    @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById Int?
+  companyId   Int?
+  company     Company? @relation(fields: [companyId], references: [id])
+  branch      Branch?  @relation(fields: [branchId], references: [id])
+  branchId    Int?
+  name        String?
+  description String?
+  docId       String?
+  active      Boolean? @default(true)
+}
+
+model ShiftTemplate {
   id          Int      @id @default(autoincrement())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

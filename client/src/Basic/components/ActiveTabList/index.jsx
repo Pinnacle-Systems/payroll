@@ -98,8 +98,8 @@ const ActiveTabList = () => {
     "BUYER SUFFLING" : <BuyerSuffling/>,
     "DESIGNATION MASTER":<Designation/>,
     "PAY FREQUENCY" : <PayFrequency/>,
-    "SHIFT  MASTER" : <ShiftMaster/>,
-    "SHIFT COMMON TEMPLATE MASTER" :<ShiftCommonTemplateMaster/>
+    "HR TEMPLATE MASTER" :<HRTemplateMaster/>,
+    "HR COMMON TEMPLATE MASTER" :<HRCommomTemplateMaster/>
 
 
 

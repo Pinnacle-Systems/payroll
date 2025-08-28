@@ -258,5 +258,13 @@ export const  MultiSelectPartytype = [
 export const FilterParty = [
     { show: "Customer", value: "Customer" },
     { show: "Supplier", value: "Supplier" },
+]
+export const common = [
+    { show: "Yes", value: "Yes" },
+    { show: "No", value: "No" },
+]
 
+export const SalaryMethod = [
+    { show: "ByCash", value: "Cash" },
+    { show: "ByBank", value: "Bank" },
 ]
