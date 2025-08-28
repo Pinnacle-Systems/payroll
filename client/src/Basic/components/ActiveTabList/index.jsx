@@ -50,6 +50,7 @@ import PartyDetailModal from "../../../Uniform/Components/styleesheet/partyMaste
 // import HRTemplateMaster from "../Shift Master";
 import ShiftCommonTemplateMaster from "../ShiftCommonTemplate";
 import ShiftMaster from "../ShiftMaster";
+import ShiftTemplateMaster from "../ShiftTemplateMaster";
 
 const ActiveTabList = () => {
   const openTabs = useSelector((state) => state.openTabs);
@@ -102,8 +103,8 @@ const ActiveTabList = () => {
     "DESIGNATION MASTER":<Designation/>,
     "PAY FREQUENCY" : <PayFrequency/>,
     "SHIFT COMMON TEMPLATE MASTER" :<ShiftCommonTemplateMaster/>,
-    "SHIFT  MASTER":<ShiftMaster/>
-
+    "SHIFT  MASTER":<ShiftMaster/>,
+    "SHIFT TEMPLATE MASTER" : <ShiftTemplateMaster/>
 
 
 

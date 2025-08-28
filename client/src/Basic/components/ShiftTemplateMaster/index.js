@@ -358,7 +358,151 @@ const ShiftTemplateMaster = () => {
                                                         />
                                                     </div>
                                                 </div>
+                                                <div>
+                                                    <div className={`w-full`}>
+                                                        <table className="w-full border-collapse table-fixed ">
+                                                            <thead className="bg-gray-200 text-gray-800">
+                                                                <tr>
+                                                                    <th
+                                                                        className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        S.No
+                                                                    </th>
+                                                                    <th
 
+                                                                        className={`w-32 px-4 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        Shift Common Template
+                                                                    </th>
+                                                                    <th
+
+                                                                        className={`w-52 px-4 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        In Next day
+                                                                    </th>
+                                                                    <th
+
+                                                                        className={`w-40 px-4 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        Tolerance Before Start
+                                                                    </th>
+
+                                                                    <th
+
+                                                                        className={`w-32 px-4 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        Start Time
+                                                                    </th>
+                                                                    <th
+
+                                                                        className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        Tolerance After End
+
+                                                                    </th>
+                                                                    <th
+
+                                                                        className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        FB OUT
+                                                                    </th>
+                                                                    <th
+
+                                                                        className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        FB IN
+                                                                    </th>
+                                                                    <th
+
+                                                                        className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        Lunch B.ST
+                                                                    </th>
+                                                                    <th
+
+                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        LB.SNDay
+                                                                    </th>
+                                                                     <th
+
+                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        Lunch B.ET
+                                                                    </th>          
+                                                                   <th
+
+                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                       LB.ENDay
+                                                                    </th>
+                                                                           <th
+
+                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                       SBOut
+                                                                    </th>
+                                                                          <th
+
+                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                       SBIn
+                                                                    </th>
+                                                                                     <th
+
+                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        Tolerance Before Start
+                                                                    </th>
+                                                                                     <th
+
+                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        End Time
+                                                                    </th>
+                                                                                       <th
+
+                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        Tolerance After Start
+                                                                    </th>
+                                                                    <th
+
+                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        Out Next Day
+                                                                    </th>
+                                                                     <th
+
+                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        Shift Time Hrs
+                                                                    </th>
+                                                                        <th
+
+                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        OT Hrs
+                                                                    </th>
+                                                                    <th
+
+                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        Quater(Y/N)
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody> 
+                                                                <tr>
+                                                                    <td>
+                                                                        
+                                                                    </td>
+                                                                </tr>
+
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
 
                                             </div>
                                         </div>
