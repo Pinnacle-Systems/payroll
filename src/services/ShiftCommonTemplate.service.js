@@ -24,7 +24,7 @@ async function getNextDocId(
     isTaxBill
   );
 
-  let lastObject = await prisma.hRCommonTemplate.findFirst({
+  let lastObject = await prisma.ShiftCommonTemplate.findFirst({
     where: {
       branchId: parseInt(branchId),
     },
@@ -53,7 +53,7 @@ async function get(req) {
 
   console.log(companyId, active, finYearId, "received");
 
-  const data = await prisma.hRCommonTemplate.findMany({
+  const data = await prisma.ShiftCommonTemplate.findMany({
     where: {
       //   companyId: companyId ? parseInt(companyId) : undefined,
       //   active: active ? Boolean(active) : undefined,
@@ -97,7 +97,7 @@ async function get(req) {
 
 async function getOne(id) {
   const childRecord = 0;
-  const data = await prisma.hRCommonTemplate.findUnique({
+  const data = await prisma.ShiftCommonTemplate.findUnique({
     where: {
       id: parseInt(id),
     },
@@ -117,7 +117,7 @@ async function getOne(id) {
 async function getSearch(req) {
   const { searchKey } = req.params;
   const { companyId, active } = req.query;
-  const data = await prisma.hRCommonTemplate.findMany({
+  const data = await prisma.ShiftCommonTemplate.findMany({
     where: {
       companyId: companyId ? parseInt(companyId) : undefined,
       active: active ? Boolean(active) : undefined,
@@ -140,7 +140,7 @@ async function getSearch(req) {
 
 async function create(body) {
   const { branchId, companyId, active, docId, employeeCategoryId } = await body;
-  const data = await prisma.hRCommonTemplate.create({
+  const data = await prisma.ShiftCommonTemplate.create({
     data: {
       companyId: parseInt(companyId),
       active,
@@ -154,7 +154,7 @@ async function create(body) {
 
 async function update(id, body) {
   const { branchId, companyId, active, docId, employeeCategoryId } = await body;
-  const dataFound = await prisma.hRCommonTemplate.findUnique({
+  const dataFound = await prisma.ShiftCommonTemplate.findUnique({
     where: {
       id: parseInt(id),
     },
@@ -176,7 +176,7 @@ async function update(id, body) {
 }
 
 async function remove(id) {
-  const data = await prisma.hRCommonTemplate.delete({
+  const data = await prisma.ShiftCommonTemplate.delete({
     where: {
       id: parseInt(id),
     },

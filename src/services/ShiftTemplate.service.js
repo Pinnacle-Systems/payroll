@@ -26,15 +26,14 @@ async function getNextDocId(
     },
   });
 
-  const code =  "SHF/TEM"
+  const code = "SHF/TEM"
 
   const branchObj = await getTableRecordWithId(branchId, "branch");
   // let newDocId = `${branchObj.branchCode}/${shortCode}/${code}/1`;
   let newDocId = `${code}/1`;
   if (lastObject) {
-    newDocId = `${code}/${
-      parseInt(lastObject.docId.split("/").at(-1)) + 1
-    }`;
+    newDocId = `${code}/${parseInt(lastObject.docId.split("/").at(-1)) + 1
+      }`;
   }
 
 
@@ -42,40 +41,40 @@ async function getNextDocId(
 }
 
 async function get(req) {
-  const { companyId, active,branchId, finYearId,searchDocId, } = req.query;
+  const { companyId, active, branchId, finYearId, searchDocId, } = req.query;
 
-  console.log(companyId, active, finYearId,"received");
-  
+  console.log(companyId, active, finYearId, "received");
+
   const data = await prisma.ShiftTemplate.findMany({
     where: {
-    //   companyId: companyId ? parseInt(companyId) : undefined,
-    //   active: active ? Boolean(active) : undefined,
-       docId: Boolean(searchDocId)
+      //   companyId: companyId ? parseInt(companyId) : undefined,
+      //   active: active ? Boolean(active) : undefined,
+      docId: Boolean(searchDocId)
         ? {
-            contains: searchDocId,
-          }
+          contains: searchDocId,
+        }
         : undefined,
     },
   });
   let finYearDate = await getFinYearStartTimeEndTime(finYearId);
- 
-   console.log(finYearDate,"finyear--");
-   
+
+  console.log(finYearDate, "finyear--");
+
 
   const shortCode = finYearDate
     ? getYearShortCodeForFinYear(
-        finYearDate?.startDateStartTime,
-        finYearDate?.endDateEndTime
-      )
+      finYearDate?.startDateStartTime,
+      finYearDate?.endDateEndTime
+    )
     : "";
   let newDocId = finYearDate
     ? await getNextDocId(
-        branchId,
-        shortCode,
-        finYearDate?.startDateStartTime,
-        finYearDate?.endDateEndTime,
-        // isTaxBill
-      )
+      branchId,
+      shortCode,
+      finYearDate?.startDateStartTime,
+      finYearDate?.endDateEndTime,
+      // isTaxBill
+    )
     : "";
 
   return { statusCode: 0, nextDocId: newDocId, data };
@@ -117,17 +116,42 @@ async function getSearch(req) {
 }
 
 async function create(body) {
-  const { name, branchId, companyId, active, description, docId } = await body;
-  const data = await prisma.ShiftTemplate.create({
-    data: {
-      name,
-      companyId: parseInt(companyId),
-      active,
-      branchId: parseInt(branchId),
-      description,
-      docId,
-    },
-  });
+  const { name, branchId, companyId, active, description, docId, ShiftTemplateItems } = await body;
+
+  console.log(ShiftTemplateItems,"ShiftTemplateItems");
+  
+
+  const data = await Promise.all(
+    ShiftTemplateItems?.map((item) =>
+      prisma.shiftTemplate.create({
+        data: {
+          templateId: item?.templateId ? item.templateId : undefined,
+          shiftId: shiftId ? shiftId : undefined,
+          inNextDay: inNextDay ? inNextDay : undefined,
+          toleranceInBeforeStart: toleranceInBeforeStart ? toleranceInBeforeStart : undefined,
+          startTime: startTime ? startTime : undefined,
+          toleranceInAfterEnd: toleranceInAfterEnd ? toleranceInAfterEnd : undefined,
+          fbOut: fbOut ? fbOut : undefined,
+          fbIn: fbIn ? fbIn : undefined,
+          lunchBst: lunchBst ? lunchBst : undefined,
+          lBSNDay: lBSNDay ? lBSNDay : undefined,
+          lunchBET: lunchBET ? lunchBET : undefined,
+          lBEnday: lBEnday ? lBEnday : undefined,
+          sbOut: sbOut ? sbOut : undefined,
+          sbIn: sbIn ? sbIn : undefined,
+          toleranceOutBeforeStart: toleranceOutBeforeStart ? toleranceOutBeforeStart : undefined,
+          endTime: endTime ? endTime : undefined,
+          toleranceOutAfterEnd: toleranceOutAfterEnd ? toleranceOutAfterEnd : undefined,
+          outNxtDay: outNxtDay ? outNxtDay : undefined,
+          shiftTimeHrs: shiftTimeHrs ? shiftTimeHrs : undefined,
+          otHrs: otHrs ? otHrs : undefined,
+          quater: quater ? quater : undefined,
+          companyId: companyId ? parseInt(companyId) : undefined,
+          branchId: branchId ? parseInt(branchId) : undefined,
+        }
+      })
+    )
+  );
   return { statusCode: 0, data };
 }
 

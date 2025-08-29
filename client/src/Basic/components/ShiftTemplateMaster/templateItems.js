@@ -10,62 +10,20 @@ import secureLocalStorage from "react-secure-storage";
 import { toast } from "react-toastify";
 import { Eye } from "lucide-react";
 
-const TemplateItems = ({ form, setForm }) => {
-
-    console.log("HItttt")
-
-    const [readOnly, setReadOnly] = useState(false);
-    const [id, setId] = useState("");
-
-    const [name, setName] = useState("");
-    const [description, setDescription] = useState("");
-    const [docId, setDocId] = useState("");
-    const [active, setActive] = useState(true);
-    const [errors, setErrors] = useState({});
-    const [searchValue, setSearchValue] = useState("");
-    const childRecord = useRef(0);
-    const [ShiftTemplateItems, setShiftTemplateItems] = useState([])
-    const [categoryId, setCategoryId] = useState("")
-
-    const params = getCommonParams();
-    const { branchId } = params
-
-    const { data: company } = useGetCompanyQuery({ params });
-    const [companyCode, setCompanyCode] = useState(company?.data[0].code);
-
-    const { data: allData } = useGetShiftTemplateMasterQuery({ params, searchParams: searchValue });
+const TemplateItems = ({
+    saveData, setForm, ShitCommonData, shiftData, readOnly, ShiftTemplateItems, setShiftTemplateItems, id,
+    companyCode, setCompanyCode, docId, setDocId, categoryId, setCategoryId, childRecord
 
 
-    const { data: ShitCommonData } = useGetShiftCommonTemplateQuery({ params, searchParams: searchValue });
-    const { data: singleData, isLoading: isSingleLoading, isFetching: isSingleFetching } = useGetShiftTemplateMasterByIdQuery({ params, searchParams: searchValue });
-    const { data: shiftData } = useGetshiftMasterQuery({ params, searchParams: searchValue });
+}) => {
 
 
 
-    const [addData] = useAddShiftTemplateMasterMutation();
-    const [updateData] = useUpdateShiftTemplateMasterMutation();
-    const [removeData] = useDeleteShiftTemplateMasterMutation();
 
 
-    const getNextDocId = useCallback(() => {
-        if (id) return;
-        if (allData?.nextDocId) {
-            setDocId(allData?.nextDocId);
-        }
-    }, [allData, id]);
 
-    useEffect(getNextDocId, [getNextDocId]);
 
-    useEffect(() => {
-        if (ShiftTemplateItems?.length >= 1) return
-        setShiftTemplateItems(prev => {
-            let newArray = Array.from({ length: 1 - prev.length }, i => {
-                return { fabricId: "", qty: "0.000", colorId: "", taxPercent: "0.000", uomId: "", gaugeId: "", designId: "", gsmId: "", loopLengthId: "", kDiaId: "", fDiaId: "", price: "", discountType: "Percentage", discountValue: "0.00" };
-            })
-            return [...prev, ...newArray]
-        }
-        )
-    }, [ShiftTemplateItems, setShiftTemplateItems])
+
 
     const handleInputChange = (value, index, field) => {
         const newBlend = structuredClone(ShiftTemplateItems);
@@ -74,75 +32,12 @@ const TemplateItems = ({ form, setForm }) => {
         setShiftTemplateItems(newBlend);
     };
 
-    const syncFormWithDb = useCallback(
-        (data) => {
-            if (!id) {
-                // setReadOnly(false);
-                setName("");
-                setDescription("")
-                setActive(true);
-                // setCompanyName(company?.data[0].name);
-                setCompanyCode(company?.data[0].code);
-            } else {
-                // setReadOnly(true);
-                setName(data?.name || "");
-                setDocId(data?.docId || "")
-                setDescription(data?.description || "");
-                setActive(id ? data?.active ?? false : true);
-            }
-        },
-        [id, company]
-    );
 
-    useEffect(() => {
-        syncFormWithDb(singleData?.data);
-    }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
 
-    const data = {
-        name,
-        description,
-        docId,
-        active,
-        companyId: secureLocalStorage.getItem(
-            sessionStorage.getItem("sessionId") + "userCompanyId"
-        ),
-        id,
-        branchId,
-    };
 
-    const validateData = (data) => {
-        if (data.name && data.code) {
-            return true;
-        }
-        return false;
-    };
 
-    const handleSubmitCustom = async (callback, data, text) => {
-        try {
-            let returnData = await callback(data).unwrap();
-            setId(returnData.data.id);
-            toast.success(text + "Successfully");
-        } catch (error) {
-            console.log("handle");
-        }
-    };
 
-    const saveData = () => {
-        // if (!validateData(data)) {
-        //   toast.error("Please fill all required fields...!", {
-        //     position: "top-center",
-        //   });
-        //   return;
-        // }
-        if (!window.confirm("Are you sure save the details ...?")) {
-            return;
-        }
-        if (id) {
-            handleSubmitCustom(updateData, data, "Updated");
-        } else {
-            handleSubmitCustom(addData, data, "Added");
-        }
-    };
+
     return (
         <>
 
@@ -386,7 +281,7 @@ const TemplateItems = ({ form, setForm }) => {
                                                         >
                                                             Quater(Y/N)
                                                         </th>
-                                                             <th
+                                                        <th
 
                                                             className={`w-28 px-3 py-2 text-center font-medium text-[13px] `}
                                                         >
@@ -403,7 +298,12 @@ const TemplateItems = ({ form, setForm }) => {
                                                             </td>
 
                                                             <td className=' border border-gray-500'>
-                                                                <input type="date" />
+                                                                <input
+                                                                    type="date"
+                                                                    value={item?.appliedOn}
+                                                                    onChange={(e) => handleInputChange(e.target.value, index, "appliedOn")}
+
+                                                                />
                                                             </td>
                                                             <td className=' border border-gray-500'>
                                                                 <select
@@ -718,7 +618,7 @@ const TemplateItems = ({ form, setForm }) => {
                                                             </td>
                                                             <td className='table-data flex item-center'>
 
-                                                                    <Eye/>        
+                                                                <Eye />
                                                             </td>
 
                                                         </tr>
