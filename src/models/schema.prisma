@@ -23,44 +23,44 @@ model Page {
 }
 
 model Company {
-  id                 Int                  @id @default(autoincrement())
-  companyId          String               @unique @default(uuid())
-  name               String
-  code               String?
-  gstNo              String?
-  panNo              String?
-  contactName        String?
-  contactMobile      BigInt
-  contactEmail       String?
-  bankName           String?
-  accNo              String?
-  branchName         String?
-  ifscCode           String?
-  branch             Branch[]
-  country            Country[]
-  active             Boolean              @default(true)
-  Department         Department[]
-  Role               Role[]
-  Subscription       Subscription[]
-  finYear            FinYear[]
-  PartyCategory      PartyCategory[]
-  Currency           Currency[]
-  Party              Party[]
-  Hsn                Hsn[]
-  PayTerm            PayTerm[]
-  TaxTerm            TaxTerm[]
-  TaxTemplate        TaxTemplate[]
-  Location           Location[]
-  TermsAndConditions TermsAndConditions[]
-  OrderImport        OrderImport[]
-  LineMaster         LineMaster[]
-  Color              Color[]
-  unitOfMeasurement  UnitOfMeasurement[]
-  PartyMasterNew     PartyMasterNew[]
-  Designation        Designation[]
-  HRTemplate         HRTemplate[]
-  HRCommonTemplate   HRCommonTemplate[]
-  ShiftTemplate      ShiftTemplate[]
+  id                  Int                   @id @default(autoincrement())
+  companyId           String                @unique @default(uuid())
+  name                String
+  code                String?
+  gstNo               String?
+  panNo               String?
+  contactName         String?
+  contactMobile       BigInt
+  contactEmail        String?
+  bankName            String?
+  accNo               String?
+  branchName          String?
+  ifscCode            String?
+  branch              Branch[]
+  country             Country[]
+  active              Boolean               @default(true)
+  Department          Department[]
+  Role                Role[]
+  Subscription        Subscription[]
+  finYear             FinYear[]
+  PartyCategory       PartyCategory[]
+  Currency            Currency[]
+  Party               Party[]
+  Hsn                 Hsn[]
+  PayTerm             PayTerm[]
+  TaxTerm             TaxTerm[]
+  TaxTemplate         TaxTemplate[]
+  Location            Location[]
+  TermsAndConditions  TermsAndConditions[]
+  OrderImport         OrderImport[]
+  LineMaster          LineMaster[]
+  Color               Color[]
+  unitOfMeasurement   UnitOfMeasurement[]
+  PartyMasterNew      PartyMasterNew[]
+  Designation         Designation[]
+  Shift               Shift[]
+  ShiftCommonTemplate ShiftCommonTemplate[]
+  ShiftTemplate       ShiftTemplate[]
 }
 
 model Subscription {
@@ -100,8 +100,8 @@ model Branch {
   purchaseInwardEntry purchaseInwardEntry[]
   SampleEntry         SampleEntry[]
   poAttachments       poAttachments[]
-  HRTemplate          HRTemplate[]
-  HRCommonTemplate    HRCommonTemplate[]
+  Shift               Shift[]
+  ShiftCommonTemplate ShiftCommonTemplate[]
   ShiftTemplate       ShiftTemplate[]
 }
 
@@ -187,10 +187,10 @@ model User {
   SampleEntryUpdatedBy         SampleEntry[]         @relation(name: "updatedBy")
   poAttachementsCreatedBy      poAttachments[]       @relation(name: "createdBy")
   poAttachementsupdatedBy      poAttachments[]       @relation(name: "updatedBy")
-  HRTemplateCreatedBy          HRTemplate[]          @relation(name: "createdBy")
-  HRTemplateupdatedBy          HRTemplate[]          @relation(name: "updatedBy")
-  HRCommonTemplateCreatedBy    HRCommonTemplate[]    @relation(name: "createdBy")
-  HRCommonTemplateupdatedBy    HRCommonTemplate[]    @relation(name: "updatedBy")
+  ShiftCreatedBy               Shift[]               @relation(name: "createdBy")
+  ShiftupdatedBy               Shift[]               @relation(name: "updatedBy")
+  ShiftCommonTemplateCreatedBy ShiftCommonTemplate[] @relation(name: "createdBy")
+  ShiftCommonTemplateupdatedBy ShiftCommonTemplate[] @relation(name: "updatedBy")
   ShiftTemplateCreatedBy       ShiftTemplate[]       @relation(name: "createdBy")
   ShiftTemplateupdatedBy       ShiftTemplate[]       @relation(name: "updatedBy")
   PayFrequencyCreatedBy        PayFrequency[]        @relation(name: "createdBy")
@@ -262,15 +262,15 @@ model FinYear {
 }
 
 model EmployeeCategory {
-  id               Int                @id @default(autoincrement())
-  name             String
-  code             String
-  Branch           Branch?            @relation(fields: [branchId], references: [id])
-  branchId         Int?
-  active           Boolean            @default(true)
-  defaultCategory  Boolean            @default(false)
-  Employee         Employee[]
-  HRCommonTemplate HRCommonTemplate[]
+  id                  Int                   @id @default(autoincrement())
+  name                String
+  code                String
+  Branch              Branch?               @relation(fields: [branchId], references: [id])
+  branchId            Int?
+  active              Boolean               @default(true)
+  defaultCategory     Boolean               @default(false)
+  Employee            Employee[]
+  ShiftCommonTemplate ShiftCommonTemplate[]
 }
 
 model Country {
@@ -1143,7 +1143,7 @@ model Designation {
   Employee   Employee[]
 }
 
-model HRTemplate {
+model Shift {
   id          Int      @id @default(autoincrement())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -1161,7 +1161,7 @@ model HRTemplate {
   active      Boolean? @default(true)
 }
 
-model HRCommonTemplate {
+model ShiftCommonTemplate {
   id                 Int               @id @default(autoincrement())
   createdAt          DateTime          @default(now())
   updatedAt          DateTime          @updatedAt
@@ -1180,20 +1180,20 @@ model HRCommonTemplate {
 }
 
 model ShiftTemplate {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdBy   User?    @relation("createdBy", fields: [createdById], references: [id])
-  createdById Int?
-  updatedBy   User?    @relation("updatedBy", fields: [updatedById], references: [id])
-  updatedById Int?
-  companyId   Int?
-  company     Company? @relation(fields: [companyId], references: [id])
-  branch      Branch?  @relation(fields: [branchId], references: [id])
-  branchId    Int?
-  name        String?
-  docId       String?
-  active      Boolean? @default(true)
+  id                      Int      @id @default(autoincrement())
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+  createdBy               User?    @relation("createdBy", fields: [createdById], references: [id])
+  createdById             Int?
+  updatedBy               User?    @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById             Int?
+  companyId               Int?
+  company                 Company? @relation(fields: [companyId], references: [id])
+  branch                  Branch?  @relation(fields: [branchId], references: [id])
+  branchId                Int?
+  name                    String?
+  docId                   String?
+  active                  Boolean? @default(true)
   templateId              Int?
   shiftId                 Int?
   inNextDay               String?
@@ -1216,7 +1216,6 @@ model ShiftTemplate {
   otHrs                   String?
   quater                  String?
 }
-
 
 model PayFrequency {
   id               Int       @id @default(autoincrement())
