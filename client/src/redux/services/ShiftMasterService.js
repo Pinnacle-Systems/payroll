@@ -1,20 +1,20 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { HRCommonTemplate_API } from "../../Api";
+import { SHIFT_MASTER_API } from "../../Api";
 
 const BASE_URL = process.env.REACT_APP_SERVER_URL;
 
-const HRCommonTemplateMasterApi = createApi({
-  reducerPath: "HRCommonTemplateMaster",
+const shiftMasterApi = createApi({
+  reducerPath: "shiftMaster",
   baseQuery: fetchBaseQuery({
     baseUrl: BASE_URL,
   }),
-  tagTypes: ["HRCommonTemplate"],
+  tagTypes: ["shiftMaster"],
   endpoints: (builder) => ({
-    getHRCommonTemplate: builder.query({
+    getshiftMaster: builder.query({
       query: ({ params, searchParams }) => {
         if (searchParams) {
           return {
-            url: HRCommonTemplate_API  + "/search/" + searchParams,
+            url: SHIFT_MASTER_API  + "/search/" + searchParams,
             method: "GET",
             headers: {
               "Content-type": "application/json; charset=UTF-8",
@@ -23,7 +23,7 @@ const HRCommonTemplateMasterApi = createApi({
           };
         }
         return {
-          url: HRCommonTemplate_API ,
+          url: SHIFT_MASTER_API ,
           method: "GET",
           headers: {
             "Content-type": "application/json; charset=UTF-8",
@@ -31,58 +31,58 @@ const HRCommonTemplateMasterApi = createApi({
           params,
         };
       },
-      providesTags:["HRCommonTemplate"],
+      providesTags: ["shiftMaster"],
     }),
-    getHRCommonTemplateById: builder.query({
+    getshiftMasterById: builder.query({
       query: (id) => {
         return {
-          url: `${HRCommonTemplate_API }/${id}`,
+          url: `${SHIFT_MASTER_API }/${id}`,
           method: "GET",
           headers: {
             "Content-type": "application/json; charset=UTF-8",
           },
         };
       },
-      providesTags: ["HRCommonTemplate"],
+      providesTags: ["shiftMaster"],
     }),
-    addHRCommonTemplate: builder.mutation({
+    addshiftMaster: builder.mutation({
       query: (payload) => ({
-        url: HRCommonTemplate_API ,
+        url: SHIFT_MASTER_API ,
         method: "POST",
         body: payload,
         headers: {
           "Content-type": "application/json; charset=UTF-8",
         },
       }),
-      invalidatesTags: ["HRCommonTemplate"],
+      invalidatesTags: ["shiftMaster"],
     }),
-    updateHRCommonTemplate: builder.mutation({
+    updateshiftMaster: builder.mutation({
       query: (payload) => {
         const { id, ...body } = payload;
         return {
-          url: `${HRCommonTemplate_API }/${id}`,
+          url: `${SHIFT_MASTER_API }/${id}`,
           method: "PUT",
           body,
         };
       },
-      invalidatesTags: ["HRCommonTemplate"],
+      invalidatesTags: ["shiftMaster"],
     }),
-    deleteHRCommonTemplate: builder.mutation({
+    deleteshiftMaster: builder.mutation({
       query: (id) => ({
-        url: `${HRCommonTemplate_API }/${id}`,
+        url: `${SHIFT_MASTER_API }/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["HRCommonTemplate"],
+      invalidatesTags: ["shiftMaster"],
     }),
   }),
 });
 
 export const {
-  useGetHRCommonTemplateQuery,
-  useGetHRCommonTemplateByIdQuery,
-  useAddHRCommonTemplateMutation,
-  useUpdateHRCommonTemplateMutation,
-  useDeleteHRCommonTemplateMutation,
-} = HRCommonTemplateMasterApi;
+  useGetshiftMasterQuery,
+  useGetshiftMasterByIdQuery,
+  useAddshiftMasterMutation,
+  useUpdateshiftMasterMutation,
+  useDeleteshiftMasterMutation,
+} = shiftMasterApi;
 
-export default HRCommonTemplateMasterApi;
+export default shiftMasterApi;

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 const router = Router();
-import { get,  getOne, getSearch, create, update, remove } from '../controllers/hrTemplate.Controller.js';
+import { get,  getOne, getSearch, create, update, remove } from '../controllers/ShiftCommonTemplate.controller.js';
 
 
 router.post('/', create);
