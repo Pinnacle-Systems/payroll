@@ -1,99 +1,116 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import secureLocalStorage from "react-secure-storage";
-import { useGetDepartmentQuery } from "../../../redux/services/DepartmentMasterService";
 
 import { toast } from "react-toastify";
-import { TextInput, ToggleButton, ReusableTable } from "../../../Inputs";
-
-import Mastertable from "../MasterTable/Mastertable";
-import MastersForm from "../MastersForm/MastersForm";
-import { statusDropdown } from "../../../Utils/DropdownData";
-import Modal from "../../../UiComponents/Modal";
 import {
-  useAdddesignationMutation,
-  useDeletedesignationMutation,
-  useGetdesignationByIdQuery,
-  useGetdesignationQuery,
-  useUpdatedesignationMutation,
-} from "../../../redux/services/DesignationMasterService";
-import { useGetFinYearQuery } from "../../../redux/services/FinYearMasterService";
+  TextInput,
+  ToggleButton,
+  ReusableTable,
+  TextAreaInput,
+} from "../../../Inputs";
+
+import { statusDropdown } from "../../../Utils/DropdownData";
+
+import { useGetCompanyQuery } from "../../../redux/services/CompanyMasterService";
+import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
 
-const PayFrequency = () => {
+import { getCommonParams } from "../../../Utils/helper";
+import {
+  useAddShiftCommonTemplateMutation,
+  useDeleteShiftCommonTemplateMutation,
+  useGetShiftCommonTemplateByIdQuery,
+  useGetShiftCommonTemplateQuery,
+  useUpdateShiftCommonTemplateMutation,
+} from "../../../redux/services/ShiftCommonTemplate.service";
+import { useGetPartyCategoryMasterQuery } from "../../../redux/services/PartyCategoryServices";
+import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCategoryMasterService";
+
+const ShiftCommonTemplateMaster = () => {
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
-  const [payfrequency, setPayfrequency] = useState("");
-  const [finYearId, setFinYearId] = useState("");
+
+  const [docId, setDocId] = useState("");
   const [active, setActive] = useState(true);
   const [errors, setErrors] = useState({});
   const [form, setForm] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const MODEL = "PAY FREQUENCY";
-  console.log(form, "form");
-  const params = {
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
-  };
-  const { data: department } = useGetDepartmentQuery({
+  const [employeeCategoryId, setEmployeeCategoryId] = useState("");
+  const params = getCommonParams();
+
+  const { branchId } = params;
+
+  const { data: company } = useGetCompanyQuery({ params });
+  const [companyName, setCompanyName] = useState(company?.data[0].name);
+  const [companyCode, setCompanyCode] = useState(company?.data[0].code);
+  const { data: allData } = useGetShiftCommonTemplateQuery({
     params,
     searchParams: searchValue,
   });
-
-  const {
-    data: allData,
-    isLoading,
-    isFetching,
-  } = useGetdesignationQuery({ params, searchParams: searchValue });
   const {
     data: singleData,
     isFetching: isSingleFetching,
     isLoading: isSingleLoading,
-  } = useGetdesignationByIdQuery(id, { skip: !id });
+  } = useGetShiftCommonTemplateByIdQuery(id, { skip: !id });
 
-  const { data: finYear } = useGetFinYearQuery({
-    params,
-    searchParams: searchValue,
-  });
+  const { data: employeeCategory } = useGetEmployeeCategoryQuery({ params });
 
-  const [addData] = useAdddesignationMutation();
-  const [updateData] = useUpdatedesignationMutation();
-  const [removeData] = useDeletedesignationMutation();
+  // useEffect(() => {
+  //   if (company?.data?.length > 0) {
+  //     setCompanyName(company.data[0].name);
+  //     setCompanyCode(company.data[0].code);
+  //   }
+  // }, [company]);
 
+  const [addData] = useAddShiftCommonTemplateMutation();
+  const [updateData] = useUpdateShiftCommonTemplateMutation();
+  const [removeData] = useDeleteShiftCommonTemplateMutation();
+  const getNextDocId = useCallback(() => {
+    if (id) return;
+    if (allData?.nextDocId) {
+      setDocId(allData?.nextDocId);
+    }
+  }, [allData, id]);
+
+  useEffect(getNextDocId, [getNextDocId]);
   const syncFormWithDb = useCallback(
     (data) => {
-      setActive(id ? data?.active ?? false : true);
-      setPayfrequency(data?.payId);
+      if (!id) {
+        // setReadOnly(false);
+     
+        setActive(true);
+        setEmployeeCategoryId("");
+        setCompanyName(company?.data[0].name);
+        setCompanyCode(company?.data[0].code);
+      } else {
+        // setReadOnly(true);
+       
+        setDocId(data?.docId || "");
+        
+        setEmployeeCategoryId(data?.employeeCategoryId || "");
+        setActive(id ? data?.active ?? false : true);
+      }
     },
-    [id]
+    [id, company]
   );
 
   useEffect(() => {
     syncFormWithDb(singleData?.data);
   }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
 
+  console.log(singleData?.data,"singleData?.data");
+  
+
   const data = {
+    docId,
+    employeeCategoryId,
     active,
-
+    companyId: secureLocalStorage.getItem(
+      sessionStorage.getItem("sessionId") + "userCompanyId"
+    ),
     id,
-    payfrequency,
-  };
-  const handleFinYearChange = (e) => {
-    const selectedId = Number(e.target.value);
-    setFinYearId(selectedId);
-
-    const selectedYear = finYear?.data?.find((fin) => fin?.id === selectedId);
-    console.log(selectedYear, "selectedYear");
-    if (selectedYear) {
-      setStartDate(selectedYear?.from?.split("T")[0] ?? "");
-      setEndDate(selectedYear?.to?.split("T")[0] ?? "");
-    } else {
-      setStartDate("");
-      setEndDate("");
-    }
+    branchId,
   };
 
   const validateData = (data) => {
@@ -114,12 +131,12 @@ const PayFrequency = () => {
   };
 
   const saveData = () => {
-    if (!validateData(data)) {
-      toast.error("Please fill all required fields...!", {
-        position: "top-center",
-      });
-      return;
-    }
+    // if (!validateData(data)) {
+    //   toast.error("Please fill all required fields...!", {
+    //     position: "top-center",
+    //   });
+    //   return;
+    // }
     if (!window.confirm("Are you sure save the details ...?")) {
       return;
     }
@@ -130,7 +147,7 @@ const PayFrequency = () => {
     }
   };
 
-  const deleteData = async () => {
+  const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
         return;
@@ -164,17 +181,9 @@ const PayFrequency = () => {
     setReadOnly(false);
     setForm(true);
     setSearchValue("");
-    setPayfrequency("");
-    setActive(true);
-    setFinYearId("")
-    setStartDate("")
-    setEndDate("")
+    setCompanyName(company.data[0].name);
+    setCompanyCode(company.data[0].code);
   };
-
-  function onDataClick(id) {
-    setId(id);
-    setForm(true);
-  }
   const handleView = (id) => {
     setId(id);
     setForm(true);
@@ -205,65 +214,36 @@ const PayFrequency = () => {
     },
 
     {
-      header: "Shift Name",
-      accessor: (item) => item?.name,
+      header: "Common Template Name",
+      accessor: (item) => item?.employeeCategory.name,
       //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-32",
+      className: "font-medium text-gray-900 text-center uppercase w-72",
     },
 
     {
       header: "Status",
       accessor: (item) => (item.active ? ACTIVE : INACTIVE),
       //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-16",
+      className: "font-medium text-gray-900 text-center uppercase w-36",
     },
     {
       header: "",
       accessor: (item) => "",
       //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 uppercase w-[75%]",
+      className: "font-medium text-gray-900 uppercase w-[65%]",
     },
   ];
-  // const tableHeaders = [
-  //   "S.NO",
-  //   "Code",
-  //   "Name",
-  //   "Status",
-  //   " ",
-  //   " ",
-  //   " ",
-  //   " ",
-  //   " ",
-  //   " ",
-  //   " ",
-  //   " ",
-  //   " ",
-  //   " ",
-  //   " ",
-  // ];
-  // const tableDataNames = [
-  //   "index+1",
-  //   "dataObj.code",
-  //   "dataObj.name",
-  //   "dataObj.active ? ACTIVE : INACTIVE",
-  //   " ",
-  //   " ",
-  //   " ",
-  //   " ",
-  //   " ",
-  //   " ",
-  //   " ",
-  //   " ",
-  //   " ",
-  //   " ",
-  //   " ",
-  // ];
+  function onDataClick(id) {
+    setId(id);
+    setForm(true);
+  }
+
   return (
     <div>
-      <div onKeyDown={handleKeyDown} className="p-1">
+      <div onKeyDown={handleKeyDown} className="p-1 ">
         <div className="w-full flex bg-white p-1 justify-between  items-center">
           <h1 className="text-2xl font-bold text-gray-800">
-            PayFrequency Master
+            Shift Common Template Master
           </h1>
           <div className="flex items-center gap-4">
             <button
@@ -273,7 +253,7 @@ const PayFrequency = () => {
               }}
               className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
             >
-              + Add New PayFrequency
+              + Add New Shift Common Template
             </button>
           </div>
         </div>
@@ -292,7 +272,7 @@ const PayFrequency = () => {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[55%]  h-[70%]"}
+            widthClass={"w-[45%]  h-[65%]"}
             onClose={() => {
               setForm(false);
               setErrors({});
@@ -304,9 +284,9 @@ const PayFrequency = () => {
                   <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
                     {id
                       ? !readOnly
-                        ? "Edit PayFrequency Master"
-                        : "PayFrequency Master"
-                      : "Add New PayFrequency"}
+                        ? "Edit Shift Common Template Master"
+                        : "Shift Common Template Master"
+                      : "Add  New Shift Common  Template"}
                   </h2>
                 </div>
                 <div className="flex gap-2">
@@ -345,75 +325,93 @@ const PayFrequency = () => {
                 <div className="grid grid-cols-1  gap-3  h-full">
                   <div className="lg:col-span- space-y-3">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
-                      <div className="space-y-4  w-[90%]">
-                        <div className="flex gap-x-12">
-                          <label className="block text-xs text-black mb-1">
-                            Choose Finyear
-                            <span className="text-red-500">*</span>
-                            <select
-                              value={finYearId}
-                              onChange={handleFinYearChange}
-                              required
-                              className="w-full border p-1 rounded"
-                            >
-                              <option value="">-- Select Finyear --</option>
-
-                              {finYear?.data?.map((fin) => (
-                                <option key={fin?.id} value={fin?.id}>
-                                  {fin?.code}
-                                </option>
-                              ))}
-                            </select>
-                          </label>
-
-                          <label className="text-xs text-black mb-1">
-                            Start Date
-                            <input
-                              type="date"
-                              value={startDate}
-                              readOnly
-                              className="block border p-1 rounded"
-                            />{" "}
-                          </label>
-
-                          <label className=" text-xs text-black mb-1">
-                            End Date
-                            <input
-                              type="date"
-                              value={endDate}
-                              readOnly
-                              className="block border p-1 rounded"
-                            />{" "}
-                          </label>
-                        </div>
-
-                        {/* <div>
-                            <label className="block text-xs text-black mb-1">
-                              Pay Frequency{" "}
-                              <span className="text-red-500">*</span>
-                              <select
-                                value={payfrequency}
-                                onChange={(e) =>
-                                  setPayfrequency(e.target.value)
-                                }
-                                required
-                                className="w-full border p-1 rounded"
-                              >
-                                <option value="">
-                                  -- Select Pay Frequency --
-                                </option>
-                                <option value="biWeekly">Biweekly</option>
-                                <option value="weekly">Weekly</option>
-                                <option value="semiWeekly">Semi Weekly</option>
-                                <option value="semiMonthly">
-                                  Semi Monthly
-                                </option>
-
-                                <option value="monthly">Monthly</option>
-                              </select>
-                            </label>
+                      <div className="space-y-4 w-[40%]">
+                        {/* <div className="w-72">
+                            <TextInput
+                              name="Company Name"
+                              type="text"
+                              value={companyName}
+                              setValue={setCompanyName}
+                              required={true}
+                              // readOnly={readOnly}
+                              disabled={true}
+                            />
                           </div> */}
-                        <div className="mb-3">
+
+                        <TextInput
+                          name="Company Code"
+                          type="text"
+                          value={companyCode}
+                          setValue={setCompanyCode}
+                          required={true}
+                          // readOnly={readOnly}
+                          disabled={true}
+                        />
+
+                        <div className="w-42">
+                          <TextInput
+                            name="Shift Common Template Code"
+                            type="text"
+                            value={docId}
+                            // setValue={setDocId}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                          />
+                        </div>
+                        {/* <div className="w-72">
+                            <TextInput
+                              name="Shift Common Template Name"
+                              type="text"
+                              value={name}
+                              setValue={setName}
+                              required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                    
+                        </div> */}
+                        <div className="w-42">
+                          <label className="block text-xs text-black mb-1">
+                            Choose Template
+                          </label>
+                          <select
+                            className="w-full px-2 h-[26px] text-[12px] border border-slate-300 rounded-md 
+                    focus:border-indigo-300 focus:outline-none transition-all duration-200
+                     hover:border-slate-400"
+                            value={employeeCategoryId}
+                            onChange={(e) => {
+                              setEmployeeCategoryId(e.target.value);
+                            }}
+                            disabled={readOnly}
+                          >
+                            <option value="">Select Category</option>
+
+                            {console.log(employeeCategory?.data, "dropdown")}
+
+                            {employeeCategory?.data?.map((doc) => (
+                              <option value={doc?.id} key={doc.id}>
+                                {doc.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                        {/* <div className="w-60">
+                          <label className="block text-xs text-black mb-1">
+                            Common Template Description
+                          </label>
+                          <TextAreaInput
+                            name=""
+                            type="text"
+                            value={description}
+                            setValue={setDescription}
+                            // required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                          />
+                        </div> */}
+
+                        <div className="mt-5">
                           <ToggleButton
                             name="Status"
                             options={statusDropdown}
@@ -436,4 +434,4 @@ const PayFrequency = () => {
   );
 };
 
-export default PayFrequency;
+export default ShiftCommonTemplateMaster;

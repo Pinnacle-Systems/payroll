@@ -32,7 +32,12 @@ import {
   purchaseInwardEntry,
   partyMasterNew,
   sampleEntry,
-  designation
+  designation,
+ 
+ 
+  ShiftTemplate,
+  ShiftCommonTemplate,
+  shiftMaster
 
 } from './src/routes/index.js';
 
@@ -113,15 +118,23 @@ app.use('/uom', uom);
 app.use('/purchaseInwardEntry',purchaseInwardEntry);
 app.use("/partyMasterNew",partyMasterNew)
 app.use("/sampleEntry",sampleEntry)
-  app.get("/retreiveFile/:fileName", (req, res) => {
-    const { fileName } = req.params
-    res.sendFile(__dirname + "/uploads/" + fileName);
-  })
-
 app.use('/uploads', express.static('uploads'));
 
 app.use("/sendMail", sendMail)
 app.use("/designation",designation)
+app.use('/shift',shiftMaster)
+app.use('/shiftCommonTemplate',ShiftCommonTemplate)
+app.use('/ShiftTemplate',ShiftTemplate)
+
+
+
+
+
+
+app.get("/retreiveFile/:fileName", (req, res) => {
+  const { fileName } = req.params
+  res.sendFile(__dirname + "/uploads/" + fileName);
+})
 
 
 const httpServer = createServer(app);

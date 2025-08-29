@@ -58,6 +58,9 @@ model Company {
   unitOfMeasurement  UnitOfMeasurement[]
   PartyMasterNew     PartyMasterNew[]
   Designation        Designation[]
+  HRTemplate         HRTemplate[]
+  HRCommonTemplate   HRCommonTemplate[]
+  ShiftTemplate      ShiftTemplate[]
 }
 
 model Subscription {
@@ -97,6 +100,9 @@ model Branch {
   purchaseInwardEntry purchaseInwardEntry[]
   SampleEntry         SampleEntry[]
   poAttachments       poAttachments[]
+  HRTemplate          HRTemplate[]
+  HRCommonTemplate    HRCommonTemplate[]
+  ShiftTemplate       ShiftTemplate[]
 }
 
 model UserOnBranch {
@@ -181,6 +187,12 @@ model User {
   SampleEntryUpdatedBy         SampleEntry[]         @relation(name: "updatedBy")
   poAttachementsCreatedBy      poAttachments[]       @relation(name: "createdBy")
   poAttachementsupdatedBy      poAttachments[]       @relation(name: "updatedBy")
+  HRTemplateCreatedBy          HRTemplate[]          @relation(name: "createdBy")
+  HRTemplateupdatedBy          HRTemplate[]          @relation(name: "updatedBy")
+  HRCommonTemplateCreatedBy    HRCommonTemplate[]    @relation(name: "createdBy")
+  HRCommonTemplateupdatedBy    HRCommonTemplate[]    @relation(name: "updatedBy")
+  ShiftTemplateCreatedBy       ShiftTemplate[]       @relation(name: "createdBy")
+  ShiftTemplateupdatedBy       ShiftTemplate[]       @relation(name: "updatedBy")
   PayFrequencyCreatedBy        PayFrequency[]        @relation(name: "createdBy")
   PayFrequencyupdatedBy        PayFrequency[]        @relation(name: "updatedBy")
 }
@@ -250,14 +262,15 @@ model FinYear {
 }
 
 model EmployeeCategory {
-  id              Int        @id @default(autoincrement())
-  name            String
-  code            String
-  Branch          Branch?    @relation(fields: [branchId], references: [id])
-  branchId        Int?
-  active          Boolean    @default(true)
-  defaultCategory Boolean    @default(false)
-  Employee        Employee[]
+  id               Int                @id @default(autoincrement())
+  name             String
+  code             String
+  Branch           Branch?            @relation(fields: [branchId], references: [id])
+  branchId         Int?
+  active           Boolean            @default(true)
+  defaultCategory  Boolean            @default(false)
+  Employee         Employee[]
+  HRCommonTemplate HRCommonTemplate[]
 }
 
 model Country {
@@ -1130,23 +1143,56 @@ model Designation {
   Employee   Employee[]
 }
 
-model PayFrequency {
-  id               Int       @id @default(autoincrement())
-  createdAt        DateTime? @default(now())
-  updatedAt        DateTime? @updatedAt
-  createdBy        User?     @relation("createdBy", fields: [createdById], references: [id])
-  createdById      Int?
-  updatedBy        User?     @relation("updatedBy", fields: [updatedById], references: [id])
-  updatedById      Int?
-  name             String?
-  active           Boolean?  @default(true)
-  payFrequencyType String?
+model HRTemplate {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation("createdBy", fields: [createdById], references: [id])
+  createdById Int?
+  updatedBy   User?    @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById Int?
+  companyId   Int?
+  company     Company? @relation(fields: [companyId], references: [id])
+  branch      Branch?  @relation(fields: [branchId], references: [id])
+  branchId    Int?
+  name        String?
+  description String?
+  docId       String?
+  active      Boolean? @default(true)
 }
 
-model payType {
-  id             Int       @id @default(autoincrement())
-  weekStartsDate DateTime?
-  weekEndsDate   DateTime?
-  salaryDate     DateTime?
-  notes          String?
+model HRCommonTemplate {
+  id                 Int               @id @default(autoincrement())
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  createdBy          User?             @relation("createdBy", fields: [createdById], references: [id])
+  createdById        Int?
+  updatedBy          User?             @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById        Int?
+  companyId          Int?
+  company            Company?          @relation(fields: [companyId], references: [id])
+  branch             Branch?           @relation(fields: [branchId], references: [id])
+  branchId           Int?
+  employeeCategory   EmployeeCategory? @relation(fields: [employeeCategoryId], references: [id])
+  employeeCategoryId Int?
+  docId              String?
+  active             Boolean?          @default(true)
+}
+
+model ShiftTemplate {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation("createdBy", fields: [createdById], references: [id])
+  createdById Int?
+  updatedBy   User?    @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById Int?
+  companyId   Int?
+  company     Company? @relation(fields: [companyId], references: [id])
+  branch      Branch?  @relation(fields: [branchId], references: [id])
+  branchId    Int?
+  name        String?
+  description String?
+  docId       String?
+  active      Boolean? @default(true)
 }

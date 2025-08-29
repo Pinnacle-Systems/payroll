@@ -26,10 +26,12 @@ import {
 import Modal from "../../../UiComponents/Modal";
 import {
   statusDropdown,
-  employeeType,
+  employeeType as EmployeeType,
   genderList,
   maritalStatusList,
   bloodList,
+  common,
+  SalaryMethod,
 } from "../../../Utils/DropdownData";
 import moment from "moment";
 import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCategoryMasterService";
@@ -62,7 +64,6 @@ export default function Form() {
   const [id, setId] = useState("");
   const [panNo, setPanNo] = useState("");
   const [name, setName] = useState("");
-  const [fatherName, setFatherName] = useState("");
   const [dob, setDob] = useState("");
   const [chamberNo, setChamberNo] = useState("");
   const [localAddress, setlocalAddress] = useState("");
@@ -84,7 +85,7 @@ export default function Form() {
   const [consultFee, setConsultFee] = useState("");
   const [accountNo, setAccountNo] = useState("");
   const [ifscNo, setIfscNo] = useState("");
-  const [branchName, setbranchName] = useState("");
+  const [branchName, setBranchName] = useState("");
   const [bloodGroup, setBloodGroup] = useState("");
   const [department, setDepartment] = useState("");
   const [employeeCategory, setEmployeeCategory] = useState("");
@@ -99,7 +100,58 @@ export default function Form() {
   const [searchValue, setSearchValue] = useState("");
   const [image, setImage] = useState(null);
   const [newForm, setNewForm] = useState(false);
-  const [formHeading, setFormHeading] = "";
+
+
+  const [employeeType, setEmployeeType] = useState("")
+  const [middleName, setMiddleName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [aadharNo, setAadharNo] = useState("");
+  const [fatherName, setFatherName] = useState("");
+  const [motherName, setMotherName] = useState("");
+  const [disability, setDisability] = useState("");
+  const [identificationMark, setIdentificationMark] = useState("");
+  const [height, setHeight] = useState("");
+  const [weight, setWeight] = useState("");
+  const [payCategory, setPayCategory] = useState("");
+  const [idNumber, setIdNumber] = useState("");
+  const [desigination, setDesigination] = useState("");
+  const [shiftTemplate, setShiftTemplate] = useState("");
+  const [salaryMethod, setSalaryMethod] = useState("");
+  const [pf, setPf] = useState("");
+  const [religion, setReligion] = useState("");
+  const [esiNo, setEsiNo] = useState("");
+  const [pfNo, setPfNo] = useState("");
+  const [uanNo, setUanNo] = useState("");
+  const [salary, setSalary] = useState("")
+  const [esi, setEsi] = useState("")
+
+  const [presentAddress, setPresentAddress] = useState({
+    address: "",
+    city: "",
+    village: "",
+    state: "",
+    country: "",
+    pincode: "",
+    mobile: "",
+  })
+
+  const [permanentAddress, setPermanentAddress] = useState({
+    address: "",
+    city: "",
+    village: "",
+    state: "",
+    country: "",
+    pincode: "",
+    mobile: "",
+  })
+  const [sameAsPresent, setSameAsPresent] = useState(false)
+    // const [esi, setEsi] = useState("")
+  
+
+
+
+
+
   const childRecord = useRef(0);
   const dispatch = useDispatch();
   const params = {
@@ -188,7 +240,6 @@ export default function Form() {
         setConsultFee("");
         setAccountNo("");
         setIfscNo("");
-        setbranchName("");
         setBloodGroup("");
         setDepartment("");
         setImage(null);
@@ -230,7 +281,7 @@ export default function Form() {
       setConsultFee(data?.consultFee || "");
       setAccountNo(data?.accountNo || "");
       setIfscNo(data?.ifscNo || "");
-      setbranchName(data?.branchName || "");
+      // setbranchName(data?.branchName || "");
       setBloodGroup(data?.bloodGroup || "");
       setDepartment(data?.department?.id || "");
       setImage(data?.imageBase64 ? viewBase64String(data?.imageBase64) : null);
@@ -260,10 +311,46 @@ export default function Form() {
     branchId: secureLocalStorage.getItem(
       sessionStorage.getItem("sessionId") + "currentBranchId"
     ),
-    panNo,
+    employeeType,
     name,
+    middleName,
+    lastName,
     fatherName,
+    motherName,
+    gender,
+    disability,
+    identificationMark,
     dob,
+    bloodGroup,
+    height,
+    weight,
+    maritalStatus,
+
+    joiningDate,
+    department,
+    employeeCategory,
+    payCategory,
+    idNumber,
+    desigination,
+    shiftTemplate,
+    pf,
+    esi,
+    salary,
+    salaryMethod,
+
+    religion,
+    aadharNo,
+    panNo,
+    esiNo,
+    pfNo,
+    uanNo,
+
+    presentAddress ,
+    permanentAddress,
+    sameAsPresent ,
+
+    
+
     chamberNo,
     localAddress,
     localCity,
@@ -273,18 +360,14 @@ export default function Form() {
     specialization,
     salaryPerMonth,
     commissionCharges,
-    gender,
-    joiningDate,
     permAddress,
     permCity,
     permPincode,
     email,
-    maritalStatus,
     consultFee,
     accountNo,
     ifscNo,
     branchName,
-    bloodGroup,
     ...(department && { department }),
     employeeCategoryId: employeeCategory,
     permanent,
@@ -442,7 +525,7 @@ export default function Form() {
     setConsultFee("");
     setAccountNo("");
     setIfscNo("");
-    setbranchName("");
+    // setbranchName("");
     setBloodGroup("");
     setDepartment("");
     setImage(null);
@@ -491,8 +574,9 @@ export default function Form() {
     setLeavingForm(false);
   };
 
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState("Basic Details");
   const [errors, setErrors] = useState({});
+
   const validateStep = () => {
     let newErrors = {};
     if (step === 1) {
@@ -519,6 +603,48 @@ export default function Form() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleTabClick = (tabNumber) => {
+    // if (tabNumber < step || validateStep()) {
+    // if (tabNumber < step) {
+
+    setStep(tabNumber);
+    // }
+  };
+
+
+
+  const handleCheckboxChange = (e) => {
+    const checked = e.target.checked
+    setSameAsPresent(checked)
+    if (checked) {
+      setPermanentAddress({ ...presentAddress }) // copy all values
+    } else {
+      setPermanentAddress({
+        address: "",
+        city: "",
+        village: "",
+        state: "",
+        country: "",
+        pincode: "",
+        mobile: "",
+      }) // clear when unchecked
+    }
+  }
+
+  const handlePresentChange = (field, value) => {
+    setPresentAddress((prev) => {
+      const updated = { ...prev, [field]: value }
+      if (sameAsPresent) {
+        setPermanentAddress(updated) // keep permanent in sync
+      }
+      return updated
+    })
+  }
+
+  const handlePermanentChange = (field, value) => {
+    setPermanentAddress((prev) => ({ ...prev, [field]: value }))
+  }
+
   return (
     <div onKeyDown={handleKeyDown} className="p-1 ">
       {/* Header Section */}
@@ -539,22 +665,20 @@ export default function Form() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setView("table")}
-              className={`px-3 py-1 rounded-md text-xs flex items-center gap-1 ${
-                view === "table"
-                  ? "bg-indigo-100 text-indigo-600"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
+              className={`px-3 py-1 rounded-md text-xs flex items-center gap-1 ${view === "table"
+                ? "bg-indigo-100 text-indigo-600"
+                : "text-gray-600 hover:bg-gray-100"
+                }`}
             >
               <Table size={16} />
               Table
             </button>
             <button
               onClick={() => setView("card")}
-              className={`px-3 py-1 rounded-md text-xs flex items-center gap-1 ${
-                view === "card"
-                  ? "bg-indigo-100 text-indigo-600"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
+              className={`px-3 py-1 rounded-md text-xs flex items-center gap-1 ${view === "card"
+                ? "bg-indigo-100 text-indigo-600"
+                : "text-gray-600 hover:bg-gray-100"
+                }`}
             >
               <LayoutGrid size={16} />
               Cards
@@ -583,24 +707,21 @@ export default function Form() {
                 <div
                   key={index}
                   onClick={() => onDataClick(employee.id)}
-                  className={`border rounded-lg text-bold overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer ${
-                    employee?.active ? "border-green-200" : "border-red-200"
-                  }`}
+                  className={`border rounded-lg text-bold overflow-hidden transition-all duration-200 hover:shadow-md cursor-pointer ${employee?.active ? "border-green-200" : "border-red-200"
+                    }`}
                 >
                   <div
-                    className={`p-4 ${
-                      employee?.active ? "bg-green-50" : "bg-red-50"
-                    }`}
+                    className={`p-4 ${employee?.active ? "bg-green-50" : "bg-red-50"
+                      }`}
                   >
                     <div className="flex items-center">
                       <img
                         src={employee?.imageBase64 || imageDefault}
                         alt="Profile"
-                        className={`w-12 h-12 object-cover rounded-full border-2 ${
-                          employee?.active
-                            ? "border-green-500"
-                            : "border-red-500"
-                        }`}
+                        className={`w-12 h-12 object-cover rounded-full border-2 ${employee?.active
+                          ? "border-green-500"
+                          : "border-red-500"
+                          }`}
                       />
                       <div className="ml-3">
                         <h3 className="font-medium text-gray-900">
@@ -623,9 +744,8 @@ export default function Form() {
                       <div>
                         <p className="text-gray-500">Status</p>
                         <p
-                          className={`font-medium ${
-                            employee?.active ? "text-green-600" : "text-red-600"
-                          }`}
+                          className={`font-medium ${employee?.active ? "text-green-600" : "text-red-600"
+                            }`}
                         >
                           {employee?.active ? "Active" : "Inactive"}
                         </p>
@@ -648,38 +768,38 @@ export default function Form() {
           )}
         </div>
       </div>
+
+
       {form && (
         <Modal
           isOpen={form}
           form={form}
-          widthClass={"w-[95%] max-w-6xl h-[85vh]"}
+          widthClass={"w-[90%] max-w-6xl h-[75%]"}
           onClose={() => {
             setForm(false);
             setErrors({});
           }}
         >
           <div className="h-full flex flex-col bg-[f1f1f0]">
-            <div className="border-b py-2 px-4 mx-3 flex justify-between items-center sticky top-0 z-10 bg-white">
+            <div className="border-b py-2 px-4 mx-3 flex justify-between items-center sticky top-0 z-10 bg-white mt-4">
               <div className="flex items-center gap-2">
                 <h2 className="text-lg font-semibold text-gray-800">
-                    {id ? (!readOnly?"Edit Employee": "Employee Master") : "Add New Employee"}
+                  {id ? (!readOnly ? "Edit Employee" : "Employee Master") : "Add New Employee"}
                 </h2>
-                {console.log(id,"id")
-                }
+
                 {regNo && (
+
                   <span
-                    className={`px-2 py-0.5 text-xs text-bold rounded-full ${
-                      active
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
+                    className={`px-2 py-0.5 text-xs text-bold rounded-full ${active
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                      }`}
                   >
                     {regNo}
                   </span>
                 )}
               </div>
-             
-              {/* <button type="button" className="px-3 py-1  text-blue-600 hover:bg-blue-600 hover:text-white border border-blue-600 text-xs rounded" onClick={() => setReadOnly(false)}> Edit</button> */}
+
               <div className="flex gap-2">
                 <div>
                   {!readOnly && (
@@ -724,207 +844,527 @@ export default function Form() {
               </div>
             </div>
 
-            <div className="flex-1 overflow-auto p-3">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-2">
-                <div className="lg:col-span-3 space-y-3">
-                  <div className="bg-white p-3 rounded-md border border-gray-200">
-                    <SingleImageFileUploadComponent
-                      setWebCam={setCameraOpen}
-                      disabled={readOnly}
-                      image={image}
-                      setImage={setImage}
-                      className="mb-3"
-                    />
+            <div className="flex-1  p-3 h-[100%]">
+              <div className="flex gap-x-1">
+                {["Basic Details", "Employment Details", "Personal Details", "Contact Details", "Bank Details"].map((tabNumber) => (
+                  <button
+                    key={tabNumber}
+                    onClick={() => handleTabClick(tabNumber)}
+                    className={`px-3 py-1 field-text border-b-2 rounded-t-md transition-colors duration-200
+                ${step === tabNumber
+                        ? 'border-b-2 border-secondary text-secondary font-semibold bg-white'
+                        : 'border-b-2 border-transparent text-gray-500 hover:border-secondary hover:text-secondary'
+                      }`}
+                  >
+                    {tabNumber}
+                  </button>
+                ))}
+              </div>
 
-                    <div className="space-y-2">
-                      <TextInput
-                        ref={input1Ref}
-                        name="Full Name"
-                        value={name}
-                        setValue={setName}
-                        required={true}
-                        readOnly={readOnly}
-                        disabled={childRecord.current > 0}
-                        onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                      />
-                      {errors.name && (
-                        <span className="text-red-500 text-xs ml-1">
-                          {errors.name}
-                        </span>
-                      )}
+              <div className="grid grid-cols-1 gap-2 h-[90%] mt-2 overflow-y-auto">
 
-                      <div className="grid grid-cols-2 gap-2">
-                         <DateInput
-                        name="Date of Birth"
-                        value={dob}
-                        setValue={setDob}
-                        required
-                        readOnly={readOnly}
-                        disabled={childRecord.current > 0}
-                      />
-                      {errors.dob && (
-                        <span className="text-red-500 text-xs ml-1">
-                          {errors.dob}
-                        </span>
-                      )}
-                        <div>
-                          <DropdownInput
-                            ref={input2Ref}
-                            name="Gender"
-                            options={genderList}
-                            value={gender}
-                            setValue={setGender}
-                            required
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                          />
-                          {errors.gender && (
-                            <span className="text-red-500 text-xs">
-                              {errors.gender}
-                            </span>
-                          )}
-                        </div>
 
-                      </div>
-
-                     
-                        <div>
-                          <DropdownInput
-                            name="Blood Group"
-                            options={bloodList}
-                            value={bloodGroup}
-                            setValue={setBloodGroup}
-                            required
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                          />
-                          {errors.bloodGroup && (
-                            <span className="text-red-500 text-xs ml-1">
-                              {errors.bloodGroup}
-                            </span>
-                          )}
-                        </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-white p-3 rounded-md border border-gray-200">
-                    <h3 className="font-medium text-gray-800 mb-2 text-sm">
-                      Employment Status
-                    </h3>
-                    <div className="space-y-2">
-                      <ToggleButton
-                        name="Status"
-                        options={statusDropdown}
-                        value={active}
-                        setActive={setActive}
-                        required={true}
-                        readOnly={readOnly}
-                      />
-                      {errors.active && (
-                        <span className="text-red-500 text-xs ml-1">
-                          {errors.active}
-                        </span>
-                      )}
-
-                      {!active && (
-                        <button
-                          type="button"
-                          onClick={() => setLeavingForm(true)}
-                          className="text-xs text-red-600 hover:text-red-800 underline"
-                        >
-                          Add Leaving Details
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="lg:col-span-5 space-y-3">
-                  <div className="bg-white p-3 rounded-md border border-gray-200">
-                    <h3 className="font-medium text-gray-800 mb-2 text-sm">
-                      Official Details
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      <div>
+                {step === "Basic Details" && (
+                  <div className=" bg-white p-4 rounded-md border border-gray-200 overflow-y-auto">
+                    <h1 className=" text-gray-800 mb-2 ">
+                      Basic Details
+                    </h1>
+                    <div className="grid grid-cols-6 gap-4 ">
+                      <div className="col-span-1">
                         <DropdownInput
-                          ref={input3Ref}
-                          name="Employee Category"
-                          options={dropDownListObject(
-                            id
-                              ? employeeCategoryList?.data
-                              : employeeCategoryList?.data?.filter(
-                                  (item) => item.active
-                                ),
-                            "name",
-                            "id"
-                          )}
-                          value={employeeCategory}
-                          setValue={(value) => setEmployeeCategory(value)}
+                          ref={input1Ref}
+                          name="Employee Type"
+                          value={employeeType}
+                          setValue={setEmployeeType}
+                          options={EmployeeType}
                           required={true}
                           readOnly={readOnly}
                           disabled={childRecord.current > 0}
-                          onKeyDown={(e) => handleKeyNext(e, null)}
+                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                         />
-                        {errors.employeeCategory && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.employeeCategory}
-                          </span>
+                        {errors.name && (
+                          <span className="text-red-500 text-xs ml-1">{errors.name}</span>
                         )}
                       </div>
-
-                      <div>
-                        <DropdownInput
-                          name="Department"
-                          options={dropDownListObject(
-                            id
-                              ? departmentList?.data
-                              : departmentList?.data?.filter(
-                                  (item) => item.active
-                                ),
-                            "name",
-                            "id"
-                          )}
-                          value={department}
-                          setValue={setDepartment}
-                          readOnly={readOnly}
-                          required={true}
-                          disabled={childRecord.current > 0}
-                        />
-                        {errors.department && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.department}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="">
-                        <DateInput
-                          name="Joining Date"
-                          value={joiningDate}
-                          setValue={setJoiningDate}
-                          required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                        />
-                        {errors.joiningDate && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.joiningDate}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-white p-3 rounded-md border border-gray-200">
-                    <h3 className="font-medium text-gray-800 mb-2 text-sm">
-                      Additional Information
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      <div>
+                      <div className="col-span-1">
                         <TextInput
-                          name="Father Name"
+                          ref={input1Ref}
+                          name="First Name"
+                          value={name}
+                          setValue={setName}
+                          required={true}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                        />
+                        {errors.name && (
+                          <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                        )}
+                      </div>       <div className="col-span-1">
+                        <TextInput
+                          ref={input1Ref}
+                          name="Middle Name"
+                          value={middleName}
+                          setValue={setMiddleName}
+                          required={true}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                        />
+                        {errors.name && (
+                          <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                        )}
+                      </div>       <div className="col-span-1">
+                        <TextInput
+                          ref={input1Ref}
+                          name="Last Name"
+                          value={lastName}
+                          setValue={setLastName}
+                          required={true}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                        />
+                        {errors.name && (
+                          <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                        )}
+                      </div>
+
+
+
+                      <div className="col-span-1">
+                        <TextInput
+                          ref={input1Ref}
+                          name="Father/Husband Name"
                           value={fatherName}
                           setValue={setFatherName}
+                          required={true}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                        />
+                        {errors.name && (
+                          <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                        )}
+                      </div>       <div className="col-span-1">
+                        <TextInput
+                          ref={input1Ref}
+                          name="Mother Name"
+                          value={motherName}
+                          setValue={setMotherName}
+                          required={true}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                        />
+                        {errors.name && (
+                          <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                        )}
+                      </div>       <div className="col-span-1">
+                        <TextInput
+                          ref={input1Ref}
+                          name="Gender"
+                          value={gender}
+                          setValue={setGender}
+                          required={true}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                        />
+                        {errors.name && (
+                          <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                        )}
+                      </div>       <div className="col-span-1">
+                        <DropdownInput
+                          ref={input1Ref}
+                          name="Disability"
+                          value={disability}
+                          setValue={setDisability}
+                          required={true}
+                          readOnly={readOnly}
+                          options={common}
+                          disabled={childRecord.current > 0}
+                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                        />
+                        {errors.name && (
+                          <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                        )}
+                      </div>       <div className="col-span-1">
+                        <TextInput
+                          ref={input1Ref}
+                          name="Identification Mark"
+                          value={identificationMark}
+                          setValue={setIdentificationMark}
+                          required={true}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                        />
+                        {errors.name && (
+                          <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                        )}
+                      </div>       <div className="col-span-1">
+                        <DateInput
+                          ref={input1Ref}
+                          name="Date of Birth"
+                          value={dob}
+                          setValue={setDob}
+                          required={true}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                        />
+                        {errors.name && (
+                          <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                        )}
+                      </div>       <div className="col-span-1">
+                        <DropdownInput
+                          ref={input1Ref}
+                          name="Blood Group"
+                          value={bloodGroup}
+                          setValue={setBloodGroup}
+                          options={bloodList}
+                          required={true}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                        />
+                        {errors.name && (
+                          <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                        )}
+                      </div>       <div className="col-span-1">
+                        <TextInput
+                          ref={input1Ref}
+                          name="Height in Cms"
+                          value={height}
+                          setValue={setHeight}
+                          required={true}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                        />
+                        {errors.name && (
+                          <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                        )}
+                      </div>       <div className="col-span-1">
+                        <TextInput
+                          ref={input1Ref}
+                          name="Weight in Kgs"
+                          value={weight}
+                          setValue={setWeight}
+                          required={true}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                        />
+                        {errors.name && (
+                          <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                        )}
+                      </div>       <div className="col-span-1">
+                        <DropdownInput
+                          ref={input1Ref}
+                          name="Marital Status"
+                          value={maritalStatus}
+                          setValue={setMaritalStatus}
+                          required={true}
+                          options={common}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                        />
+                        {errors.name && (
+                          <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                        )}
+                      </div>
+
+                    </div>
+                  </div>
+
+
+
+
+                )}
+                {step === "Employment Details" && (
+                  <div className="flex flex-col  gap-4  h-full">
+
+
+                    <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
+                      <h3 className="font-medium text-gray-800 mb-2 text-sm">
+                        Employment Details
+                      </h3>
+                      <div className="grid grid-cols-4 md:grid-cols-4 gap-2">
+
+                        <div className="">
+                          <DateInput
+                            name="Joining Date"
+                            value={joiningDate}
+                            setValue={setJoiningDate}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                          />
+                          {errors.joiningDate && (
+                            <span className="text-red-500 text-xs ml-1">
+                              {errors.joiningDate}
+                            </span>
+                          )}
+                        </div>
+                        <div className="col-span-1">
+                          <TextInput
+                            ref={input1Ref}
+                            name="Department"
+                            value={department}
+                            setValue={setDepartment}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                          {errors.name && (
+                            <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                          )}
+                        </div>
+
+                        <div className="col-span-1">
+                          <DropdownInput
+                            ref={input1Ref}
+                            name="Employee Category"
+                            value={name}
+                            setValue={setName}
+                            options={dropDownListObject(employeeCategoryList?.data, "name", "id")}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                          {errors.name && (
+                            <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                          )}
+                        </div>
+                        <div className="col-span-1">
+                          <TextInput
+                            ref={input1Ref}
+                            name="Pay Category"
+                            value={payCategory}
+                            setValue={setPayCategory}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                          {errors.name && (
+                            <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                          )}
+                        </div>
+                        <div className="col-span-1">
+                          <TextInput
+                            ref={input1Ref}
+                            name="Id Card Number"
+                            value={idNumber}
+                            setValue={setIdNumber}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                          {errors.name && (
+                            <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                          )}
+                        </div>
+
+                        <div className="col-span-1">
+                          <TextInput
+                            ref={input1Ref}
+                            name="Designation"
+                            value={desigination}
+                            setValue={setDesigination}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                          {errors.name && (
+                            <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                          )}
+                        </div>
+
+                        <div className="col-span-1">
+                          <TextInput
+                            ref={input1Ref}
+                            name="Shift Template"
+                            value={shiftTemplate}
+                            setValue={setShiftTemplate}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                          {errors.name && (
+                            <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                          )}
+                        </div>
+                        <div className="col-span-1">
+                          <DropdownInput
+                            ref={input1Ref}
+                            name="PF (Y/N)"
+                            value={pf}
+                            setValue={setPf}
+                            required={true}
+                            options={common}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                          {errors.name && (
+                            <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                          )}
+                        </div>
+
+                        <div className="col-span-1">
+                          <DropdownInput
+                            ref={input1Ref}
+                            name="ESI (Y/N)"
+                            value={esi}
+                            setValue={setEsi}
+                            required={true}
+                            options={common}
+
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                          {errors.name && (
+                            <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                          )}
+                        </div>
+
+                        <div className="col-span-1">
+                          <TextInput
+                            ref={input1Ref}
+                            name="Salary"
+                            value={salary}
+                            setValue={setSalary}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                          {errors.name && (
+                            <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                          )}
+                        </div>
+                        <div className="col-span-1">
+                          <DropdownInput
+                            ref={input1Ref}
+                            name="Salary"
+                            value={salaryMethod}
+                            setValue={setSalaryMethod}
+                            options={SalaryMethod}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                          {errors.name && (
+                            <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                          )}
+                        </div>
+
+
+                      </div>
+                    </div>
+                  </div>
+
+
+
+
+                )}
+                {step === "Personal Details" && (
+                  <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
+                    <h3 className="font-medium text-gray-800 mb-2 text-sm">
+                      Personal Details
+                    </h3>
+                    <div className="grid grid-cols-4 md:grid-cols-4 gap-2">
+                      <div>
+                        <TextInput
+                          name="Religion"
+                          value={religion}
+                          setValue={setReligion}
+                          required
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                        />
+                        {errors.fatherName && (
+                          <span className="text-red-500 text-xs ml-1">
+                            {errors.fatherName}
+                          </span>
+                        )}
+                      </div>
+                      <div className="col-span-1">
+                        <TextInput
+                          ref={input1Ref}
+                          name="Adhaar No"
+                          value={aadharNo}
+                          setValue={setAadharNo}
+                          required={true}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                        />
+                        {errors.name && (
+                          <span className="text-red-500 text-xs ml-1">{errors.name}</span>
+                        )}
+                      </div>
+                      <div>
+                        <TextInput
+                          name="Pan No"
+                          value={panNo}
+                          setValue={setPanNo}
+                          required
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                        />
+                        {errors.fatherName && (
+                          <span className="text-red-500 text-xs ml-1">
+                            {errors.fatherName}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <TextInput
+                          name="ESI No"
+                          value={esiNo}
+                          setValue={setEsiNo}
+                          required
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                        />
+                        {errors.fatherName && (
+                          <span className="text-red-500 text-xs ml-1">
+                            {errors.fatherName}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <TextInput
+                          name="PF No"
+                          value={pfNo}
+                          setValue={setPfNo}
+                          required
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                        />
+                        {errors.fatherName && (
+                          <span className="text-red-500 text-xs ml-1">
+                            {errors.fatherName}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <TextInput
+                          name="UAN No (PF)"
+                          value={uanNo}
+                          setValue={setUanNo}
                           required
                           readOnly={readOnly}
                           disabled={childRecord.current > 0}
@@ -936,189 +1376,455 @@ export default function Form() {
                         )}
                       </div>
 
-                      <div>
-                        <DropdownInput
-                          name="Marital Status"
-                          options={maritalStatusList}
-                          value={maritalStatus}
-                          setValue={setMaritalStatus}
-                          required
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                        />
-                        {errors.maritalStatus && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.maritalStatus}
-                          </span>
-                        )}
-                      </div>
 
-                      <div>
-                        <TextInput
-                          name="Pan No"
-                          value={panNo}
-                          setValue={setPanNo}
-                          required
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                        />
-                        {errors.panNo && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.panNo}
-                          </span>
-                        )}
-                      </div>
-
-                      <div>
-                        <TextInput
-                          name="Degree"
-                          value={degree}
-                          setValue={setDegree}
-                          required
-                          readOnly={readOnly}
-                        />
-                        {errors.degree && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.degree}
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="md:col-span-2">
-                        <TextInput
-                          name="Specialization"
-                          value={specialization}
-                          setValue={setSpecialization}
-                          required
-                          readOnly={readOnly}
-                        />
-                        {errors.specialization && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.specialization}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="lg:col-span-4 space-y-3">
-                  <div className="bg-white p-3 rounded-md border border-gray-200">
-                    <h3 className="font-medium text-gray-800 mb-2 text-sm">
-                      Bank Details
-                    </h3>
-                    <div className="space-y-2">
-                      <TextInput
-                        name="Account No"
-                        type="number"
-                        value={accountNo}
-                        setValue={setAccountNo}
-                        readOnly={readOnly}
-                        disabled={childRecord.current > 0}
-                      />
-
-                      <div className="grid grid-cols-2 gap-2">
-                        <TextInput
-                          name="IFSC No"
-                          value={ifscNo}
-                          setValue={setIfscNo}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                        />
-
-                        <TextInput
-                          name="Branch Name"
-                          value={branchName}
-                          setValue={setbranchName}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                        />
-                      </div>
                     </div>
                   </div>
 
-                  <div className="bg-white p-3 rounded-md border border-gray-200 ">
-                    <h3 className="font-medium text-gray-800 mb-2 text-sm">
-                      Contact Information
-                    </h3>
-                    <div className="space-y-2">
-                      <div className="flex flex-wrap">
-                        <div className="grid grid-cols-3 gap-2 items-start">
-                          <TextInput
-                            name="Mobile No"
-                            type="number"
-                            value={mobile}
-                            width="w-24" // Tailwind class to reduce width
-                            setValue={setMobile}
-                            required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                          />
-                          {errors.mobile && (
-                            <span className="text-red-500 text-xs ml-1 col-span-2">
-                              {errors.mobile}
-                            </span>
-                          )}
+                )}
+                {step === "Contact Details" && (
+                  <div className="flex flex-col  gap-4  h-full">
+
+
+                    <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
+
+                      {/* <div className="grid grid-cols-2 gap-3 justify-between">
+                        <div className="grid grid-cols-2 gap-3">
+                          <h3 className="font-medium text-gray-800 mb-2 text-sm">
+                            PRESENT ADDRESS
+                          </h3>
                           <div className="col-span-2">
-                            <TextInput
-                              name="Email Id"
-                              type="email"
-                              value={email}
-                              setValue={setEmail}
+                            <TextArea
+                              name="Address"
+                              value={fatherName}
+                              setValue={setFatherName}
+                              required
                               readOnly={readOnly}
                               disabled={childRecord.current > 0}
                             />
-                            {errors.email && (
-                              <span className="text-red-500 text-xs ml-1">
-                                {errors.email}
-                              </span>
+                            {errors.fatherName && (
+                              <span className="text-red-500 text-xs ml-1">{errors.fatherName}</span>
                             )}
+                          </div>
+
+                          <div className="col-span-1">
+                            <TextInput
+                              name="City"
+                              // value={city}
+                              // setValue={setCity}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                            {errors.city && (
+                              <span className="text-red-500 text-xs ml-1">{errors.city}</span>
+                            )}
+                          </div>
+                          <div className="col-span-1">
+                            <TextInput
+                              name="Village"
+                              // value={city}
+                              // setValue={setCity}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                            {errors.city && (
+                              <span className="text-red-500 text-xs ml-1">{errors.city}</span>
+                            )}
+                          </div>
+                          <div className="col-span-1">
+                            <TextInput
+                              name="State"
+                              // value={taluk}
+                              // setValue={setTaluk}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                            {errors.taluk && (
+                              <span className="text-red-500 text-xs ml-1">{errors.taluk}</span>
+                            )}
+                          </div>
+
+                          <div className="col-span-1">
+                            <TextInput
+                              name="Country"
+                              // value={state}
+                              // setValue={setState}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                            {errors.state && (
+                              <span className="text-red-500 text-xs ml-1">{errors.state}</span>
+                            )}
+                          </div>
+                          <div className="col-span-1">
+                            <TextInput
+                              name="Pincode"
+                              // value={state}
+                              // setValue={setState}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                            {errors.state && (
+                              <span className="text-red-500 text-xs ml-1">{errors.state}</span>
+                            )}
+                          </div>        <div className="col-span-1">
+                            <TextInput
+                              name="Mobile No"
+                              // value={state}
+                              // setValue={setState}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                            {errors.state && (
+                              <span className="text-red-500 text-xs ml-1">{errors.state}</span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <h3 className="font-medium text-gray-800 mb-2 text-sm">
+                            PERMANENT ADDRESS
+                          </h3>
+                          <div className="col-span-2">
+                            <TextArea
+                              name="Address"
+                              value={fatherName}
+                              setValue={setFatherName}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                            {errors.fatherName && (
+                              <span className="text-red-500 text-xs ml-1">{errors.fatherName}</span>
+                            )}
+                          </div>
+
+                          <div className="col-span-1">
+                            <TextInput
+                              name="City"
+                              // value={city}
+                              // setValue={setCity}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                            {errors.city && (
+                              <span className="text-red-500 text-xs ml-1">{errors.city}</span>
+                            )}
+                          </div>
+                          <div className="col-span-1">
+                            <TextInput
+                              name="Village"
+                              // value={city}
+                              // setValue={setCity}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                            {errors.city && (
+                              <span className="text-red-500 text-xs ml-1">{errors.city}</span>
+                            )}
+                          </div>
+                          <div className="col-span-1">
+                            <TextInput
+                              name="State"
+                              // value={taluk}
+                              // setValue={setTaluk}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                            {errors.taluk && (
+                              <span className="text-red-500 text-xs ml-1">{errors.taluk}</span>
+                            )}
+                          </div>
+
+                          <div className="col-span-1">
+                            <TextInput
+                              name="Country"
+                              // value={state}
+                              // setValue={setState}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                            {errors.state && (
+                              <span className="text-red-500 text-xs ml-1">{errors.state}</span>
+                            )}
+                          </div>
+                          <div className="col-span-1">
+                            <TextInput
+                              name="Pincode"
+                              // value={state}
+                              // setValue={setState}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                            {errors.state && (
+                              <span className="text-red-500 text-xs ml-1">{errors.state}</span>
+                            )}
+                          </div>        <div className="col-span-1">
+                            <TextInput
+                              name="Mobile No"
+                              // value={state}
+                              // setValue={setState}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                            {errors.state && (
+                              <span className="text-red-500 text-xs ml-1">{errors.state}</span>
+                            )}
+                          </div>
+                        </div>
+                      </div> */}
+                      <div className="grid grid-cols-2 gap-3 justify-between">
+                        <div className="grid grid-cols-2 gap-3">
+                          <h3 className="font-medium text-gray-800 mb-2 text-sm">
+                            PRESENT ADDRESS
+                          </h3>
+                          <div className="col-span-2">
+                            <TextArea
+                              name="Address"
+                              value={presentAddress.address}
+                              setValue={(val) => handlePresentChange("address", val)}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                            {errors.address && (
+                              <span className="text-red-500 text-xs ml-1">{errors.address}</span>
+                            )}
+                          </div>
+                          <div className="col-span-1">
+                            <TextInput
+                              name="City"
+                              value={presentAddress.city}
+                              setValue={(val) => handlePresentChange("city", val)}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                            {errors.city && (
+                              <span className="text-red-500 text-xs ml-1">{errors.city}</span>
+                            )}
+                          </div>
+                          <div className="col-span-1">
+                            <TextInput
+                              name="Village"
+                              value={presentAddress.village}
+                              setValue={(val) => handlePresentChange("village", val)}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <TextInput
+                              name="State"
+                              value={presentAddress.state}
+                              setValue={(val) => handlePresentChange("state", val)}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <TextInput
+                              name="Country"
+                              value={presentAddress.country}
+                              setValue={(val) => handlePresentChange("country", val)}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <TextInput
+                              name="Pincode"
+                              value={presentAddress.pincode}
+                              setValue={(val) => handlePresentChange("pincode", val)}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <TextInput
+                              name="Mobile No"
+                              value={presentAddress.mobile}
+                              setValue={(val) => handlePresentChange("mobile", val)}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                          </div>
+                        </div>
+
+                        {/* PERMANENT ADDRESS */}
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="col-span-2 flex items-center gap-2">
+                            <h3 className="font-medium text-gray-800 text-sm">
+                              PERMANENT ADDRESS
+                            </h3>
+                            <label className="flex items-center gap-1 text-xs text-gray-600">
+                              <input
+                                type="checkbox"
+                                checked={sameAsPresent}
+                                onChange={handleCheckboxChange}
+                              />
+                              Same as Present
+                            </label>
+                          </div>
+
+                          <div className="col-span-2">
+                            <TextArea
+                              name="Address"
+                              value={permanentAddress.address}
+                              setValue={(val) => handlePermanentChange("address", val)}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0 || sameAsPresent}
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <TextInput
+                              name="City"
+                              value={permanentAddress.city}
+                              setValue={(val) => handlePermanentChange("city", val)}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0 || sameAsPresent}
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <TextInput
+                              name="Village"
+                              value={permanentAddress.village}
+                              setValue={(val) => handlePermanentChange("village", val)}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0 || sameAsPresent}
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <TextInput
+                              name="State"
+                              value={permanentAddress.state}
+                              setValue={(val) => handlePermanentChange("state", val)}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0 || sameAsPresent}
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <TextInput
+                              name="Country"
+                              value={permanentAddress.country}
+                              setValue={(val) => handlePermanentChange("country", val)}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0 || sameAsPresent}
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <TextInput
+                              name="Pincode"
+                              value={permanentAddress.pincode}
+                              setValue={(val) => handlePermanentChange("pincode", val)}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0 || sameAsPresent}
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <TextInput
+                              name="Mobile No"
+                              value={permanentAddress.mobile}
+                              setValue={(val) => handlePermanentChange("mobile", val)}
+                              required
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0 || sameAsPresent}
+                            />
                           </div>
                         </div>
                       </div>
 
-                      <TextArea
-                        name="Address"
-                        rows="2"
-                        value={localAddress}
-                        setValue={setlocalAddress}
-                        required
-                        readOnly={readOnly}
-                        disabled={childRecord.current > 0}
-                      />
-                      {errors.localAddress && (
-                        <span className="text-red-500 text-xs ml-1">
-                          {errors.localAddress}
-                        </span>
-                      )}
 
-                      <div className="grid grid-cols-2 gap-2">
-                        <TextInput
-                          name="Pincode"
-                          type="number"
-                          value={permPincode}
-                          setValue={setPermPincode}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                        />
-                        <DropdownInput
-                          name="City/State"
-                          options={dropDownListMergedObject(
-                            (cityList?.data || []).filter(
-                              (item) => id || item.active
-                            ),
-                            "name",
-                            "id"
-                          )}
-                          value={permCity}
-                          setValue={setPermCity}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                        />
-                      </div>
+
+
+
+
+
+
                     </div>
                   </div>
-                </div>
+                )}
+                {step === "Bank Details" && (
+                  <div className="flex flex-col  gap-4  h-full">
+
+
+                    <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
+                      <h3 className="font-medium text-gray-800 mb-2 text-sm">
+                        Bank Details
+                      </h3>
+                      <div className="grid grid-cols-4 gap-3">
+
+
+                        <TextInput
+                          name="Bank Name"
+                          type="text"
+                          // value={bankName}
+                          // setValue={setBankName}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                          className="focus:ring-2 focus:ring-blue-100 w-10"
+                        />
+                        <TextInput
+                          name="Branch Name"
+                          type="text"
+                          value={branchName}
+                          setValue={setBranchName}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                          className="focus:ring-2 focus:ring-blue-100 w-10"
+                        />
+
+                        <TextInput
+                          name="Account Number"
+                          type="text"
+                          // value={accountNumber}
+
+                          // setValue={setAccountNumber}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                          className="focus:ring-2 focus:ring-blue-100 w-10"
+                        />
+                        <TextInput
+                          name="IFSC CODE"
+                          type="text"
+                          // value={ifscCode}
+                          // setValue={setIfscCode}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                          className="focus:ring-2 focus:ring-blue-100 w-10"
+                        />
+
+
+
+
+                      </div>
+
+                    </div>
+                  </div>
+                )}
+
+
               </div>
             </div>
           </div>

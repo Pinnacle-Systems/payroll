@@ -6,6 +6,7 @@ import excelIcon from "../assets/icons8-microsoft-excel-48.png"
 
 
 export const AddNewButton = ({ onClick, disabled = false }) => {
+console.log();
 
     return (
         <button className='text--300 py-2 px-4 rounded focus:outline-none focus:shadow-outline' onClick={() => onClick()} disabled={disabled}>

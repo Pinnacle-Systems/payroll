@@ -20,6 +20,11 @@ import {
   machineMasterApi,
   sampleEntryApi,
   designationMasterApi,
+  hrTemplateMasterApi,
+
+  ShiftTemplateMasterApi,
+  ShiftCommonTemplateMasterAPi,
+  ShiftMasterApi,
 
 } from "./services"
 import projectPaymentFormApi from "./services/ProjectPaymentService";
@@ -57,6 +62,7 @@ import tagTypeMasterApi from "./uniformService/TagTypeMasterServices";
 import CertificateMasterApi from "./uniformService/CertificateMasterService";
 import UnitOfMeasurementMasterApi from "./uniformService/UnitOfMeasurementServices";
 import partyMasterNewApi from "./services/PartyMasterNewService";
+
 
 
 
@@ -151,7 +157,10 @@ const commonReducers = {
   [purchaseInwardEntryApi.reducerPath]: purchaseInwardEntryApi.reducer,
   [partyMasterNewApi.reducerPath]: partyMasterNewApi.reducer,
   [sampleEntryApi.reducerPath]:sampleEntryApi.reducer,
-  [designationMasterApi.reducerPath]:designationMasterApi.reducer
+  [designationMasterApi.reducerPath]:designationMasterApi.reducer,
+  [ShiftMasterApi.reducerPath]:ShiftMasterApi.reducer,
+  [ShiftCommonTemplateMasterAPi.reducerPath]:ShiftCommonTemplateMasterAPi.reducer,
+  ShiftTemplateMaster : ShiftTemplateMasterApi.reducer,
 
 
 
@@ -244,7 +253,10 @@ UnitOfMeasurementMasterApi.middleware,
 purchaseInwardEntryApi.middleware,
 partyMasterNewApi.middleware,
 sampleEntryApi.middleware,
-designationMasterApi.middleware
+designationMasterApi.middleware,
+ShiftMasterApi.middleware,
+ShiftCommonTemplateMasterAPi.middleware,
+ShiftTemplateMasterApi.middleware,
 ];
 
 

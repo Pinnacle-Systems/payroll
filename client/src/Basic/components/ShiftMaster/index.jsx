@@ -1,12 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import secureLocalStorage from "react-secure-storage";
-import {
-  useGetEmployeeCategoryQuery,
-  useGetEmployeeCategoryByIdQuery,
-  useAddEmployeeCategoryMutation,
-  useUpdateEmployeeCategoryMutation,
-  useDeleteEmployeeCategoryMutation,
-} from "../../../redux/services/EmployeeCategoryMasterService";
+import { useGetDepartmentQuery } from "../../../redux/services/DepartmentMasterService";
 import FormHeader from "../FormHeader";
 import FormReport from "../FormReportTemplate";
 import { toast } from "react-toastify";
@@ -15,59 +9,103 @@ import {
   CheckBox,
   ToggleButton,
   ReusableTable,
+  TextAreaInput,
 } from "../../../Inputs";
 import ReportTemplate from "../ReportTemplate";
 import Mastertable from "../MasterTable/Mastertable";
 import MastersForm from "../MastersForm/MastersForm";
 import { statusDropdown } from "../../../Utils/DropdownData";
+import {
+  useAdddesignMutation,
+  useGetdesignByIdQuery,
+  useGetdesignQuery,
+  useUpdatedesignMutation,
+} from "../../../redux/uniformService/DesignMasterServices";
+
+import { useGetCompanyQuery } from "../../../redux/services/CompanyMasterService";
 import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
-const MODEL = "Employee Category Master";
-export default function Form() {
-  const [form, setForm] = useState(false);
+import {
+  useAddshiftMasterMutation,
+  useDeleteshiftMasterMutation,
+  useGetshiftMasterByIdQuery,
+  useGetshiftMasterQuery,
+  useUpdateshiftMasterMutation,
+} from "../../../redux/services/ShiftMasterService";
+import { getCommonParams } from "../../../Utils/helper";
 
-  //  const [openTable,setOpenTable] = useState(false);
-
+const ShiftMaster = () => {
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
+
   const [name, setName] = useState("");
-  const [code, setCode] = useState("");
+  const [description, setDescription] = useState("");
+  const [docId, setDocId] = useState("");
   const [active, setActive] = useState(true);
   const [errors, setErrors] = useState({});
-
+  const [form, setForm] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
 
-  const params = {
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "currentBranchId"
-    ),
-  };
+  const MODEL = "DESIGNATION";
+  console.log(form, "form");
+
+  const params = getCommonParams();
+
+  console.log(params, "params");
+
+  const { branchId } = params;
+
+  const { data: company } = useGetCompanyQuery({ params });
+  const [companyName, setCompanyName] = useState(company?.data[0]?.name);
+  const [companyCode, setCompanyCode] = useState(company?.data[0]?.code);
   const {
     data: allData,
     isLoading,
     isFetching,
-  } = useGetEmployeeCategoryQuery({ params, searchParams: searchValue });
+  } = useGetshiftMasterQuery({ params, searchParams: searchValue });
   const {
     data: singleData,
     isFetching: isSingleFetching,
     isLoading: isSingleLoading,
-  } = useGetEmployeeCategoryByIdQuery(id, { skip: !id });
+  } = useGetshiftMasterByIdQuery(id, { skip: !id });
 
-  const [addData] = useAddEmployeeCategoryMutation();
-  const [updateData] = useUpdateEmployeeCategoryMutation();
-  const [removeData] = useDeleteEmployeeCategoryMutation();
+  // useEffect(() => {
+  //   if (company?.data?.length > 0) {
+  //     setCompanyName(company.data[0].name);
+  //     setCompanyCode(company.data[0].code);
+  //   }
+  // }, [company]);
 
+  const [addData] = useAddshiftMasterMutation();
+  const [updateData] = useUpdateshiftMasterMutation();
+  const [removeData] = useDeleteshiftMasterMutation();
+  const getNextDocId = useCallback(() => {
+    if (id) return;
+    if (allData?.nextDocId) {
+      setDocId(allData?.nextDocId);
+    }
+  }, [allData, id]);
+
+  useEffect(getNextDocId, [getNextDocId]);
   const syncFormWithDb = useCallback(
     (data) => {
-   
-        
+      if (!id) {
+        // setReadOnly(false);
+        setName("");
+        setDescription("");
+        setActive(true);
+        setCompanyName(company?.data[0].name);
+        setCompanyCode(company?.data[0].code);
+      } else {
+        // setReadOnly(true);
         setName(data?.name || "");
-        setCode(data?.code || "");
+        setDocId(data?.docId || "");
+        setDescription(data?.description || "");
         setActive(id ? data?.active ?? false : true);
       }
-    ,
-    [id]
+    },
+    [id, company]
   );
 
   useEffect(() => {
@@ -76,12 +114,14 @@ export default function Form() {
 
   const data = {
     name,
-    code,
+    description,
+    docId,
     active,
     companyId: secureLocalStorage.getItem(
       sessionStorage.getItem("sessionId") + "userCompanyId"
     ),
     id,
+    branchId,
   };
 
   const validateData = (data) => {
@@ -95,7 +135,6 @@ export default function Form() {
     try {
       let returnData = await callback(data).unwrap();
       setId(returnData.data.id);
-      syncFormWithDb(undefined);
       toast.success(text + "Successfully");
     } catch (error) {
       console.log("handle");
@@ -103,12 +142,12 @@ export default function Form() {
   };
 
   const saveData = () => {
-    if (!validateData(data)) {
-      toast.error("Please fill all required fields...!", {
-        position: "top-center",
-      });
-      return;
-    }
+    // if (!validateData(data)) {
+    //   toast.error("Please fill all required fields...!", {
+    //     position: "top-center",
+    //   });
+    //   return;
+    // }
     if (!window.confirm("Are you sure save the details ...?")) {
       return;
     }
@@ -153,12 +192,21 @@ export default function Form() {
     setReadOnly(false);
     setForm(true);
     setSearchValue("");
+    setCompanyName(company.data[0].name);
+    setCompanyCode(company.data[0].code);
   };
-
-  function onDataClick(id) {
+  const handleView = (id) => {
     setId(id);
     setForm(true);
-  }
+    setReadOnly(true);
+    console.log("view");
+  };
+  const handleEdit = (id) => {
+    setId(id);
+    setForm(true);
+    setReadOnly(false);
+    console.log("Edit");
+  };
   const ACTIVE = (
     <div className="bg-gradient-to-r from-green-200 to-green-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-green-500 shadow-lg text-white hover:scale-110 transition-transform duration-300">
       <Power size={10} />
@@ -177,115 +225,65 @@ export default function Form() {
     },
 
     {
-      header: "Category Name",
+      header: "Shift Name",
       accessor: (item) => item?.name,
       //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-72",
+      className: "font-medium text-gray-900 text-center uppercase w-32",
     },
 
     {
       header: "Status",
       accessor: (item) => (item.active ? ACTIVE : INACTIVE),
       //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-36",
+      className: "font-medium text-gray-900 text-center uppercase w-16",
     },
     {
       header: "",
       accessor: (item) => "",
       //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 uppercase w-[65%]",
+      className: "font-medium text-gray-900 uppercase w-[75%]",
     },
   ];
-  const handleView = (id) => {
+  function onDataClick(id) {
     setId(id);
     setForm(true);
-    setReadOnly(true);
-    console.log("view");
-  };
-  const handleEdit = (id) => {
-    setId(id);
-    setForm(true);
-    setReadOnly(false);
-    console.log("Edit");
-  };
-  const tableHeaders = [
-    "S.NO",
-    "Code",
-    "Name",
-    "Status",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-  ];
-  const tableDataNames = [
-    "index+1",
-    "dataObj.code",
-    "dataObj.name",
-    "dataObj.active ? ACTIVE : INACTIVE",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-  ];
-  return (
-    <div onKeyDown={handleKeyDown} className="p-1">
-      <div className="w-full flex bg-white p-1 justify-between  items-center">
-        <h1 className="text-2xl font-bold text-gray-800">Employee Category Master</h1>
-        <div className="flex items-center">
-          <button
-            onClick={() => {
-              setForm(true);
-              onNew();
-            }}
-            className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
-          >
-            +Add New Employee Category
-          </button>
-        </div>
-      </div>
+  }
 
-      {/* <Mastertable
-          header={"Employee Category list"}
-          searchValue={searchValue}
-          setSearchValue={setSearchValue}
-          onDataClick={onDataClick}
-          // setOpenTable={setOpenTable}
-          tableHeaders={tableHeaders}
-          tableDataNames={tableDataNames}
-          data={allData?.data}
-          loading={isLoading || isFetching}
-        /> */}
-      <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-3">
-        <ReusableTable
-          columns={columns}
-          data={allData?.data}
-          onView={handleView}
-          onEdit={handleEdit}
-          onDelete={deleteData}
-          itemsPerPage={10}
-        />
-      </div>
-      <div>
+  return (
+    <div>
+      <div onKeyDown={handleKeyDown} className="p-1">
+        <div className="w-full flex bg-white p-1 justify-between  items-center">
+          <h1 className="text-2xl font-bold text-gray-800">
+            Shift Master
+          </h1>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => {
+                setForm(true);
+                onNew();
+              }}
+              className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+            >
+              + Add New Shift Template
+            </button>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-3">
+          <ReusableTable
+            columns={columns}
+            data={allData?.data}
+            onView={handleView}
+            onEdit={handleEdit}
+            onDelete={deleteData}
+            itemsPerPage={10}
+          />
+        </div>
         {form === true && (
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[40%] h-[45%]"}
+            widthClass={"w-[45%]  h-[65%]"}
             onClose={() => {
               setForm(false);
               setErrors({});
@@ -297,9 +295,9 @@ export default function Form() {
                   <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
                     {id
                       ? !readOnly
-                        ? "Edit Employee Category"
-                        : "Employee Category"
-                      : "Add New Employee Category"}
+                        ? "Edit Shift Master"
+                        : "Shift Master"
+                      : "Add New Shift"}
                   </h2>
                 </div>
                 <div className="flex gap-2">
@@ -338,43 +336,55 @@ export default function Form() {
                 <div className="grid grid-cols-1  gap-3  h-full">
                   <div className="lg:col-span- space-y-3">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
-                      <div className="space-y-4 ">
-                        <div className="">
-                          <div className="flex flex-wrap">
-                            <div className="mb-3 w-[48%]">
-                              <TextInput
-                                name="Category Name"
-                                type="text"
-                                value={name}
-                                setValue={setName}
-                                required={true}
-                                readOnly={readOnly}
-                                disabled={childRecord.current > 0}
-                              />
-                            </div>
+                      <div className="space-y-4 w-[50%]">
+                     
+                         
 
-                            <div className="mb-3 w-[20%] ml-6">
-                              <TextInput
-                                name="Code"
-                                type="text"
-                                value={code}
-                                setValue={setCode}
-                                required={true}
-                                readOnly={readOnly}
-                                disabled={childRecord.current > 0}
-                              />
-                            </div>
-                          </div>
-                          <div className="mb-3">
-                            <ToggleButton
-                              name="Status"
-                              options={statusDropdown}
-                              value={active}
-                              setActive={setActive}
+                          <TextInput
+                            name="Company Code"
+                            type="text"
+                            value={companyCode}
+                            setValue={setCompanyCode}
+                            required={true}
+                            // readOnly={readOnly}
+                            disabled={true}
+                          />
+                       
+                      
+                          <div className="w-42">
+                            <TextInput
+                              name="Shift Code"
+                              type="text"
+                              value={docId}
+                              // setValue={setDocId}
                               required={true}
                               readOnly={readOnly}
+                              disabled={childRecord.current > 0}
                             />
                           </div>
+                        
+                            <TextInput
+                              name="Shift Name"
+                              type="text"
+                              value={name}
+                              setValue={setName}
+                              required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                          
+                        
+                  
+
+                        <div className="mt-5">
+                          <ToggleButton
+                            name="Status"
+                            options={statusDropdown}
+                            value={active}
+                            setActive={setActive}
+                            required={true}
+                            readOnly={readOnly}
+                          />
                         </div>
                       </div>
                     </div>
@@ -387,4 +397,6 @@ export default function Form() {
       </div>
     </div>
   );
-}
+};
+
+export default ShiftMaster;

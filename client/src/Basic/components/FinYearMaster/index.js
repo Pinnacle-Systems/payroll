@@ -382,6 +382,7 @@ export default function Form() {
                 <div className="lg:col-span- space-y-3">
                   <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
                     <div className="space-y-2 w-[50%]">
+                      
                       <DateInput
                         name="From"
                         value={from}
