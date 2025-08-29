@@ -103,7 +103,7 @@ const ActiveTabList = () => {
     "DESIGNATION MASTER":<Designation/>,
     "PAY FREQUENCY" : <PayFrequency/>,
     "SHIFT COMMON TEMPLATE MASTER" :<ShiftCommonTemplateMaster/>,
-    "SHIFT  MASTER":<ShiftMaster/>,
+    "SHIFT MASTER":<ShiftMaster/>,
     "SHIFT TEMPLATE MASTER" : <ShiftTemplateMaster/>
 
 

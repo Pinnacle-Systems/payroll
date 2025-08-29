@@ -17,7 +17,7 @@ async function getNextDocId(
 ) {
   console.log("argumnts : ", branchId, shortCode, startTime, endTime, isTaxBill);
 
-  let lastObject = await prisma.hRCommonTemplate.findFirst({
+  let lastObject = await prisma.ShiftTemplate.findFirst({
     where: {
       branchId: parseInt(branchId),
     },
@@ -26,11 +26,8 @@ async function getNextDocId(
     },
   });
 
-  const code = (
-    typeof isTaxBill === "undefined" ? undefined : JSON.parse(isTaxBill)
-  )
-    ? "COM/TEM"
-    : "COM/TEM";
+  const code =  "SHF/TEM"
+
   const branchObj = await getTableRecordWithId(branchId, "branch");
   // let newDocId = `${branchObj.branchCode}/${shortCode}/${code}/1`;
   let newDocId = `${code}/1`;
@@ -49,7 +46,7 @@ async function get(req) {
 
   console.log(companyId, active, finYearId,"received");
   
-  const data = await prisma.hRCommonTemplate.findMany({
+  const data = await prisma.ShiftTemplate.findMany({
     where: {
     //   companyId: companyId ? parseInt(companyId) : undefined,
     //   active: active ? Boolean(active) : undefined,
@@ -86,7 +83,7 @@ async function get(req) {
 
 async function getOne(id) {
   const childRecord = 0;
-  const data = await prisma.hRCommonTemplate.findUnique({
+  const data = await prisma.ShiftTemplate.findUnique({
     where: {
       id: parseInt(id),
     },
@@ -98,7 +95,7 @@ async function getOne(id) {
 async function getSearch(req) {
   const { searchKey } = req.params;
   const { companyId, active } = req.query;
-  const data = await prisma.hRCommonTemplate.findMany({
+  const data = await prisma.ShiftTemplate.findMany({
     where: {
       companyId: companyId ? parseInt(companyId) : undefined,
       active: active ? Boolean(active) : undefined,
@@ -121,7 +118,7 @@ async function getSearch(req) {
 
 async function create(body) {
   const { name, branchId, companyId, active, description, docId } = await body;
-  const data = await prisma.hRCommonTemplate.create({
+  const data = await prisma.ShiftTemplate.create({
     data: {
       name,
       companyId: parseInt(companyId),
@@ -136,13 +133,13 @@ async function create(body) {
 
 async function update(id, body) {
   const { name, branchId, companyId, active, description, docId } = await body;
-  const dataFound = await prisma.hRCommonTemplate.findUnique({
+  const dataFound = await prisma.ShiftTemplate.findUnique({
     where: {
       id: parseInt(id),
     },
   });
   if (!dataFound) return NoRecordFound("hRCommonTemplate");
-  const data = await prisma.hRCommonTemplate.update({
+  const data = await prisma.ShiftTemplate.update({
     where: {
       id: parseInt(id),
     },
@@ -159,7 +156,7 @@ async function update(id, body) {
 }
 
 async function remove(id) {
-  const data = await prisma.hRCommonTemplate.delete({
+  const data = await prisma.ShiftTemplate.delete({
     where: {
       id: parseInt(id),
     },

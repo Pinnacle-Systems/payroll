@@ -8,9 +8,10 @@ import {
     ToggleButton,
     ReusableTable,
     TextAreaInput,
+    DropdownInput,
 } from "../../../Inputs";
 
-import { statusDropdown } from "../../../Utils/DropdownData";
+import { commonNew, statusDropdown } from "../../../Utils/DropdownData";
 
 
 
@@ -20,6 +21,8 @@ import { Check, Power } from "lucide-react";
 
 import { getCommonParams } from "../../../Utils/helper";
 import { useAddHRCommonTemplateMutation, useDeleteHRCommonTemplateMutation, useGetHRCommonTemplateByIdQuery, useGetHRCommonTemplateQuery, useUpdateHRCommonTemplateMutation } from "../../../redux/services/HRCommonTemplate.service";
+import { useGethrTemplateQuery } from "../../../redux/services/HrTemplateService";
+import { useGetShiftTemplateMasterQuery } from "../../../redux/services/ShiftTemplateMaster";
 
 const ShiftTemplateMaster = () => {
     const [readOnly, setReadOnly] = useState(false);
@@ -33,6 +36,7 @@ const ShiftTemplateMaster = () => {
     const [form, setForm] = useState(false);
     const [searchValue, setSearchValue] = useState("");
     const childRecord = useRef(0);
+    const [ShiftTemplateItems, setShiftTemplateItems] = useState([])
 
 
 
@@ -45,10 +49,14 @@ const ShiftTemplateMaster = () => {
     const { data: company } = useGetCompanyQuery({ params });
 
     const [companyCode, setCompanyCode] = useState(company?.data[0].code);
-    const {
-        data: allData,
+    const { data: ShitCommonData } = useGetHRCommonTemplateQuery({ params, searchParams: searchValue });
+    const { data: allData } = useGetShiftTemplateMasterQuery({ params, searchParams: searchValue });
 
-    } = useGetHRCommonTemplateQuery({ params, searchParams: searchValue });
+    const {
+        data: shiftData,
+
+    } = useGethrTemplateQuery({ params, searchParams: searchValue });
+
     const {
         data: singleData,
         isFetching: isSingleFetching,
@@ -65,6 +73,7 @@ const ShiftTemplateMaster = () => {
     const [addData] = useAddHRCommonTemplateMutation();
     const [updateData] = useUpdateHRCommonTemplateMutation();
     const [removeData] = useDeleteHRCommonTemplateMutation();
+
     const getNextDocId = useCallback(() => {
         if (id) return;
         if (allData?.nextDocId) {
@@ -73,6 +82,20 @@ const ShiftTemplateMaster = () => {
     }, [allData, id]);
 
     useEffect(getNextDocId, [getNextDocId]);
+
+
+    useEffect(() => {
+        if (ShiftTemplateItems?.length >= 1) return
+        setShiftTemplateItems(prev => {
+            let newArray = Array.from({ length: 1 - prev.length }, i => {
+                return { fabricId: "", qty: "0.000", colorId: "", taxPercent: "0.000", uomId: "", gaugeId: "", designId: "", gsmId: "", loopLengthId: "", kDiaId: "", fDiaId: "", price: "", discountType: "Percentage", discountValue: "0.00" };
+            })
+            return [...prev, ...newArray]
+        }
+        )
+    }, [ShiftTemplateItems, setShiftTemplateItems])
+
+
     const syncFormWithDb = useCallback(
         (data) => {
             if (!id) {
@@ -235,6 +258,13 @@ const ShiftTemplateMaster = () => {
         setForm(true);
     }
 
+    const handleInputChange = (value, index, field) => {
+        const newBlend = structuredClone(ShiftTemplateItems);
+        newBlend[index][field] = value;
+
+        setShiftTemplateItems(newBlend);
+    };
+
     return (
         <div>
             <div onKeyDown={handleKeyDown} className="p-1 ">
@@ -258,7 +288,7 @@ const ShiftTemplateMaster = () => {
                 <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-3">
                     <ReusableTable
                         columns={columns}
-                        data={allData?.data}
+                        // data={allData?.data}
                         onView={handleView}
                         onEdit={handleEdit}
                         onDelete={deleteData}
@@ -269,14 +299,14 @@ const ShiftTemplateMaster = () => {
                     <Modal
                         isOpen={form}
                         form={form}
-                        widthClass={"w-[95%]  h-[95%]"}
+                        widthClass={"w-[98%]  h-[95%]"}
                         onClose={() => {
                             setForm(false);
                             setErrors({});
                         }}
                     >
-                        <div className="h-full flex flex-col bg-[f1f1f0]">
-                            <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
+                        <div className="h-full flex flex-col bg-[f1f1f0] overflow-x-auto">
+                            <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10  bg-white ">
                                 <div className="flex items-center gap-2">
                                     <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
                                         {id
@@ -318,11 +348,11 @@ const ShiftTemplateMaster = () => {
                                 </div>
                             </div>
 
-                            <div className="flex-1 overflow-auto p-3">
-                                <div className="grid grid-cols-1  gap-3  h-full">
+                            <div className="flex-1 overflow-auto p-3 ">
+                                <div className="grid grid-cols-1  gap-3  h-full ">
                                     <div className="lg:col-span- space-y-3">
-                                        <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
-                                            <div className="space-y-4 ">
+                                        <div className="bg-white p-3 rounded-md border border-gray-200 h-full w-full overflow-x-auto">
+                                            <div className="space-y-4 w-full">
                                                 <div className="flex  gap-x-8">
 
 
@@ -359,7 +389,7 @@ const ShiftTemplateMaster = () => {
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <div className={`w-full`}>
+                                                    <div className={`w-full `}>
                                                         <table className="w-full border-collapse table-fixed ">
                                                             <thead className="bg-gray-200 text-gray-800">
                                                                 <tr>
@@ -369,6 +399,11 @@ const ShiftTemplateMaster = () => {
                                                                         S.No
                                                                     </th>
                                                                     <th
+                                                                        className={`w-28 px-4 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        Applied On
+                                                                    </th>
+                                                                    <th
 
                                                                         className={`w-32 px-4 py-2 text-center font-medium text-[13px] `}
                                                                     >
@@ -376,128 +411,410 @@ const ShiftTemplateMaster = () => {
                                                                     </th>
                                                                     <th
 
-                                                                        className={`w-52 px-4 py-2 text-center font-medium text-[13px] `}
+                                                                        className={`w-32 px-4 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        Shift
+                                                                    </th>
+                                                                    <th
+
+                                                                        className={`w-20 px-4 py-2 text-center font-medium text-[13px] `}
                                                                     >
                                                                         In Next day
                                                                     </th>
                                                                     <th
 
-                                                                        className={`w-40 px-4 py-2 text-center font-medium text-[13px] `}
+                                                                        className={`w-28 px-4 py-2 text-center font-medium text-[13px] `}
                                                                     >
                                                                         Tolerance Before Start
                                                                     </th>
 
                                                                     <th
 
-                                                                        className={`w-32 px-4 py-2 text-center font-medium text-[13px] `}
+                                                                        className={`w-28 px-4 py-2 text-center font-medium text-[13px] `}
                                                                     >
                                                                         Start Time
                                                                     </th>
                                                                     <th
 
-                                                                        className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
+                                                                        className={`w-28 px-4 py-2 text-center font-medium text-[13px] `}
                                                                     >
                                                                         Tolerance After End
 
                                                                     </th>
                                                                     <th
 
-                                                                        className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
+                                                                        className={`w-28 px-4 py-2 text-center font-medium text-[13px] `}
                                                                     >
                                                                         FB OUT
                                                                     </th>
                                                                     <th
 
-                                                                        className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
+                                                                        className={`w-28 px-4 py-2 text-center font-medium text-[13px] `}
                                                                     >
                                                                         FB IN
                                                                     </th>
                                                                     <th
 
-                                                                        className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
+                                                                        className={`w-28 px-4 py-2 text-center font-medium text-[13px] `}
                                                                     >
                                                                         Lunch B.ST
                                                                     </th>
                                                                     <th
 
-                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                        className={`w-28 px-3 py-2 text-center font-medium text-[13px] `}
                                                                     >
                                                                         LB.SNDay
                                                                     </th>
-                                                                     <th
+                                                                    <th
 
-                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                        className={`w-28 px-3 py-2 text-center font-medium text-[13px] `}
                                                                     >
                                                                         Lunch B.ET
-                                                                    </th>          
-                                                                   <th
-
-                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
-                                                                    >
-                                                                       LB.ENDay
                                                                     </th>
-                                                                           <th
+                                                                    <th
 
-                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                        className={`w-28 px-3 py-2 text-center font-medium text-[13px] `}
                                                                     >
-                                                                       SBOut
+                                                                        LB.ENDay
                                                                     </th>
-                                                                          <th
+                                                                    <th
 
-                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                        className={`w-28 px-3 py-2 text-center font-medium text-[13px] `}
                                                                     >
-                                                                       SBIn
+                                                                        SBOut
                                                                     </th>
-                                                                                     <th
+                                                                    <th
 
-                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                        className={`w-28 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                    >
+                                                                        SBIn
+                                                                    </th>
+                                                                    <th
+
+                                                                        className={`w-28 px-3 py-2 text-center font-medium text-[13px] `}
                                                                     >
                                                                         Tolerance Before Start
                                                                     </th>
-                                                                                     <th
+                                                                    <th
 
-                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                        className={`w-28 px-3 py-2 text-center font-medium text-[13px] `}
                                                                     >
                                                                         End Time
                                                                     </th>
-                                                                                       <th
+                                                                    <th
 
-                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                        className={`w-28 px-3 py-2 text-center font-medium text-[13px] `}
                                                                     >
                                                                         Tolerance After Start
                                                                     </th>
                                                                     <th
 
-                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                        className={`w-28 px-3 py-2 text-center font-medium text-[13px] `}
                                                                     >
                                                                         Out Next Day
                                                                     </th>
-                                                                     <th
+                                                                    <th
 
-                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                        className={`w-28 px-3 py-2 text-center font-medium text-[13px] `}
                                                                     >
                                                                         Shift Time Hrs
                                                                     </th>
-                                                                        <th
+                                                                    <th
 
-                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                        className={`w-28 px-3 py-2 text-center font-medium text-[13px] `}
                                                                     >
                                                                         OT Hrs
                                                                     </th>
                                                                     <th
 
-                                                                        className={`w-16 px-3 py-2 text-center font-medium text-[13px] `}
+                                                                        className={`w-28 px-3 py-2 text-center font-medium text-[13px] `}
                                                                     >
                                                                         Quater(Y/N)
                                                                     </th>
                                                                 </tr>
                                                             </thead>
-                                                            <tbody> 
-                                                                <tr>
-                                                                    <td>
-                                                                        
-                                                                    </td>
-                                                                </tr>
+                                                            <tbody>
+                                                                {ShiftTemplateItems?.map((item, index) => (
+
+                                                                    <tr className="w-full table-row">
+                                                                        <td className="table-data  w-2 text-left px-1">
+                                                                            {index + 1}
+                                                                        </td>
+
+                                                                        <td className=' border border-gray-500'>
+                                                                            <input type="date" />
+                                                                        </td>
+                                                                        <td className=' border border-gray-500'>
+                                                                            <select
+                                                                                // onKeyDown={e => { if (e.key === "Delete") { handleInputChange("", index, "accessoryGroupId") } }}
+                                                                                disabled={readOnly} className='text-left w-full rounded py-1 table-data-input'
+                                                                                value={item.TemplateId}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "TemplateId")}
+                                                                            // onBlur={(e) => {
+
+                                                                            //     handleInputChange(e.target.value, index, "accessoryGroupId")
+
+                                                                            // }
+                                                                            // }
+                                                                            >
+                                                                                <option>
+                                                                                </option>
+                                                                                {(id ? (ShitCommonData?.data || []) : ShitCommonData?.data.filter(item => item.active) || []).map((blend) =>
+                                                                                    <option value={blend.id} key={blend.id}>
+                                                                                        {blend.employeeCategory?.name}
+                                                                                    </option>
+                                                                                )}
+                                                                            </select>
+                                                                        </td>
+                                                                        <td className=' border border-gray-500'>
+                                                                            <select
+                                                                                // onKeyDown={e => { if (e.key === "Delete") { handleInputChange("", index, "accessoryGroupId") } }}
+                                                                                disabled={readOnly} className='text-left w-full rounded py-1 table-data-input'
+                                                                                value={item.shiftId}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "shiftId")}
+                                                                            // onBlur={(e) => {
+                                                                            //     handleInputChange(e.target.value, index, "accessoryGroupId")
+                                                                            // }
+                                                                            // }
+
+
+                                                                            >
+                                                                                <option>
+                                                                                </option>
+                                                                                {(id ? (shiftData?.data || []) : shiftData?.data.filter(item => item.active) || []).map((blend) =>
+                                                                                    <option value={blend.id} key={blend.id}>
+                                                                                        {blend?.name}
+                                                                                    </option>
+                                                                                )}
+                                                                            </select>
+                                                                        </td>
+                                                                        <td className=' border border-gray-500'>
+                                                                            <select
+                                                                                // onKeyDown={e => { if (e.key === "Delete") { handleInputChange("", index, "accessoryGroupId") } }}
+                                                                                disabled={readOnly} className='text-left w-full rounded py-1 table-data-input'
+                                                                                value={item.nextDay}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
+                                                                            // onBlur={(e) => {
+                                                                            //     handleInputChange(e.target.value, index, "accessoryGroupId")
+                                                                            // }
+                                                                            // }
+
+
+                                                                            >
+                                                                                <option>
+                                                                                </option>
+                                                                                {(commonNew).map((blend) =>
+                                                                                    <option value={blend.value} key={blend.value}>
+                                                                                        {blend?.show}
+                                                                                    </option>
+                                                                                )}
+                                                                            </select>
+                                                                        </td>
+
+                                                                        <td className='table-data'>
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.nextDay}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
+                                                                                className="text-right rounded py-1 px-1 w-full table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+                                                                        </td>
+
+
+                                                                        <td className='table-data'>
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.toleranceBeforeStart}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "toleranceBeforeStart")}
+                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+                                                                        </td>
+
+
+                                                                        <td className='table-data'>
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.startTime}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "startTime")}
+                                                                                className="text-right rounded py-1 px-1 w-full table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+                                                                        </td>
+                                                                        <td className='table-data'>
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.toleranceAfterEnd}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "toleranceAfterEnd")}
+                                                                                className="text-right rounded py-1 px-1 w-full table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+
+                                                                        </td>
+                                                                        <td className='table-data'>
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.nextDay}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
+                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+                                                                        </td>
+                                                                        <td className='table-data '>
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.nextDay}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
+                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+                                                                        </td>
+
+
+                                                                        <td className='table-data '>
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.nextDay}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
+                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+                                                                        </td>
+                                                                        <td className='table-data '>
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.nextDay}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
+                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+                                                                        </td>
+                                                                        <td className='table-data '>
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.nextDay}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
+                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+                                                                        </td>
+
+
+
+                                                                        <td className='table-data '>
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.nextDay}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
+                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+                                                                        </td>
+
+                                                                        <td className='table-data '>
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.nextDay}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
+                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+                                                                        </td>
+                                                                        <td className='table-data '>
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.nextDay}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
+                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+                                                                        </td>
+
+                                                                        <td className='table-data '>
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.nextDay}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
+                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+                                                                        </td>
+                                                                        <td className='table-data '>
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.nextDay}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
+                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+                                                                        </td>
+                                                                        <td className='table-data '>
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.nextDay}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
+                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+                                                                        </td>
+                                                                        <td className='table-data '>
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.nextDay}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
+                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+                                                                        </td>
+                                                                        <td className=''>
+
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.nextDay}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
+                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+
+                                                                        </td>
+
+                                                                    </tr>
+                                                                ))}
 
                                                             </tbody>
                                                         </table>
