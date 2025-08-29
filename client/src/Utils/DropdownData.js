@@ -273,3 +273,8 @@ export const SalaryMethod = [
     { show: "ByCash", value: "Cash" },
     { show: "ByBank", value: "Bank" },
 ]
+
+export const ShowShiftData = [
+    { show: "Actual", value: "Actual" },
+    { show: "Buyer", value: "Buyer" },
+]

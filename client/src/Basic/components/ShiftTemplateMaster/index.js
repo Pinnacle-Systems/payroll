@@ -11,7 +11,7 @@ import {
     DropdownInput,
 } from "../../../Inputs";
 
-import { commonNew, statusDropdown } from "../../../Utils/DropdownData";
+import { common, commonNew, statusDropdown } from "../../../Utils/DropdownData";
 
 
 
@@ -23,6 +23,7 @@ import { getCommonParams } from "../../../Utils/helper";
 import { useAddShiftTemplateMasterMutation, useDeleteShiftTemplateMasterMutation, useGetShiftTemplateMasterByIdQuery, useGetShiftTemplateMasterQuery, useUpdateShiftTemplateMasterMutation } from "../../../redux/services/ShiftTemplateMaster";
 import { useGetShiftCommonTemplateQuery } from "../../../redux/services/ShiftCommonTemplate.service";
 import { useGetshiftMasterQuery } from "../../../redux/services/ShiftMasterService";
+import TemplateItems from "./templateItems";
 
 
 const ShiftTemplateMaster = () => {
@@ -49,14 +50,14 @@ const ShiftTemplateMaster = () => {
 
     const { data: company } = useGetCompanyQuery({ params });
 
-        const { data: ShitCommonData } = useGetShiftCommonTemplateQuery({ params, searchParams: searchValue });
+    const { data: ShitCommonData } = useGetShiftCommonTemplateQuery({ params, searchParams: searchValue });
 
-        const { data: shiftData } = useGetshiftMasterQuery({ params, searchParams: searchValue });
+    const { data: shiftData } = useGetshiftMasterQuery({ params, searchParams: searchValue });
 
     const [companyCode, setCompanyCode] = useState(company?.data[0].code);
     const { data: allData } = useGetShiftTemplateMasterQuery({ params, searchParams: searchValue });
 
-  
+
     const {
         data: singleData,
         isFetching: isSingleFetching,
@@ -73,136 +74,136 @@ const ShiftTemplateMaster = () => {
     const [addData] = useAddShiftTemplateMasterMutation();
     const [updateData] = useUpdateShiftTemplateMasterMutation();
     const [removeData] = useDeleteShiftTemplateMasterMutation();
-    const getNextDocId = useCallback(() => {
-        if (id) return;
-        if (allData?.nextDocId) {
-            setDocId(allData?.nextDocId);
-        }
-    }, [allData, id]);
+    // const getNextDocId = useCallback(() => {
+    //     if (id) return;
+    //     if (allData?.nextDocId) {
+    //         setDocId(allData?.nextDocId);
+    //     }
+    // }, [allData, id]);
 
-    useEffect(getNextDocId, [getNextDocId]);
-
-
-    useEffect(() => {
-        if (ShiftTemplateItems?.length >= 1) return
-        setShiftTemplateItems(prev => {
-            let newArray = Array.from({ length: 1 - prev.length }, i => {
-                return { fabricId: "", qty: "0.000", colorId: "", taxPercent: "0.000", uomId: "", gaugeId: "", designId: "", gsmId: "", loopLengthId: "", kDiaId: "", fDiaId: "", price: "", discountType: "Percentage", discountValue: "0.00" };
-            })
-            return [...prev, ...newArray]
-        }
-        )
-    }, [ShiftTemplateItems, setShiftTemplateItems])
+    // useEffect(getNextDocId, [getNextDocId]);
 
 
-    const syncFormWithDb = useCallback(
-        (data) => {
-            if (!id) {
-                // setReadOnly(false);
-                setName("");
-                setDescription("")
-                setActive(true);
-                // setCompanyName(company?.data[0].name);
-                setCompanyCode(company?.data[0].code);
-            } else {
-                // setReadOnly(true);
-                setName(data?.name || "");
-                setDocId(data?.docId || "")
-                setDescription(data?.description || "");
-                setActive(id ? data?.active ?? false : true);
-            }
-        },
-        [id, company]
-    );
+    // useEffect(() => {
+    //     if (ShiftTemplateItems?.length >= 1) return
+    //     setShiftTemplateItems(prev => {
+    //         let newArray = Array.from({ length: 1 - prev.length }, i => {
+    //             return { fabricId: "", qty: "0.000", colorId: "", taxPercent: "0.000", uomId: "", gaugeId: "", designId: "", gsmId: "", loopLengthId: "", kDiaId: "", fDiaId: "", price: "", discountType: "Percentage", discountValue: "0.00" };
+    //         })
+    //         return [...prev, ...newArray]
+    //     }
+    //     )
+    // }, [ShiftTemplateItems, setShiftTemplateItems])
 
-    useEffect(() => {
-        syncFormWithDb(singleData?.data);
-    }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
 
-    const data = {
-        name,
-        description,
-        docId,
-        active,
-        companyId: secureLocalStorage.getItem(
-            sessionStorage.getItem("sessionId") + "userCompanyId"
-        ),
-        id,
-        branchId,
-    };
+    // const syncFormWithDb = useCallback(
+    //     (data) => {
+    //         if (!id) {
+    //             // setReadOnly(false);
+    //             setName("");
+    //             setDescription("")
+    //             setActive(true);
+    //             // setCompanyName(company?.data[0].name);
+    //             setCompanyCode(company?.data[0].code);
+    //         } else {
+    //             // setReadOnly(true);
+    //             setName(data?.name || "");
+    //             setDocId(data?.docId || "")
+    //             setDescription(data?.description || "");
+    //             setActive(id ? data?.active ?? false : true);
+    //         }
+    //     },
+    //     [id, company]
+    // );
 
-    const validateData = (data) => {
-        if (data.name && data.code) {
-            return true;
-        }
-        return false;
-    };
+    // useEffect(() => {
+    //     syncFormWithDb(singleData?.data);
+    // }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
 
-    const handleSubmitCustom = async (callback, data, text) => {
-        try {
-            let returnData = await callback(data).unwrap();
-            setId(returnData.data.id);
-            toast.success(text + "Successfully");
-        } catch (error) {
-            console.log("handle");
-        }
-    };
+    // const data = {
+    //     name,
+    //     description,
+    //     docId,
+    //     active,
+    //     companyId: secureLocalStorage.getItem(
+    //         sessionStorage.getItem("sessionId") + "userCompanyId"
+    //     ),
+    //     id,
+    //     branchId,
+    // };
 
-    const saveData = () => {
-        // if (!validateData(data)) {
-        //   toast.error("Please fill all required fields...!", {
-        //     position: "top-center",
-        //   });
-        //   return;
-        // }
-        if (!window.confirm("Are you sure save the details ...?")) {
-            return;
-        }
-        if (id) {
-            handleSubmitCustom(updateData, data, "Updated");
-        } else {
-            handleSubmitCustom(addData, data, "Added");
-        }
-    };
+    // const validateData = (data) => {
+    //     if (data.name && data.code) {
+    //         return true;
+    //     }
+    //     return false;
+    // };
 
-    const deleteData = async () => {
-        if (id) {
-            if (!window.confirm("Are you sure to delete...?")) {
-                return;
-            }
-            try {
-                const deldata = await removeData(id).unwrap();
-                if (deldata?.statusCode == 1) {
-                    toast.error(deldata?.message);
-                    setForm(false);
-                    return;
-                }
-                setId("");
-                toast.success("Deleted Successfully");
-                setForm(false);
-            } catch (error) {
-                toast.error("something went wrong");
-            }
-        }
-    };
+    // const handleSubmitCustom = async (callback, data, text) => {
+    //     try {
+    //         let returnData = await callback(data).unwrap();
+    //         setId(returnData.data.id);
+    //         toast.success(text + "Successfully");
+    //     } catch (error) {
+    //         console.log("handle");
+    //     }
+    // };
+
+    // const saveData = () => {
+    //     // if (!validateData(data)) {
+    //     //   toast.error("Please fill all required fields...!", {
+    //     //     position: "top-center",
+    //     //   });
+    //     //   return;
+    //     // }
+    //     if (!window.confirm("Are you sure save the details ...?")) {
+    //         return;
+    //     }
+    //     if (id) {
+    //         handleSubmitCustom(updateData, data, "Updated");
+    //     } else {
+    //         handleSubmitCustom(addData, data, "Added");
+    //     }
+    // };
+
+    // const deleteData = async () => {
+    //     if (id) {
+    //         if (!window.confirm("Are you sure to delete...?")) {
+    //             return;
+    //         }
+    //         try {
+    //             const deldata = await removeData(id).unwrap();
+    //             if (deldata?.statusCode == 1) {
+    //                 toast.error(deldata?.message);
+    //                 setForm(false);
+    //                 return;
+    //             }
+    //             setId("");
+    //             toast.success("Deleted Successfully");
+    //             setForm(false);
+    //         } catch (error) {
+    //             toast.error("something went wrong");
+    //         }
+    //     }
+    // };
 
     const handleKeyDown = (event) => {
         let charCode = String.fromCharCode(event.which).toLowerCase();
         if ((event.ctrlKey || event.metaKey) && charCode === "s") {
             event.preventDefault();
-            saveData();
+            // saveData();
         }
     };
 
-    const onNew = () => {
-        setId("");
-        setReadOnly(false);
-        setForm(true);
-        setSearchValue("");
-        // setCompanyName(company.data[0].name);
-        setCompanyCode(company.data[0].code);
+    // const onNew = () => {
+    //     setId("");
+    //     setReadOnly(false);
+    //     setForm(true);
+    //     setSearchValue("");
+    //     // setCompanyName(company.data[0].name);
+    //     setCompanyCode(company?.data[0]?.code);
 
-    };
+    // };
     const handleView = (id) => {
         setId(id);
         setForm(true);
@@ -267,34 +268,45 @@ const ShiftTemplateMaster = () => {
     return (
         <div>
             <div onKeyDown={handleKeyDown} className="p-1 ">
-                <div className="w-full flex bg-white p-1 justify-between  items-center">
-                    <h1 className="text-2xl font-bold text-gray-800">
-                        Shift Template Master
-                    </h1>
-                    <div className="flex items-center gap-4">
-                        <button
-                            onClick={() => {
-                                setForm(true);
-                                onNew();
-                            }}
-                            className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
-                        >
-                            + Add Shift Template Master
-                        </button>
-                    </div>
-                </div>
+                {form === true ? ( 
+                    <TemplateItems setForm={setForm}  />
 
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-3">
-                    <ReusableTable
-                        columns={columns}
-                        // data={allData?.data}
-                        onView={handleView}
-                        onEdit={handleEdit}
-                        onDelete={deleteData}
-                        itemsPerPage={10}
-                    />
-                </div>
-                {form === true && (
+                )
+                    :
+                    (
+                        <>
+                            <div className="w-full flex bg-white p-1 justify-between  items-center">
+                                <h1 className="text-2xl font-bold text-gray-800">
+                                    Shift Template Master
+                                </h1>
+                                <div className="flex items-center gap-4">
+                                    <button
+                                        onClick={() => {
+                                            setForm(true);
+                                            // onNew();
+                                        }}
+                                        className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+                                    >
+                                        + Add Shift Template Master
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-3">
+                                <ReusableTable
+                                    columns={columns}
+                                    // data={allData?.data}
+                                    onView={handleView}
+                                    onEdit={handleEdit}
+                                    // onDelete={deleteData}
+                                    itemsPerPage={10}
+                                />
+                            </div>
+                        </>
+                    )
+                }
+
+                {/* {form === true && (
                     <Modal
                         isOpen={form}
                         form={form}
@@ -550,9 +562,7 @@ const ShiftTemplateMaster = () => {
                                                                                 value={item.TemplateId}
                                                                                 onChange={(e) => handleInputChange(e.target.value, index, "TemplateId")}
                                                                             // onBlur={(e) => {
-
                                                                             //     handleInputChange(e.target.value, index, "accessoryGroupId")
-
                                                                             // }
                                                                             // }
                                                                             >
@@ -565,6 +575,8 @@ const ShiftTemplateMaster = () => {
                                                                                 )}
                                                                             </select>
                                                                         </td>
+
+
                                                                         <td className=' border border-gray-500'>
                                                                             <select
                                                                                 // onKeyDown={e => { if (e.key === "Delete") { handleInputChange("", index, "accessoryGroupId") } }}
@@ -610,17 +622,7 @@ const ShiftTemplateMaster = () => {
                                                                             </select>
                                                                         </td>
 
-                                                                        <td className='table-data'>
-                                                                            <input
-                                                                                min={"0"}
-                                                                                type="number"
-                                                                                value={item?.nextDay}
-                                                                                onFocus={(e) => e.target.select()}
-                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
-                                                                                className="text-right rounded py-1 px-1 w-full table-data-input"
-                                                                                disabled={readOnly}
-                                                                            />
-                                                                        </td>
+
 
 
                                                                         <td className='table-data'>
@@ -630,7 +632,7 @@ const ShiftTemplateMaster = () => {
                                                                                 value={item?.toleranceBeforeStart}
                                                                                 onFocus={(e) => e.target.select()}
                                                                                 onChange={(e) => handleInputChange(e.target.value, index, "toleranceBeforeStart")}
-                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                className="text-right rounded py-1 px-1 w-full table-data-input"
                                                                                 disabled={readOnly}
                                                                             />
                                                                         </td>
@@ -663,10 +665,10 @@ const ShiftTemplateMaster = () => {
                                                                             <input
                                                                                 min={"0"}
                                                                                 type="number"
-                                                                                value={item?.nextDay}
+                                                                                value={item?.fbOut}
                                                                                 onFocus={(e) => e.target.select()}
-                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
-                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "fbOut")}
+                                                                                className="text-right rounded py-1 px-1 w-full table-data-input"
                                                                                 disabled={readOnly}
                                                                             />
                                                                         </td>
@@ -674,10 +676,10 @@ const ShiftTemplateMaster = () => {
                                                                             <input
                                                                                 min={"0"}
                                                                                 type="number"
-                                                                                value={item?.nextDay}
+                                                                                value={item?.fbIn}
                                                                                 onFocus={(e) => e.target.select()}
-                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
-                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "fbIn")}
+                                                                                className="text-right rounded py-1 px-1 w-full table-data-input"
                                                                                 disabled={readOnly}
                                                                             />
                                                                         </td>
@@ -687,34 +689,29 @@ const ShiftTemplateMaster = () => {
                                                                             <input
                                                                                 min={"0"}
                                                                                 type="number"
-                                                                                value={item?.nextDay}
+                                                                                value={item?.lunchBst}
                                                                                 onFocus={(e) => e.target.select()}
-                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
-                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "lunchBst")}
+                                                                                className="text-right rounded py-1 px-1 w-full table-data-input"
                                                                                 disabled={readOnly}
                                                                             />
                                                                         </td>
                                                                         <td className='table-data '>
-                                                                            <input
-                                                                                min={"0"}
-                                                                                type="number"
-                                                                                value={item?.nextDay}
-                                                                                onFocus={(e) => e.target.select()}
-                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
-                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
-                                                                                disabled={readOnly}
-                                                                            />
-                                                                        </td>
-                                                                        <td className='table-data '>
-                                                                            <input
-                                                                                min={"0"}
-                                                                                type="number"
-                                                                                value={item?.nextDay}
-                                                                                onFocus={(e) => e.target.select()}
-                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
-                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
-                                                                                disabled={readOnly}
-                                                                            />
+                                                                            <select
+                                                                                // onKeyDown={e => { if (e.key === "Delete") { handleInputChange("", index, "accessoryGroupId") } }}
+                                                                                disabled={readOnly} className='text-left w-full rounded py-1 table-data-input'
+                                                                                value={item.lBSnDay}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "lBSnDay")}
+
+                                                                            >
+                                                                                <option>
+                                                                                </option>
+                                                                                {(commonNew).map((blend) =>
+                                                                                    <option value={blend.value} key={blend.value}>
+                                                                                        {blend?.show}
+                                                                                    </option>
+                                                                                )}
+                                                                            </select>
                                                                         </td>
 
 
@@ -723,10 +720,53 @@ const ShiftTemplateMaster = () => {
                                                                             <input
                                                                                 min={"0"}
                                                                                 type="number"
-                                                                                value={item?.nextDay}
+                                                                                value={item?.lunchBET}
                                                                                 onFocus={(e) => e.target.select()}
-                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
-                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "lunchBET")}
+                                                                                className="text-right rounded py-1 px-1 w-full table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+                                                                        </td>
+
+
+
+                                                                        <td className='table-data '>
+                                                                            <select
+                                                                                // onKeyDown={e => { if (e.key === "Delete") { handleInputChange("", index, "accessoryGroupId") } }}
+                                                                                disabled={readOnly} className='text-left w-full rounded py-1 table-data-input'
+                                                                                value={item.LBenday}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "LBenday")}
+
+                                                                            >
+                                                                                <option>
+                                                                                </option>
+                                                                                {(commonNew).map((blend) =>
+                                                                                    <option value={blend.value} key={blend.value}>
+                                                                                        {blend?.show}
+                                                                                    </option>
+                                                                                )}
+                                                                            </select>
+                                                                        </td>
+
+                                                                        <td className='table-data '>
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.SBOut}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "SBOut")}
+                                                                                className="text-right rounded py-1 px-1 w-full table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+                                                                        </td>
+                                                                        <td className='table-data '>
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.SBIn}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "SBIn")}
+                                                                                className="text-right rounded py-1 px-1 w-full table-data-input"
                                                                                 disabled={readOnly}
                                                                             />
                                                                         </td>
@@ -735,10 +775,10 @@ const ShiftTemplateMaster = () => {
                                                                             <input
                                                                                 min={"0"}
                                                                                 type="number"
-                                                                                value={item?.nextDay}
+                                                                                value={item?.toleranceBeforeStart}
                                                                                 onFocus={(e) => e.target.select()}
-                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
-                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "toleranceBeforeStart")}
+                                                                                className="text-right rounded py-1 px-1 w-full table-data-input"
                                                                                 disabled={readOnly}
                                                                             />
                                                                         </td>
@@ -746,72 +786,86 @@ const ShiftTemplateMaster = () => {
                                                                             <input
                                                                                 min={"0"}
                                                                                 type="number"
-                                                                                value={item?.nextDay}
+                                                                                value={item?.endTime}
                                                                                 onFocus={(e) => e.target.select()}
-                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
-                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "endTime")}
+                                                                                className="text-right rounded py-1 px-1 w-full table-data-input"
                                                                                 disabled={readOnly}
                                                                             />
                                                                         </td>
+                                                                        <td className='table-data '>
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.toleranceAfterStart}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "toleranceAfterStart")}
+                                                                                className="text-right rounded py-1 px-1 w-full table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+                                                                        </td>
+                                                                        <td className='table-data '>
+                                                                            <select
+                                                                                // onKeyDown={e => { if (e.key === "Delete") { handleInputChange("", index, "accessoryGroupId") } }}
+                                                                                disabled={readOnly} className='text-left w-full rounded py-1 table-data-input'
+                                                                                value={item.outNxtDay}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "outNxtDay")}
 
-                                                                        <td className='table-data '>
-                                                                            <input
-                                                                                min={"0"}
-                                                                                type="number"
-                                                                                value={item?.nextDay}
-                                                                                onFocus={(e) => e.target.select()}
-                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
-                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
-                                                                                disabled={readOnly}
-                                                                            />
+                                                                            >
+                                                                                <option>
+                                                                                </option>
+                                                                                {(commonNew).map((blend) =>
+                                                                                    <option value={blend.value} key={blend.value}>
+                                                                                        {blend?.show}
+                                                                                    </option>
+                                                                                )}
+                                                                            </select>
                                                                         </td>
                                                                         <td className='table-data '>
-                                                                            <input
-                                                                                min={"0"}
-                                                                                type="number"
-                                                                                value={item?.nextDay}
-                                                                                onFocus={(e) => e.target.select()}
-                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
-                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
-                                                                                disabled={readOnly}
-                                                                            />
-                                                                        </td>
-                                                                        <td className='table-data '>
-                                                                            <input
-                                                                                min={"0"}
-                                                                                type="number"
-                                                                                value={item?.nextDay}
-                                                                                onFocus={(e) => e.target.select()}
-                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
-                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
-                                                                                disabled={readOnly}
-                                                                            />
-                                                                        </td>
-                                                                        <td className='table-data '>
-                                                                            <input
-                                                                                min={"0"}
-                                                                                type="number"
-                                                                                value={item?.nextDay}
-                                                                                onFocus={(e) => e.target.select()}
-                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
-                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
-                                                                                disabled={readOnly}
-                                                                            />
-                                                                        </td>
-                                                                        <td className=''>
 
                                                                             <input
                                                                                 min={"0"}
                                                                                 type="number"
-                                                                                value={item?.nextDay}
+                                                                                value={item?.shiftTimeHrs}
                                                                                 onFocus={(e) => e.target.select()}
-                                                                                onChange={(e) => handleInputChange(e.target.value, index, "nextDay")}
-                                                                                className="text-right rounded py-1 px-1 w-16 table-data-input"
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "shiftTimeHrs")}
+                                                                                className="text-right rounded py-1 px-1 w-full table-data-input"
                                                                                 disabled={readOnly}
                                                                             />
 
                                                                         </td>
+                                                                        <td className='table-data '>
 
+                                                                            <input
+                                                                                min={"0"}
+                                                                                type="number"
+                                                                                value={item?.otHrs}
+                                                                                onFocus={(e) => e.target.select()}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "otHrs")}
+                                                                                className="text-right rounded py-1 px-1 w-full table-data-input"
+                                                                                disabled={readOnly}
+                                                                            />
+
+                                                                        </td>
+                                                                        <td className='table-data '>
+
+                                                                            <select
+                                                                                // onKeyDown={e => { if (e.key === "Delete") { handleInputChange("", index, "accessoryGroupId") } }}
+                                                                                disabled={readOnly} className='text-left w-full rounded py-1 table-data-input'
+                                                                                value={item.outNxtDay}
+                                                                                onChange={(e) => handleInputChange(e.target.value, index, "outNxtDay")}
+
+                                                                            >
+                                                                                <option>
+                                                                                </option>
+                                                                                {(common).map((blend) =>
+                                                                                    <option value={blend.value} key={blend.value}>
+                                                                                        {blend?.show}
+                                                                                    </option>
+                                                                                )}
+                                                                            </select>
+
+                                                                        </td>
                                                                     </tr>
                                                                 ))}
 
@@ -827,7 +881,8 @@ const ShiftTemplateMaster = () => {
                             </div>
                         </div>
                     </Modal>
-                )}
+                )} */}
+
             </div>
         </div>
     );
