@@ -251,7 +251,7 @@ const ShiftMaster = () => {
 
   return (
     <div>
-      <div onKeyDown={handleKeyDown} className="p-1 ">
+      <div onKeyDown={handleKeyDown} className="p-1">
         <div className="w-full flex bg-white p-1 justify-between  items-center">
           <h1 className="text-2xl font-bold text-gray-800">
             Shift Master
