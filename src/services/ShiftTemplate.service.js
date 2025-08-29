@@ -118,36 +118,36 @@ async function getSearch(req) {
 async function create(body) {
   const { name, branchId, companyId, active, description, docId, ShiftTemplateItems } = await body;
 
-  console.log(ShiftTemplateItems,"ShiftTemplateItems");
-  
+  console.log(ShiftTemplateItems, "ShiftTemplateItems");
+
 
   const data = await Promise.all(
     ShiftTemplateItems?.map((item) =>
       prisma.shiftTemplate.create({
-        data: {
-          templateId: item?.templateId ? item.templateId : undefined,
-          shiftId: shiftId ? shiftId : undefined,
-          inNextDay: inNextDay ? inNextDay : undefined,
-          toleranceInBeforeStart: toleranceInBeforeStart ? toleranceInBeforeStart : undefined,
-          startTime: startTime ? startTime : undefined,
-          toleranceInAfterEnd: toleranceInAfterEnd ? toleranceInAfterEnd : undefined,
-          fbOut: fbOut ? fbOut : undefined,
-          fbIn: fbIn ? fbIn : undefined,
-          lunchBst: lunchBst ? lunchBst : undefined,
-          lBSNDay: lBSNDay ? lBSNDay : undefined,
-          lunchBET: lunchBET ? lunchBET : undefined,
-          lBEnday: lBEnday ? lBEnday : undefined,
-          sbOut: sbOut ? sbOut : undefined,
-          sbIn: sbIn ? sbIn : undefined,
-          toleranceOutBeforeStart: toleranceOutBeforeStart ? toleranceOutBeforeStart : undefined,
-          endTime: endTime ? endTime : undefined,
-          toleranceOutAfterEnd: toleranceOutAfterEnd ? toleranceOutAfterEnd : undefined,
-          outNxtDay: outNxtDay ? outNxtDay : undefined,
-          shiftTimeHrs: shiftTimeHrs ? shiftTimeHrs : undefined,
-          otHrs: otHrs ? otHrs : undefined,
-          quater: quater ? quater : undefined,
-          companyId: companyId ? parseInt(companyId) : undefined,
-          branchId: branchId ? parseInt(branchId) : undefined,
+         data : {
+          templateId: item?.templateId ? parseInt(item.templateId) : undefined,
+          shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
+          inNextDay: item?.inNextDay ? item.inNextDay : undefined,
+          toleranceInBeforeStart: item?.toleranceInBeforeStart ? item.toleranceInBeforeStart : undefined,
+          startTime: item?.startTime ? item.startTime : undefined,
+          toleranceInAfterEnd: item?.toleranceInAfterEnd ? item.toleranceInAfterEnd : undefined,
+          fbOut: item?.fbOut ? item.fbOut : undefined,
+          fbIn: item?.fbIn ? item.fbIn : undefined,
+          lunchBst: item?.lunchBst ? item.lunchBst : undefined,
+          lBSNDay: item?.lBSNDay ? item.lBSNDay : undefined,
+          lunchBET: item?.lunchBET ? item.lunchBET : undefined,
+          lBEnday: item?.lBEnday ? item.lBEnday : undefined,
+          sbOut: item?.sbOut ? item.sbOut : undefined,
+          sbIn: item?.sbIn ? item.sbIn : undefined,
+          toleranceOutBeforeStart: item?.toleranceOutBeforeStart ? item.toleranceOutBeforeStart : undefined,
+          endTime: item?.endTime ? item.endTime : undefined,
+          toleranceOutAfterEnd: item?.toleranceOutAfterEnd ? item.toleranceOutAfterEnd : undefined,
+          outNxtDay: item?.outNxtDay ? item.outNxtDay : undefined,
+          shiftTimeHrs: item?.shiftTimeHrs ? item.shiftTimeHrs : undefined,
+          otHrs: item?.otHrs ? item.otHrs : undefined,
+          quater: item?.quater ? item.quater : undefined,
+          companyId: item?.companyId ? parseInt(item.companyId) : undefined,
+          branchId: item?.branchId ? parseInt(item.branchId) : undefined,
         }
       })
     )
@@ -156,26 +156,44 @@ async function create(body) {
 }
 
 async function update(id, body) {
-  const { name, branchId, companyId, active, description, docId } = await body;
+  const { name, branchId, companyId, active, description, docId ,ShiftTemplateItems} = await body;
   const dataFound = await prisma.ShiftTemplate.findUnique({
     where: {
       id: parseInt(id),
     },
   });
-  if (!dataFound) return NoRecordFound("hRCommonTemplate");
-  const data = await prisma.ShiftTemplate.update({
-    where: {
-      id: parseInt(id),
-    },
-    data: {
-      name,
-      active,
-      companyId: parseInt(companyId),
-      branchId: parseInt(branchId),
-      description,
-      docId,
-    },
-  });
+  if (!dataFound) return NoRecordFound("shiftTempalte");
+  const data = await Promise.all(
+    ShiftTemplateItems?.map((item) =>
+      prisma.shiftTemplate.update({
+         data : {
+          templateId: item?.templateId ? parseInt(item.templateId) : undefined,
+          shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
+          inNextDay: item?.inNextDay ? item.inNextDay : undefined,
+          toleranceInBeforeStart: item?.toleranceInBeforeStart ? item.toleranceInBeforeStart : undefined,
+          startTime: item?.startTime ? item.startTime : undefined,
+          toleranceInAfterEnd: item?.toleranceInAfterEnd ? item.toleranceInAfterEnd : undefined,
+          fbOut: item?.fbOut ? item.fbOut : undefined,
+          fbIn: item?.fbIn ? item.fbIn : undefined,
+          lunchBst: item?.lunchBst ? item.lunchBst : undefined,
+          lBSNDay: item?.lBSNDay ? item.lBSNDay : undefined,
+          lunchBET: item?.lunchBET ? item.lunchBET : undefined,
+          lBEnday: item?.lBEnday ? item.lBEnday : undefined,
+          sbOut: item?.sbOut ? item.sbOut : undefined,
+          sbIn: item?.sbIn ? item.sbIn : undefined,
+          toleranceOutBeforeStart: item?.toleranceOutBeforeStart ? item.toleranceOutBeforeStart : undefined,
+          endTime: item?.endTime ? item.endTime : undefined,
+          toleranceOutAfterEnd: item?.toleranceOutAfterEnd ? item.toleranceOutAfterEnd : undefined,
+          outNxtDay: item?.outNxtDay ? item.outNxtDay : undefined,
+          shiftTimeHrs: item?.shiftTimeHrs ? item.shiftTimeHrs : undefined,
+          otHrs: item?.otHrs ? item.otHrs : undefined,
+          quater: item?.quater ? item.quater : undefined,
+          companyId: item?.companyId ? parseInt(item.companyId) : undefined,
+          branchId: item?.branchId ? parseInt(item.branchId) : undefined,
+        }
+      })
+    )
+  );
   return { statusCode: 0, data };
 }
 

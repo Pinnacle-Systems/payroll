@@ -195,6 +195,8 @@ model User {
   ShiftTemplateupdatedBy       ShiftTemplate[]       @relation(name: "updatedBy")
   PayFrequencyCreatedBy        PayFrequency[]        @relation(name: "createdBy")
   PayFrequencyupdatedBy        PayFrequency[]        @relation(name: "updatedBy")
+  ShiftTemplateItemsCreatedBy  ShiftTemplateItems[]  @relation(name: "createdBy")
+  ShiftTemplateItemsupdatedBy  ShiftTemplateItems[]  @relation(name: "updatedBy")
 }
 
 model Employee {
@@ -1180,20 +1182,36 @@ model ShiftCommonTemplate {
 }
 
 model ShiftTemplate {
-  id                      Int      @id @default(autoincrement())
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @updatedAt
-  createdBy               User?    @relation("createdBy", fields: [createdById], references: [id])
+  id                 Int                  @id @default(autoincrement())
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  createdBy          User?                @relation("createdBy", fields: [createdById], references: [id])
+  createdById        Int?
+  updatedBy          User?                @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById        Int?
+  companyId          Int?
+  company            Company?             @relation(fields: [companyId], references: [id])
+  branch             Branch?              @relation(fields: [branchId], references: [id])
+  branchId           Int?
+  name               String?
+  docId              String?
+  active             Boolean?             @default(true)
+  ShiftTemplateItems ShiftTemplateItems[]
+}
+
+model ShiftTemplateItems {
+  id                      Int            @id @default(autoincrement())
+  ShiftTemplate           ShiftTemplate? @relation(fields: [shiftTemplateId], references: [id])
+  shiftTemplateId         Int?
+  createdAt               DateTime       @default(now())
+  updatedAt               DateTime       @updatedAt
+  createdBy               User?          @relation("createdBy", fields: [createdById], references: [id])
   createdById             Int?
-  updatedBy               User?    @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedBy               User?          @relation("updatedBy", fields: [updatedById], references: [id])
   updatedById             Int?
-  companyId               Int?
-  company                 Company? @relation(fields: [companyId], references: [id])
-  branch                  Branch?  @relation(fields: [branchId], references: [id])
-  branchId                Int?
   name                    String?
   docId                   String?
-  active                  Boolean? @default(true)
+  active                  Boolean?       @default(true)
   templateId              Int?
   shiftId                 Int?
   inNextDay               String?
@@ -1215,6 +1233,7 @@ model ShiftTemplate {
   shiftTimeHrs            String?
   otHrs                   String?
   quater                  String?
+
 }
 
 model PayFrequency {
