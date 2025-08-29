@@ -110,6 +110,7 @@ CREATE TABLE `User` (
     `roleId` INTEGER NULL,
     `otp` VARCHAR(191) NULL,
     `active` BOOLEAN NULL DEFAULT true,
+    `isAdmin` BOOLEAN NULL DEFAULT false,
     `employeeId` INTEGER NULL,
     `partyType` VARCHAR(191) NULL,
     `userType` VARCHAR(191) NULL,
@@ -126,6 +127,7 @@ CREATE TABLE `Employee` (
     `regNo` VARCHAR(191) NULL,
     `chamberNo` VARCHAR(191) NULL,
     `departmentId` INTEGER NULL,
+    `designationId` INTEGER NULL,
     `joiningDate` DATETIME(3) NULL,
     `fatherName` VARCHAR(191) NULL,
     `dob` DATETIME(3) NULL,
@@ -174,6 +176,7 @@ CREATE TABLE `FinYear` (
     `to` DATETIME(3) NOT NULL,
     `companyId` INTEGER NULL,
     `active` BOOLEAN NOT NULL DEFAULT true,
+    `code` VARCHAR(191) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -274,7 +277,7 @@ CREATE TABLE `Party` (
     `code` VARCHAR(191) NULL,
     `aliasName` VARCHAR(191) NULL,
     `displayName` VARCHAR(191) NULL,
-    `address` VARCHAR(191) NULL,
+    `address` TEXT NULL,
     `image` LONGBLOB NULL,
     `cityId` INTEGER NULL,
     `pincode` INTEGER NULL,
@@ -306,7 +309,58 @@ CREATE TABLE `Party` (
     `isIgst` BOOLEAN NULL DEFAULT false,
     `isVendor` BOOLEAN NULL DEFAULT false,
     `partyType` VARCHAR(191) NULL,
+    `mobileNumber` VARCHAR(191) NULL,
     `mailId` VARCHAR(191) NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `PartyBranch` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `branchName` VARCHAR(191) NULL,
+    `branchCode` VARCHAR(191) NULL,
+    `branchContact` VARCHAR(191) NULL,
+    `branchEmail` LONGTEXT NULL,
+    `partyId` INTEGER NULL,
+    `active` BOOLEAN NOT NULL DEFAULT true,
+    `branchAddress` LONGTEXT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `PartyShippingAddress` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `partyBranchId` INTEGER NULL,
+    `address` LONGTEXT NULL,
+    `aliasName` LONGTEXT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `PartyContactDetails` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `contactPersonName` VARCHAR(191) NULL,
+    `mobileNo` VARCHAR(191) NULL,
+    `email` VARCHAR(191) NULL,
+    `partyBranchId` INTEGER NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `PartyBranchContactDetails` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `contactPersonName` VARCHAR(191) NULL,
+    `mobileNo` INTEGER NULL,
+    `email` VARCHAR(191) NULL,
+    `branchName` VARCHAR(191) NULL,
+    `branchCode` VARCHAR(191) NULL,
+    `branchAddress` VARCHAR(191) NULL,
+    `partyId` INTEGER NULL,
+    `partyBranchId` INTEGER NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -428,6 +482,10 @@ CREATE TABLE `order` (
     `updatedById` INTEGER NULL,
     `docId` VARCHAR(191) NULL,
     `orderdate` DATETIME(3) NULL,
+    `customerId` INTEGER NULL,
+    `supplierId` INTEGER NULL,
+    `customerAddress` VARCHAR(191) NULL,
+    `supplierAddress` VARCHAR(191) NULL,
     `poNumber` VARCHAR(191) NULL,
     `isDeleted` BOOLEAN NOT NULL DEFAULT false,
     `userId` INTEGER NULL,
@@ -447,8 +505,10 @@ CREATE TABLE `order` (
     `poStatus` VARCHAR(191) NULL,
     `approvalstatusReason` VARCHAR(191) NULL,
     `tagType` VARCHAR(191) NULL,
+    `isPurchased` BOOLEAN NULL,
     `userRoleId` INTEGER NULL,
     `manufacturerMailId` VARCHAR(191) NULL,
+    `proformaImage` TEXT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -457,21 +517,27 @@ CREATE TABLE `order` (
 CREATE TABLE `orderBillItems` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `orderId` INTEGER NULL,
-    `barCode` VARCHAR(191) NULL,
-    `class` VARCHAR(191) NULL,
-    `color` VARCHAR(191) NULL,
-    `department` VARCHAR(191) NULL,
-    `date` DATETIME(3) NULL,
-    `itemCode` VARCHAR(191) NULL,
-    `mrp` DOUBLE NULL,
-    `orderQty` DOUBLE NULL,
-    `product` VARCHAR(191) NULL,
-    `qty` DOUBLE NULL,
-    `size` VARCHAR(191) NULL,
-    `sizeDesc` VARCHAR(191) NULL,
-    `styleCode` VARCHAR(191) NULL,
-    `supplierCode` VARCHAR(191) NULL,
-    `excessQty` DOUBLE NULL,
+    `fabCode` VARCHAR(191) NULL,
+    `isPurchased` BOOLEAN NULL,
+    `styleSheetId` INTEGER NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `SubGrid` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `orderBillItemsId` INTEGER NULL,
+    `fabType` VARCHAR(191) NULL,
+    `fiberContent` VARCHAR(191) NULL,
+    `weightGSM` VARCHAR(191) NULL,
+    `widthFinished` VARCHAR(191) NULL,
+    `priceFob` DOUBLE NULL,
+    `surCharges` DOUBLE NULL,
+    `colorId` INTEGER NULL,
+    `quantity` DOUBLE NULL,
+    `isPurchased` BOOLEAN NULL,
+    `uomId` INTEGER NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -479,25 +545,59 @@ CREATE TABLE `orderBillItems` (
 -- CreateTable
 CREATE TABLE `Po` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `poNumber` VARCHAR(191) NULL,
-    `jobNo` VARCHAR(191) NULL,
-    `dcNo` VARCHAR(191) NULL,
-    `orderNo` VARCHAR(191) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `createdById` INTEGER NULL,
     `updatedById` INTEGER NULL,
     `branchId` INTEGER NULL,
-    `poDate` DATETIME(3) NULL,
-    `deliveryDate` DATETIME(3) NULL,
-    `customerName` VARCHAR(191) NULL,
-    `primaryEmail` VARCHAR(191) NULL,
-    `secondaryEmail` VARCHAR(191) NULL,
-    `excelFile` VARCHAR(191) NULL,
-    `documantationFile` VARCHAR(191) NULL,
-    `status` VARCHAR(191) NULL,
-    `subject` VARCHAR(191) NULL,
-    `description` VARCHAR(191) NULL,
+    `docId` VARCHAR(191) NULL,
+    `date` DATETIME(3) NOT NULL,
+    `revisedDate` DATETIME(3) NULL,
+    `customerPoNumber` VARCHAR(191) NULL,
+    `quantityAllowance` VARCHAR(191) NULL,
+    `shippingMark` VARCHAR(191) NULL,
+    `shipmentMode` VARCHAR(191) NULL,
+    `shipDate` DATETIME(3) NULL,
+    `deliveryTerm` VARCHAR(191) NULL,
+    `portOrigin` VARCHAR(191) NULL,
+    `finalDestination` VARCHAR(191) NULL,
+    `paymentTerms` VARCHAR(191) NULL,
+    `shipName` VARCHAR(191) NULL,
+    `shipAddress` VARCHAR(191) NULL,
+    `shipMobile` VARCHAR(191) NULL,
+    `customerId` INTEGER NOT NULL,
+    `supplierId` INTEGER NOT NULL,
+    `orderId` INTEGER NULL,
+    `proformaImage` JSON NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `poGrid` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `poId` INTEGER NOT NULL,
+    `gridId` INTEGER NULL,
+    `fabCode` VARCHAR(191) NULL,
+    `styleSheetId` INTEGER NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `poSubGrid` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `poGridId` INTEGER NOT NULL,
+    `subgridId` INTEGER NULL,
+    `fabType` VARCHAR(191) NULL,
+    `fiberContent` VARCHAR(191) NULL,
+    `weightGSM` VARCHAR(191) NULL,
+    `widthFinished` VARCHAR(191) NULL,
+    `priceFob` DOUBLE NULL,
+    `surCharges` DOUBLE NULL,
+    `quantity` DOUBLE NULL,
+    `colorId` INTEGER NULL,
+    `uomId` INTEGER NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -664,8 +764,8 @@ CREATE TABLE `StyleSheet` (
     `bulkMcq` VARCHAR(191) NULL,
     `bulkMoq` VARCHAR(191) NULL,
     `bulkLeadTime` VARCHAR(191) NULL,
-    `surCharges` VARCHAR(191) NULL,
-    `priceFob` VARCHAR(191) NULL,
+    `surCharges` DOUBLE NULL,
+    `priceFob` DOUBLE NULL,
     `fabricImage` TEXT NULL,
     `construction` VARCHAR(191) NULL,
     `fiberContent` VARCHAR(191) NULL,
@@ -675,6 +775,7 @@ CREATE TABLE `StyleSheet` (
     `widthFinished` VARCHAR(191) NULL,
     `widthCuttale` VARCHAR(191) NULL,
     `wrapCoursesCount` VARCHAR(191) NULL,
+    `dyeName` VARCHAR(191) NULL,
     `dyedMethod` VARCHAR(191) NULL,
     `printingMethod` VARCHAR(191) NULL,
     `surfaceFinish` VARCHAR(191) NULL,
@@ -717,6 +818,266 @@ CREATE TABLE `Color` (
     `companyId` INTEGER NOT NULL,
     `active` BOOLEAN NOT NULL DEFAULT true,
     `isGrey` BOOLEAN NOT NULL DEFAULT false,
+    `number` INTEGER NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `UnitOfMeasurement` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NOT NULL,
+    `active` BOOLEAN NOT NULL DEFAULT true,
+    `isCutting` BOOLEAN NOT NULL DEFAULT false,
+    `companyId` INTEGER NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `purchaseInwardEntry` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+    `createdById` INTEGER NULL,
+    `updatedById` INTEGER NULL,
+    `branchId` INTEGER NULL,
+    `poId` INTEGER NULL,
+    `date` DATETIME(3) NULL,
+    `isPurchased` BOOLEAN NOT NULL DEFAULT false,
+    `orderId` INTEGER NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `purchaseInwardEntryGrid` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `purchaseInwardEntryId` INTEGER NULL,
+    `styleSheetId` INTEGER NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `purchaseInwardEntrySubGrid` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `purchaseInwardEntryGridId` INTEGER NULL,
+    `colorId` INTEGER NULL,
+    `uomId` INTEGER NULL,
+    `fabType` VARCHAR(191) NULL,
+    `fiberContent` VARCHAR(191) NULL,
+    `quantity` DOUBLE NULL,
+    `actualQuantity` DOUBLE NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `PartyMasterNew` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `createdAt` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NULL,
+    `createdById` INTEGER NULL,
+    `updatedById` INTEGER NULL,
+    `isSupplier` BOOLEAN NULL DEFAULT false,
+    `isClient` BOOLEAN NULL DEFAULT false,
+    `name` VARCHAR(191) NULL,
+    `aliasName` VARCHAR(191) NULL,
+    `partyCode` VARCHAR(191) NULL,
+    `active` BOOLEAN NULL DEFAULT true,
+    `displayName` VARCHAR(191) NULL,
+    `address` LONGTEXT NULL,
+    `landMark` VARCHAR(191) NULL,
+    `cityId` INTEGER NULL,
+    `pincode` INTEGER NULL,
+    `email` VARCHAR(191) NULL,
+    `contact` BIGINT NULL,
+    `contactPersonName` VARCHAR(191) NULL,
+    `designation` VARCHAR(191) NULL,
+    `department` VARCHAR(191) NULL,
+    `contactPersonEmail` VARCHAR(191) NULL,
+    `contactPersonNumber` BIGINT NULL,
+    `alterContactNumber` BIGINT NULL,
+    `currencyId` INTEGER NULL,
+    `payTermId` INTEGER NULL,
+    `panNo` VARCHAR(191) NULL,
+    `gstNo` VARCHAR(191) NULL,
+    `msmeNo` VARCHAR(191) NULL,
+    `cinNo` VARCHAR(191) NULL,
+    `bankName` VARCHAR(191) NULL,
+    `bankBranchName` VARCHAR(191) NULL,
+    `accountNumber` BIGINT NULL,
+    `ifscCode` VARCHAR(191) NULL,
+    `companyId` INTEGER NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `SampleEntry` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `createdAt` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NULL,
+    `createdById` INTEGER NULL,
+    `updatedById` INTEGER NULL,
+    `branchId` INTEGER NULL,
+    `date` DATETIME(3) NULL,
+    `submitter` VARCHAR(191) NULL,
+    `submittingTo` VARCHAR(191) NULL,
+    `supplierId` INTEGER NULL,
+    `supplierAddress` VARCHAR(191) NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `sampleEntryGrid` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `sampleEntryId` INTEGER NULL,
+    `fabCode` VARCHAR(191) NULL,
+    `styleSheetId` INTEGER NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `sampleEntrySubGrid` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `sampleEntryGridId` INTEGER NULL,
+    `fabType` VARCHAR(191) NULL,
+    `fiberContent` VARCHAR(191) NULL,
+    `weightGSM` VARCHAR(191) NULL,
+    `widthFinished` VARCHAR(191) NULL,
+    `smsMcq` VARCHAR(191) NULL,
+    `smsMoq` VARCHAR(191) NULL,
+    `smsLeadTime` VARCHAR(191) NULL,
+    `fabricImage` TEXT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `poAttachments` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `createdAt` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NULL,
+    `createdById` INTEGER NULL,
+    `updatedById` INTEGER NULL,
+    `branchId` INTEGER NULL,
+    `poId` INTEGER NULL,
+    `date` DATETIME(3) NULL,
+    `comments` LONGTEXT NULL,
+    `fileName` VARCHAR(191) NULL,
+    `filePath` VARCHAR(191) NULL,
+    `log` LONGTEXT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Designation` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(191) NULL,
+    `code` VARCHAR(191) NULL,
+    `active` BOOLEAN NULL DEFAULT true,
+    `departmentId` INTEGER NULL,
+    `companyId` INTEGER NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `Shift` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+    `createdById` INTEGER NULL,
+    `updatedById` INTEGER NULL,
+    `companyId` INTEGER NULL,
+    `branchId` INTEGER NULL,
+    `name` VARCHAR(191) NULL,
+    `description` VARCHAR(191) NULL,
+    `docId` VARCHAR(191) NULL,
+    `active` BOOLEAN NULL DEFAULT true,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ShiftCommonTemplate` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+    `createdById` INTEGER NULL,
+    `updatedById` INTEGER NULL,
+    `companyId` INTEGER NULL,
+    `branchId` INTEGER NULL,
+    `employeeCategoryId` INTEGER NULL,
+    `docId` VARCHAR(191) NULL,
+    `active` BOOLEAN NULL DEFAULT true,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ShiftTemplate` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+    `createdById` INTEGER NULL,
+    `updatedById` INTEGER NULL,
+    `companyId` INTEGER NULL,
+    `branchId` INTEGER NULL,
+    `name` VARCHAR(191) NULL,
+    `docId` VARCHAR(191) NULL,
+    `active` BOOLEAN NULL DEFAULT true,
+    `templateId` INTEGER NULL,
+    `shiftId` INTEGER NULL,
+    `inNextDay` VARCHAR(191) NULL,
+    `toleranceInBeforeStart` VARCHAR(191) NULL,
+    `startTime` VARCHAR(191) NULL,
+    `toleranceInAfterEnd` VARCHAR(191) NULL,
+    `fbOut` VARCHAR(191) NULL,
+    `fbIn` VARCHAR(191) NULL,
+    `lunchBst` VARCHAR(191) NULL,
+    `lBSNDay` VARCHAR(191) NULL,
+    `lunchBET` VARCHAR(191) NULL,
+    `lBEnday` VARCHAR(191) NULL,
+    `sbOut` VARCHAR(191) NULL,
+    `sbIn` VARCHAR(191) NULL,
+    `toleranceOutBeforeStart` VARCHAR(191) NULL,
+    `endTime` VARCHAR(191) NULL,
+    `toleranceOutAfterEnd` VARCHAR(191) NULL,
+    `outNxtDay` VARCHAR(191) NULL,
+    `shiftTimeHrs` VARCHAR(191) NULL,
+    `otHrs` VARCHAR(191) NULL,
+    `quater` VARCHAR(191) NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `PayFrequency` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `createdAt` DATETIME(3) NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NULL,
+    `createdById` INTEGER NULL,
+    `updatedById` INTEGER NULL,
+    `name` VARCHAR(191) NULL,
+    `active` BOOLEAN NULL DEFAULT true,
+    `payFrequencyType` VARCHAR(191) NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `payType` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `weekStartsDate` DATETIME(3) NULL,
+    `weekEndsDate` DATETIME(3) NULL,
+    `salaryDate` DATETIME(3) NULL,
+    `notes` VARCHAR(191) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -753,6 +1114,9 @@ ALTER TABLE `User` ADD CONSTRAINT `User_roleId_fkey` FOREIGN KEY (`roleId`) REFE
 
 -- AddForeignKey
 ALTER TABLE `Employee` ADD CONSTRAINT `Employee_departmentId_fkey` FOREIGN KEY (`departmentId`) REFERENCES `Department`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Employee` ADD CONSTRAINT `Employee_designationId_fkey` FOREIGN KEY (`designationId`) REFERENCES `Designation`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Employee` ADD CONSTRAINT `Employee_localCityId_fkey` FOREIGN KEY (`localCityId`) REFERENCES `City`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -812,6 +1176,21 @@ ALTER TABLE `Party` ADD CONSTRAINT `Party_createdById_fkey` FOREIGN KEY (`create
 ALTER TABLE `Party` ADD CONSTRAINT `Party_updatedById_fkey` FOREIGN KEY (`updatedById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `PartyBranch` ADD CONSTRAINT `PartyBranch_partyId_fkey` FOREIGN KEY (`partyId`) REFERENCES `Party`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `PartyShippingAddress` ADD CONSTRAINT `PartyShippingAddress_partyBranchId_fkey` FOREIGN KEY (`partyBranchId`) REFERENCES `PartyBranch`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `PartyContactDetails` ADD CONSTRAINT `PartyContactDetails_partyBranchId_fkey` FOREIGN KEY (`partyBranchId`) REFERENCES `PartyBranch`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `PartyBranchContactDetails` ADD CONSTRAINT `PartyBranchContactDetails_partyId_fkey` FOREIGN KEY (`partyId`) REFERENCES `Party`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `PartyBranchContactDetails` ADD CONSTRAINT `PartyBranchContactDetails_partyBranchId_fkey` FOREIGN KEY (`partyBranchId`) REFERENCES `PartyBranch`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `Hsn` ADD CONSTRAINT `Hsn_companyId_fkey` FOREIGN KEY (`companyId`) REFERENCES `Company`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -866,6 +1245,12 @@ ALTER TABLE `order` ADD CONSTRAINT `order_createdById_fkey` FOREIGN KEY (`create
 ALTER TABLE `order` ADD CONSTRAINT `order_updatedById_fkey` FOREIGN KEY (`updatedById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `order` ADD CONSTRAINT `order_customerId_fkey` FOREIGN KEY (`customerId`) REFERENCES `Party`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `order` ADD CONSTRAINT `order_supplierId_fkey` FOREIGN KEY (`supplierId`) REFERENCES `Party`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `order` ADD CONSTRAINT `order_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -881,6 +1266,18 @@ ALTER TABLE `order` ADD CONSTRAINT `order_userRoleId_fkey` FOREIGN KEY (`userRol
 ALTER TABLE `orderBillItems` ADD CONSTRAINT `orderBillItems_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `order`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE `orderBillItems` ADD CONSTRAINT `orderBillItems_styleSheetId_fkey` FOREIGN KEY (`styleSheetId`) REFERENCES `StyleSheet`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `SubGrid` ADD CONSTRAINT `SubGrid_orderBillItemsId_fkey` FOREIGN KEY (`orderBillItemsId`) REFERENCES `orderBillItems`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `SubGrid` ADD CONSTRAINT `SubGrid_colorId_fkey` FOREIGN KEY (`colorId`) REFERENCES `Color`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `SubGrid` ADD CONSTRAINT `SubGrid_uomId_fkey` FOREIGN KEY (`uomId`) REFERENCES `UnitOfMeasurement`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE `Po` ADD CONSTRAINT `Po_createdById_fkey` FOREIGN KEY (`createdById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -888,6 +1285,36 @@ ALTER TABLE `Po` ADD CONSTRAINT `Po_updatedById_fkey` FOREIGN KEY (`updatedById`
 
 -- AddForeignKey
 ALTER TABLE `Po` ADD CONSTRAINT `Po_branchId_fkey` FOREIGN KEY (`branchId`) REFERENCES `Branch`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Po` ADD CONSTRAINT `Po_customerId_fkey` FOREIGN KEY (`customerId`) REFERENCES `Party`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Po` ADD CONSTRAINT `Po_supplierId_fkey` FOREIGN KEY (`supplierId`) REFERENCES `Party`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Po` ADD CONSTRAINT `Po_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `order`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `poGrid` ADD CONSTRAINT `poGrid_poId_fkey` FOREIGN KEY (`poId`) REFERENCES `Po`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `poGrid` ADD CONSTRAINT `poGrid_gridId_fkey` FOREIGN KEY (`gridId`) REFERENCES `orderBillItems`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `poGrid` ADD CONSTRAINT `poGrid_styleSheetId_fkey` FOREIGN KEY (`styleSheetId`) REFERENCES `StyleSheet`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `poSubGrid` ADD CONSTRAINT `poSubGrid_subgridId_fkey` FOREIGN KEY (`subgridId`) REFERENCES `SubGrid`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `poSubGrid` ADD CONSTRAINT `poSubGrid_poGridId_fkey` FOREIGN KEY (`poGridId`) REFERENCES `poGrid`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `poSubGrid` ADD CONSTRAINT `poSubGrid_colorId_fkey` FOREIGN KEY (`colorId`) REFERENCES `Color`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `poSubGrid` ADD CONSTRAINT `poSubGrid_uomId_fkey` FOREIGN KEY (`uomId`) REFERENCES `UnitOfMeasurement`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Email` ADD CONSTRAINT `Email_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `order`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -948,3 +1375,138 @@ ALTER TABLE `LineMaster` ADD CONSTRAINT `LineMaster_companyId_fkey` FOREIGN KEY 
 
 -- AddForeignKey
 ALTER TABLE `Color` ADD CONSTRAINT `Color_companyId_fkey` FOREIGN KEY (`companyId`) REFERENCES `Company`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `UnitOfMeasurement` ADD CONSTRAINT `UnitOfMeasurement_companyId_fkey` FOREIGN KEY (`companyId`) REFERENCES `Company`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `purchaseInwardEntry` ADD CONSTRAINT `purchaseInwardEntry_createdById_fkey` FOREIGN KEY (`createdById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `purchaseInwardEntry` ADD CONSTRAINT `purchaseInwardEntry_updatedById_fkey` FOREIGN KEY (`updatedById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `purchaseInwardEntry` ADD CONSTRAINT `purchaseInwardEntry_branchId_fkey` FOREIGN KEY (`branchId`) REFERENCES `Branch`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `purchaseInwardEntry` ADD CONSTRAINT `purchaseInwardEntry_poId_fkey` FOREIGN KEY (`poId`) REFERENCES `Po`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `purchaseInwardEntry` ADD CONSTRAINT `purchaseInwardEntry_orderId_fkey` FOREIGN KEY (`orderId`) REFERENCES `order`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `purchaseInwardEntryGrid` ADD CONSTRAINT `purchaseInwardEntryGrid_purchaseInwardEntryId_fkey` FOREIGN KEY (`purchaseInwardEntryId`) REFERENCES `purchaseInwardEntry`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `purchaseInwardEntryGrid` ADD CONSTRAINT `purchaseInwardEntryGrid_styleSheetId_fkey` FOREIGN KEY (`styleSheetId`) REFERENCES `StyleSheet`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `purchaseInwardEntrySubGrid` ADD CONSTRAINT `purchaseInwardEntrySubGrid_purchaseInwardEntryGridId_fkey` FOREIGN KEY (`purchaseInwardEntryGridId`) REFERENCES `purchaseInwardEntryGrid`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `purchaseInwardEntrySubGrid` ADD CONSTRAINT `purchaseInwardEntrySubGrid_colorId_fkey` FOREIGN KEY (`colorId`) REFERENCES `Color`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `purchaseInwardEntrySubGrid` ADD CONSTRAINT `purchaseInwardEntrySubGrid_uomId_fkey` FOREIGN KEY (`uomId`) REFERENCES `UnitOfMeasurement`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `PartyMasterNew` ADD CONSTRAINT `PartyMasterNew_createdById_fkey` FOREIGN KEY (`createdById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `PartyMasterNew` ADD CONSTRAINT `PartyMasterNew_updatedById_fkey` FOREIGN KEY (`updatedById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `PartyMasterNew` ADD CONSTRAINT `PartyMasterNew_cityId_fkey` FOREIGN KEY (`cityId`) REFERENCES `City`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `PartyMasterNew` ADD CONSTRAINT `PartyMasterNew_currencyId_fkey` FOREIGN KEY (`currencyId`) REFERENCES `Currency`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `PartyMasterNew` ADD CONSTRAINT `PartyMasterNew_payTermId_fkey` FOREIGN KEY (`payTermId`) REFERENCES `PayTerm`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `PartyMasterNew` ADD CONSTRAINT `PartyMasterNew_companyId_fkey` FOREIGN KEY (`companyId`) REFERENCES `Company`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `SampleEntry` ADD CONSTRAINT `SampleEntry_createdById_fkey` FOREIGN KEY (`createdById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `SampleEntry` ADD CONSTRAINT `SampleEntry_updatedById_fkey` FOREIGN KEY (`updatedById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `SampleEntry` ADD CONSTRAINT `SampleEntry_branchId_fkey` FOREIGN KEY (`branchId`) REFERENCES `Branch`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `SampleEntry` ADD CONSTRAINT `SampleEntry_supplierId_fkey` FOREIGN KEY (`supplierId`) REFERENCES `Party`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `sampleEntryGrid` ADD CONSTRAINT `sampleEntryGrid_sampleEntryId_fkey` FOREIGN KEY (`sampleEntryId`) REFERENCES `SampleEntry`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `sampleEntryGrid` ADD CONSTRAINT `sampleEntryGrid_styleSheetId_fkey` FOREIGN KEY (`styleSheetId`) REFERENCES `StyleSheet`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `sampleEntrySubGrid` ADD CONSTRAINT `sampleEntrySubGrid_sampleEntryGridId_fkey` FOREIGN KEY (`sampleEntryGridId`) REFERENCES `sampleEntryGrid`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `poAttachments` ADD CONSTRAINT `poAttachments_createdById_fkey` FOREIGN KEY (`createdById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `poAttachments` ADD CONSTRAINT `poAttachments_updatedById_fkey` FOREIGN KEY (`updatedById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `poAttachments` ADD CONSTRAINT `poAttachments_branchId_fkey` FOREIGN KEY (`branchId`) REFERENCES `Branch`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `poAttachments` ADD CONSTRAINT `poAttachments_poId_fkey` FOREIGN KEY (`poId`) REFERENCES `Po`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Designation` ADD CONSTRAINT `Designation_departmentId_fkey` FOREIGN KEY (`departmentId`) REFERENCES `Department`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Designation` ADD CONSTRAINT `Designation_companyId_fkey` FOREIGN KEY (`companyId`) REFERENCES `Company`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Shift` ADD CONSTRAINT `Shift_createdById_fkey` FOREIGN KEY (`createdById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Shift` ADD CONSTRAINT `Shift_updatedById_fkey` FOREIGN KEY (`updatedById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Shift` ADD CONSTRAINT `Shift_companyId_fkey` FOREIGN KEY (`companyId`) REFERENCES `Company`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Shift` ADD CONSTRAINT `Shift_branchId_fkey` FOREIGN KEY (`branchId`) REFERENCES `Branch`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ShiftCommonTemplate` ADD CONSTRAINT `ShiftCommonTemplate_createdById_fkey` FOREIGN KEY (`createdById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ShiftCommonTemplate` ADD CONSTRAINT `ShiftCommonTemplate_updatedById_fkey` FOREIGN KEY (`updatedById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ShiftCommonTemplate` ADD CONSTRAINT `ShiftCommonTemplate_companyId_fkey` FOREIGN KEY (`companyId`) REFERENCES `Company`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ShiftCommonTemplate` ADD CONSTRAINT `ShiftCommonTemplate_branchId_fkey` FOREIGN KEY (`branchId`) REFERENCES `Branch`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ShiftCommonTemplate` ADD CONSTRAINT `ShiftCommonTemplate_employeeCategoryId_fkey` FOREIGN KEY (`employeeCategoryId`) REFERENCES `EmployeeCategory`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ShiftTemplate` ADD CONSTRAINT `ShiftTemplate_createdById_fkey` FOREIGN KEY (`createdById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ShiftTemplate` ADD CONSTRAINT `ShiftTemplate_updatedById_fkey` FOREIGN KEY (`updatedById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ShiftTemplate` ADD CONSTRAINT `ShiftTemplate_companyId_fkey` FOREIGN KEY (`companyId`) REFERENCES `Company`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ShiftTemplate` ADD CONSTRAINT `ShiftTemplate_branchId_fkey` FOREIGN KEY (`branchId`) REFERENCES `Branch`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `PayFrequency` ADD CONSTRAINT `PayFrequency_createdById_fkey` FOREIGN KEY (`createdById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `PayFrequency` ADD CONSTRAINT `PayFrequency_updatedById_fkey` FOREIGN KEY (`updatedById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
