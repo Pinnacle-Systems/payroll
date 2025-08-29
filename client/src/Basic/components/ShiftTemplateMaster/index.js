@@ -21,6 +21,8 @@ import { Check, Power } from "lucide-react";
 
 import { getCommonParams } from "../../../Utils/helper";
 import { useAddShiftTemplateMasterMutation, useDeleteShiftTemplateMasterMutation, useGetShiftTemplateMasterByIdQuery, useGetShiftTemplateMasterQuery, useUpdateShiftTemplateMasterMutation } from "../../../redux/services/ShiftTemplateMaster";
+import { useGetShiftCommonTemplateQuery } from "../../../redux/services/ShiftCommonTemplate.service";
+import { useGetshiftMasterQuery } from "../../../redux/services/ShiftMasterService";
 
 
 const ShiftTemplateMaster = () => {
@@ -47,16 +49,14 @@ const ShiftTemplateMaster = () => {
 
     const { data: company } = useGetCompanyQuery({ params });
 
+        const { data: ShitCommonData } = useGetShiftCommonTemplateQuery({ params, searchParams: searchValue });
+
+        const { data: shiftData } = useGetshiftMasterQuery({ params, searchParams: searchValue });
+
     const [companyCode, setCompanyCode] = useState(company?.data[0].code);
-    const { data: ShitCommonData } = useGetHRCommonTemplateQuery({ params, searchParams: searchValue });
     const { data: allData } = useGetShiftTemplateMasterQuery({ params, searchParams: searchValue });
 
-    const {
-        data: shiftData,
-
-    } = useGethrTemplateQuery({ params, searchParams: searchValue });
-
-    } = useGetShiftTemplateMasterQuery({ params, searchParams: searchValue });
+  
     const {
         data: singleData,
         isFetching: isSingleFetching,
