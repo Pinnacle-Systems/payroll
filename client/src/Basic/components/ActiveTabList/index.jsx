@@ -26,6 +26,7 @@ import {
   BuyerSuffling,
   Designation,
   PayFrequency,
+  EmployeeSubCategory,
 
  
   
@@ -104,7 +105,8 @@ const ActiveTabList = () => {
     "PAY FREQUENCY" : <PayFrequency/>,
     "SHIFT COMMON TEMPLATE MASTER" :<ShiftCommonTemplateMaster/>,
     "SHIFT MASTER":<ShiftMaster/>,
-    "SHIFT TEMPLATE MASTER" : <ShiftTemplateMaster/>
+    "SHIFT TEMPLATE MASTER" : <ShiftTemplateMaster/>,
+    "EMPLOYEE SUB CATEGORY":<EmployeeSubCategory/>
 
 
 
