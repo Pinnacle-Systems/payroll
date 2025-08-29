@@ -12,13 +12,14 @@ import { useGetCountriesQuery } from "../../../redux/services/CountryMasterServi
 import FormHeader from "../FormHeader";
 import FormReport from "../FormReportTemplate";
 import { toast } from "react-toastify";
-import { TextInput, CheckBox, DropdownInput, ToggleButton, Modal } from "../../../Inputs";
+import { TextInput, CheckBox, DropdownInput, ToggleButton,  ReusableTable, } from "../../../Inputs";
 import ReportTemplate from "../ReportTemplate";
 import { dropDownListObject } from '../../../Utils/contructObject';
 import { useDispatch } from "react-redux";
 import Mastertable from "../MasterTable/Mastertable";
 import MastersForm from '../MastersForm/MastersForm';
-
+import Modal from "../../../UiComponents/Modal";
+import { Check, Power } from "lucide-react";
 
 const MODEL = "State Master";
 
@@ -64,19 +65,8 @@ export default function Form() {
   const [removeData] = useDeleteStateMutation();
 
   const syncFormWithDb = useCallback((data) => {
-    if (!id) {
-      setReadOnly(false);
-      setActive(false)
-      setName("");
-      setCode("");
-      setActive(id ? (data?.active ?? true) : false);
-      setCountry("");
-      setGstNo("");
-
-      return
-    }
-    setReadOnly(true);
-    setActive(true)
+   
+   
     setName(data?.name || "");
     setCode(data?.code || "");
     setActive(id ? (data?.active ?? false) : true);
@@ -168,6 +158,7 @@ export default function Form() {
     setReadOnly(false);
     setForm(true);
     setSearchValue("");
+    setActive(true)
   };
   function onDataClick(id) {
     setId(id);
