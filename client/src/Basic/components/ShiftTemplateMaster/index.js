@@ -133,7 +133,7 @@ const ShiftTemplateMaster = () => {
         ShiftTemplateItems,
     };
 
-    console.log(ShiftTemplateItems, "ShiftTemplateItems")
+    console.log(ShiftTemplateItems, "ShiftTemplateItems  ")       
 
     const validateData = (data) => {
         if (data.name && data.code) {
