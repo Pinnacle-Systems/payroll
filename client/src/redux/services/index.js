@@ -46,7 +46,7 @@ export {default as designationMasterApi} from  './DesignationMasterService'
 export {default as ShiftMasterApi} from './ShiftMasterService'
 export {default as ShiftCommonTemplateMasterAPi} from  './ShiftCommonTemplate.service'
 export {default as ShiftTemplateMasterApi} from  './ShiftTemplateMaster'
-
+export {default as employeeSubCategoryApi} from './EmployeeSubCategoryservice'
 
 
 

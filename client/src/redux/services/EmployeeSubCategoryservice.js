@@ -8,9 +8,9 @@ const employeesubCategoryApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: BASE_URL,
   }),
-  tagTypes: ["Employee"],
+  tagTypes: ["employeeSubCategory"],
   endpoints: (builder) => ({
-    getEmployee: builder.query({
+    getemployeeSubCategory: builder.query({
       query: ({params, searchParams}) => {
         if(searchParams){
           return {
@@ -31,9 +31,9 @@ const employeesubCategoryApi = createApi({
           params
         };
       },
-      providesTags: ["Employee"],
+      providesTags: ["employeeSubCategory"],
     }),
-    getEmployeeById: builder.query({
+    getemployeeSubCategoryById: builder.query({
       query: (id) => {
         return {
           url: `${EMPLOYEE_SUB_CATEGORY_API}/${id}`,
@@ -43,17 +43,17 @@ const employeesubCategoryApi = createApi({
           },
         };
       },
-      providesTags: ["Employee"],
+      providesTags: ["employeeSubCategory"],
     }),
-    addEmployee: builder.mutation({
+    addemployeeSubCategory: builder.mutation({
       query: (payload) => ({
         url: EMPLOYEE_SUB_CATEGORY_API,
         method: "POST",
         body: payload,
       }),
-      invalidatesTags: ["Employee"],
+      invalidatesTags: ["employeeSubCategory"],
     }),
-    updateEmployee: builder.mutation({
+    updateemployeeSubCategory: builder.mutation({
       query: ({id, body}) => {
         return {
           url: `${EMPLOYEE_SUB_CATEGORY_API}/${id}`,
@@ -61,24 +61,24 @@ const employeesubCategoryApi = createApi({
           body,
         };
       },
-      invalidatesTags: ["Employee"],
+      invalidatesTags: ["employeeSubCategory"],
     }),
-    deleteEmployee: builder.mutation({
+    deleteemployeeSubCategory: builder.mutation({
       query: (id) => ({
         url: `${EMPLOYEE_SUB_CATEGORY_API}/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Employee"],
+      invalidatesTags: ["employeeSubCategory"],
     }),
   }),
 });
 
 export const {
-  useGetEmployeeQuery,
-  useGetEmployeeByIdQuery,
-  useAddEmployeeMutation,
-  useUpdateEmployeeMutation,
-  useDeleteEmployeeMutation,
+  useGetemployeeSubCategoryQuery,
+  useGetemployeeSubCategoryByIdQuery,
+  useAddemployeeSubCategoryMutation,
+  useUpdateemployeeSubCategoryMutation,
+  useDeleteemployeeSubCategoryMutation,
 } = employeesubCategoryApi;
 
 export default employeesubCategoryApi;
