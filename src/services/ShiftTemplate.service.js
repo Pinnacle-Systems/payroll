@@ -86,9 +86,9 @@ async function getOne(id) {
     where: {
       id: parseInt(id),
     },
-      include : {
-        ShiftTemplateItems : true
-      }
+    include: {
+      ShiftTemplateItems: true
+    }
   });
   if (!data) return NoRecordFound("hRCommonTemplate");
   return { statusCode: 0, data: { ...data, ...{ childRecord } } };
@@ -173,9 +173,91 @@ async function create(body) {
   return { statusCode: 0, data };
 }
 
+async function updateShiftTemplateItems(tx, ShiftTemplateItems, data) {
+  console.log(data, "data")
+  console.log(ShiftTemplateItems, "ShiftTemplateItems")
+
+  let removedItems = data?.ShiftTemplateItems?.filter(oldItem => {
+    let result = ShiftTemplateItems?.find(newItem => newItem.id === oldItem.id)
+    if (result) return false
+    return true
+  })
+
+  let removedItemsId = removedItems.map(item => parseInt(item.id))
+  await tx.ShiftTemplateItems.deleteMany({
+    where: {
+      id: {
+        in: removedItemsId
+      }
+    }
+  })
+
+  const promises = ShiftTemplateItems.map(async (item) => {
+    if (item?.id) {
+      return await tx.ShiftTemplateItems.update({
+        where: {
+          id: parseInt(item.id)
+        },
+        data: {
+          // shiftTemplateId : item?.
+          templateId: item?.templateId ? parseInt(item.templateId) : undefined,
+          shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
+          inNextDay: item?.inNextDay ? item.inNextDay : undefined,
+          toleranceInBeforeStart: item?.toleranceInBeforeStart ? item.toleranceInBeforeStart : undefined,
+          startTime: item?.startTime ? item.startTime : undefined,
+          toleranceInAfterEnd: item?.toleranceInAfterEnd ? item.toleranceInAfterEnd : undefined,
+          fbOut: item?.fbOut ? item.fbOut : undefined,
+          fbIn: item?.fbIn ? item.fbIn : undefined,
+          lunchBst: item?.lunchBst ? item.lunchBst : undefined,
+          lBSNDay: item?.lBSNDay ? item.lBSNDay : undefined,
+          lunchBET: item?.lunchBET ? item.lunchBET : undefined,
+          lBEnday: item?.lBEnday ? item.lBEnday : undefined,
+          sbOut: item?.sbOut ? item.sbOut : undefined,
+          sbIn: item?.sbIn ? item.sbIn : undefined,
+          toleranceOutBeforeStart: item?.toleranceOutBeforeStart ? item.toleranceOutBeforeStart : undefined,
+          endTime: item?.endTime ? item.endTime : undefined,
+          toleranceOutAfterEnd: item?.toleranceOutAfterEnd ? item.toleranceOutAfterEnd : undefined,
+          outNxtDay: item?.outNxtDay ? item.outNxtDay : undefined,
+          shiftTimeHrs: item?.shiftTimeHrs ? item.shiftTimeHrs : undefined,
+          otHrs: item?.otHrs ? item.otHrs : undefined,
+          quater: item?.quater ? item.quater : undefined,
+        }
+      })
+    } else {
+      return await tx.ShiftTemplateItems.create({
+        data: {
+          templateId: item?.templateId ? parseInt(item.templateId) : undefined,
+          shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
+          inNextDay: item?.inNextDay ? item.inNextDay : undefined,
+          toleranceInBeforeStart: item?.toleranceInBeforeStart ? item.toleranceInBeforeStart : undefined,
+          startTime: item?.startTime ? item.startTime : undefined,
+          toleranceInAfterEnd: item?.toleranceInAfterEnd ? item.toleranceInAfterEnd : undefined,
+          fbOut: item?.fbOut ? item.fbOut : undefined,
+          fbIn: item?.fbIn ? item.fbIn : undefined,
+          lunchBst: item?.lunchBst ? item.lunchBst : undefined,
+          lBSNDay: item?.lBSNDay ? item.lBSNDay : undefined,
+          lunchBET: item?.lunchBET ? item.lunchBET : undefined,
+          lBEnday: item?.lBEnday ? item.lBEnday : undefined,
+          sbOut: item?.sbOut ? item.sbOut : undefined,
+          sbIn: item?.sbIn ? item.sbIn : undefined,
+          toleranceOutBeforeStart: item?.toleranceOutBeforeStart ? item.toleranceOutBeforeStart : undefined,
+          endTime: item?.endTime ? item.endTime : undefined,
+          toleranceOutAfterEnd: item?.toleranceOutAfterEnd ? item.toleranceOutAfterEnd : undefined,
+          outNxtDay: item?.outNxtDay ? item.outNxtDay : undefined,
+          shiftTimeHrs: item?.shiftTimeHrs ? item.shiftTimeHrs : undefined,
+          otHrs: item?.otHrs ? item.otHrs : undefined,
+          quater: item?.quater ? item.quater : undefined,
+        }
+      })
+    }
+  })
+  return Promise.all(promises)
+}
+
+
 async function update(id, body) {
   const { name, branchId, companyId, active, description, docId, ShiftTemplateItems } = await body;
-  const dataFound = await prisma.ShiftTemplate.findUnique({
+  const dataFound = await prisma.shiftTemplate.findUnique({
     where: {
       id: parseInt(id),
     },
@@ -184,7 +266,10 @@ async function update(id, body) {
 
   let data;
   await prisma.$transaction(async (tx) => {
-    data = await tx.ShiftTemplate.update({
+    data = await tx.shiftTemplate.update({
+      where: {
+        id: parseInt(id),
+      },
       data: {
         docId: docId,
 
@@ -195,44 +280,50 @@ async function update(id, body) {
 
 
 
-        ShiftTemplateItems:
-          ShiftTemplateItems?.length > 0
-            ? {
-              update: ShiftTemplateItems?.map((item) => ({
-                templateId: item?.templateId ? parseInt(item.templateId) : undefined,
-                shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
-                inNextDay: item?.inNextDay ? item.inNextDay : undefined,
-                toleranceInBeforeStart: item?.toleranceInBeforeStart ? item.toleranceInBeforeStart : undefined,
-                startTime: item?.startTime ? item.startTime : undefined,
-                toleranceInAfterEnd: item?.toleranceInAfterEnd ? item.toleranceInAfterEnd : undefined,
-                fbOut: item?.fbOut ? item.fbOut : undefined,
-                fbIn: item?.fbIn ? item.fbIn : undefined,
-                lunchBst: item?.lunchBst ? item.lunchBst : undefined,
-                lBSNDay: item?.lBSNDay ? item.lBSNDay : undefined,
-                lunchBET: item?.lunchBET ? item.lunchBET : undefined,
-                lBEnday: item?.lBEnday ? item.lBEnday : undefined,
-                sbOut: item?.sbOut ? item.sbOut : undefined,
-                sbIn: item?.sbIn ? item.sbIn : undefined,
-                toleranceOutBeforeStart: item?.toleranceOutBeforeStart ? item.toleranceOutBeforeStart : undefined,
-                endTime: item?.endTime ? item.endTime : undefined,
-                toleranceOutAfterEnd: item?.toleranceOutAfterEnd ? item.toleranceOutAfterEnd : undefined,
-                outNxtDay: item?.outNxtDay ? item.outNxtDay : undefined,
-                shiftTimeHrs: item?.shiftTimeHrs ? item.shiftTimeHrs : undefined,
-                otHrs: item?.otHrs ? item.otHrs : undefined,
-                quater: item?.quater ? item.quater : undefined,
-              })),
-            }
-            : undefined,
+        // ShiftTemplateItems:
+        //   ShiftTemplateItems?.length > 0
+        //     ? {
+        //       update: ShiftTemplateItems?.map((item) => ({
+        //         templateId: item?.templateId ? parseInt(item.templateId) : undefined,
+        //         shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
+        //         inNextDay: item?.inNextDay ? item.inNextDay : undefined,
+        //         toleranceInBeforeStart: item?.toleranceInBeforeStart ? item.toleranceInBeforeStart : undefined,
+        //         startTime: item?.startTime ? item.startTime : undefined,
+        //         toleranceInAfterEnd: item?.toleranceInAfterEnd ? item.toleranceInAfterEnd : undefined,
+        //         fbOut: item?.fbOut ? item.fbOut : undefined,
+        //         fbIn: item?.fbIn ? item.fbIn : undefined,
+        //         lunchBst: item?.lunchBst ? item.lunchBst : undefined,
+        //         lBSNDay: item?.lBSNDay ? item.lBSNDay : undefined,
+        //         lunchBET: item?.lunchBET ? item.lunchBET : undefined,
+        //         lBEnday: item?.lBEnday ? item.lBEnday : undefined,
+        //         sbOut: item?.sbOut ? item.sbOut : undefined,
+        //         sbIn: item?.sbIn ? item.sbIn : undefined,
+        //         toleranceOutBeforeStart: item?.toleranceOutBeforeStart ? item.toleranceOutBeforeStart : undefined,
+        //         endTime: item?.endTime ? item.endTime : undefined,
+        //         toleranceOutAfterEnd: item?.toleranceOutAfterEnd ? item.toleranceOutAfterEnd : undefined,
+        //         outNxtDay: item?.outNxtDay ? item.outNxtDay : undefined,
+        //         shiftTimeHrs: item?.shiftTimeHrs ? item.shiftTimeHrs : undefined,
+        //         otHrs: item?.otHrs ? item.otHrs : undefined,
+        //         quater: item?.quater ? item.quater : undefined,
+        //       })),
+        //     }
+        //     : undefined,
+
 
 
       },
+      include: {
+        ShiftTemplateItems: true
+      }
     });
+    await updateShiftTemplateItems(tx, ShiftTemplateItems, data)
+
   });
   return { statusCode: 0, data };
 }
 
 async function remove(id) {
-  const data = await prisma.ShiftTemplate.delete({
+  const data = await prisma.shiftTemplate.delete({
     where: {
       id: parseInt(id),
     },

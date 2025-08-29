@@ -9,6 +9,8 @@ import { common, commonNew, ShowShiftData } from "../../../Utils/DropdownData";
 import secureLocalStorage from "react-secure-storage";
 import { toast } from "react-toastify";
 import { Eye } from "lucide-react";
+import { DELETE, PLUS } from "../../../icons";
+import { HiPlus, HiTrash } from "react-icons/hi";
 
 const TemplateItems = ({
     saveData, setForm, ShitCommonData, shiftData, readOnly, ShiftTemplateItems, setShiftTemplateItems, id,
@@ -33,9 +35,14 @@ const TemplateItems = ({
     };
 
 
+    const addNewRow = () => {
+        const newRow = { templateId: '' };
+        setShiftTemplateItems([...ShiftTemplateItems, newRow]);
+    };
 
-
-
+    const deleteRow = id => {
+        setShiftTemplateItems(yarnBlend => yarnBlend?.filter((row, index) => index !== parseInt(id)));
+    };
 
 
     return (
@@ -283,9 +290,23 @@ const TemplateItems = ({
                                                         </th>
                                                         <th
 
-                                                            className={`w-28 px-3 py-2 text-center font-medium text-[13px] `}
+                                                            className={`w-14 px-3 py-2 text-center font-medium text-[13px] `}
                                                         >
                                                             SubFill
+                                                        </th>
+                                                        <th
+
+                                                            className={`w-20 px-3 py-2 item-center font-medium text-[13px] `}
+                                                        >
+                                                            <button
+                                                                onClick={() => {
+                                                                    addNewRow()
+                                                                }}
+                                                                className="hover:bg-green-600 text-green-600 hover:text-white border border-green-600 px-2 py-1 rounded-md flex items-center text-xs"
+                                                            >
+                                                                <HiPlus className="w-3 h-3" />
+
+                                                            </button>
                                                         </th>
                                                     </tr>
                                                 </thead>
@@ -333,13 +354,10 @@ const TemplateItems = ({
                                                                     disabled={readOnly} className='text-left w-full rounded py-1 table-data-input'
                                                                     value={item.shiftId}
                                                                     onChange={(e) => handleInputChange(e.target.value, index, "shiftId")}
-                                                                // onBlur={(e) => {
-                                                                //     handleInputChange(e.target.value, index, "accessoryGroupId")
-                                                                // }
-                                                                // }
-
 
                                                                 >
+
+
                                                                     <option>
                                                                     </option>
                                                                     {(id ? (shiftData?.data || []) : shiftData?.data.filter(item => item.active) || []).map((blend) =>
@@ -355,13 +373,10 @@ const TemplateItems = ({
                                                                     disabled={readOnly} className='text-left w-full rounded py-1 table-data-input'
                                                                     value={item.inNextDay}
                                                                     onChange={(e) => handleInputChange(e.target.value, index, "inNextDay")}
-                                                                // onBlur={(e) => {
-                                                                //     handleInputChange(e.target.value, index, "accessoryGroupId")
-                                                                // }
-                                                                // }
-
-
                                                                 >
+
+
+
                                                                     <option>
                                                                     </option>
                                                                     {(commonNew).map((blend) =>
@@ -616,11 +631,25 @@ const TemplateItems = ({
                                                                 </select>
 
                                                             </td>
-                                                            <td className='table-data flex item-center'>
-
-                                                                <Eye />
+                                                            <td className="w-40 border border-gray-300 text-[11px] py-0.5 item-center">
+                                                                <button
+                                                                    // onClick={() => handleView(index)}
+                                                                    // onMouseEnter={() => setTooltipVisible(true)}
+                                                                    // onMouseLeave={() => setTooltipVisible(false)}
+                                                                    className="text-blue-800 py-1.5 flex items-center bg-blue-50 rounded"
+                                                                >
+                                                                    👁 <span className="text-xs"></span>
+                                                                </button>
                                                             </td>
 
+                                                            <td className="w-40 border border-gray-300 text-[11px] py-0.5">
+                                                                <button
+                                                                    onClick={() => deleteRow(index)}
+                                                                    className="text-red-600 hover:text-red-800 bg-red-50 py-1 rounded text-xs flex items-center"
+                                                                >
+                                                                    <HiTrash className="w-4 h-4" />
+                                                                </button>
+                                                            </td>
                                                         </tr>
                                                     ))}
 
