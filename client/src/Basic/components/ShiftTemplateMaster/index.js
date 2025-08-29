@@ -55,13 +55,13 @@ const ShiftTemplateMaster = () => {
 
     const { data: allData } = useGetShiftTemplateMasterQuery({ params, searchParams: searchValue });
 
-        const {
+    const {
         data: singleData,
         isFetching: isSingleFetching,
         isLoading: isSingleLoading,
     } = useGetShiftTemplateMasterByIdQuery(id, { skip: !id });
 
-     const [addData] = useAddShiftTemplateMasterMutation();
+    const [addData] = useAddShiftTemplateMasterMutation();
     const [updateData] = useUpdateShiftTemplateMasterMutation();
     const [removeData] = useDeleteShiftTemplateMasterMutation();
 
@@ -79,7 +79,7 @@ const ShiftTemplateMaster = () => {
         }
     }, [company]);
 
-   
+
     const getNextDocId = useCallback(() => {
         if (id) return;
         if (allData?.nextDocId) {
