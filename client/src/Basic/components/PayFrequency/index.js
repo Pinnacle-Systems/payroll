@@ -198,31 +198,31 @@ const PayFrequency = () => {
     </div>
   );
   const columns = [
-    {
-      header: "S.No",
-      accessor: (item, index) => index + 1,
-      className: "font-medium text-gray-900 w-12  text-center",
-    },
+    // {
+    //   header: "S.No",
+    //   accessor: (item, index) => index + 1,
+    //   className: "font-medium text-gray-900 w-12  text-center",
+    // },
 
-    {
-      header: "Shift Name",
-      accessor: (item) => item?.name,
-      //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-32",
-    },
+    // {
+    //   header: "Shift Name",
+    //   accessor: (item) => item?.name,
+    
+    //   className: "font-medium text-gray-900 text-center uppercase w-32",
+    // },
 
-    {
-      header: "Status",
-      accessor: (item) => (item.active ? ACTIVE : INACTIVE),
-      //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-16",
-    },
-    {
-      header: "",
-      accessor: (item) => "",
-      //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 uppercase w-[75%]",
-    },
+    // {
+    //   header: "Status",
+    //   accessor: (item) => (item.active ? ACTIVE : INACTIVE),
+     
+    //   className: "font-medium text-gray-900 text-center uppercase w-16",
+    // },
+    // {
+    //   header: "",
+    //   accessor: (item) => "",
+     
+    //   className: "font-medium text-gray-900 uppercase w-[75%]",
+    // },
   ];
   // const tableHeaders = [
   //   "S.NO",
