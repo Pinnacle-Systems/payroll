@@ -37,7 +37,8 @@ import {
  
   ShiftTemplate,
   ShiftCommonTemplate,
-  shiftMaster
+  shiftMaster,
+  employeeSubCategory
 
 } from './src/routes/index.js';
 
@@ -125,7 +126,7 @@ app.use("/designation",designation)
 app.use('/shift',shiftMaster)
 app.use('/shiftCommonTemplate',ShiftCommonTemplate)
 app.use('/ShiftTemplate',ShiftTemplate)
-
+app.use('/employeeSubcategory',employeeSubCategory)
 
 
 

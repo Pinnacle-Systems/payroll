@@ -41,6 +41,7 @@ export {default as designation} from './designation.route.js'
 export {default as shiftMaster} from './ShiftMaster.route.js'
 export {default as ShiftCommonTemplate} from './ShiftCommontemplate.route.js'
 export {default as ShiftTemplate} from './shiftTemplate.route.js'
+export {default as employeeSubCategory} from './employeeSubCategory.route.js'
 
 
 
