@@ -49,20 +49,28 @@ const ShiftTemplateMaster = () => {
     const { branchId } = params
 
     const { data: company } = useGetCompanyQuery({ params });
-
-    const { data: ShitCommonData } = useGetShiftCommonTemplateQuery({ params, searchParams: searchValue });
-
-    const { data: shiftData } = useGetshiftMasterQuery({ params, searchParams: searchValue });
-
     const [companyCode, setCompanyCode] = useState(company?.data[0].code);
+
+
+
     const { data: allData } = useGetShiftTemplateMasterQuery({ params, searchParams: searchValue });
 
-
-    const {
+        const {
         data: singleData,
         isFetching: isSingleFetching,
         isLoading: isSingleLoading,
     } = useGetShiftTemplateMasterByIdQuery(id, { skip: !id });
+
+     const [addData] = useAddShiftTemplateMasterMutation();
+    const [updateData] = useUpdateShiftTemplateMasterMutation();
+    const [removeData] = useDeleteShiftTemplateMasterMutation();
+
+
+    const { data: shiftData } = useGetshiftMasterQuery({ params, searchParams: searchValue });
+    const { data: ShitCommonData } = useGetShiftCommonTemplateQuery({ params, searchParams: searchValue });
+
+
+
 
     useEffect(() => {
         if (company?.data?.length > 0) {
@@ -71,9 +79,7 @@ const ShiftTemplateMaster = () => {
         }
     }, [company]);
 
-    const [addData] = useAddShiftTemplateMasterMutation();
-    const [updateData] = useUpdateShiftTemplateMasterMutation();
-    const [removeData] = useDeleteShiftTemplateMasterMutation();
+   
     const getNextDocId = useCallback(() => {
         if (id) return;
         if (allData?.nextDocId) {
@@ -88,12 +94,12 @@ const ShiftTemplateMaster = () => {
         if (ShiftTemplateItems?.length >= 1) return
         setShiftTemplateItems(prev => {
             let newArray = Array.from({ length: 1 - prev.length }, i => {
-                return { templateId : "" };
+                return { templateId: "" };
             })
             return [...prev, ...newArray]
         }
         )
-    }, [ShiftTemplateItems, setShiftTemplateItems])
+    }, [])
 
 
     const syncFormWithDb = useCallback(
@@ -111,6 +117,7 @@ const ShiftTemplateMaster = () => {
                 setDocId(data?.docId || "")
                 setDescription(data?.description || "");
                 setActive(id ? data?.active ?? false : true);
+                setShiftTemplateItems(data?.ShiftTemplateItems ? data?.ShiftTemplateItems : undefined)
             }
         },
         [id, company]
@@ -133,7 +140,7 @@ const ShiftTemplateMaster = () => {
         ShiftTemplateItems,
     };
 
-    console.log(ShiftTemplateItems, "ShiftTemplateItems  ")       
+    console.log(ShiftTemplateItems, "ShiftTemplateItems  ")
 
     const validateData = (data) => {
         if (data.name && data.code) {
@@ -299,10 +306,10 @@ const ShiftTemplateMaster = () => {
                             <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-3">
                                 <ReusableTable
                                     columns={columns}
-                                    // data={allData?.data}
+                                    data={allData?.data}
                                     onView={handleView}
                                     onEdit={handleEdit}
-                                    // onDelete={deleteData}
+                                    onDelete={deleteData}
                                     itemsPerPage={10}
                                 />
                             </div>

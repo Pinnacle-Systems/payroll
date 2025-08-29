@@ -1233,7 +1233,6 @@ model ShiftTemplateItems {
   shiftTimeHrs            String?
   otHrs                   String?
   quater                  String?
-
 }
 
 model PayFrequency {

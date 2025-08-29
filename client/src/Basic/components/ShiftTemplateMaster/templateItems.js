@@ -379,7 +379,7 @@ const TemplateItems = ({
                                                                 <input
                                                                     min={"0"}
                                                                     type="number"
-                                                                    value={item?.toleranceBeforeStart}
+                                                                    value={item?.toleranceInBeforeStart}
                                                                     onFocus={(e) => e.target.select()}
                                                                     onChange={(e) => handleInputChange(e.target.value, index, "toleranceInBeforeStart")}
                                                                     className="text-right rounded py-1 px-1 w-full table-data-input"
@@ -403,7 +403,7 @@ const TemplateItems = ({
                                                                 <input
                                                                     min={"0"}
                                                                     type="number"
-                                                                    value={item?.toleranceAfterEnd}
+                                                                    value={item?.toleranceInAfterEnd}
                                                                     onFocus={(e) => e.target.select()}
                                                                     onChange={(e) => handleInputChange(e.target.value, index, "toleranceInAfterEnd")}
                                                                     className="text-right rounded py-1 px-1 w-full table-data-input"
@@ -450,7 +450,7 @@ const TemplateItems = ({
                                                                 <select
                                                                     // onKeyDown={e => { if (e.key === "Delete") { handleInputChange("", index, "accessoryGroupId") } }}
                                                                     disabled={readOnly} className='text-left w-full rounded py-1 table-data-input'
-                                                                    value={item.lBSnDay}
+                                                                    value={item.lBSNDay}
                                                                     onChange={(e) => handleInputChange(e.target.value, index, "lBSNDay")}
 
                                                                 >
@@ -484,7 +484,7 @@ const TemplateItems = ({
                                                                 <select
                                                                     // onKeyDown={e => { if (e.key === "Delete") { handleInputChange("", index, "accessoryGroupId") } }}
                                                                     disabled={readOnly} className='text-left w-full rounded py-1 table-data-input'
-                                                                    value={item.LBenday}
+                                                                    value={item.lBEnday}
                                                                     onChange={(e) => handleInputChange(e.target.value, index, "lBEnday")}
 
                                                                 >
@@ -502,7 +502,7 @@ const TemplateItems = ({
                                                                 <input
                                                                     min={"0"}
                                                                     type="number"
-                                                                    value={item?.SBOut}
+                                                                    value={item?.sbOut}
                                                                     onFocus={(e) => e.target.select()}
                                                                     onChange={(e) => handleInputChange(e.target.value, index, "sbOut")}
                                                                     className="text-right rounded py-1 px-1 w-full table-data-input"
@@ -513,7 +513,7 @@ const TemplateItems = ({
                                                                 <input
                                                                     min={"0"}
                                                                     type="number"
-                                                                    value={item?.SBIn}
+                                                                    value={item?.sbIn}
                                                                     onFocus={(e) => e.target.select()}
                                                                     onChange={(e) => handleInputChange(e.target.value, index, "sbIn")}
                                                                     className="text-right rounded py-1 px-1 w-full table-data-input"
@@ -525,7 +525,7 @@ const TemplateItems = ({
                                                                 <input
                                                                     min={"0"}
                                                                     type="number"
-                                                                    value={item?.toleranceBeforeStart}
+                                                                    value={item?.toleranceOutBeforeStart}
                                                                     onFocus={(e) => e.target.select()}
                                                                     onChange={(e) => handleInputChange(e.target.value, index, "toleranceOutBeforeStart")}
                                                                     className="text-right rounded py-1 px-1 w-full table-data-input"
@@ -547,7 +547,7 @@ const TemplateItems = ({
                                                                 <input
                                                                     min={"0"}
                                                                     type="number"
-                                                                    value={item?.toleranceAfterStart}
+                                                                    value={item?.toleranceOutAfterEnd}
                                                                     onFocus={(e) => e.target.select()}
                                                                     onChange={(e) => handleInputChange(e.target.value, index, "toleranceOutAfterEnd")}
                                                                     className="text-right rounded py-1 px-1 w-full table-data-input"

@@ -1032,6 +1032,21 @@ CREATE TABLE `ShiftTemplate` (
     `name` VARCHAR(191) NULL,
     `docId` VARCHAR(191) NULL,
     `active` BOOLEAN NULL DEFAULT true,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `ShiftTemplateItems` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `shiftTemplateId` INTEGER NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+    `createdById` INTEGER NULL,
+    `updatedById` INTEGER NULL,
+    `name` VARCHAR(191) NULL,
+    `docId` VARCHAR(191) NULL,
+    `active` BOOLEAN NULL DEFAULT true,
     `templateId` INTEGER NULL,
     `shiftId` INTEGER NULL,
     `inNextDay` VARCHAR(191) NULL,
@@ -1504,6 +1519,15 @@ ALTER TABLE `ShiftTemplate` ADD CONSTRAINT `ShiftTemplate_companyId_fkey` FOREIG
 
 -- AddForeignKey
 ALTER TABLE `ShiftTemplate` ADD CONSTRAINT `ShiftTemplate_branchId_fkey` FOREIGN KEY (`branchId`) REFERENCES `Branch`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ShiftTemplateItems` ADD CONSTRAINT `ShiftTemplateItems_shiftTemplateId_fkey` FOREIGN KEY (`shiftTemplateId`) REFERENCES `ShiftTemplate`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ShiftTemplateItems` ADD CONSTRAINT `ShiftTemplateItems_createdById_fkey` FOREIGN KEY (`createdById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `ShiftTemplateItems` ADD CONSTRAINT `ShiftTemplateItems_updatedById_fkey` FOREIGN KEY (`updatedById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `PayFrequency` ADD CONSTRAINT `PayFrequency_createdById_fkey` FOREIGN KEY (`createdById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
