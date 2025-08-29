@@ -193,6 +193,8 @@ model User {
   HRCommonTemplateupdatedBy    HRCommonTemplate[]    @relation(name: "updatedBy")
   ShiftTemplateCreatedBy       ShiftTemplate[]       @relation(name: "createdBy")
   ShiftTemplateupdatedBy       ShiftTemplate[]       @relation(name: "updatedBy")
+  PayFrequencyCreatedBy        PayFrequency[]        @relation(name: "createdBy")
+  PayFrequencyupdatedBy        PayFrequency[]        @relation(name: "updatedBy")
 }
 
 model Employee {
@@ -1193,4 +1195,25 @@ model ShiftTemplate {
   description String?
   docId       String?
   active      Boolean? @default(true)
+}
+
+model PayFrequency {
+  id               Int       @id @default(autoincrement())
+  createdAt        DateTime? @default(now())
+  updatedAt        DateTime? @updatedAt
+  createdBy        User?     @relation("createdBy", fields: [createdById], references: [id])
+  createdById      Int?
+  updatedBy        User?     @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById      Int?
+  name             String?
+  active           Boolean?  @default(true)
+  payFrequencyType String?
+}
+
+model payType {
+  id             Int       @id @default(autoincrement())
+  weekStartsDate DateTime?
+  weekEndsDate   DateTime?
+  salaryDate     DateTime?
+  notes          String?
 }
