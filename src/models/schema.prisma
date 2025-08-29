@@ -1192,10 +1192,31 @@ model ShiftTemplate {
   branch      Branch?  @relation(fields: [branchId], references: [id])
   branchId    Int?
   name        String?
-  description String?
   docId       String?
   active      Boolean? @default(true)
+  templateId              Int?
+  shiftId                 Int?
+  inNextDay               String?
+  toleranceInBeforeStart  String?
+  startTime               String?
+  toleranceInAfterEnd     String?
+  fbOut                   String?
+  fbIn                    String?
+  lunchBst                String?
+  lBSNDay                 String?
+  lunchBET                String?
+  lBEnday                 String?
+  sbOut                   String?
+  sbIn                    String?
+  toleranceOutBeforeStart String?
+  endTime                 String?
+  toleranceOutAfterEnd    String?
+  outNxtDay               String?
+  shiftTimeHrs            String?
+  otHrs                   String?
+  quater                  String?
 }
+
 
 model PayFrequency {
   id               Int       @id @default(autoincrement())
