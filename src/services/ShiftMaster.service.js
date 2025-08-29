@@ -17,7 +17,7 @@ async function getNextDocId(
 ) {
   console.log("argumnts : ", branchId, shortCode, startTime, endTime, isTaxBill);
 
-  let lastObject = await prisma.hRTemplate.findFirst({
+  let lastObject = await prisma.shift.findFirst({
     where: {
       branchId: parseInt(branchId),
     },
@@ -46,7 +46,7 @@ async function get(req) {
 
   console.log(companyId, active, finYearId,"received");
   
-  const data = await prisma.hRTemplate.findMany({
+  const data = await prisma.shift.findMany({
     where: {
     //   companyId: companyId ? parseInt(companyId) : undefined,
     //   active: active ? Boolean(active) : undefined,
@@ -83,7 +83,7 @@ async function get(req) {
 
 async function getOne(id) {
   const childRecord = 0;
-  const data = await prisma.hRTemplate.findUnique({
+  const data = await prisma.shift.findUnique({
     where: {
       id: parseInt(id),
     },
@@ -95,7 +95,7 @@ async function getOne(id) {
 async function getSearch(req) {
   const { searchKey } = req.params;
   const { companyId, active } = req.query;
-  const data = await prisma.hRTemplate.findMany({
+  const data = await prisma.shift.findMany({
     where: {
       companyId: companyId ? parseInt(companyId) : undefined,
       active: active ? Boolean(active) : undefined,
@@ -118,7 +118,7 @@ async function getSearch(req) {
 
 async function create(body) {
   const { name, branchId, companyId, active, description, docId } = await body;
-  const data = await prisma.hRTemplate.create({
+  const data = await prisma.shift.create({
     data: {
       name,
       companyId: parseInt(companyId),
@@ -133,13 +133,13 @@ async function create(body) {
 
 async function update(id, body) {
   const { name, branchId, companyId, active, description, docId } = await body;
-  const dataFound = await prisma.hRTemplate.findUnique({
+  const dataFound = await prisma.shift.findUnique({
     where: {
       id: parseInt(id),
     },
   });
   if (!dataFound) return NoRecordFound("HRTemplate");
-  const data = await prisma.hRTemplate.update({
+  const data = await prisma.shift.update({
     where: {
       id: parseInt(id),
     },
@@ -156,7 +156,7 @@ async function update(id, body) {
 }
 
 async function remove(id) {
-  const data = await prisma.hRTemplate.delete({
+  const data = await prisma.shift.delete({
     where: {
       id: parseInt(id),
     },

@@ -39,7 +39,7 @@ const ShiftTemplateMaster = () => {
     const [searchValue, setSearchValue] = useState("");
     const childRecord = useRef(0);
     const [ShiftTemplateItems, setShiftTemplateItems] = useState([])
-
+    const [categoryId, setCategoryId] = useState("")
 
 
 
@@ -64,128 +64,131 @@ const ShiftTemplateMaster = () => {
         isLoading: isSingleLoading,
     } = useGetShiftTemplateMasterByIdQuery(id, { skip: !id });
 
-    // useEffect(() => {
-    //   if (company?.data?.length > 0) {
-    //     setCompanyName(company.data[0].name);
-    //     setCompanyCode(company.data[0].code);
-    //   }
-    // }, [company]);
+    useEffect(() => {
+        if (company?.data?.length > 0) {
+            // setCompanyName(company.data[0].name);
+            setCompanyCode(company.data[0].code);
+        }
+    }, [company]);
 
     const [addData] = useAddShiftTemplateMasterMutation();
     const [updateData] = useUpdateShiftTemplateMasterMutation();
     const [removeData] = useDeleteShiftTemplateMasterMutation();
-    // const getNextDocId = useCallback(() => {
-    //     if (id) return;
-    //     if (allData?.nextDocId) {
-    //         setDocId(allData?.nextDocId);
-    //     }
-    // }, [allData, id]);
+    const getNextDocId = useCallback(() => {
+        if (id) return;
+        if (allData?.nextDocId) {
+            setDocId(allData?.nextDocId);
+        }
+    }, [allData, id]);
 
-    // useEffect(getNextDocId, [getNextDocId]);
-
-
-    // useEffect(() => {
-    //     if (ShiftTemplateItems?.length >= 1) return
-    //     setShiftTemplateItems(prev => {
-    //         let newArray = Array.from({ length: 1 - prev.length }, i => {
-    //             return { fabricId: "", qty: "0.000", colorId: "", taxPercent: "0.000", uomId: "", gaugeId: "", designId: "", gsmId: "", loopLengthId: "", kDiaId: "", fDiaId: "", price: "", discountType: "Percentage", discountValue: "0.00" };
-    //         })
-    //         return [...prev, ...newArray]
-    //     }
-    //     )
-    // }, [ShiftTemplateItems, setShiftTemplateItems])
+    useEffect(getNextDocId, [getNextDocId]);
 
 
-    // const syncFormWithDb = useCallback(
-    //     (data) => {
-    //         if (!id) {
-    //             // setReadOnly(false);
-    //             setName("");
-    //             setDescription("")
-    //             setActive(true);
-    //             // setCompanyName(company?.data[0].name);
-    //             setCompanyCode(company?.data[0].code);
-    //         } else {
-    //             // setReadOnly(true);
-    //             setName(data?.name || "");
-    //             setDocId(data?.docId || "")
-    //             setDescription(data?.description || "");
-    //             setActive(id ? data?.active ?? false : true);
-    //         }
-    //     },
-    //     [id, company]
-    // );
+    useEffect(() => {
+        if (ShiftTemplateItems?.length >= 1) return
+        setShiftTemplateItems(prev => {
+            let newArray = Array.from({ length: 1 - prev.length }, i => {
+                return { templateId : "" };
+            })
+            return [...prev, ...newArray]
+        }
+        )
+    }, [ShiftTemplateItems, setShiftTemplateItems])
 
-    // useEffect(() => {
-    //     syncFormWithDb(singleData?.data);
-    // }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
 
-    // const data = {
-    //     name,
-    //     description,
-    //     docId,
-    //     active,
-    //     companyId: secureLocalStorage.getItem(
-    //         sessionStorage.getItem("sessionId") + "userCompanyId"
-    //     ),
-    //     id,
-    //     branchId,
-    // };
+    const syncFormWithDb = useCallback(
+        (data) => {
+            if (!id) {
+                // setReadOnly(false);
+                setName("");
+                setDescription("")
+                setActive(true);
+                // setCompanyName(company?.data[0].name);
+                setCompanyCode(company?.data[0].code);
+            } else {
+                // setReadOnly(true);
+                setName(data?.name || "");
+                setDocId(data?.docId || "")
+                setDescription(data?.description || "");
+                setActive(id ? data?.active ?? false : true);
+            }
+        },
+        [id, company]
+    );
 
-    // const validateData = (data) => {
-    //     if (data.name && data.code) {
-    //         return true;
-    //     }
-    //     return false;
-    // };
+    useEffect(() => {
+        syncFormWithDb(singleData?.data);
+    }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
 
-    // const handleSubmitCustom = async (callback, data, text) => {
-    //     try {
-    //         let returnData = await callback(data).unwrap();
-    //         setId(returnData.data.id);
-    //         toast.success(text + "Successfully");
-    //     } catch (error) {
-    //         console.log("handle");
-    //     }
-    // };
+    const data = {
+        name,
+        description,
+        docId,
+        active,
+        companyId: secureLocalStorage.getItem(
+            sessionStorage.getItem("sessionId") + "userCompanyId"
+        ),
+        id,
+        branchId,
+        ShiftTemplateItems,
+    };
 
-    // const saveData = () => {
-    //     // if (!validateData(data)) {
-    //     //   toast.error("Please fill all required fields...!", {
-    //     //     position: "top-center",
-    //     //   });
-    //     //   return;
-    //     // }
-    //     if (!window.confirm("Are you sure save the details ...?")) {
-    //         return;
-    //     }
-    //     if (id) {
-    //         handleSubmitCustom(updateData, data, "Updated");
-    //     } else {
-    //         handleSubmitCustom(addData, data, "Added");
-    //     }
-    // };
+    console.log(ShiftTemplateItems, "ShiftTemplateItems")
 
-    // const deleteData = async () => {
-    //     if (id) {
-    //         if (!window.confirm("Are you sure to delete...?")) {
-    //             return;
-    //         }
-    //         try {
-    //             const deldata = await removeData(id).unwrap();
-    //             if (deldata?.statusCode == 1) {
-    //                 toast.error(deldata?.message);
-    //                 setForm(false);
-    //                 return;
-    //             }
-    //             setId("");
-    //             toast.success("Deleted Successfully");
-    //             setForm(false);
-    //         } catch (error) {
-    //             toast.error("something went wrong");
-    //         }
-    //     }
-    // };
+    const validateData = (data) => {
+        if (data.name && data.code) {
+            return true;
+        }
+        return false;
+    };
+
+    const handleSubmitCustom = async (callback, data, text) => {
+        try {
+            let returnData = await callback(data).unwrap();
+            setId(returnData.data.id);
+            toast.success(text + "Successfully");
+        } catch (error) {
+            console.log("handle");
+        }
+    };
+
+    const saveData = () => {
+        // if (!validateData(data)) {
+        //   toast.error("Please fill all required fields...!", {
+        //     position: "top-center",
+        //   });
+        //   return;
+        // }
+        if (!window.confirm("Are you sure save the details ...?")) {
+            return;
+        }
+        if (id) {
+            handleSubmitCustom(updateData, data, "Updated");
+        } else {
+            handleSubmitCustom(addData, data, "Added");
+        }
+    };
+
+    const deleteData = async () => {
+        if (id) {
+            if (!window.confirm("Are you sure to delete...?")) {
+                return;
+            }
+            try {
+                const deldata = await removeData(id).unwrap();
+                if (deldata?.statusCode == 1) {
+                    toast.error(deldata?.message);
+                    setForm(false);
+                    return;
+                }
+                setId("");
+                toast.success("Deleted Successfully");
+                setForm(false);
+            } catch (error) {
+                toast.error("something went wrong");
+            }
+        }
+    };
 
     const handleKeyDown = (event) => {
         let charCode = String.fromCharCode(event.which).toLowerCase();
@@ -268,8 +271,9 @@ const ShiftTemplateMaster = () => {
     return (
         <div>
             <div onKeyDown={handleKeyDown} className="p-1 ">
-                {form === true ? ( 
-                    <TemplateItems setForm={setForm}  />
+                {form === true ? (
+                    <TemplateItems saveData={saveData} setForm={setForm} ShitCommonData={ShitCommonData} shiftData={shiftData} readOnly={readOnly} ShiftTemplateItems={ShiftTemplateItems} setShiftTemplateItems={setShiftTemplateItems} id={id}
+                        companyCode={companyCode} setCompanyCode={setCompanyCode} docId={docId} setDocId={setDocId} categoryId={categoryId} setCategoryId={setCategoryId} childRecord={childRecord} />
 
                 )
                     :
