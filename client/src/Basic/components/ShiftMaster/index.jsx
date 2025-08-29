@@ -26,12 +26,12 @@ import { useGetCompanyQuery } from "../../../redux/services/CompanyMasterService
 import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
 import {
-  useAddhrTemplateMutation,
-  useDeletehrTemplateMutation,
-  useGethrTemplateByIdQuery,
-  useGethrTemplateQuery,
-  useUpdatehrTemplateMutation,
-} from "../../../redux/services/HrTemplateService";
+  useAddshiftMasterMutation,
+  useDeleteshiftMasterMutation,
+  useGetshiftMasterByIdQuery,
+  useGetshiftMasterQuery,
+  useUpdateshiftMasterMutation,
+} from "../../../redux/services/ShiftMasterService";
 import { getCommonParams } from "../../../Utils/helper";
 
 const ShiftMaster = () => {
@@ -63,12 +63,12 @@ const ShiftMaster = () => {
     data: allData,
     isLoading,
     isFetching,
-  } = useGethrTemplateQuery({ params, searchParams: searchValue });
+  } = useGetshiftMasterQuery({ params, searchParams: searchValue });
   const {
     data: singleData,
     isFetching: isSingleFetching,
     isLoading: isSingleLoading,
-  } = useGethrTemplateByIdQuery(id, { skip: !id });
+  } = useGetshiftMasterByIdQuery(id, { skip: !id });
 
   // useEffect(() => {
   //   if (company?.data?.length > 0) {
@@ -77,9 +77,9 @@ const ShiftMaster = () => {
   //   }
   // }, [company]);
 
-  const [addData] = useAddhrTemplateMutation();
-  const [updateData] = useUpdatehrTemplateMutation();
-  const [removeData] = useDeletehrTemplateMutation();
+  const [addData] = useAddshiftMasterMutation();
+  const [updateData] = useUpdateshiftMasterMutation();
+  const [removeData] = useDeleteshiftMasterMutation();
   const getNextDocId = useCallback(() => {
     if (id) return;
     if (allData?.nextDocId) {

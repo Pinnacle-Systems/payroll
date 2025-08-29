@@ -33,9 +33,11 @@ import {
   partyMasterNew,
   sampleEntry,
   designation,
-  hrTemplate,
-  HRCommonTemplate,
-  ShiftTemplate
+ 
+ 
+  ShiftTemplate,
+  ShiftCommonTemplate,
+  shiftMaster
 
 } from './src/routes/index.js';
 
@@ -117,10 +119,11 @@ app.use('/purchaseInwardEntry',purchaseInwardEntry);
 app.use("/partyMasterNew",partyMasterNew)
 app.use("/sampleEntry",sampleEntry)
 app.use('/uploads', express.static('uploads'));
-app.use('/hrTemplate',hrTemplate)
+
 app.use("/sendMail", sendMail)
 app.use("/designation",designation)
-app.use('/HRCommonTemplate',HRCommonTemplate)
+app.use('/shift',shiftMaster)
+app.use('/shiftCommonTemplate',ShiftCommonTemplate)
 app.use('/ShiftTemplate',ShiftTemplate)
 
 

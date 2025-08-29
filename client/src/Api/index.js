@@ -93,8 +93,8 @@ export const PARTY_MASTER_NEW_API = "purchaseInwardEntry"
 export const SAMPLE_ENTRY_API = "sampleEntry"
 export const DESIGNATION_API = "designation"
 export const PAYFREQUENCY_API = "payfrequency"
-export const HRTEMPLATE_API = "hrTemplate"
-export const HRCommonTemplate_API = "HRCommonTemplate"
+export const SHIFT_MASTER_API = "shift"
+export const SHIFT_COMMAN_TEMPLATE_API = "shiftCommonTemplate"
 export const SHIFT_TEMPLATE_API = "ShiftTemplate"
 
 

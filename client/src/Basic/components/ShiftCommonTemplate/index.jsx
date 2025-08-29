@@ -17,12 +17,12 @@ import { Check, Power } from "lucide-react";
 
 import { getCommonParams } from "../../../Utils/helper";
 import {
-  useAddHRCommonTemplateMutation,
-  useDeleteHRCommonTemplateMutation,
-  useGetHRCommonTemplateByIdQuery,
-  useGetHRCommonTemplateQuery,
-  useUpdateHRCommonTemplateMutation,
-} from "../../../redux/services/HRCommonTemplate.service";
+  useAddShiftCommonTemplateMutation,
+  useDeleteShiftCommonTemplateMutation,
+  useGetShiftCommonTemplateByIdQuery,
+  useGetShiftCommonTemplateQuery,
+  useUpdateShiftCommonTemplateMutation,
+} from "../../../redux/services/ShiftCommonTemplate.service";
 import { useGetPartyCategoryMasterQuery } from "../../../redux/services/PartyCategoryServices";
 import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCategoryMasterService";
 
@@ -44,7 +44,7 @@ const ShiftCommonTemplateMaster = () => {
   const { data: company } = useGetCompanyQuery({ params });
   const [companyName, setCompanyName] = useState(company?.data[0].name);
   const [companyCode, setCompanyCode] = useState(company?.data[0].code);
-  const { data: allData } = useGetHRCommonTemplateQuery({
+  const { data: allData } = useGetShiftCommonTemplateQuery({
     params,
     searchParams: searchValue,
   });
@@ -52,7 +52,7 @@ const ShiftCommonTemplateMaster = () => {
     data: singleData,
     isFetching: isSingleFetching,
     isLoading: isSingleLoading,
-  } = useGetHRCommonTemplateByIdQuery(id, { skip: !id });
+  } = useGetShiftCommonTemplateByIdQuery(id, { skip: !id });
 
   const { data: employeeCategory } = useGetEmployeeCategoryQuery({ params });
 
@@ -63,9 +63,9 @@ const ShiftCommonTemplateMaster = () => {
   //   }
   // }, [company]);
 
-  const [addData] = useAddHRCommonTemplateMutation();
-  const [updateData] = useUpdateHRCommonTemplateMutation();
-  const [removeData] = useDeleteHRCommonTemplateMutation();
+  const [addData] = useAddShiftCommonTemplateMutation();
+  const [updateData] = useUpdateShiftCommonTemplateMutation();
+  const [removeData] = useDeleteShiftCommonTemplateMutation();
   const getNextDocId = useCallback(() => {
     if (id) return;
     if (allData?.nextDocId) {

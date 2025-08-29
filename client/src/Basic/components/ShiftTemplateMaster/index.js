@@ -19,7 +19,8 @@ import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
 
 import { getCommonParams } from "../../../Utils/helper";
-import { useAddHRCommonTemplateMutation, useDeleteHRCommonTemplateMutation, useGetHRCommonTemplateByIdQuery, useGetHRCommonTemplateQuery, useUpdateHRCommonTemplateMutation } from "../../../redux/services/HRCommonTemplate.service";
+import { useAddShiftTemplateMasterMutation, useDeleteShiftTemplateMasterMutation, useGetShiftTemplateMasterByIdQuery, useGetShiftTemplateMasterQuery, useUpdateShiftTemplateMasterMutation } from "../../../redux/services/ShiftTemplateMaster";
+
 
 const ShiftTemplateMaster = () => {
     const [readOnly, setReadOnly] = useState(false);
@@ -48,12 +49,12 @@ const ShiftTemplateMaster = () => {
     const {
         data: allData,
 
-    } = useGetHRCommonTemplateQuery({ params, searchParams: searchValue });
+    } = useGetShiftTemplateMasterQuery({ params, searchParams: searchValue });
     const {
         data: singleData,
         isFetching: isSingleFetching,
         isLoading: isSingleLoading,
-    } = useGetHRCommonTemplateByIdQuery(id, { skip: !id });
+    } = useGetShiftTemplateMasterByIdQuery(id, { skip: !id });
 
     // useEffect(() => {
     //   if (company?.data?.length > 0) {
@@ -62,9 +63,9 @@ const ShiftTemplateMaster = () => {
     //   }
     // }, [company]);
 
-    const [addData] = useAddHRCommonTemplateMutation();
-    const [updateData] = useUpdateHRCommonTemplateMutation();
-    const [removeData] = useDeleteHRCommonTemplateMutation();
+    const [addData] = useAddShiftTemplateMasterMutation();
+    const [updateData] = useUpdateShiftTemplateMasterMutation();
+    const [removeData] = useDeleteShiftTemplateMasterMutation();
     const getNextDocId = useCallback(() => {
         if (id) return;
         if (allData?.nextDocId) {
