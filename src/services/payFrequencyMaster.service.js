@@ -87,7 +87,7 @@ async function getOne(id) {
             id: parseInt(id),
         },
         include: {
-            ShiftTemplateItems: true
+            PayFrequencyItems: true
         }
     });
     if (!data) return NoRecordFound("hRCommonTemplate");
@@ -119,48 +119,29 @@ async function getSearch(req) {
 }
 
 async function create(body) {
-    const { name, branchId, companyId, active, description, docId, ShiftTemplateItems } = await body;
+    const { name, branchId, companyId, active, description, docId, PayFrequencyItems } = await body;
 
-    console.log(ShiftTemplateItems, "ShiftTemplateItems");
+    console.log(PayFrequencyItems, "PayFrequencyItems");
     let data;
 
     await prisma.$transaction(async (tx) => {
         data = await tx.payFrequency.create({
             data: {
-                docId: docId,
-
-                branchId: branchId ? parseInt(branchId) : undefined,
-                companyId: companyId ? parseInt(companyId) : undefined,
+                finYearId: finYearId ? finYearId : undefined,
+                // branchId: branchId ? parseInt(branchId) : undefined,
+                // companyId: companyId ? parseInt(companyId) : undefined,
                 active: active ? Boolean(active) : undefined,
 
 
 
-
-                ShiftTemplateItems:
-                    ShiftTemplateItems?.length > 0
+                PayFrequencyItems:
+                    PayFrequencyItems?.length > 0
                         ? {
-                            create: ShiftTemplateItems?.map((item) => ({
-                                templateId: item?.templateId ? parseInt(item.templateId) : undefined,
-                                shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
-                                inNextDay: item?.inNextDay ? item.inNextDay : undefined,
-                                toleranceInBeforeStart: item?.toleranceInBeforeStart ? item.toleranceInBeforeStart : undefined,
-                                startTime: item?.startTime ? item.startTime : undefined,
-                                toleranceInAfterEnd: item?.toleranceInAfterEnd ? item.toleranceInAfterEnd : undefined,
-                                fbOut: item?.fbOut ? item.fbOut : undefined,
-                                fbIn: item?.fbIn ? item.fbIn : undefined,
-                                lunchBst: item?.lunchBst ? item.lunchBst : undefined,
-                                lBSNDay: item?.lBSNDay ? item.lBSNDay : undefined,
-                                lunchBET: item?.lunchBET ? item.lunchBET : undefined,
-                                lBEnday: item?.lBEnday ? item.lBEnday : undefined,
-                                sbOut: item?.sbOut ? item.sbOut : undefined,
-                                sbIn: item?.sbIn ? item.sbIn : undefined,
-                                toleranceOutBeforeStart: item?.toleranceOutBeforeStart ? item.toleranceOutBeforeStart : undefined,
-                                endTime: item?.endTime ? item.endTime : undefined,
-                                toleranceOutAfterEnd: item?.toleranceOutAfterEnd ? item.toleranceOutAfterEnd : undefined,
-                                outNxtDay: item?.outNxtDay ? item.outNxtDay : undefined,
-                                shiftTimeHrs: item?.shiftTimeHrs ? item.shiftTimeHrs : undefined,
-                                otHrs: item?.otHrs ? item.otHrs : undefined,
-                                quater: item?.quater ? item.quater : undefined,
+                            create: PayFrequencyItems?.map((item) => ({
+                                weekStartsDate: item?.weekStartsDate ? item.weekStartsDate : undefined,
+                                weekEndsDate: item?.weekEndsDate ? item.weekEndsDate : undefined,
+                                salaryDate: item?.salaryDate ? item.salaryDate : undefined,
+                                salaryDate: item?.salaryDate ? item.salaryDate : undefined,
                             })),
                         }
                         : undefined,
@@ -174,7 +155,7 @@ async function create(body) {
 }
 
 async function update(id, body) {
-    const { name, branchId, companyId, active, description, docId, ShiftTemplateItems } = await body;
+    const { name, branchId, companyId, active, description, docId, PayFrequencyItems } = await body;
     const dataFound = await prisma.payFrequency.findUnique({
         where: {
             id: parseInt(id),
@@ -195,10 +176,10 @@ async function update(id, body) {
 
 
 
-                ShiftTemplateItems:
-                    ShiftTemplateItems?.length > 0
+                PayFrequencyItems:
+                    PayFrequencyItems?.length > 0
                         ? {
-                            update: ShiftTemplateItems?.map((item) => ({
+                            update: PayFrequencyItems?.map((item) => ({
                                 templateId: item?.templateId ? parseInt(item.templateId) : undefined,
                                 shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
                                 inNextDay: item?.inNextDay ? item.inNextDay : undefined,

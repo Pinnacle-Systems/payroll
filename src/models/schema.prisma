@@ -1252,7 +1252,7 @@ model PayFrequency {
   finYearId        Int?
 }
 
-model payType {
+model PayFrequencyItems {
   id             Int       @id @default(autoincrement())
   weekStartsDate DateTime?
   weekEndsDate   DateTime?
