@@ -687,7 +687,7 @@ export default function Form() {
         </div>
       </div>
 
-      <div className="bg-[f1f1f0] rounded-xl shadow overflow-hidden">
+      {/* <div className="bg-[f1f1f0] rounded-xl shadow overflow-hidden">
         <div className="pt-2">
           {view === "table" ? (
             <Mastertable
@@ -767,7 +767,7 @@ export default function Form() {
             </div>
           )}
         </div>
-      </div>
+      </div> */}
 
 
       {form && (
