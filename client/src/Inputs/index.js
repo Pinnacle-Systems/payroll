@@ -1194,7 +1194,7 @@ export const TextInput = ({
   return (
     <div className={`mb-2 ${width}`}>
       {name && (
-        <label className="block text-xs font-bold text-slate-700 mb-2">
+        <label className="block text-xs font-bold text-slate-700 mb-1">
           {required ? <RequiredLabel name={label ? label : name} /> : name}
         </label>
       )}
@@ -1505,6 +1505,7 @@ export const DropdownInput = ({
 
   const isDisabled = readOnly || disabled;
 
+  console.log(options, '134');
 
 
   return (
@@ -2258,7 +2259,7 @@ export const ReusableTable = ({
                         <button
                           className="text-blue-600  flex items-center   px-2 mr-2  bg-blue-50 rounded"
                           onClick={() => onView(item.id)}
-                           title="View"
+                          title="View"
                         >
                           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />

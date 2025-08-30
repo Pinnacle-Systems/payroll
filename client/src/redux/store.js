@@ -20,12 +20,14 @@ import {
   machineMasterApi,
   sampleEntryApi,
   designationMasterApi,
-  
+
 
   ShiftTemplateMasterApi,
   ShiftCommonTemplateMasterAPi,
   ShiftMasterApi,
   employeeSubCategoryApi,
+  payFrequency,
+  payFrequencyApi,
 
 } from "./services"
 import projectPaymentFormApi from "./services/ProjectPaymentService";
@@ -63,6 +65,7 @@ import tagTypeMasterApi from "./uniformService/TagTypeMasterServices";
 import CertificateMasterApi from "./uniformService/CertificateMasterService";
 import UnitOfMeasurementMasterApi from "./uniformService/UnitOfMeasurementServices";
 import partyMasterNewApi from "./services/PartyMasterNewService";
+import PayFrequencyMasterApi from "./services/PayFrequencyService";
 
 
 
@@ -107,6 +110,7 @@ const commonReducers = {
   colorMaster: ColorMasterApi.reducer,
   fabricMaster: FabricMasterApi.reducer,
   certificateMaster: CertificateMasterApi.reducer,
+  payFrequency: payFrequencyApi.reducer,
 
   panelMaster: PanelMasterApi.reducer,
   gauge: GaugeApi.reducer,
@@ -157,12 +161,12 @@ const commonReducers = {
   [ProductionReceiptApi.reducerPath]: ProductionReceiptApi.reducer,
   [purchaseInwardEntryApi.reducerPath]: purchaseInwardEntryApi.reducer,
   [partyMasterNewApi.reducerPath]: partyMasterNewApi.reducer,
-  [sampleEntryApi.reducerPath]:sampleEntryApi.reducer,
-  [designationMasterApi.reducerPath]:designationMasterApi.reducer,
-  [ShiftMasterApi.reducerPath]:ShiftMasterApi.reducer,
-  [ShiftCommonTemplateMasterAPi.reducerPath]:ShiftCommonTemplateMasterAPi.reducer,
-  ShiftTemplateMaster : ShiftTemplateMasterApi.reducer,
-  [employeeSubCategoryApi.reducerPath] : employeeSubCategoryApi.reducer
+  [sampleEntryApi.reducerPath]: sampleEntryApi.reducer,
+  [designationMasterApi.reducerPath]: designationMasterApi.reducer,
+  [ShiftMasterApi.reducerPath]: ShiftMasterApi.reducer,
+  [ShiftCommonTemplateMasterAPi.reducerPath]: ShiftCommonTemplateMasterAPi.reducer,
+  ShiftTemplateMaster: ShiftTemplateMasterApi.reducer,
+  [employeeSubCategoryApi.reducerPath]: employeeSubCategoryApi.reducer
 
 
 
@@ -259,7 +263,8 @@ designationMasterApi.middleware,
 ShiftMasterApi.middleware,
 ShiftCommonTemplateMasterAPi.middleware,
 ShiftTemplateMasterApi.middleware,
-employeeSubCategoryApi.middleware
+employeeSubCategoryApi.middleware,
+payFrequencyApi.middleware
 ];
 
 

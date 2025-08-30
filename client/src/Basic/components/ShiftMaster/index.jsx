@@ -33,6 +33,7 @@ import {
   useUpdateshiftMasterMutation,
 } from "../../../redux/services/ShiftMasterService";
 import { getCommonParams } from "../../../Utils/helper";
+import Swal from "sweetalert2";
 
 const ShiftMaster = () => {
   const [readOnly, setReadOnly] = useState(false);
@@ -125,7 +126,7 @@ const ShiftMaster = () => {
   };
 
   const validateData = (data) => {
-    if (data.name && data.code) {
+    if (data.name) {
       return true;
     }
     return false;
@@ -135,19 +136,34 @@ const ShiftMaster = () => {
     try {
       let returnData = await callback(data).unwrap();
       setId(returnData.data.id);
-      toast.success(text + "Successfully");
+      Swal.fire({
+        title: text + "  " + "Successfully",
+        icon: "success",
+        draggable: true,
+        timer: 1000,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
     } catch (error) {
-      console.log("handle");
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission error',
+        text: error.data?.message || 'Something went wrong!',
+      });
     }
   };
 
   const saveData = () => {
-    // if (!validateData(data)) {
-    //   toast.error("Please fill all required fields...!", {
-    //     position: "top-center",
-    //   });
-    //   return;
-    // }
+    if (!validateData(data)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission error',
+        text: 'Please fill all required fields...!',
+      });
+      return;
+    }
     if (!window.confirm("Are you sure save the details ...?")) {
       return;
     }
@@ -166,15 +182,27 @@ const ShiftMaster = () => {
       try {
         const deldata = await removeData(id).unwrap();
         if (deldata?.statusCode == 1) {
-          toast.error(deldata?.message);
+          Swal.fire({
+            icon: 'error',
+            title: 'Submission error',
+            text: deldata.data?.message || 'Something went wrong!',
+          });
           setForm(false);
           return;
         }
         setId("");
-        toast.success("Deleted Successfully");
-        setForm(false);
+        Swal.fire({
+          title: "Deleted Successfully",
+          icon: "success",
+          timer: 1000,
+
+        }); setForm(false);
       } catch (error) {
-        toast.error("something went wrong");
+        Swal.fire({
+          icon: 'error',
+          title: 'Submission error',
+          text: error.data?.message || 'Something went wrong!',
+        });
       }
     }
   };
@@ -337,44 +365,44 @@ const ShiftMaster = () => {
                   <div className="lg:col-span- space-y-3">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
                       <div className="space-y-4 w-[50%]">
-                     
-                         
 
+
+
+                        <TextInput
+                          name="Company Code"
+                          type="text"
+                          value={companyCode}
+                          setValue={setCompanyCode}
+                          required={true}
+                          // readOnly={readOnly}
+                          disabled={true}
+                        />
+
+
+                        <div className="w-42">
                           <TextInput
-                            name="Company Code"
+                            name="Shift Code"
                             type="text"
-                            value={companyCode}
-                            setValue={setCompanyCode}
+                            value={docId}
+                            // setValue={setDocId}
                             required={true}
-                            // readOnly={readOnly}
-                            disabled={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
                           />
-                       
-                      
-                          <div className="w-42">
-                            <TextInput
-                              name="Shift Code"
-                              type="text"
-                              value={docId}
-                              // setValue={setDocId}
-                              required={true}
-                              readOnly={readOnly}
-                              disabled={childRecord.current > 0}
-                            />
-                          </div>
-                        
-                            <TextInput
-                              name="Shift Name"
-                              type="text"
-                              value={name}
-                              setValue={setName}
-                              required={true}
-                              readOnly={readOnly}
-                              disabled={childRecord.current > 0}
-                            />
-                          
-                        
-                  
+                        </div>
+
+                        <TextInput
+                          name="Shift Name"
+                          type="text"
+                          value={name}
+                          setValue={setName}
+                          required={true}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                        />
+
+
+
 
                         <div className="mt-5">
                           <ToggleButton

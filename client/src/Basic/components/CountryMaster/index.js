@@ -19,6 +19,7 @@ import { push } from "../../../redux/features/opentabs";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Check, Power } from "lucide-react";
+import Swal from "sweetalert2";
 
 const MODEL = "Country Master";
 
@@ -100,17 +101,35 @@ export default function Form() {
     try {
       let returnData = await callback(data).unwrap();
       setId(returnData.data.id);
-      toast.success(text + "Successfully");
+      Swal.fire({
+        title: text + "  " + "Successfully",
+        icon: "success",
+        draggable: true,
+        timer: 1000,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
     } catch (error) {
-      console.log("handle");
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission error',
+        text: error.data?.message || 'Something went wrong!',
+      });
     }
   };
 
   const saveData = () => {
     console.log("saveData hit");
     if (!validateData(data)) {
-      toast.error("Please fill all required fields...!", {
-        position: "top-center",
+      // toast.error("Please fill all required fields...!", {
+      //   position: "top-center",
+      // });
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission error',
+        text: 'Please fill all required fields...!',
       });
       return;
     }
@@ -133,14 +152,27 @@ export default function Form() {
       try {
         let deldata = await removeData(id).unwrap();
         if (deldata?.statusCode == 1) {
-          toast.error(deldata?.message);
+          Swal.fire({
+            icon: 'error',
+            title: 'Submission error',
+            text: deldata.data?.message || 'Something went wrong!',
+          });
           return;
         }
         setId("");
-        toast.success("Deleted Successfully");
+        Swal.fire({
+          title: "Deleted Successfully",
+          icon: "success",
+          timer: 1000,
+
+        });
         setForm(false);
       } catch (error) {
-        toast.error("something went wrong");
+        Swal.fire({
+          icon: 'error',
+          title: 'Submission error',
+          text: error.data?.message || 'Something went wrong!',
+        });
         setForm(false);
       }
     }

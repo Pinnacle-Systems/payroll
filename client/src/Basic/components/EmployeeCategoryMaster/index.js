@@ -22,6 +22,7 @@ import MastersForm from "../MastersForm/MastersForm";
 import { statusDropdown } from "../../../Utils/DropdownData";
 import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
+import Swal from "sweetalert2";
 const MODEL = "Employee Category Master";
 export default function Form() {
   const [form, setForm] = useState(false);
@@ -60,12 +61,12 @@ export default function Form() {
 
   const syncFormWithDb = useCallback(
     (data) => {
-   
-        
-        setName(data?.name || "");
-        setCode(data?.code || "");
-        setActive(id ? data?.active ?? false : true);
-      }
+
+
+      setName(data?.name || "");
+      setCode(data?.code || "");
+      setActive(id ? data?.active ?? false : true);
+    }
     ,
     [id]
   );
@@ -96,7 +97,16 @@ export default function Form() {
       let returnData = await callback(data).unwrap();
       setId(returnData.data.id);
       syncFormWithDb(undefined);
-      toast.success(text + "Successfully");
+      Swal.fire({
+        title: text + "  " + "Successfully",
+        icon: "success",
+        draggable: true,
+        timer: 1000,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
     } catch (error) {
       console.log("handle");
     }
@@ -104,8 +114,10 @@ export default function Form() {
 
   const saveData = () => {
     if (!validateData(data)) {
-      toast.error("Please fill all required fields...!", {
-        position: "top-center",
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission error',
+        text: 'Please fill all required fields...!',
       });
       return;
     }
@@ -127,15 +139,28 @@ export default function Form() {
       try {
         const deldata = await removeData(id).unwrap();
         if (deldata?.statusCode == 1) {
-          toast.error(deldata?.message);
+          Swal.fire({
+            icon: 'error',
+            title: 'Submission error',
+            text: deldata.data?.message || 'Something went wrong!',
+          });
           setForm(false);
           return;
         }
         setId("");
-        toast.success("Deleted Successfully");
+        Swal.fire({
+          title: "Deleted Successfully",
+          icon: "success",
+          timer: 1000,
+
+        });
         setForm(false);
       } catch (error) {
-        toast.error("something went wrong");
+        Swal.fire({
+          icon: 'error',
+          title: 'Submission error',
+          text: error.data?.message || 'Something went wrong!',
+        });
       }
     }
   };

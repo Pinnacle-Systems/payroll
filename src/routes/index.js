@@ -34,14 +34,16 @@ export { default as color } from "./color.route.js"
 export { default as payTerm } from './payTerm.route.js'
 export { default as currency } from './currency.route.js'
 export { default as uom } from './uom.route.js'
-export {default as purchaseInwardEntry} from './purchaseInwardEntry.route.js'
-export {default as partyMasterNew} from './partyMasterNew.route.js'
-export {default as sampleEntry} from './sampleEntry.route.js'
-export {default as designation} from './designation.route.js'
-export {default as shiftMaster} from './ShiftMaster.route.js'
-export {default as ShiftCommonTemplate} from './ShiftCommontemplate.route.js'
-export {default as ShiftTemplate} from './shiftTemplate.route.js'
-export {default as employeeSubCategory} from './employeeSubCategory.route.js'
+export { default as purchaseInwardEntry } from './purchaseInwardEntry.route.js'
+export { default as partyMasterNew } from './partyMasterNew.route.js'
+export { default as sampleEntry } from './sampleEntry.route.js'
+export { default as designation } from './designation.route.js'
+export { default as shiftMaster } from './ShiftMaster.route.js'
+export { default as ShiftCommonTemplate } from './ShiftCommontemplate.route.js'
+export { default as ShiftTemplate } from './shiftTemplate.route.js'
+export { default as employeeSubCategory } from './employeeSubCategory.route.js'
+export { default as payfrequency } from "./payFrequency.route.js"
+
 
 
 

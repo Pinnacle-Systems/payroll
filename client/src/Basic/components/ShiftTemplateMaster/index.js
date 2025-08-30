@@ -24,6 +24,7 @@ import { useAddShiftTemplateMasterMutation, useDeleteShiftTemplateMasterMutation
 import { useGetShiftCommonTemplateQuery } from "../../../redux/services/ShiftCommonTemplate.service";
 import { useGetshiftMasterQuery } from "../../../redux/services/ShiftMasterService";
 import TemplateItems from "./templateItems";
+import Swal from "sweetalert2";
 
 
 const ShiftTemplateMaster = () => {
@@ -90,16 +91,21 @@ const ShiftTemplateMaster = () => {
     useEffect(getNextDocId, [getNextDocId]);
 
 
+
     useEffect(() => {
         if (ShiftTemplateItems?.length >= 1) return
         setShiftTemplateItems(prev => {
-            let newArray = Array.from({ length: 1 - prev.length }, i => {
-                return { templateId: "" };
+            let newArray = Array?.from({ length: 1 - prev?.length }, () => {
+                return {
+                    templateId: "",
+
+                }
             })
             return [...prev, ...newArray]
         }
         )
-    }, [])
+    }, [setShiftTemplateItems, ShiftTemplateItems])
+
 
 
     const syncFormWithDb = useCallback(
@@ -117,9 +123,10 @@ const ShiftTemplateMaster = () => {
                 setDocId(data?.docId || "")
                 setDescription(data?.description || "");
                 setActive(id ? data?.active ?? false : true);
-                setShiftTemplateItems(data?.ShiftTemplateItems ? data?.ShiftTemplateItems : undefined)
+                setShiftTemplateItems(data?.ShiftTemplateItems ? data?.ShiftTemplateItems : [])
+                setCategoryId(data?.category  ?  data?.category   :  "" )
             }
-        },
+        },  
         [id, company]
     );
 
@@ -137,35 +144,101 @@ const ShiftTemplateMaster = () => {
         ),
         id,
         branchId,
-        ShiftTemplateItems,
+        ShiftTemplateItems: ShiftTemplateItems?.filter(item => item.templateId),
+        categoryId
     };
 
-    console.log(ShiftTemplateItems, "ShiftTemplateItems  ")
+    console.log(ShiftTemplateItems, "ShiftTemplateItems")
 
-    const validateData = (data) => {
-        if (data.name && data.code) {
-            return true;
-        }
-        return false;
-    };
+    // const validateData = (data) => {
+    //     if (!data?.categoryId) {
+    //         toast.error("Category is required...!");
+    //         return false;
+    //     }
+
+
+
+    //     return true;
+    // };
+
+
 
     const handleSubmitCustom = async (callback, data, text) => {
         try {
             let returnData = await callback(data).unwrap();
             setId(returnData.data.id);
-            toast.success(text + "Successfully");
+
+            // toast.success(text + "Successfully");
+            Swal.fire({
+                title: text + "  " + "Successfully",
+                icon: "success",
+                draggable: true,
+                timer: 1000,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
         } catch (error) {
-            console.log("handle");
+            Swal.fire({
+                icon: 'error',
+                title: 'Submission error',
+                text: error.data?.message || 'Something went wrong!',
+            });
         }
     };
 
+    const validateData = (data) => {
+        if (!categoryId) {
+            // toast.info("Category is Missing");
+            Swal.fire({
+                icon: 'error',
+                title: 'Submission error',
+                text: 'Category is Missing',
+            });
+            return false
+        }
+        if ((ShiftTemplateItems).length === 0) {
+            // toast.info("ShiftTemplateItems  should have atleast One Item...!!!");
+            Swal.fire({
+                icon: 'error',
+                title: 'Submission error',
+                text: 'ShiftTemplateItems  should have atleast One Item...!!!',
+            });
+            return false
+        }
+        if (ShiftTemplateItems?.some(i => !i.templateId || i.templateId === "")) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Submission error',
+                text: 'Shift Common Template  Is Missing...!!!',
+            });
+            return;
+        }
+        if (ShiftTemplateItems?.some(i => !i.shiftId || i.shiftId === "")) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Submission error',
+                text: 'shift  Is Missing...!!!',
+            });
+            return;
+        }
+        return true
+    }
+
+
+
+
     const saveData = () => {
         // if (!validateData(data)) {
-        //   toast.error("Please fill all required fields...!", {
-        //     position: "top-center",
-        //   });
-        //   return;
+        //     toast.error("Please fill all required fields...!", {
+        //         position: "top-center",
+        //     });
+        //     return;
         // }
+        if (!validateData(data)) {
+            return
+        }
         if (!window.confirm("Are you sure save the details ...?")) {
             return;
         }
@@ -176,7 +249,7 @@ const ShiftTemplateMaster = () => {
         }
     };
 
-    const deleteData = async () => {
+    const deleteData = async (id) => {
         if (id) {
             if (!window.confirm("Are you sure to delete...?")) {
                 return;
@@ -184,15 +257,28 @@ const ShiftTemplateMaster = () => {
             try {
                 const deldata = await removeData(id).unwrap();
                 if (deldata?.statusCode == 1) {
-                    toast.error(deldata?.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Submission error',
+                        text: deldata?.data?.message || 'Something went wrong!',
+                    });
                     setForm(false);
                     return;
                 }
                 setId("");
-                toast.success("Deleted Successfully");
+                Swal.fire({
+                    title: "Deleted Successfully",
+                    icon: "success",
+                    timer: 1000,
+
+                });
                 setForm(false);
             } catch (error) {
-                toast.error("something went wrong");
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Submission error',
+                    text: error.data?.message || 'Something went wrong!',
+                });
             }
         }
     };
@@ -205,15 +291,16 @@ const ShiftTemplateMaster = () => {
         }
     };
 
-    // const onNew = () => {
-    //     setId("");
-    //     setReadOnly(false);
-    //     setForm(true);
-    //     setSearchValue("");
-    //     // setCompanyName(company.data[0].name);
-    //     setCompanyCode(company?.data[0]?.code);
+    const onNew = () => {
+        console.log("Hitr")
+        setId("");
+        setReadOnly(false);
+        setSearchValue("");
+        setCompanyCode(company?.data[0]?.code);
+        setShiftTemplateItems([])
+        setCategoryId('')
 
-    // };
+    };
     const handleView = (id) => {
         setId(id);
         setForm(true);
@@ -244,12 +331,17 @@ const ShiftTemplateMaster = () => {
         },
 
         {
-            header: "Common Template Name",
-            accessor: (item) => item?.name,
+            header: "docId",
+            accessor: (item) => item?.docId,
             //   cellClass: () => "font-medium  text-gray-900",
             className: "font-medium text-gray-900 text-center uppercase w-72",
         },
-
+        {
+            header: "Category",
+            accessor: (item) => item?.category,
+            //   cellClass: () => "font-medium  text-gray-900",
+            className: "font-medium text-gray-900 text-center uppercase w-72",
+        },
         {
             header: "Status",
             accessor: (item) => (item.active ? ACTIVE : INACTIVE),
@@ -263,24 +355,17 @@ const ShiftTemplateMaster = () => {
             className: "font-medium text-gray-900 uppercase w-[65%]",
         },
     ];
-    function onDataClick(id) {
-        setId(id);
-        setForm(true);
-    }
 
-    const handleInputChange = (value, index, field) => {
-        const newBlend = structuredClone(ShiftTemplateItems);
-        newBlend[index][field] = value;
-
-        setShiftTemplateItems(newBlend);
-    };
 
     return (
         <div>
             <div onKeyDown={handleKeyDown} className="p-1 ">
                 {form === true ? (
                     <TemplateItems saveData={saveData} setForm={setForm} ShitCommonData={ShitCommonData} shiftData={shiftData} readOnly={readOnly} ShiftTemplateItems={ShiftTemplateItems} setShiftTemplateItems={setShiftTemplateItems} id={id}
-                        companyCode={companyCode} setCompanyCode={setCompanyCode} docId={docId} setDocId={setDocId} categoryId={categoryId} setCategoryId={setCategoryId} childRecord={childRecord} />
+                        companyCode={companyCode} setCompanyCode={setCompanyCode} docId={docId} setDocId={setDocId} categoryId={categoryId} setCategoryId={setCategoryId} childRecord={childRecord} onClose={() => {
+                            setForm(false)
+                            onNew()
+                        }} />
 
                 )
                     :
