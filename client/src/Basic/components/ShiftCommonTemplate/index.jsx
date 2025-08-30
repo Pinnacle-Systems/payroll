@@ -134,7 +134,9 @@ const ShiftCommonTemplateMaster = () => {
         didOpen: () => {
           Swal.showLoading();
         }
+       
       });
+       setForm(false)
     } catch (error) {
       Swal.fire({
         icon: 'error',

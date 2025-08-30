@@ -172,6 +172,7 @@ const ShiftTemplateMaster = () => {
                     Swal.showLoading();
                 }
             });
+            setForm(false)
         } catch (error) {
             Swal.fire({
                 icon: 'error',
