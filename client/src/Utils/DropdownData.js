@@ -278,3 +278,10 @@ export const ShowShiftData = [
     { show: "Actual", value: "Actual" },
     { show: "Buyer", value: "Buyer" },
 ]
+
+
+export const payCategory = [
+    { show: "Monthly - 2 Pay Frequency", value: "Monthly - 2 Pay Frequency" },
+    { show: "Monthly Pay Frequency", value: "Monthly Pay Frequency" },
+    { show: "Weekly Pay Frequency", value: "Weekly Pay Frequency" },
+]

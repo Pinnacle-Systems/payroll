@@ -40,13 +40,14 @@ export { default as TaxTemplateApi } from './TaxTemplateServices'
 export { default as TermsAndConditionsMasterApi } from "./TermsAndConditionsService";
 export { default as machineMasterApi } from "./MachineMasterService"
 export { default as CertificateMaster } from './CertificateMasterService'
-export {default as partyMasterNewApi} from './PartyMasterNewService'
-export {default as sampleEntryApi} from './sampleEntryService'
-export {default as designationMasterApi} from  './DesignationMasterService'
-export {default as ShiftMasterApi} from './ShiftMasterService'
-export {default as ShiftCommonTemplateMasterAPi} from  './ShiftCommonTemplate.service'
-export {default as ShiftTemplateMasterApi} from  './ShiftTemplateMaster'
-export {default as employeeSubCategoryApi} from './EmployeeSubCategoryservice'
+export { default as partyMasterNewApi } from './PartyMasterNewService'
+export { default as sampleEntryApi } from './sampleEntryService'
+export { default as designationMasterApi } from './DesignationMasterService'
+export { default as ShiftMasterApi } from './ShiftMasterService'
+export { default as ShiftCommonTemplateMasterAPi } from './ShiftCommonTemplate.service'
+export { default as ShiftTemplateMasterApi } from './ShiftTemplateMaster'
+export { default as employeeSubCategoryApi } from './EmployeeSubCategoryservice'
+export { default as payFrequencyApi } from './PayFrequencyService'
 
 
 
