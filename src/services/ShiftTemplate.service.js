@@ -199,7 +199,7 @@ async function updateShiftTemplateItems(tx, ShiftTemplateItems, data) {
           id: parseInt(item.id)
         },
         data: {
-          // shiftTemplateId : item?.
+          shiftTemplateId: data?.id ? data?.id : undefined,
           templateId: item?.templateId ? parseInt(item.templateId) : undefined,
           shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
           inNextDay: item?.inNextDay ? item.inNextDay : undefined,
@@ -226,6 +226,7 @@ async function updateShiftTemplateItems(tx, ShiftTemplateItems, data) {
     } else {
       return await tx.ShiftTemplateItems.create({
         data: {
+          shiftTemplateId: data?.id ? data?.id : undefined,
           templateId: item?.templateId ? parseInt(item.templateId) : undefined,
           shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
           inNextDay: item?.inNextDay ? item.inNextDay : undefined,
@@ -248,6 +249,7 @@ async function updateShiftTemplateItems(tx, ShiftTemplateItems, data) {
           otHrs: item?.otHrs ? item.otHrs : undefined,
           quater: item?.quater ? item.quater : undefined,
         }
+
       })
     }
   })
