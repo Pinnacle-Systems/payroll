@@ -111,6 +111,7 @@ export default function Form() {
           Swal.showLoading();
         }
       });
+      setForm(false);
     } catch (error) {
       Swal.fire({
         icon: 'error',

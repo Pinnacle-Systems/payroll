@@ -44,6 +44,7 @@ async function getNextDocId(
   if (lastObject) {
     newDocId = `${branchObj.branchCode}/${code}/${parseInt(lastObject.docId.split("/").at(-1)) + 1}`;
   }
+console.log(newDocId ,"newDocId");
 
   return newDocId;
 }
