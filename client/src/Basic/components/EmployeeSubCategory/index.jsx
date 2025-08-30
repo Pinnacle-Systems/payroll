@@ -87,6 +87,7 @@ const EmployeeSubCategory = () => {
       let returnData = await callback(data).unwrap();
       setId(returnData.data.id);
       toast.success(text + "Successfully");
+      setForm(false)
     } catch (error) {
       console.log("handle");
     }

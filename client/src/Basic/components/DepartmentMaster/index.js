@@ -108,7 +108,9 @@ export default function Form() {
         didOpen: () => {
           Swal.showLoading();
         }
+        
       });
+      setForm(false);
     } catch (error) {
       console.log("handle");
     }
