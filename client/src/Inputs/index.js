@@ -1212,7 +1212,7 @@ export const TextInput = ({
         disabled={disabled}
         tabIndex={tabIndex ?? undefined}
 
-        className={`w-full px-1 py-1.5 text-xs border border-gray-300 rounded-lg
+        className={`w-full px-1 py-0.5 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
           ${readOnly || disabled

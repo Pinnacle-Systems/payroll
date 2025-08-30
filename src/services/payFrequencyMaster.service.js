@@ -82,7 +82,7 @@ async function get(req) {
 
 async function getOne(id) {
     const childRecord = 0;
-    const data = await prisma.shiftTemplate.findUnique({
+    const data = await prisma.payFrequency.findUnique({
         where: {
             id: parseInt(id),
         },

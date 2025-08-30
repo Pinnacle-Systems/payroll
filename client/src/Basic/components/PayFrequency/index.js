@@ -116,7 +116,9 @@ const PayFrequencymaster = () => {
             setDocId(data?.docId || "")
             setDescription(data?.description || "");
             setActive(id ? data?.active ?? false : true);
-            setPayFrequencyItems(data?.payFrequencyItems ? data?.payFrequencyItems : undefined)
+            setPayFrequencyItems(data?.PayFrequencyItems
+                ? data?.PayFrequencyItems
+                : undefined)
 
         },
         [id, company]

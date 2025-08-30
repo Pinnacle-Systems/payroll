@@ -377,7 +377,7 @@ export default function Form() {
                         <div className="space-y-4 ">
                           <div className="">
                             <div className="flex flex-wrap w-full ">
-                              <div className="mb-3 ">
+                              <div className="mb-3 w-60">
                                 <TextInput
                                   name="City Name"
                                   type="text"
