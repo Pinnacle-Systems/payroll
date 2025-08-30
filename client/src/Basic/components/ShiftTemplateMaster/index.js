@@ -110,14 +110,7 @@ const ShiftTemplateMaster = () => {
 
     const syncFormWithDb = useCallback(
         (data) => {
-            if (!id) {
-                // setReadOnly(false);
-                setName("");
-                setDescription("")
-                setActive(true);
-                // setCompanyName(company?.data[0].name);
-                setCompanyCode(company?.data[0].code);
-            } else {
+           
                 // setReadOnly(true);
                 setName(data?.name || "");
                 setDocId(data?.docId || "")
@@ -125,7 +118,7 @@ const ShiftTemplateMaster = () => {
                 setActive(id ? data?.active ?? false : true);
                 setShiftTemplateItems(data?.ShiftTemplateItems ? data?.ShiftTemplateItems : [])
                 setCategoryId(data?.category  ?  data?.category   :  "" )
-            }
+            
         },  
         [id, company]
     );
