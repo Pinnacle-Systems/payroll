@@ -67,17 +67,17 @@ async function get(req) {
             finYearDate?.endDateEndTime
         )
         : "";
-    let newDocId = finYearDate
-        ? await getNextDocId(
-            branchId,
-            shortCode,
-            finYearDate?.startDateStartTime,
-            finYearDate?.endDateEndTime,
-            // isTaxBill
-        )
-        : "";
+    // let newDocId = finYearDate
+    //     ? await getNextDocId(
+    //         branchId,
+    //         shortCode,
+    //         finYearDate?.startDateStartTime,
+    //         finYearDate?.endDateEndTime,
+    //         // isTaxBill
+    //     )
+    //     : "";
 
-    return { statusCode: 0, nextDocId: newDocId, data };
+    return { statusCode: 0, data };
 }
 
 async function getOne(id) {
@@ -119,29 +119,29 @@ async function getSearch(req) {
 }
 
 async function create(body) {
-    const { name, branchId, companyId, active, description, docId, PayFrequencyItems } = await body;
+    const { name, branchId, companyId, active, description, docId, payFrequencyItems, finYearId } = await body;
 
-    console.log(PayFrequencyItems, "PayFrequencyItems");
+    console.log(payFrequencyItems, "payFrequencyItems");
     let data;
 
     await prisma.$transaction(async (tx) => {
         data = await tx.payFrequency.create({
             data: {
-                finYearId: finYearId ? finYearId : undefined,
-                // branchId: branchId ? parseInt(branchId) : undefined,
-                // companyId: companyId ? parseInt(companyId) : undefined,
+                finYearId: finYearId ? parseInt(finYearId) : undefined,
+                branchId: branchId ? parseInt(branchId) : undefined,
+                companyId: companyId ? parseInt(companyId) : undefined,
                 active: active ? Boolean(active) : undefined,
 
 
 
                 PayFrequencyItems:
-                    PayFrequencyItems?.length > 0
+                    payFrequencyItems?.length > 0
                         ? {
-                            create: PayFrequencyItems?.map((item) => ({
-                                weekStartsDate: item?.weekStartsDate ? item.weekStartsDate : undefined,
-                                weekEndsDate: item?.weekEndsDate ? item.weekEndsDate : undefined,
-                                salaryDate: item?.salaryDate ? item.salaryDate : undefined,
-                                salaryDate: item?.salaryDate ? item.salaryDate : undefined,
+                            create: payFrequencyItems?.map((item) => ({
+                                startDate: item?.startDate ? new Date(item.startDate) : undefined,
+                                endDate: item?.endDate ? new Date(item.endDate) : undefined,
+                                salaryDate: item?.salaryDate ? new Date(item.salaryDate) : undefined,
+                                notes: item?.notes ? item.notes : undefined,
                             })),
                         }
                         : undefined,
@@ -155,7 +155,7 @@ async function create(body) {
 }
 
 async function update(id, body) {
-    const { name, branchId, companyId, active, description, docId, PayFrequencyItems } = await body;
+    const { name, branchId, companyId, active, description, docId, payFrequencyItems } = await body;
     const dataFound = await prisma.payFrequency.findUnique({
         where: {
             id: parseInt(id),
@@ -175,14 +175,14 @@ async function update(id, body) {
 
 
 
-                PayFrequencyItems:
-                    PayFrequencyItems?.length > 0
+                payFrequencyItems:
+                    payFrequencyItems?.length > 0
                         ? {
-                            update: PayFrequencyItems?.map((item) => ({
-                                weekStartsDate: item?.weekStartsDate ? item.weekStartsDate : undefined,
-                                weekEndsDate: item?.weekEndsDate ? item.weekEndsDate : undefined,
+                            update: payFrequencyItems?.map((item) => ({
+                                startDate: item?.startDate ? item.startDate : undefined,
+                                endDate: item?.endDate ? item.endDate : undefined,
                                 salaryDate: item?.salaryDate ? item.salaryDate : undefined,
-                                salaryDate: item?.salaryDate ? item.salaryDate : undefined,
+                                notes: item?.notes ? item.notes : undefined,
                             })),
                         }
                         : undefined,

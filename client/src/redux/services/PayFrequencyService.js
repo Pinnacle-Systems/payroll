@@ -4,7 +4,7 @@ import { PAY_FREQUENCY_API } from "../../Api";
 const BASE_URL = process.env.REACT_APP_SERVER_URL;
 
 const PayFrequencyMasterApi = createApi({
-    reducerPath: "PayFrequency",
+    reducerPath: "payFrequency",
     baseQuery: fetchBaseQuery({
         baseUrl: BASE_URL,
     }),

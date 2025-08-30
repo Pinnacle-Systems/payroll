@@ -33,12 +33,13 @@ import {
   partyMasterNew,
   sampleEntry,
   designation,
- 
- 
+
+
   ShiftTemplate,
   ShiftCommonTemplate,
   shiftMaster,
-  employeeSubCategory
+  employeeSubCategory,
+  payfrequency
 
 } from './src/routes/index.js';
 
@@ -116,17 +117,18 @@ app.use("/tagType", TagType);
 app.use("/payTerm", payTerm)
 app.use("/currency", currency)
 app.use('/uom', uom);
-app.use('/purchaseInwardEntry',purchaseInwardEntry);
-app.use("/partyMasterNew",partyMasterNew)
-app.use("/sampleEntry",sampleEntry)
+app.use('/purchaseInwardEntry', purchaseInwardEntry);
+app.use("/partyMasterNew", partyMasterNew)
+app.use("/sampleEntry", sampleEntry)
 app.use('/uploads', express.static('uploads'));
 
 app.use("/sendMail", sendMail)
-app.use("/designation",designation)
-app.use('/shift',shiftMaster)
-app.use('/shiftCommonTemplate',ShiftCommonTemplate)
-app.use('/ShiftTemplate',ShiftTemplate)
-app.use('/employeeSubcategory',employeeSubCategory)
+app.use("/designation", designation)
+app.use('/shift', shiftMaster)
+app.use('/shiftCommonTemplate', ShiftCommonTemplate)
+app.use('/ShiftTemplate', ShiftTemplate)
+app.use('/employeeSubcategory', employeeSubCategory)
+app.use('/payFrequency', payfrequency)
 
 
 

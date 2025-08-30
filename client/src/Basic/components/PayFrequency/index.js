@@ -40,7 +40,7 @@ const PayFrequencymaster = () => {
     const [form, setForm] = useState(false);
     const [searchValue, setSearchValue] = useState("");
     const childRecord = useRef(0);
-    const [ShiftTemplateItems, setShiftTemplateItems] = useState([])
+    const [payFrequencyItems, setPayFrequencyItems] = useState([])
     const [payFrequencyType, setPayFrequencyType] = useState('')
     const [finYearId, setFinYearId] = useState("")
 
@@ -60,6 +60,7 @@ const PayFrequencymaster = () => {
     } = useGetFinYearQuery({ params, searchParams: searchValue });
 
     const { data: allData } = useGetPayFrequencyQuery({ params, searchParams: searchValue });
+    console.log(allData, 'allData');
 
     const {
         data: singleData,
@@ -72,8 +73,7 @@ const PayFrequencymaster = () => {
     const [removeData] = useDeletePayFrequencyMutation();
 
 
-    const { data: shiftData } = useGetshiftMasterQuery({ params, searchParams: searchValue });
-    const { data: ShitCommonData } = useGetShiftCommonTemplateQuery({ params, searchParams: searchValue });
+
 
 
 
@@ -97,8 +97,8 @@ const PayFrequencymaster = () => {
 
 
     useEffect(() => {
-        if (ShiftTemplateItems?.length >= 1) return
-        setShiftTemplateItems(prev => {
+        if (payFrequencyItems?.length >= 1) return
+        setPayFrequencyItems(prev => {
             let newArray = Array.from({ length: 1 - prev.length }, i => {
                 return { templateId: "" };
             })
@@ -110,21 +110,14 @@ const PayFrequencymaster = () => {
 
     const syncFormWithDb = useCallback(
         (data) => {
-            if (!id) {
-                // setReadOnly(false);
-                setName("");
-                setDescription("")
-                setActive(true);
-                // setCompanyName(company?.data[0].name);
-                setCompanyCode(company?.data[0].code);
-            } else {
-                // setReadOnly(true);
-                setName(data?.name || "");
-                setDocId(data?.docId || "")
-                setDescription(data?.description || "");
-                setActive(id ? data?.active ?? false : true);
-                setShiftTemplateItems(data?.ShiftTemplateItems ? data?.ShiftTemplateItems : undefined)
-            }
+
+            // setReadOnly(true);
+            setName(data?.name || "");
+            setDocId(data?.docId || "")
+            setDescription(data?.description || "");
+            setActive(id ? data?.active ?? false : true);
+            setPayFrequencyItems(data?.payFrequencyItems ? data?.payFrequencyItems : undefined)
+
         },
         [id, company]
     );
@@ -143,10 +136,12 @@ const PayFrequencymaster = () => {
         ),
         id,
         branchId,
-        ShiftTemplateItems,
+        payFrequencyItems,
+        payFrequencyType,
+        finYearId
     };
 
-    console.log(ShiftTemplateItems, "ShiftTemplateItems  ")
+    console.log(payFrequencyItems, "payFrequencyItems  ")
 
     const validateData = (data) => {
         if (data.name && data.code) {
@@ -250,7 +245,7 @@ const PayFrequencymaster = () => {
         },
 
         {
-            header: "Common Template Name",
+            header: "Pay frequency",
             accessor: (item) => item?.name,
             //   cellClass: () => "font-medium  text-gray-900",
             className: "font-medium text-gray-900 text-center uppercase w-72",
@@ -275,17 +270,17 @@ const PayFrequencymaster = () => {
     }
 
     const handleInputChange = (value, index, field) => {
-        const newBlend = structuredClone(ShiftTemplateItems);
+        const newBlend = structuredClone(payFrequencyItems);
         newBlend[index][field] = value;
 
-        setShiftTemplateItems(newBlend);
+        setPayFrequencyItems(newBlend);
     };
 
     return (
         <div>
             <div onKeyDown={handleKeyDown} className="p-1 ">
                 {form === true ? (
-                    <TemplateItems yearData={yearData} saveData={saveData} setForm={setForm} ShitCommonData={ShitCommonData} shiftData={shiftData} readOnly={readOnly} ShiftTemplateItems={ShiftTemplateItems} setShiftTemplateItems={setShiftTemplateItems} id={id}
+                    <TemplateItems yearData={yearData} saveData={saveData} setForm={setForm} readOnly={readOnly} payFrequencyItems={payFrequencyItems} setPayFrequencyItems={setPayFrequencyItems} id={id}
                         companyCode={companyCode} setCompanyCode={setCompanyCode} docId={docId} setDocId={setDocId} finYearId={finYearId} setFinYearId={setFinYearId} childRecord={childRecord} payFrequencyType={payFrequencyType} setPayFrequencyType={setPayFrequencyType} />
 
 

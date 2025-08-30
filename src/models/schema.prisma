@@ -61,6 +61,7 @@ model Company {
   Shift               Shift[]
   ShiftCommonTemplate ShiftCommonTemplate[]
   ShiftTemplate       ShiftTemplate[]
+  PayFrequency        PayFrequency[]
 }
 
 model Subscription {
@@ -103,6 +104,7 @@ model Branch {
   Shift               Shift[]
   ShiftCommonTemplate ShiftCommonTemplate[]
   ShiftTemplate       ShiftTemplate[]
+  PayFrequency        PayFrequency[]
 }
 
 model UserOnBranch {
@@ -1238,24 +1240,31 @@ model ShiftTemplateItems {
 }
 
 model PayFrequency {
-  id               Int       @id @default(autoincrement())
-  createdAt        DateTime? @default(now())
-  updatedAt        DateTime? @updatedAt
-  createdBy        User?     @relation("createdBy", fields: [createdById], references: [id])
-  createdById      Int?
-  updatedBy        User?     @relation("updatedBy", fields: [updatedById], references: [id])
-  updatedById      Int?
-  name             String?
-  active           Boolean?  @default(true)
-  payFrequencyType String?
-  finYear          FinYear?  @relation(fields: [finYearId], references: [id], onDelete: Cascade)
-  finYearId        Int?
+  id                Int                 @id @default(autoincrement())
+  createdAt         DateTime?           @default(now())
+  updatedAt         DateTime?           @updatedAt
+  createdBy         User?               @relation("createdBy", fields: [createdById], references: [id])
+  createdById       Int?
+  updatedBy         User?               @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById       Int?
+  name              String?
+  active            Boolean?            @default(true)
+  payFrequencyType  String?
+  finYear           FinYear?            @relation(fields: [finYearId], references: [id], onDelete: Cascade)
+  finYearId         Int?
+  companyId         Int?
+  company           Company?            @relation(fields: [companyId], references: [id])
+  branch            Branch?             @relation(fields: [branchId], references: [id])
+  branchId          Int?
+  PayFrequencyItems PayFrequencyItems[]
 }
 
 model PayFrequencyItems {
-  id             Int       @id @default(autoincrement())
-  weekStartsDate DateTime?
-  weekEndsDate   DateTime?
+  id             Int           @id @default(autoincrement())
+  payFrequency   PayFrequency? @relation(fields: [payFrequencyId], references: [id])
+  payFrequencyId Int?
+  startDate      DateTime?
+  endDate        DateTime?
   salaryDate     DateTime?
   notes          String?
 }

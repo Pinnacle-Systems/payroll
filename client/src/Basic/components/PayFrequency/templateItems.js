@@ -11,8 +11,9 @@ import { toast } from "react-toastify";
 import { Eye } from "lucide-react";
 import { dropDownFinYear, dropDownListMergedObject } from "../../../Utils/contructObject";
 import moment from 'moment';
+import { HiPlus, HiTrash } from "react-icons/hi";
 const TemplateItems = ({
-    saveData, setForm, ShitCommonData, shiftData, readOnly, ShiftTemplateItems, setShiftTemplateItems, id,
+    saveData, setForm, ShitCommonData, shiftData, readOnly, payFrequencyItems, setPayFrequencyItems, id,
     companyCode, setCompanyCode, docId, setDocId, finYearId, setFinYearId, childRecord,
     yearData, payFrequencyType, setPayFrequencyType
 }) => {
@@ -27,10 +28,10 @@ const TemplateItems = ({
 
 
     const handleInputChange = (value, index, field) => {
-        const newBlend = structuredClone(ShiftTemplateItems);
+        const newBlend = structuredClone(payFrequencyItems);
         newBlend[index][field] = value;
 
-        setShiftTemplateItems(newBlend);
+        setPayFrequencyItems(newBlend);
     };
 
 
@@ -40,7 +41,40 @@ const TemplateItems = ({
         || "", 'data');
 
 
+    const handleDeleteRow = (id) => {
+        setPayFrequencyItems((yarnBlend) => {
+            if (yarnBlend.length <= 1) {
+                return yarnBlend;
+            }
+            return yarnBlend.filter((_, index) => index !== parseInt(id));
+        });
+    };
 
+    const addNewRow = () => {
+        const newRow = { templateId: '' };
+        setPayFrequencyItems([...payFrequencyItems, newRow]);
+    };
+    const calculatePayPeriod = (startDate, endDate) => {
+        if (!startDate || !endDate) return { totalDays: 0, sundays: 0 };
+
+        const start = moment(startDate);
+        const end = moment(endDate);
+
+        // total days (inclusive of both start & end)
+        const totalDays = end.diff(start, "days") + 1;
+
+        // count Sundays
+        let sundays = 0;
+        let current = start.clone();
+        while (current.isSameOrBefore(end)) {
+            if (current.day() === 0) { // 0 = Sunday
+                sundays++;
+            }
+            current.add(1, "day");
+        }
+
+        return { totalDays, sundays };
+    };
     return (
         <>
 
@@ -179,117 +213,127 @@ const TemplateItems = ({
                                                 <thead className="bg-gray-200 text-gray-800">
                                                     <tr>
                                                         <th
-                                                            className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
+                                                            className={`w-4 px-1 py-2 text-center font-medium text-[13px] `}
                                                         >
                                                             S.No
                                                         </th>
                                                         <th
-                                                            className={`w-28 px-4 py-2 text-center font-medium text-[13px] `}
+                                                            className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
                                                         >
-                                                            Starts At
+                                                            Start Date
                                                         </th>
                                                         <th
 
-                                                            className={`w-32 px-4 py-2 text-center font-medium text-[13px] `}
+                                                            className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
                                                         >
-                                                            Ends At
+                                                            End Date
                                                         </th>
                                                         <th
 
-                                                            className={`w-32 px-4 py-2 text-center font-medium text-[13px] `}
-                                                        >
-                                                            Total Days
-                                                        </th>
-                                                        <th
-
-                                                            className={`w-20 px-4 py-2 text-center font-medium text-[13px] `}
+                                                            className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
                                                         >
                                                             Salary Date
                                                         </th>
                                                         <th
 
-                                                            className={`w-28 px-4 py-2 text-center font-medium text-[13px] `}
+                                                            className={`w-36 px-4 py-2 text-center font-medium text-[13px] `}
                                                         >
-                                                            Pay Month
+                                                            Pay Period days
                                                         </th>
 
                                                         <th
 
-                                                            className={`w-28 px-4 py-2 text-center font-medium text-[13px] `}
+                                                            className={`w-8 px-4 py-2 text-center font-medium text-[13px] `}
                                                         >
-                                                            Pay Period
+                                                            Holoidays
                                                         </th>
                                                         <th
 
-                                                            className={`w-28 px-4 py-2 text-center font-medium text-[13px] `}
-                                                        >
-                                                            Holidays
-
-                                                        </th>
-                                                        <th
-
-                                                            className={`w-28 px-4 py-2 text-center font-medium text-[13px] `}
-                                                        >
-                                                            Working Days
-                                                        </th>
-                                                        <th
-
-                                                            className={`w-28 px-4 py-2 text-center font-medium text-[13px] `}
+                                                            className={`w-8 px-4 py-2 text-center font-medium text-[13px] `}
                                                         >
                                                             Notes
                                                         </th>
 
+                                                        <th
+
+                                                            className={`w-8 px-3 py-2 item-center font-medium text-[13px] `}
+                                                        >
+                                                            <button
+                                                                onClick={() => {
+                                                                    addNewRow()
+                                                                }}
+                                                                className="hover:bg-green-600 text-green-600 hover:text-white border border-green-600 px-2 py-1 rounded-md flex items-center text-xs"
+                                                            >
+                                                                <HiPlus className="w-3 h-3" />
+
+                                                            </button>
+                                                        </th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {ShiftTemplateItems?.map((item, index) => (
+                                                    {payFrequencyItems?.map((item, index) => {
+                                                        const { totalDays, sundays } = calculatePayPeriod(item.startDate, item.endDate);
 
-                                                        <tr className="w-full table-row">
-                                                            <td className="table-data  w-2 text-left px-1">
-                                                                {index + 1}
-                                                            </td>
+                                                        return (
+                                                            <tr key={index} className="w-full table-row">
+                                                                <td className="table-data w-2 text-left px-1 border border-gray-300">
+                                                                    {index + 1}
+                                                                </td>
 
-                                                            <td className=' border border-gray-500'>
-                                                                <input
-                                                                    type="date"
-                                                                    value={item?.weekEndsDate}
-                                                                    onChange={(e) => handleInputChange(e.target.value, index, "weekEndsDate")}
+                                                                <td className="border border-gray-300 text-[11px] py-0.5 item-center">
+                                                                    <input
+                                                                        type="date"
+                                                                        value={item?.startDate}
+                                                                        onChange={(e) => handleInputChange(e.target.value, index, "startDate")}
+                                                                    />
+                                                                </td>
+                                                                <td className="border border-gray-300 text-[11px] py-0.5 item-center">
+                                                                    <input
+                                                                        type="date"
+                                                                        value={item?.endDate}
+                                                                        onChange={(e) => handleInputChange(e.target.value, index, "endDate")}
+                                                                    />
+                                                                </td>
 
-                                                                />
-                                                            </td>
-                                                            <td className=' border border-gray-500'>
-                                                                <input
-                                                                    type="date"
-                                                                    value={item?.weekEndsDate}
-                                                                    onChange={(e) => handleInputChange(e.target.value, index, "weekEndsDate")}
+                                                                <td className="border border-gray-300 text-[11px] py-0.5 item-center">
+                                                                    <input
+                                                                        type="date"
+                                                                        value={item?.salaryDate}
+                                                                        onChange={(e) => handleInputChange(e.target.value, index, "salaryDate")}
+                                                                    />
+                                                                </td>
 
-                                                                />
-                                                            </td>
+                                                                {/* Total Days */}
+                                                                <td className="border border-gray-300 text-[11px] py-0.5 item-center">
+                                                                    {totalDays}
+                                                                </td>
 
+                                                                {/* Total Sundays */}
+                                                                <td className="border border-gray-300 text-[11px] py-0.5 item-center">
+                                                                    {sundays}
+                                                                </td>
 
-                                                            <td className=' border border-gray-500'>
-                                                                <input
-                                                                    type="date"
-                                                                    value={item?.salaryDate}
-                                                                    onChange={(e) => handleInputChange(e.target.value, index, "salaryDate")}
+                                                                <td className="w-44 border border-gray-300 text-[11px] py-0.5 item-center">
+                                                                    <input
+                                                                        type="text"
+                                                                        value={item?.notes}
+                                                                        onChange={(e) => handleInputChange(e.target.value, index, "notes")}
+                                                                    />
+                                                                </td>
 
-                                                                />
-                                                            </td>
-
-
-
-
-
-
-                                                            <td className='table-data flex item-center'>
-
-                                                                <Eye />
-                                                            </td>
-
-                                                        </tr>
-                                                    ))}
-
+                                                                <td className="w-40 border border-gray-300 text-[11px] py-0.5">
+                                                                    <button
+                                                                        onClick={() => handleDeleteRow(index)}
+                                                                        className="text-red-600 hover:text-red-800 bg-red-50 py-1 rounded text-xs flex items-center"
+                                                                    >
+                                                                        <HiTrash className="w-4 h-4" />
+                                                                    </button>
+                                                                </td>
+                                                            </tr>
+                                                        );
+                                                    })}
                                                 </tbody>
+
                                             </table>
                                         </div>
                                     </div>
