@@ -110,16 +110,16 @@ const ShiftTemplateMaster = () => {
 
     const syncFormWithDb = useCallback(
         (data) => {
-           
-                // setReadOnly(true);
-                setName(data?.name || "");
-                setDocId(data?.docId || "")
-                setDescription(data?.description || "");
-                setActive(id ? data?.active ?? false : true);
-                setShiftTemplateItems(data?.ShiftTemplateItems ? data?.ShiftTemplateItems : [])
-                setCategoryId(data?.category  ?  data?.category   :  "" )
-            
-        },  
+
+            // setReadOnly(true);
+            setName(data?.name || "");
+            setDocId(data?.docId || "")
+            setDescription(data?.description || "");
+            setActive(id ? data?.active ?? false : true);
+            setShiftTemplateItems(data?.ShiftTemplateItems ? data?.ShiftTemplateItems : [])
+            setCategoryId(data?.category ? data?.category : "")
+
+        },
         [id, company]
     );
 
@@ -358,7 +358,7 @@ const ShiftTemplateMaster = () => {
                         companyCode={companyCode} setCompanyCode={setCompanyCode} docId={docId} setDocId={setDocId} categoryId={categoryId} setCategoryId={setCategoryId} childRecord={childRecord} onClose={() => {
                             setForm(false)
                             onNew()
-                        }} />
+                        }} onNew={onNew} />
 
                 )
                     :

@@ -129,6 +129,10 @@ async function create(body) {
         finYearId,
         payFrequencyType = [],
     } = body;
+    console.log(payFrequencyType, "payFrequency", typeof (JSON.parse(payFrequencyType)));
+
+
+
 
     let data;
 
@@ -144,7 +148,7 @@ async function create(body) {
                 active: active ? Boolean(active) : undefined,
 
                 payFrequencyType: {
-                    create: payFrequencyType.map((type) => ({
+                    create: (payFrequencyType ? payFrequencyType : [])?.map((type) => ({
                         payFrequencyType: type.payFrequencyType,
                         PayFrequencyItems: {
                             create: type.PayFrequencyItems.map((item) => ({
