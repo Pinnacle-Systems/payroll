@@ -23,6 +23,7 @@ import { statusDropdown } from "../../../Utils/DropdownData";
 import { useGetdesignationByIdQuery } from "../../../redux/services/DesignationMasterService";
 import { Check, Power } from "lucide-react";
 import Modal from "../../../UiComponents/Modal";
+import Swal from "sweetalert2";
 const MODEL = "Department Master";
 
 export default function Form() {
@@ -46,7 +47,7 @@ export default function Form() {
   };
   const {
     data: allData,
-    
+
   } = useGetDepartmentQuery({ params, searchParams: searchValue });
   const {
     data: singleData,
@@ -60,12 +61,12 @@ export default function Form() {
 
   const syncFormWithDb = useCallback(
     (data) => {
-   
-        // setReadOnly(true);
-        setName(data?.name || "");
-        setCode(data?.code || "");
-        setActive(id ? data?.active ?? false : true);
-      
+
+      // setReadOnly(true);
+      setName(data?.name || "");
+      setCode(data?.code || "");
+      setActive(id ? data?.active ?? false : true);
+
     },
     [id]
   );
@@ -74,8 +75,8 @@ export default function Form() {
     syncFormWithDb(singleData?.data);
   }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
 
-  console.log(singleData?.data,"singleData?.data");
-  
+  console.log(singleData?.data, "singleData?.data");
+
 
   const data = {
     name,
@@ -98,7 +99,16 @@ export default function Form() {
     try {
       let returnData = await callback(data).unwrap();
       setId(returnData.data.id);
-      toast.success(text + "Successfully");
+      Swal.fire({
+        title: text + "  " + "Successfully",
+        icon: "success",
+        draggable: true,
+        timer: 1000,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
     } catch (error) {
       console.log("handle");
     }
@@ -106,8 +116,10 @@ export default function Form() {
 
   const saveData = () => {
     if (!validateData(data)) {
-      toast.error("Please fill all required fields...!", {
-        position: "top-center",
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission error',
+        text: 'Please fill all required fields...!',
       });
       return;
     }
@@ -129,15 +141,23 @@ export default function Form() {
       try {
         const deldata = await removeData(id).unwrap();
         if (deldata?.statusCode == 1) {
-          toast.error(deldata?.message);
+          // toast.error(deldata?.message);
           setForm(false);
           return;
         }
         setId("");
-        toast.success("Deleted Successfully");
-        setForm(false);
+        Swal.fire({
+          title: "Deleted Successfully",
+          icon: "success",
+          timer: 1000,
+
+        }); setForm(false);
       } catch (error) {
-        toast.error("something went wrong");
+        Swal.fire({
+          icon: 'error',
+          title: 'Submission error',
+          text: error.data?.message || 'Something went wrong!',
+        });
       }
     }
   };

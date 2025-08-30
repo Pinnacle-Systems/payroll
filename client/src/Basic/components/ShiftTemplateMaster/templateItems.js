@@ -12,6 +12,7 @@ import { Eye } from "lucide-react";
 import { DELETE, PLUS } from "../../../icons";
 import { HiPlus, HiTrash } from "react-icons/hi";
 import { FaFileAlt } from "react-icons/fa";
+import { FiSave } from "react-icons/fi";
 
 const TemplateItems = ({
     saveData, setForm, ShitCommonData, shiftData, readOnly, ShiftTemplateItems, setShiftTemplateItems, id,
@@ -56,7 +57,7 @@ const TemplateItems = ({
     return (
         <>
 
-            <div className="w-full bg-[#f1f1f0] mx-auto rounded-md shadow-md px-2 py-1 overflow-y-auto">
+            <div className="w-full bg-[#f1f1f0] mx-auto rounded-md shadow-md px-2 py-1">
                 <div className="flex justify-between items-center mb-1">
                     <h1 className="text-2xl font-bold text-gray-800">Shift Template </h1>
                     <div className="gpa-4">
@@ -77,7 +78,7 @@ const TemplateItems = ({
                     </div>
 
                 </div>
-                <div className="space-y-3 h-full ">
+                <div className="space-y-3  h-[580px] ">
                     <div className="grid grid-cols-1 md:grid-cols-1 gap-2">
 
 
@@ -125,7 +126,7 @@ const TemplateItems = ({
 
 
                     </div>
-                    <div className={`w-full  p-2 overflow-x-auto`}>
+                    <div className={`w-full   p-2 overflow-x-auto`}>
                         <table className="w-full border-collapse table-fixed ">
                             <thead className="bg-gray-200 text-gray-800">
                                 <tr>
@@ -267,21 +268,21 @@ const TemplateItems = ({
                                     >
                                         Quater(Y/N)
                                     </th>
-                                    <th
+                                    {/* <th
 
                                         className={`w-14 px-3 py-2 text-center font-medium text-[13px] `}
                                     >
                                         SubFill
-                                    </th>
+                                    </th> */}
                                     <th
 
-                                        className={`w-20 px-3 py-2 item-center font-medium text-[13px] `}
+                                        className={`w-20  item-center font-medium text-[13px] `}
                                     >
                                         <button
                                             onClick={() => {
                                                 addNewRow()
                                             }}
-                                            className="hover:bg-green-600 text-green-600 hover:text-white border border-green-600 px-2 py-1 rounded-md flex items-center text-xs"
+                                            className="hover:bg-green-600 text-green-600 hover:text-white border border-green-600 px-2 py-1 ml-5 rounded-md flex items-center text-xs"
                                         >
                                             <HiPlus className="w-3 h-3" />
 
@@ -292,12 +293,12 @@ const TemplateItems = ({
                             <tbody>
                                 {ShiftTemplateItems?.map((item, index) => (
 
-                                    <tr className="w-full table-row">
-                                        <td className="table-data  w-2 text-left px-1">
+                                    <tr className=" border border-gray-300 text-[11px] py-0.5 px-1 text-center">
+                                        <td className="  w-2 text-left px-1">
                                             {index + 1}
                                         </td>
 
-                                        <td className=' border border-gray-300 text-[11px] py-0.5 item-center'>
+                                        <td className=' border border-gray-300 text-[11px] py-0.5 px-1 item-center'>
                                             <input
                                                 type="date"
                                                 value={item?.appliedOn}
@@ -311,6 +312,7 @@ const TemplateItems = ({
                                                 disabled={readOnly} className='text-left w-full rounded py-1 '
                                                 value={item.templateId}
                                                 onChange={(e) => handleInputChange(e.target.value, index, "templateId")}
+
                                             // onBlur={(e) => {
                                             //     handleInputChange(e.target.value, index, "accessoryGroupId")
                                             // }
@@ -372,7 +374,7 @@ const TemplateItems = ({
                                         <td className='w-40 border border-gray-300 text-[11px] py-0.5 item-center'>
                                             <input
                                                 min={"0"}
-                                                type="number"
+                                                type="text"
                                                 value={item?.toleranceInBeforeStart}
                                                 onFocus={(e) => e.target.select()}
                                                 onChange={(e) => handleInputChange(e.target.value, index, "toleranceInBeforeStart")}
@@ -385,8 +387,7 @@ const TemplateItems = ({
                                         <td className='w-40 border border-gray-300 text-[11px] py-0.5 item-center'>
                                             <input
                                                 min={"0"}
-                                                type="number"
-                                                value={item?.startTime}
+                                                type="text" value={item?.startTime}
                                                 onFocus={(e) => e.target.select()}
                                                 onChange={(e) => handleInputChange(e.target.value, index, "startTime")}
                                                 className="text-right rounded py-1 px-1 w-full "
@@ -396,8 +397,7 @@ const TemplateItems = ({
                                         <td className='w-40 border border-gray-300 text-[11px] py-0.5 item-center'>
                                             <input
                                                 min={"0"}
-                                                type="number"
-                                                value={item?.toleranceInAfterEnd}
+                                                type="text" value={item?.toleranceInAfterEnd}
                                                 onFocus={(e) => e.target.select()}
                                                 onChange={(e) => handleInputChange(e.target.value, index, "toleranceInAfterEnd")}
                                                 className="text-right rounded py-1 px-1 w-full "
@@ -408,8 +408,7 @@ const TemplateItems = ({
                                         <td className='w-40 border border-gray-300 text-[11px] py-0.5 item-center'>
                                             <input
                                                 min={"0"}
-                                                type="number"
-                                                value={item?.fbOut}
+                                                type="text" value={item?.fbOut}
                                                 onFocus={(e) => e.target.select()}
                                                 onChange={(e) => handleInputChange(e.target.value, index, "fbOut")}
                                                 className="text-right rounded py-1 px-1 w-full "
@@ -419,7 +418,7 @@ const TemplateItems = ({
                                         <td className='w-40 border border-gray-300 text-[11px] py-0.5 item-center'>
                                             <input
                                                 min={"0"}
-                                                type="number"
+                                                type="text"
                                                 value={item?.fbIn}
                                                 onFocus={(e) => e.target.select()}
                                                 onChange={(e) => handleInputChange(e.target.value, index, "fbIn")}
@@ -432,7 +431,7 @@ const TemplateItems = ({
                                         <td className='w-40 border border-gray-300 text-[11px] py-0.5 item-center'>
                                             <input
                                                 min={"0"}
-                                                type="number"
+                                                type="text"
                                                 value={item?.lunchBst}
                                                 onFocus={(e) => e.target.select()}
                                                 onChange={(e) => handleInputChange(e.target.value, index, "lunchBst")}
@@ -463,7 +462,7 @@ const TemplateItems = ({
                                         <td className='w-40 border border-gray-300 text-[11px] py-0.5 item-center'>
                                             <input
                                                 min={"0"}
-                                                type="number"
+                                                type="text"
                                                 value={item?.lunchBET}
                                                 onFocus={(e) => e.target.select()}
                                                 onChange={(e) => handleInputChange(e.target.value, index, "lunchBET")}
@@ -495,7 +494,7 @@ const TemplateItems = ({
                                         <td className='w-40 border border-gray-300 text-[11px] py-0.5 item-center '>
                                             <input
                                                 min={"0"}
-                                                type="number"
+                                                type="text"
                                                 value={item?.sbOut}
                                                 onFocus={(e) => e.target.select()}
                                                 onChange={(e) => handleInputChange(e.target.value, index, "sbOut")}
@@ -506,7 +505,7 @@ const TemplateItems = ({
                                         <td className='w-40 border border-gray-300 text-[11px] py-0.5 item-center'>
                                             <input
                                                 min={"0"}
-                                                type="number"
+                                                type="text"
                                                 value={item?.sbIn}
                                                 onFocus={(e) => e.target.select()}
                                                 onChange={(e) => handleInputChange(e.target.value, index, "sbIn")}
@@ -518,7 +517,7 @@ const TemplateItems = ({
                                         <td className='w-40 border border-gray-300 text-[11px] py-0.5 item-center'>
                                             <input
                                                 min={"0"}
-                                                type="number"
+                                                type="text"
                                                 value={item?.toleranceOutBeforeStart}
                                                 onFocus={(e) => e.target.select()}
                                                 onChange={(e) => handleInputChange(e.target.value, index, "toleranceOutBeforeStart")}
@@ -529,7 +528,7 @@ const TemplateItems = ({
                                         <td className='w-40 border border-gray-300 text-[11px] py-0.5 item-center'>
                                             <input
                                                 min={"0"}
-                                                type="number"
+                                                type="text"
                                                 value={item?.endTime}
                                                 onFocus={(e) => e.target.select()}
                                                 onChange={(e) => handleInputChange(e.target.value, index, "endTime")}
@@ -540,7 +539,7 @@ const TemplateItems = ({
                                         <td className='w-40 border border-gray-300 text-[11px] py-0.5 item-center'>
                                             <input
                                                 min={"0"}
-                                                type="number"
+                                                type="text"
                                                 value={item?.toleranceOutAfterEnd}
                                                 onFocus={(e) => e.target.select()}
                                                 onChange={(e) => handleInputChange(e.target.value, index, "toleranceOutAfterEnd")}
@@ -569,7 +568,7 @@ const TemplateItems = ({
 
                                             <input
                                                 min={"0"}
-                                                type="number"
+                                                type="text"
                                                 value={item?.shiftTimeHrs}
                                                 onFocus={(e) => e.target.select()}
                                                 onChange={(e) => handleInputChange(e.target.value, index, "shiftTimeHrs")}
@@ -582,7 +581,7 @@ const TemplateItems = ({
 
                                             <input
                                                 min={"0"}
-                                                type="number"
+                                                type="text"
                                                 value={item?.otHrs}
                                                 onFocus={(e) => e.target.select()}
                                                 onChange={(e) => handleInputChange(e.target.value, index, "otHrs")}
@@ -610,7 +609,7 @@ const TemplateItems = ({
                                             </select>
 
                                         </td>
-                                        <td className="w-40 border border-gray-300 text-[11px] py-0.5 item-center">
+                                        {/* <td className="w-40 border border-gray-300 text-[11px] py-0.5 item-center">
                                             <button
                                                 // onClick={() => handleView(index)}
                                                 // onMouseEnter={() => setTooltipVisible(true)}
@@ -619,9 +618,9 @@ const TemplateItems = ({
                                             >
                                                 👁 <span className="text-xs"></span>
                                             </button>
-                                        </td>
+                                        </td> */}
 
-                                        <td className="w-40 border border-gray-300 text-[11px] py-0.5">
+                                        <td className=" border border-gray-300 text-[11px] py-0.5 flex items-center justify-center">
                                             <button
                                                 onClick={() => handleDeleteRow(index)}
                                                 className="text-red-600 hover:text-red-800 bg-red-50 py-1 rounded text-xs flex items-center"
@@ -637,6 +636,25 @@ const TemplateItems = ({
                     </div>
                 </div>
 
+                    <div className="flex flex-col md:flex-row gap-2 justify-between mt-4">
+                        {/* Left Buttons */}
+                        <div className="flex gap-2 flex-wrap">
+                            <button onClick={() => saveData()} className="bg-indigo-500 text-white px-4 py-1 rounded-md hover:bg-indigo-600 flex items-center text-sm">
+                                <FiSave className="w-4 h-4 mr-2" />
+                                Save & New
+                            </button>
+                            {/* <button onClick={() => saveData("close")} className="bg-indigo-500 text-white px-4 py-1 rounded-md hover:bg-indigo-600 flex items-center text-sm">
+                                <HiOutlineRefresh className="w-4 h-4 mr-2" />
+                                Save & Close
+                            </button>
+                            <button onClick={() => saveData("draft")} className="bg-indigo-500 text-white px-4 py-1 rounded-md hover:bg-indigo-600 flex items-center text-sm">
+                                <HiOutlineRefresh className="w-4 h-4 mr-2" />
+                                Draft Save
+                            </button> */}
+                        </div>
+
+                  
+                    </div>
 
 
 

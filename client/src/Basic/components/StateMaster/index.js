@@ -26,6 +26,7 @@ import Mastertable from "../MasterTable/Mastertable";
 import MastersForm from "../MastersForm/MastersForm";
 import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
+import Swal from "sweetalert2";
 
 const MODEL = "State Master";
 
@@ -80,7 +81,7 @@ export default function Form() {
       setName(data?.name || "");
       setCode(data?.code || "");
       setActive(id ? data?.active ?? false : true);
-      setCountry(data?.countryId ? data?.countryId : "" );
+      setCountry(data?.countryId ? data?.countryId : "");
       setGstNo(data?.gstNo || "");
       childRecord.current = data?.childRecord ? data?.childRecord : 0;
     },
@@ -113,21 +114,35 @@ export default function Form() {
     try {
       let returnData = await callback(data).unwrap();
       setId(returnData.data.id);
-      toast.success(text + "Successfully");
-      dispatch({
+      Swal.fire({
+        title: text + "  " + "Successfully",
+        icon: "success",
+        draggable: true,
+        timer: 1000,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      }); dispatch({
         type: `countryMaster/invalidateTags`,
         payload: ["Countries"],
       });
     } catch (error) {
       console.log(error);
-      console.log("handle");
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission error',
+        text: error.data?.message || 'Something went wrong!',
+      });
     }
   };
 
   const saveData = () => {
     if (!validateData(data)) {
-      toast.error("Please fill all required fields...!", {
-        position: "top-center",
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission error',
+        text: 'Please fill all required fields...!',
       });
       return;
     }
@@ -153,10 +168,18 @@ export default function Form() {
           type: `countryMaster/invalidateTags`,
           payload: ["Countries"],
         });
-        toast.success("Deleted Successfully");
-        setForm(false);
+        Swal.fire({
+          title: "Deleted Successfully",
+          icon: "success",
+          timer: 1000,
+
+        }); setForm(false);
       } catch (error) {
-        toast.error("something went wrong");
+        Swal.fire({
+          icon: 'error',
+          title: 'Submission error',
+          text: error.data?.message || 'Something went wrong!',
+        });
       }
     }
   };
@@ -261,7 +284,7 @@ export default function Form() {
     " ",
     " ",
   ];
-console.log(country,"check");
+  console.log(country, "check");
 
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
@@ -387,8 +410,8 @@ console.log(country,"check");
                               width={"w-[200px]"}
                             />
                           </div> */}
-                          {console.log(country,"countrycehck")}
-                          
+                          {console.log(country, "countrycehck")}
+
                           <div className="w-[200px] mb-3 ">
                             <DropdownInput
                               name="Country"
@@ -396,8 +419,8 @@ console.log(country,"check");
                                 id
                                   ? countriesList?.data
                                   : countriesList?.data?.filter(
-                                      (item) => item.active
-                                    ),
+                                    (item) => item.active
+                                  ),
                                 "name",
                                 "id"
                               )}
@@ -407,12 +430,12 @@ console.log(country,"check");
                               readOnly={readOnly}
                               className={`w-[150px]`}
                             />
-                        
-                            
+
+
                           </div>
                         </div>
-                           
-                            
+
+
                         <div>
                           <ToggleButton
                             name="Status"

@@ -26,11 +26,11 @@ async function getNextDocId(
     },
   });
 
-  const code = (
-    typeof isTaxBill === "undefined" ? undefined : JSON.parse(isTaxBill)
-  )
-    ? "SHF"
-    : "SHF";
+  console.log(lastObject,"lastObject");
+  
+
+  const code = "SHF";
+
   const branchObj = await getTableRecordWithId(branchId, "branch");
     let newDocId = `${branchObj.branchCode}/${code}/1`;
   if (lastObject) {
