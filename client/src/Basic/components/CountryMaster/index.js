@@ -125,7 +125,7 @@ export default function Form() {
     }
   };
 
-  const deleteData = async () => {
+  const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
         return;
@@ -281,7 +281,7 @@ export default function Form() {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[40%] h-[50%]"}
+            widthClass={"w-[40%] h-[45%]"}
             onClose={() => {
               setForm(false);
               setErrors({});
@@ -293,9 +293,9 @@ export default function Form() {
                   <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
                     {id
                       ? !readOnly
-                        ? "Edit Shift Master"
-                        : "Shift Master"
-                      : "Add New Shift"}
+                        ? "Edit Country Master"
+                        : "Country Master"
+                      : "Add New Country"}
                   </h2>
                 </div>
                 <div className="flex gap-2">
@@ -334,10 +334,10 @@ export default function Form() {
                 <div className="grid grid-cols-1  gap-3  h-full">
                   <div className="lg:col-span- space-y-3">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
-                      <div className="space-y-4 w-[50%]">
+                      <div className="space-y-4 ">
                         <div className="p-2">
                           <div className="flex">
-                            <div className="mb-3 w-[48%]">
+                            <div className="mb-3 w-[60%]">
                               <TextInput
                                 name="Country Name"
                                 type="text"
@@ -347,7 +347,7 @@ export default function Form() {
                                 readOnly={readOnly}
                               />
                             </div>
-                            <div className="mb-3 ml-5 w-[20%]">
+                            <div className="mb-3 ml-5 ">
                               <TextInput
                                 name="Code"
                                 type="text"
