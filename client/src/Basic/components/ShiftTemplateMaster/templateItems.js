@@ -262,12 +262,12 @@ const TemplateItems = ({
                                     >
                                         OT Hrs
                                     </th>
-                                    <th
+                                    {/* <th
 
                                         className={`w-28 px-3 py-2 text-center font-medium text-[13px] `}
                                     >
                                         Quater(Y/N)
-                                    </th>
+                                    </th> */}
                                     {/* <th
 
                                         className={`w-14 px-3 py-2 text-center font-medium text-[13px] `}
@@ -590,7 +590,7 @@ const TemplateItems = ({
                                             />
 
                                         </td>
-                                        <td className='w-40 border border-gray-300 text-[11px] py-0.5 item-center '>
+                                        {/* <td className='w-40 border border-gray-300 text-[11px] py-0.5 item-center '>
 
                                             <select
                                                 // onKeyDown={e => { if (e.key === "Delete") { handleInputChange("", index, "accessoryGroupId") } }}
@@ -608,7 +608,7 @@ const TemplateItems = ({
                                                 )}
                                             </select>
 
-                                        </td>
+                                        </td> */}
                                         {/* <td className="w-40 border border-gray-300 text-[11px] py-0.5 item-center">
                                             <button
                                                 // onClick={() => handleView(index)}
@@ -636,14 +636,18 @@ const TemplateItems = ({
                     </div>
                 </div>
 
-                    <div className="flex flex-col md:flex-row gap-2 justify-between mt-4">
-                        {/* Left Buttons */}
-                        <div className="flex gap-2 flex-wrap">
-                            <button onClick={() => saveData()} className="bg-indigo-500 text-white px-4 py-1 rounded-md hover:bg-indigo-600 flex items-center text-sm">
-                                <FiSave className="w-4 h-4 mr-2" />
-                                Save & New
-                            </button>
-                            {/* <button onClick={() => saveData("close")} className="bg-indigo-500 text-white px-4 py-1 rounded-md hover:bg-indigo-600 flex items-center text-sm">
+                <div className="flex flex-col md:flex-row gap-2 justify-between mt-4">
+                    {/* Left Buttons */}
+                    <div className="flex gap-2 flex-wrap">
+                        <button onClick={() => saveData()} className="bg-indigo-500 text-white px-4 py-1 rounded-md hover:bg-indigo-600 flex items-center text-sm">
+                            <FiSave className="w-4 h-4 mr-2" />
+                            {id
+                                ? "Update"
+                                : "Save"
+                            }
+
+                        </button>
+                        {/* <button onClick={() => saveData("close")} className="bg-indigo-500 text-white px-4 py-1 rounded-md hover:bg-indigo-600 flex items-center text-sm">
                                 <HiOutlineRefresh className="w-4 h-4 mr-2" />
                                 Save & Close
                             </button>
@@ -651,10 +655,10 @@ const TemplateItems = ({
                                 <HiOutlineRefresh className="w-4 h-4 mr-2" />
                                 Draft Save
                             </button> */}
-                        </div>
-
-                  
                     </div>
+
+
+                </div>
 
 
 

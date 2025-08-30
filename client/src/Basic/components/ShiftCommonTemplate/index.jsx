@@ -25,6 +25,7 @@ import {
 } from "../../../redux/services/ShiftCommonTemplate.service";
 import { useGetPartyCategoryMasterQuery } from "../../../redux/services/PartyCategoryServices";
 import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCategoryMasterService";
+import Swal from "sweetalert2";
 
 const ShiftCommonTemplateMaster = () => {
   const [readOnly, setReadOnly] = useState(false);
@@ -78,16 +79,16 @@ const ShiftCommonTemplateMaster = () => {
     (data) => {
       if (!id) {
         // setReadOnly(false);
-     
+
         setActive(true);
         setEmployeeCategoryId("");
         setCompanyName(company?.data[0].name);
         setCompanyCode(company?.data[0].code);
       } else {
         // setReadOnly(true);
-       
+
         setDocId(data?.docId || "");
-        
+
         setEmployeeCategoryId(data?.employeeCategoryId || "");
         setActive(id ? data?.active ?? false : true);
       }
@@ -99,8 +100,8 @@ const ShiftCommonTemplateMaster = () => {
     syncFormWithDb(singleData?.data);
   }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
 
-  console.log(singleData?.data,"singleData?.data");
-  
+  console.log(singleData?.data, "singleData?.data");
+
 
   const data = {
     docId,
@@ -114,7 +115,7 @@ const ShiftCommonTemplateMaster = () => {
   };
 
   const validateData = (data) => {
-    if (data.name && data.code) {
+    if (data.employeeCategoryId) {
       return true;
     }
     return false;
@@ -124,19 +125,34 @@ const ShiftCommonTemplateMaster = () => {
     try {
       let returnData = await callback(data).unwrap();
       setId(returnData.data.id);
-      toast.success(text + "Successfully");
+      Swal.fire({
+        title: text + "  " + "Successfully",
+        icon: "success",
+        draggable: true,
+        timer: 1000,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
     } catch (error) {
-      console.log("handle");
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission error',
+        text: error.data?.message || 'Something went wrong!',
+      });
     }
   };
 
   const saveData = () => {
-    // if (!validateData(data)) {
-    //   toast.error("Please fill all required fields...!", {
-    //     position: "top-center",
-    //   });
-    //   return;
-    // }
+    if (!validateData(data)) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission error',
+        text: 'Please fill all required fields...!',
+      });
+      return;
+    }
     if (!window.confirm("Are you sure save the details ...?")) {
       return;
     }
@@ -155,15 +171,26 @@ const ShiftCommonTemplateMaster = () => {
       try {
         const deldata = await removeData(id).unwrap();
         if (deldata?.statusCode == 1) {
-          toast.error(deldata?.message);
-          setForm(false);
+          Swal.fire({
+            icon: 'error',
+            title: 'Submission error',
+            text: deldata.data?.message || 'Something went wrong!',
+          }); setForm(false);
           return;
         }
         setId("");
-        toast.success("Deleted Successfully");
-        setForm(false);
+        Swal.fire({
+          title: "Deleted Successfully",
+          icon: "success",
+          timer: 1000,
+
+        }); setForm(false);
       } catch (error) {
-        toast.error("something went wrong");
+        Swal.fire({
+          icon: 'error',
+          title: 'Submission error',
+          text: error.data?.message || 'Something went wrong!',
+        });
       }
     }
   };
