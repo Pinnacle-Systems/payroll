@@ -1521,7 +1521,7 @@ export const DropdownInput = ({
         tabIndex={tabIndex ?? undefined}
         defaultValue={defaultValue}
         required={required}
-        className={`w-full px-1 py-1.5 text-xs border border-gray-300 rounded-lg
+        className={`w-full px-1 py-0.5 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
           ${disabled
@@ -1766,7 +1766,7 @@ export const DateInput = ({
 }) => {
   return (
     <div className="flex flex-col gap-1 w-full">
-      <label className="block text-xs font-bold text-slate-700 mb-1">
+      <label className="block text-xs font-bold text-slate-700 ">
 
         {inputHead ?? name}
       </label>
@@ -1783,11 +1783,9 @@ export const DateInput = ({
           value={value}
           onChange={(e) => setValue(e.target.value)}
           className={`
-            w-full px-2 py-1 text-[12px] 
-            border border-gray-300 rounded-md
-            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-            transition-all duration-200
-            text-gray-700
+         w-full px-1 py-0.5 text-xs border border-gray-300 rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm
             ${readOnly ? "bg-gray-100 cursor-not-allowed" : "bg-white"}
             ${disabled ? "opacity-50 cursor-not-allowed" : ""}
             ${inputClass}

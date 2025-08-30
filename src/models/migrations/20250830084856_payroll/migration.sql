@@ -1032,6 +1032,7 @@ CREATE TABLE `ShiftTemplate` (
     `name` VARCHAR(191) NULL,
     `docId` VARCHAR(191) NULL,
     `active` BOOLEAN NULL DEFAULT true,
+    `category` VARCHAR(191) NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -1082,15 +1083,19 @@ CREATE TABLE `PayFrequency` (
     `name` VARCHAR(191) NULL,
     `active` BOOLEAN NULL DEFAULT true,
     `payFrequencyType` VARCHAR(191) NULL,
+    `finYearId` INTEGER NULL,
+    `companyId` INTEGER NULL,
+    `branchId` INTEGER NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `payType` (
+CREATE TABLE `PayFrequencyItems` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `weekStartsDate` DATETIME(3) NULL,
-    `weekEndsDate` DATETIME(3) NULL,
+    `payFrequencyId` INTEGER NULL,
+    `startDate` DATETIME(3) NULL,
+    `endDate` DATETIME(3) NULL,
     `salaryDate` DATETIME(3) NULL,
     `notes` VARCHAR(191) NULL,
 
@@ -1534,3 +1539,15 @@ ALTER TABLE `PayFrequency` ADD CONSTRAINT `PayFrequency_createdById_fkey` FOREIG
 
 -- AddForeignKey
 ALTER TABLE `PayFrequency` ADD CONSTRAINT `PayFrequency_updatedById_fkey` FOREIGN KEY (`updatedById`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `PayFrequency` ADD CONSTRAINT `PayFrequency_finYearId_fkey` FOREIGN KEY (`finYearId`) REFERENCES `FinYear`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `PayFrequency` ADD CONSTRAINT `PayFrequency_companyId_fkey` FOREIGN KEY (`companyId`) REFERENCES `Company`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `PayFrequency` ADD CONSTRAINT `PayFrequency_branchId_fkey` FOREIGN KEY (`branchId`) REFERENCES `Branch`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `PayFrequencyItems` ADD CONSTRAINT `PayFrequencyItems_payFrequencyId_fkey` FOREIGN KEY (`payFrequencyId`) REFERENCES `PayFrequency`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
