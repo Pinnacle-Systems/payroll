@@ -29,6 +29,7 @@ import moment from "moment";
 import { Check, Power } from "lucide-react";
 import Modal from "../../../UiComponents/Modal";
 import { ReusableInput } from "../../../Uniform/Components/styleesheet/CommonInput";
+import Swal from "sweetalert2";
 
 const MODEL = "Fin Year Master";
 
@@ -71,7 +72,7 @@ export default function Form() {
         // setReadOnly(true);
         setTo(data?.to ? moment.utc(data.to).format("YYYY-MM-DD") : "");
         setFrom(data?.from ? moment.utc(data.from).format("YYYY-MM-DD") : "");
-         setActive(data?.active);
+        setActive(data?.active);
         setCode(data?.code);
       }
     },
@@ -114,16 +115,31 @@ export default function Form() {
       let returnData = await callback(data).unwrap();
       setId(returnData.data.id);
       syncFormWithDb(undefined);
-      toast.success(text + "Successfully");
+      Swal.fire({
+        title: text + "  " + "Successfully",
+        icon: "success",
+        draggable: true,
+        timer: 1000,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
     } catch (error) {
-      console.log("handle");
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission error',
+        text: error.data?.message || 'Something went wrong!',
+      });
     }
   };
 
   const saveData = () => {
     if (!validateOneActiveFinYear(data.active)) {
-      toast.error("Only one Fin year can be active...!", {
-        position: "top-center",
+      Swal.fire({
+        icon: 'error',
+        title: 'Submission error',
+        text: 'Please fill all required fields...!',
       });
       return;
     }
@@ -151,14 +167,26 @@ export default function Form() {
       try {
         let deldata = await removeData(id).unwrap();
         if (deldata?.statusCode == 1) {
-          toast.error(deldata?.message);
-          return;
+          Swal.fire({
+            icon: 'error',
+            title: 'Submission error',
+            text: deldata.data?.message || 'Something went wrong!',
+          }); return;
         }
         setId("");
-        toast.success("Deleted Successfully");
+        Swal.fire({
+          title: "Deleted Successfully",
+          icon: "success",
+          timer: 1000,
+
+        });
         setForm(false);
       } catch (error) {
-        toast.error("something went wrong");
+        Swal.fire({
+          icon: 'error',
+          title: 'Submission error',
+          text: error.data?.message || 'Something went wrong!',
+        });
       }
     }
   };
@@ -231,7 +259,7 @@ export default function Form() {
     setReadOnly(false);
     console.log("Edit");
   };
- 
+
   const ACTIVE = (
     <div className="bg-gradient-to-r from-green-200 to-green-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-green-500 shadow-lg text-white hover:scale-110 transition-transform duration-300">
       <Power size={10} />
@@ -269,9 +297,9 @@ export default function Form() {
       //   cellClass: () => "font-medium text-gray-900",
       className: "font-medium text-gray-900 text-center uppercase w-36",
     },
-     {
+    {
       header: "Status",
-      accessor:  (item) => item.active ? ACTIVE : INACTIVE,
+      accessor: (item) => item.active ? ACTIVE : INACTIVE,
       //   cellClass: () => "font-medium text-gray-900",
       className: "font-medium text-gray-900 text-center uppercase w-36",
     },
@@ -321,7 +349,7 @@ export default function Form() {
           itemsPerPage={10}
         />
       </div>
-      {console.log(readOnly,"con")
+      {console.log(readOnly, "con")
       }
       {form === true && (
         <Modal
@@ -331,7 +359,7 @@ export default function Form() {
           onClose={() => {
             setForm(false);
             setErrors({});
-            
+
           }}
         >
           <div className="h-full flex flex-col bg-[f1f1f0]">
@@ -382,14 +410,14 @@ export default function Form() {
                 <div className="lg:col-span- space-y-3">
                   <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
                     <div className="space-y-2 w-[50%]">
-                      
+
                       <DateInput
                         name="From"
                         value={from}
                         setValue={setFrom}
                         required={true}
                         readOnly={readOnly}
-                        
+
                         disabled={childRecord.current > 0}
                       />
 
@@ -411,18 +439,18 @@ export default function Form() {
                       </div>
                       <div>
                         <label className="block text-xs text-black mb-1">
-                            Short Code
-                        <input
-                          name="code"
-                           className={`w-full px-2  py-1 mt-2 text-xs border border-gray-300 rounded-lg
+                          Short Code
+                          <input
+                            name="code"
+                            className={`w-full px-2  py-1 mt-2 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm`}
-                          value={code}
-                          
-                          onChange={(e) =>setCode(e.target.value)}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                        />
+                            value={code}
+
+                            onChange={(e) => setCode(e.target.value)}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                          />
                         </label>
                       </div>
 

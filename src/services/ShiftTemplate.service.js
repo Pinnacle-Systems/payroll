@@ -15,7 +15,6 @@ async function getNextDocId(
   endTime,
   isTaxBill
 ) {
-  console.log("argumnts : ", branchId, shortCode, startTime, endTime, isTaxBill);
 
   let lastObject = await prisma.ShiftTemplate.findFirst({
     where: {
@@ -45,7 +44,9 @@ async function get(req) {
 
   console.log(companyId, active, finYearId, "received");
 
-  const data = await prisma.ShiftTemplate.findMany({
+  const data = await prisma.shiftTemplate.findMany({
+
+
     where: {
       //   companyId: companyId ? parseInt(companyId) : undefined,
       //   active: active ? Boolean(active) : undefined,
@@ -55,12 +56,19 @@ async function get(req) {
         }
         : undefined,
     },
-  });
-  let finYearDate = await getFinYearStartTimeEndTime(finYearId);
+    include: {
+      ShiftTemplateItems: true,
 
-  const shortCode = finYearDate ? getYearShortCodeForFinYear(finYearDate?.startDateStartTime, finYearDate?.endDateEndTime)
-    : "";
-  let newDocId = finYearDate ? await getNextDocId(branchId,shortCode,finYearDate?.startDateStartTime,finYearDate?.endDateEndTime,) : "";
+    },
+    orderBy: { id: "desc" },
+
+  });
+
+
+  let finYearDate = await getFinYearStartTimeEndTime(finYearId);
+  const shortCode = finYearDate ? getYearShortCodeForFinYear(finYearDate?.startDateStartTime, finYearDate?.endDateEndTime) : "";
+  let newDocId = finYearDate ? await getNextDocId(branchId, shortCode, finYearDate?.startDateStartTime, finYearDate?.endDateEndTime,) : "";
+
 
   return { statusCode: 0, nextDocId: newDocId, data };
 }
@@ -104,7 +112,7 @@ async function getSearch(req) {
 }
 
 async function create(body) {
-  const { name, branchId, companyId, active, description, docId, ShiftTemplateItems } = await body;
+  const { name, branchId, companyId, active, categoryId, docId, ShiftTemplateItems } = await body;
 
   console.log(ShiftTemplateItems, "ShiftTemplateItems");
   let data;
@@ -117,6 +125,8 @@ async function create(body) {
         branchId: branchId ? parseInt(branchId) : undefined,
         companyId: companyId ? parseInt(companyId) : undefined,
         active: active ? Boolean(active) : undefined,
+        category: categoryId ? categoryId : "",
+
 
 
 
@@ -243,7 +253,7 @@ async function updateShiftTemplateItems(tx, ShiftTemplateItems, data) {
 
 
 async function update(id, body) {
-  const { name, branchId, companyId, active, description, docId, ShiftTemplateItems } = await body;
+  const { name, branchId, companyId, active, categoryId, docId, ShiftTemplateItems } = await body;
   const dataFound = await prisma.shiftTemplate.findUnique({
     where: {
       id: parseInt(id),
@@ -263,6 +273,7 @@ async function update(id, body) {
         branchId: branchId ? parseInt(branchId) : undefined,
         companyId: companyId ? parseInt(companyId) : undefined,
         active: active ? Boolean(active) : undefined,
+        category: categoryId ? categoryId : "",
 
 
 
