@@ -119,34 +119,43 @@ async function getSearch(req) {
 }
 
 async function create(body) {
-    const { name, branchId, companyId, active, description, docId, payFrequencyItems, finYearId } = await body;
+    const {
+        name,
+        branchId,
+        companyId,
+        active,
+        description,
+        docId,
+        finYearId,
+        payFrequencyType = [],
+    } = body;
 
-    console.log(payFrequencyItems, "payFrequencyItems");
     let data;
 
     await prisma.$transaction(async (tx) => {
         data = await tx.payFrequency.create({
             data: {
+                name,
+                description,
+                docId,
                 finYearId: finYearId ? parseInt(finYearId) : undefined,
                 branchId: branchId ? parseInt(branchId) : undefined,
                 companyId: companyId ? parseInt(companyId) : undefined,
                 active: active ? Boolean(active) : undefined,
 
-
-
-                PayFrequencyItems:
-                    payFrequencyItems?.length > 0
-                        ? {
-                            create: payFrequencyItems?.map((item) => ({
+                payFrequencyType: {
+                    create: payFrequencyType.map((type) => ({
+                        payFrequencyType: type.payFrequencyType,
+                        PayFrequencyItems: {
+                            create: type.PayFrequencyItems.map((item) => ({
                                 startDate: item?.startDate ? new Date(item.startDate) : undefined,
                                 endDate: item?.endDate ? new Date(item.endDate) : undefined,
                                 salaryDate: item?.salaryDate ? new Date(item.salaryDate) : undefined,
-                                notes: item?.notes ? item.notes : undefined,
+                                notes: item?.notes || null,
                             })),
-                        }
-                        : undefined,
-
-
+                        },
+                    })),
+                },
             },
         });
     });

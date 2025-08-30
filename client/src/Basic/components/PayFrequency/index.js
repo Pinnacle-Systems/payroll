@@ -40,8 +40,7 @@ const PayFrequencymaster = () => {
     const [form, setForm] = useState(false);
     const [searchValue, setSearchValue] = useState("");
     const childRecord = useRef(0);
-    const [payFrequencyItems, setPayFrequencyItems] = useState([])
-    const [payFrequencyType, setPayFrequencyType] = useState('')
+    const [payFrequencyType, setPayFrequencyType] = useState([])
     const [finYearId, setFinYearId] = useState("")
 
 
@@ -97,8 +96,8 @@ const PayFrequencymaster = () => {
 
 
     useEffect(() => {
-        if (payFrequencyItems?.length >= 1) return
-        setPayFrequencyItems(prev => {
+        if (payFrequencyType?.length >= 1) return
+        setPayFrequencyType(prev => {
             let newArray = Array.from({ length: 1 - prev.length }, i => {
                 return { templateId: "" };
             })
@@ -110,16 +109,22 @@ const PayFrequencymaster = () => {
 
     const syncFormWithDb = useCallback(
         (data) => {
-
-            // setReadOnly(true);
-            setName(data?.name || "");
-            setDocId(data?.docId || "")
-            setDescription(data?.description || "");
-            setActive(id ? data?.active ?? false : true);
-            setPayFrequencyItems(data?.PayFrequencyItems
-                ? data?.PayFrequencyItems
-                : undefined)
-
+            if (!id) {
+                // setReadOnly(false);
+                setName("");
+                setDescription("")
+                setActive(true);
+                // setCompanyName(company?.data[0].name);
+                setCompanyCode(company?.data[0].code);
+            } else {
+                // setReadOnly(true);
+                setName(data?.name || "");
+                setDocId(data?.docId || "")
+                setDescription(data?.description || "");
+                setActive(id ? data?.active ?? false : true);
+                setPayFrequencyType(data?.PayFrequencyItems ? data?.PayFrequencyItems : [])
+                setPayFrequencyType(data?.payFrequencyType ? data?.payFrequencyType : "")
+            }
         },
         [id, company]
     );
@@ -138,12 +143,12 @@ const PayFrequencymaster = () => {
         ),
         id,
         branchId,
-        payFrequencyItems,
+        payFrequencyType,
         payFrequencyType,
         finYearId
     };
 
-    console.log(payFrequencyItems, "payFrequencyItems  ")
+    console.log(payFrequencyType, "payFrequencyType  ")
 
     const validateData = (data) => {
         if (data.name && data.code) {
@@ -272,18 +277,18 @@ const PayFrequencymaster = () => {
     }
 
     const handleInputChange = (value, index, field) => {
-        const newBlend = structuredClone(payFrequencyItems);
+        const newBlend = structuredClone(payFrequencyType);
         newBlend[index][field] = value;
 
-        setPayFrequencyItems(newBlend);
+        setPayFrequencyType(newBlend);
     };
 
     return (
         <div>
             <div onKeyDown={handleKeyDown} className="p-1 ">
                 {form === true ? (
-                    <TemplateItems yearData={yearData} saveData={saveData} setForm={setForm} readOnly={readOnly} payFrequencyItems={payFrequencyItems} setPayFrequencyItems={setPayFrequencyItems} id={id}
-                        companyCode={companyCode} setCompanyCode={setCompanyCode} docId={docId} setDocId={setDocId} finYearId={finYearId} setFinYearId={setFinYearId} childRecord={childRecord} payFrequencyType={payFrequencyType} setPayFrequencyType={setPayFrequencyType} />
+                    <TemplateItems yearData={yearData} saveData={saveData} setForm={setForm} readOnly={readOnly} payFrequencyType={payFrequencyType} setPayFrequencyType={setPayFrequencyType} id={id}
+                        companyCode={companyCode} setCompanyCode={setCompanyCode} docId={docId} setDocId={setDocId} finYearId={finYearId} setFinYearId={setFinYearId} childRecord={childRecord} />
 
 
                 )
