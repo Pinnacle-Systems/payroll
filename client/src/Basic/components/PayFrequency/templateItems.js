@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DropdownInput, TextInput } from "../../../Inputs";
 import { dropDownFinYear } from "../../../Utils/contructObject";
 import { payCategory } from "../../../Utils/DropdownData";
@@ -17,42 +17,55 @@ const TemplateItems = ({
     payFrequencyType,
     setPayFrequencyType,
 }) => {
-    // Track active tab (which pay category is visible)
-    const [activeTab, setActiveTab] = useState(payFrequencyType?.[0]?.type || "");
+    console.log(payFrequencyType, "payFrequencyType");
 
-    // Handle payFrequencyItem changes inside a specific type
+    useEffect(() => {
+        // Always normalize so all categories exist
+        const normalized = payCategory.map((cat) => {
+            const existing = payFrequencyType?.find((t) => t.type === cat.value);
+            return {
+                type: cat.value,
+                payFrequencyItems: existing?.payFrequencyItems || [],
+            };
+        });
+        setPayFrequencyType(normalized);
+    }, [payFrequencyType, setPayFrequencyType]);
+
+
+    const [activeTab, setActiveTab] = useState(payCategory[0].value);
+
     const handleInputChange = (type, index, field, value) => {
-        const updatedTypes = structuredClone(payFrequencyType);
-        const typeIndex = updatedTypes.findIndex((t) => t.type === type);
+        const updated = structuredClone(payFrequencyType);
+        const typeIndex = updated.findIndex((t) => t.type === type);
 
         if (typeIndex !== -1) {
-            updatedTypes[typeIndex].payFrequencyItems[index][field] = value;
-            setPayFrequencyType(updatedTypes);
+            updated[typeIndex].payFrequencyItems[index][field] = value;
+            setPayFrequencyType(updated);
         }
     };
 
     const handleDeleteRow = (type, index) => {
-        const updatedTypes = structuredClone(payFrequencyType);
-        const typeIndex = updatedTypes.findIndex((t) => t.type === type);
+        const updated = structuredClone(payFrequencyType);
+        const typeIndex = updated.findIndex((t) => t.type === type);
 
         if (typeIndex !== -1) {
-            updatedTypes[typeIndex].payFrequencyItems.splice(index, 1);
-            setPayFrequencyType(updatedTypes);
+            updated[typeIndex].payFrequencyItems.splice(index, 1);
+            setPayFrequencyType(updated);
         }
     };
 
     const addNewRow = (type) => {
-        const updatedTypes = structuredClone(payFrequencyType);
-        const typeIndex = updatedTypes.findIndex((t) => t.type === type);
+        const updated = structuredClone(payFrequencyType);
+        const typeIndex = updated.findIndex((t) => t.type === type);
 
         if (typeIndex !== -1) {
-            updatedTypes[typeIndex].payFrequencyItems.push({
+            updated[typeIndex].payFrequencyItems.push({
                 startDate: "",
                 endDate: "",
                 salaryDate: "",
                 notes: "",
             });
-            setPayFrequencyType(updatedTypes);
+            setPayFrequencyType(updated);
         }
     };
 
@@ -61,7 +74,6 @@ const TemplateItems = ({
 
         const start = moment(startDate);
         const end = moment(endDate);
-
         const totalDays = end.diff(start, "days") + 1;
 
         let sundays = 0;
@@ -74,7 +86,7 @@ const TemplateItems = ({
         return { totalDays, sundays };
     };
 
-    const activeType = payFrequencyType?.find((t) => t.payFrequencyType === activeTab);
+    const activeType = payFrequencyType?.find((t) => t.type === activeTab);
 
     return (
         <div className="h-[90vh] flex flex-col bg-[f1f1f0] overflow-x-auto">
@@ -107,7 +119,6 @@ const TemplateItems = ({
                 </div>
             </div>
 
-            {/* Content */}
             <div className="flex-1 overflow-auto p-3 ">
                 <div className="grid grid-cols-1 gap-3 h-full ">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full w-full">
@@ -155,104 +166,146 @@ const TemplateItems = ({
                             />
                         </div>
 
-                        {/* Tabs for Pay Categories */}
-                        <div className="flex border-b mb-3">
-                            {payFrequencyType.map((t) => (
-                                <button
-                                    key={t.type}
-                                    onClick={() => setActiveTab(t.type)}
-                                    className={`px-4 py-2 text-sm font-medium ${activeTab === t.type
-                                        ? "border-b-2 border-blue-500 text-blue-600"
-                                        : "text-gray-600"
-                                        }`}
-                                >
-                                    {t.type}
-                                </button>
-                            ))}
-                        </div>
 
-                        {/* Active Tab Table */}
-                        {activeType && (
-                            <div className="w-full p-2 overflow-x-auto">
-                                <table className="w-full border-collapse table-fixed">
-                                    <thead className="bg-gray-200 text-gray-800">
-                                        <tr>
-                                            <th className="w-4 px-1 py-2 text-center font-medium text-[13px]">S.No</th>
-                                            <th className="w-12 px-4 py-2 text-center font-medium text-[13px]">Start Date</th>
-                                            <th className="w-12 px-4 py-2 text-center font-medium text-[13px]">End Date</th>
-                                            <th className="w-12 px-4 py-2 text-center font-medium text-[13px]">Salary Date</th>
-                                            <th className="w-36 px-4 py-2 text-center font-medium text-[13px]">Pay Period days</th>
-                                            <th className="w-8 px-4 py-2 text-center font-medium text-[13px]">Holidays</th>
-                                            <th className="w-8 px-4 py-2 text-center font-medium text-[13px]">Notes</th>
-                                            <th className="w-8 px-3 py-2 font-medium text-[13px]">
-                                                <button
-                                                    onClick={() => addNewRow(activeType.type)}
-                                                    className="hover:bg-green-600 text-green-600 hover:text-white border border-green-600 px-2 py-1 rounded-md flex items-center text-xs"
-                                                >
-                                                    <HiPlus className="w-3 h-3" />
-                                                </button>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {activeType.payFrequencyItems?.map((item, index) => {
-                                            const { totalDays, sundays } = calculatePayPeriod(item.startDate, item.endDate);
-                                            return (
-                                                <tr key={index} className="w-full table-row">
-                                                    <td className="w-2 text-left px-1 border border-gray-300">{index + 1}</td>
-                                                    <td className="border border-gray-300 text-[11px]">
-                                                        <input
-                                                            type="date"
-                                                            value={item.startDate}
-                                                            onChange={(e) =>
-                                                                handleInputChange(activeType.type, index, "startDate", e.target.value)
-                                                            }
-                                                        />
-                                                    </td>
-                                                    <td className="border border-gray-300 text-[11px]">
-                                                        <input
-                                                            type="date"
-                                                            value={item.endDate}
-                                                            onChange={(e) =>
-                                                                handleInputChange(activeType.type, index, "endDate", e.target.value)
-                                                            }
-                                                        />
-                                                    </td>
-                                                    <td className="border border-gray-300 text-[11px]">
-                                                        <input
-                                                            type="date"
-                                                            value={item.salaryDate}
-                                                            onChange={(e) =>
-                                                                handleInputChange(activeType.type, index, "salaryDate", e.target.value)
-                                                            }
-                                                        />
-                                                    </td>
-                                                    <td className="border border-gray-300 text-[11px]">{totalDays}</td>
-                                                    <td className="border border-gray-300 text-[11px]">{sundays}</td>
-                                                    <td className="w-44 border border-gray-300 text-[11px]">
-                                                        <input
-                                                            type="text"
-                                                            value={item.notes}
-                                                            onChange={(e) =>
-                                                                handleInputChange(activeType.type, index, "notes", e.target.value)
-                                                            }
-                                                        />
-                                                    </td>
-                                                    <td className="w-40 border border-gray-300 text-[11px]">
-                                                        <button
-                                                            onClick={() => handleDeleteRow(activeType.type, index)}
-                                                            className="text-red-600 hover:text-red-800 bg-red-50 py-1 rounded text-xs flex items-center"
-                                                        >
-                                                            <HiTrash className="w-4 h-4" />
-                                                        </button>
+
+                        <div className="p-1">
+                            {/* Tabs */}
+                            <div className="flex border-b ">
+                                {payFrequencyType?.map((t) => (
+                                    <button
+                                        key={t.type}
+                                        onClick={() => setActiveTab(t.type)}
+                                        className={`px-4 py-2 text-sm font-medium ${activeTab === t.type
+                                            ? "border-b-2 border-blue-500 text-blue-600"
+                                            : "text-gray-600"
+                                            }`}
+                                    >
+                                        {t.type}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Active Tab Table */}
+                            {activeType && (
+                                <div className="w-full  overflow-x-auto">
+                                    <table className="w-full border-collapse table-fixed">
+                                        <thead className="bg-gray-200 text-gray-800">
+                                            <tr>
+                                                <th className="px-2 py-2 text-center">S.No</th>
+                                                <th className="px-2 py-2 text-center">Start Date</th>
+                                                <th className="px-2 py-2 text-center">End Date</th>
+                                                <th className="px-2 py-2 text-center">Salary Date</th>
+                                                <th className="px-2 py-2 text-center">Pay Period Days</th>
+                                                <th className="px-2 py-2 text-center">Holidays</th>
+                                                <th className="px-2 py-2 text-center">Notes</th>
+                                                <th className="px-2 py-2">
+                                                    <button
+                                                        onClick={() => addNewRow(activeType.type)}
+                                                        className="hover:bg-green-600 text-green-600 hover:text-white border border-green-600 px-2 py-1 rounded-md flex items-center text-xs"
+                                                    >
+                                                        <HiPlus className="w-3 h-3" />
+                                                    </button>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {activeType?.payFrequencyItems?.map((item, index) => {
+                                                const { totalDays, sundays } = calculatePayPeriod(
+                                                    item.startDate,
+                                                    item.endDate
+                                                );
+                                                return (
+                                                    <tr key={index} className="w-full table-row">
+                                                        <td className="text-left px-2 border border-gray-300">
+                                                            {index + 1}
+                                                        </td>
+                                                        <td className="border border-gray-300">
+                                                            <input
+                                                                type="date"
+                                                                value={item.startDate}
+                                                                onChange={(e) =>
+                                                                    handleInputChange(
+                                                                        activeType.type,
+                                                                        index,
+                                                                        "startDate",
+                                                                        e.target.value
+                                                                    )
+                                                                }
+                                                            />
+                                                        </td>
+                                                        <td className="border border-gray-300">
+                                                            <input
+                                                                type="date"
+                                                                value={item.endDate}
+                                                                onChange={(e) =>
+                                                                    handleInputChange(
+                                                                        activeType.type,
+                                                                        index,
+                                                                        "endDate",
+                                                                        e.target.value
+                                                                    )
+                                                                }
+                                                            />
+                                                        </td>
+                                                        <td className="border border-gray-300">
+                                                            <input
+                                                                type="date"
+                                                                value={item.salaryDate}
+                                                                onChange={(e) =>
+                                                                    handleInputChange(
+                                                                        activeType.type,
+                                                                        index,
+                                                                        "salaryDate",
+                                                                        e.target.value
+                                                                    )
+                                                                }
+                                                            />
+                                                        </td>
+                                                        <td className="border border-gray-300">{totalDays}</td>
+                                                        <td className="border border-gray-300">{sundays}</td>
+                                                        <td className="border border-gray-300">
+                                                            <input
+                                                                type="text"
+                                                                value={item.notes}
+                                                                onChange={(e) =>
+                                                                    handleInputChange(
+                                                                        activeType.type,
+                                                                        index,
+                                                                        "notes",
+                                                                        e.target.value
+                                                                    )
+                                                                }
+                                                            />
+                                                        </td>
+                                                        <td className="border border-gray-300 text-center">
+                                                            <button
+                                                                onClick={() =>
+                                                                    handleDeleteRow(activeType.type, index)
+                                                                }
+                                                                className="text-red-600 hover:text-red-800 bg-red-50 px-2 py-1 rounded text-xs flex items-center"
+                                                            >
+                                                                <HiTrash className="w-4 h-4" />
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                            {/* Show empty row message */}
+                                            {activeType?.payFrequencyItems?.length === 0 && (
+                                                <tr>
+                                                    <td
+                                                        colSpan={8}
+                                                        className="text-center py-4 text-gray-500 border"
+                                                    >
+                                                        No records yet. Click + to add a row.
                                                     </td>
                                                 </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

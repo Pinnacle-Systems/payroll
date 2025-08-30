@@ -107,27 +107,37 @@ const PayFrequencymaster = () => {
     }, [])
 
 
-    const syncFormWithDb = useCallback(
-        (data) => {
-            if (!id) {
-                // setReadOnly(false);
-                setName("");
-                setDescription("")
-                setActive(true);
-                // setCompanyName(company?.data[0].name);
-                setCompanyCode(company?.data[0].code);
-            } else {
-                // setReadOnly(true);
-                setName(data?.name || "");
-                setDocId(data?.docId || "")
-                setDescription(data?.description || "");
-                setActive(id ? data?.active ?? false : true);
-                setPayFrequencyType(data?.PayFrequencyItems ? data?.PayFrequencyItems : [])
-                setPayFrequencyType(data?.payFrequencyType ? data?.payFrequencyType : "")
-            }
-        },
-        [id, company]
-    );
+
+    const syncFormWithDb = useCallback((data) => {
+        if (!id) {
+            setName("");
+            setDescription("");
+            setActive(true);
+            setCompanyCode(company?.data[0]?.code);
+            // setPayFrequencyType(
+            //     data?.payCategory.map(cat => ({
+            //         type: cat.value,
+            //         payFrequencyItems: []
+            //     }))
+            // );
+        } else {
+            setName(data?.name || "");
+            setDocId(data?.docId || "");
+            setDescription(data?.description || "");
+            setActive(data?.active ?? true);
+
+            // normalize categories
+            const normalized = data?.payCategory.map(cat => {
+                const existing = data?.payFrequencyType?.find(t => t.type === cat.value);
+                return {
+                    type: cat.value,
+                    payFrequencyItems: existing?.payFrequencyItems || []
+                };
+            });
+            setPayFrequencyType(normalized);
+        }
+    }, [id, company]);
+
 
     useEffect(() => {
         syncFormWithDb(singleData?.data);

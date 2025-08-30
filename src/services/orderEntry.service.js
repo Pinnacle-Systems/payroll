@@ -49,9 +49,8 @@ async function getNextDocId(
   const branchObj = await getTableRecordWithId(branchId, "branch");
   let newDocId = `${branchObj.branchCode}/${shortCode}/${code}/1`;
   if (lastObject) {
-    newDocId = `${branchObj.branchCode}/${shortCode}/${code}/${
-      parseInt(lastObject.docId.split("/").at(-1)) + 1
-    }`;
+    newDocId = `${branchObj.branchCode}/${shortCode}/${code}/${parseInt(lastObject.docId.split("/").at(-1)) + 1
+      }`;
   }
 
   return newDocId;
@@ -103,8 +102,8 @@ async function get(req) {
     where: {
       docId: Boolean(searchDocId)
         ? {
-            contains: searchDocId,
-          }
+          contains: searchDocId,
+        }
         : undefined,
     },
     include: {
@@ -153,16 +152,16 @@ async function get(req) {
   });
 
   if (value) {
-  
-    
+
+
     data = data.filter((item) => item.isPurchased !== true);
 
-   
-    
+
+
 
   }
-
   data = manualFilterSearchData(searchBillDate, searchMobileNo, data);
+
   if (IsorderFilter) {
     data = isFilterOrder(data, orderFilter);
   }
@@ -184,27 +183,27 @@ async function get(req) {
 
   const shortCode = finYearDate
     ? getYearShortCodeForFinYear(
-        finYearDate?.startDateStartTime,
-        finYearDate?.endDateEndTime
-      )
+      finYearDate?.startDateStartTime,
+      finYearDate?.endDateEndTime
+    )
     : "";
   let newDocId = finYearDate
     ? await getNextDocId(
-        branchId,
-        shortCode,
-        finYearDate?.startDateStartTime,
-        finYearDate?.endDateEndTime,
-        isTaxBill
-      )
+      branchId,
+      shortCode,
+      finYearDate?.startDateStartTime,
+      finYearDate?.endDateEndTime,
+      isTaxBill
+    )
     : "";
-  
+
 
   return { statusCode: 0, nextDocId: newDocId, data, totalCount };
 }
 
 async function getOne(req) {
   const id = parseInt(req.params.id);
-  
+
 
   console.log(id, "id ");
 
@@ -608,46 +607,46 @@ async function create(body) {
         attachments:
           attachments?.length > 0
             ? {
-                create: attachments.map((a) => ({
-                  date: a.date ? new Date(a.date) : undefined,
-                  log: a.log || "",
-                  gridUser: a.gridUser || "",
-                  filePath: a.filePath || "",
-                })),
-              }
+              create: attachments.map((a) => ({
+                date: a.date ? new Date(a.date) : undefined,
+                log: a.log || "",
+                gridUser: a.gridUser || "",
+                filePath: a.filePath || "",
+              })),
+            }
             : undefined,
 
         orderBillItems:
           orderDetails?.length > 0
             ? {
-                create: orderDetails?.map((item) => ({
-                  fabCode: item?.fabCode || "",
-                  styleSheetId: item?.styleSheetId || null,
+              create: orderDetails?.map((item) => ({
+                fabCode: item?.fabCode || "",
+                styleSheetId: item?.styleSheetId || null,
 
-                  subGrid:
-                    item.orderDetailsSubGrid?.length > 0
-                      ? {
-                          createMany: {
-                            data: item?.orderDetailsSubGrid?.map((sub) => ({
-                              fabType: sub.fabType || "",
-                              fiberContent: sub.fiberContent || "",
-                              weightGSM: sub.weightGSM?.toString() || "",
-                              widthFinished: sub.widthFinished || "",
-                              priceFob: Number(sub.priceFob) || 0,
-                              surCharges: Number(sub.surCharges) || 0,
-                              // colorId: sub.colorId || "",
-                              // uomId : sub.uomId || "",
-                              colorId: sub.colorId
-                                ? parseInt(sub.colorId)
-                                : null,
-                              uomId: sub.uomId ? parseInt(sub.uomId) : null,
-                              quantity: parseFloat(sub.quantity) || 0,
-                            })),
-                          },
-                        }
-                      : undefined,
-                })),
-              }
+                subGrid:
+                  item.orderDetailsSubGrid?.length > 0
+                    ? {
+                      createMany: {
+                        data: item?.orderDetailsSubGrid?.map((sub) => ({
+                          fabType: sub.fabType || "",
+                          fiberContent: sub.fiberContent || "",
+                          weightGSM: sub.weightGSM?.toString() || "",
+                          widthFinished: sub.widthFinished || "",
+                          priceFob: Number(sub.priceFob) || 0,
+                          surCharges: Number(sub.surCharges) || 0,
+                          // colorId: sub.colorId || "",
+                          // uomId : sub.uomId || "",
+                          colorId: sub.colorId
+                            ? parseInt(sub.colorId)
+                            : null,
+                          uomId: sub.uomId ? parseInt(sub.uomId) : null,
+                          quantity: parseFloat(sub.quantity) || 0,
+                        })),
+                      },
+                    }
+                    : undefined,
+              })),
+            }
             : undefined,
       },
     });
@@ -772,25 +771,25 @@ async function update(id, body) {
           create:
             orderDetails?.length > 0
               ? orderDetails.map((item) => ({
-                  fabCode: item.fabCode,
-                  styleSheetId: item?.styleSheetId || null,
-                  subGrid: {
-                    createMany: {
-                      data: item.orderDetailsSubGrid.map((sub) => ({
-                        fabType: sub.fabType || "",
-                        fiberContent: sub.fiberContent || "",
-                        weightGSM: sub.weightGSM?.toString() || "",
-                        widthFinished: sub.widthFinished || "",
-                        priceFob: parseFloat(sub.priceFob) || 0,
-                        surCharges: Number(sub.surCharges) || 0,
-                        // color: sub.color || "",
-                        colorId: sub.colorId ? parseInt(sub.colorId) : null,
-                        uomId: sub.uomId ? parseInt(sub.uomId) : null,
-                        quantity: parseFloat(sub.quantity) || 0,
-                      })),
-                    },
+                fabCode: item.fabCode,
+                styleSheetId: item?.styleSheetId || null,
+                subGrid: {
+                  createMany: {
+                    data: item.orderDetailsSubGrid.map((sub) => ({
+                      fabType: sub.fabType || "",
+                      fiberContent: sub.fiberContent || "",
+                      weightGSM: sub.weightGSM?.toString() || "",
+                      widthFinished: sub.widthFinished || "",
+                      priceFob: parseFloat(sub.priceFob) || 0,
+                      surCharges: Number(sub.surCharges) || 0,
+                      // color: sub.color || "",
+                      colorId: sub.colorId ? parseInt(sub.colorId) : null,
+                      uomId: sub.uomId ? parseInt(sub.uomId) : null,
+                      quantity: parseFloat(sub.quantity) || 0,
+                    })),
                   },
-                }))
+                },
+              }))
               : [],
         },
       },
