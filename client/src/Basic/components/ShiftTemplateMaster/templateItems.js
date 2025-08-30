@@ -16,8 +16,8 @@ import { FiSave } from "react-icons/fi";
 
 const TemplateItems = ({
     saveData, setForm, ShitCommonData, shiftData, readOnly, ShiftTemplateItems, setShiftTemplateItems, id,
-    companyCode, setCompanyCode, docId, setDocId, categoryId, setCategoryId, childRecord, onClose, onNew
-
+    companyCode, setCompanyCode, docId, setDocId, categoryId, setCategoryId, childRecord, onClose, onNew,
+    refetch,
 
 }) => {
 
@@ -70,8 +70,8 @@ const TemplateItems = ({
                         </button> */}
                         <button
                             onClick={() => {
-                                onNew()
                                 setForm(false)
+                                onNew()
                             }}
                             className="text-indigo-600 hover:text-indigo-700"
                             title="Open Report"

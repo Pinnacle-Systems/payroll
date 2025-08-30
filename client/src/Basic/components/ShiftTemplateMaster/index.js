@@ -54,8 +54,17 @@ const ShiftTemplateMaster = () => {
 
 
 
-    const { data: allData } = useGetShiftTemplateMasterQuery({ params, searchParams: searchValue });
+    const { data: allData, refetch } = useGetShiftTemplateMasterQuery({ params, searchParams: searchValue });
+    const getNextDocId = useCallback(() => {
+        if (id) return;
+        if (allData?.nextDocId) {
+            console.log(docId, "docId");
 
+            setDocId(allData?.nextDocId);
+        }
+    }, [allData, id]);
+
+    useEffect(getNextDocId, [getNextDocId]);
     const {
         data: singleData,
         isFetching: isSingleFetching,
@@ -81,14 +90,7 @@ const ShiftTemplateMaster = () => {
     }, [company]);
 
 
-    const getNextDocId = useCallback(() => {
-        if (id) return;
-        if (allData?.nextDocId) {
-            setDocId(allData?.nextDocId);
-        }
-    }, [allData, id]);
 
-    useEffect(getNextDocId, [getNextDocId]);
 
 
 
@@ -287,11 +289,13 @@ const ShiftTemplateMaster = () => {
     const onNew = () => {
         console.log("Hitr")
         setId("");
+
         setReadOnly(false);
         setSearchValue("");
         setCompanyCode(company?.data[0]?.code);
         setShiftTemplateItems([])
         setCategoryId('')
+        refetch()
 
     };
     const handleView = (id) => {
@@ -358,7 +362,7 @@ const ShiftTemplateMaster = () => {
                         companyCode={companyCode} setCompanyCode={setCompanyCode} docId={docId} setDocId={setDocId} categoryId={categoryId} setCategoryId={setCategoryId} childRecord={childRecord} onClose={() => {
                             setForm(false)
                             onNew()
-                        }} onNew={onNew} />
+                        }} onNew={onNew} refetch={refetch} />
 
                 )
                     :
@@ -372,7 +376,7 @@ const ShiftTemplateMaster = () => {
                                     <button
                                         onClick={() => {
                                             setForm(true);
-                                            // onNew();
+                                            onNew();
                                         }}
                                         className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
                                     >
@@ -395,7 +399,7 @@ const ShiftTemplateMaster = () => {
                     )
                 }
 
-           
+
 
             </div>
         </div>
