@@ -58,24 +58,9 @@ async function get(req) {
   });
   let finYearDate = await getFinYearStartTimeEndTime(finYearId);
 
-  console.log(finYearDate, "finyear--");
-
-
-  const shortCode = finYearDate
-    ? getYearShortCodeForFinYear(
-      finYearDate?.startDateStartTime,
-      finYearDate?.endDateEndTime
-    )
+  const shortCode = finYearDate ? getYearShortCodeForFinYear(finYearDate?.startDateStartTime, finYearDate?.endDateEndTime)
     : "";
-  let newDocId = finYearDate
-    ? await getNextDocId(
-      branchId,
-      shortCode,
-      finYearDate?.startDateStartTime,
-      finYearDate?.endDateEndTime,
-      // isTaxBill
-    )
-    : "";
+  let newDocId = finYearDate ? await getNextDocId(branchId,shortCode,finYearDate?.startDateStartTime,finYearDate?.endDateEndTime,) : "";
 
   return { statusCode: 0, nextDocId: newDocId, data };
 }

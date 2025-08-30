@@ -205,15 +205,17 @@ const ShiftTemplateMaster = () => {
         }
     };
 
-    // const onNew = () => {
-    //     setId("");
-    //     setReadOnly(false);
-    //     setForm(true);
-    //     setSearchValue("");
-    //     // setCompanyName(company.data[0].name);
-    //     setCompanyCode(company?.data[0]?.code);
+    const onNew = () => {
+        console.log("Hitr")
+        setId("");
+        setReadOnly(false);
+        setForm(true);
+        setSearchValue("");
+        setCompanyCode(company?.data[0]?.code);
+        setShiftTemplateItems([])
+        setCategoryId('')
 
-    // };
+    };
     const handleView = (id) => {
         setId(id);
         setForm(true);
@@ -280,7 +282,10 @@ const ShiftTemplateMaster = () => {
             <div onKeyDown={handleKeyDown} className="p-1 ">
                 {form === true ? (
                     <TemplateItems saveData={saveData} setForm={setForm} ShitCommonData={ShitCommonData} shiftData={shiftData} readOnly={readOnly} ShiftTemplateItems={ShiftTemplateItems} setShiftTemplateItems={setShiftTemplateItems} id={id}
-                        companyCode={companyCode} setCompanyCode={setCompanyCode} docId={docId} setDocId={setDocId} categoryId={categoryId} setCategoryId={setCategoryId} childRecord={childRecord} />
+                        companyCode={companyCode} setCompanyCode={setCompanyCode} docId={docId} setDocId={setDocId} categoryId={categoryId} setCategoryId={setCategoryId} childRecord={childRecord} onClose = {()  => {
+                            setForm(false)
+                            onNew()
+                        }} />
 
                 )
                     :
