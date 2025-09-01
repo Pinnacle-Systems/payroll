@@ -245,7 +245,7 @@ const TemplateItems = ({
 
                                         className={`w-28 px-3 py-2 text-center font-medium text-[13px] `}
                                     >
-                                        Tolerance After Start
+                                        Tolerance After End
                                     </th>
                                     <th
 

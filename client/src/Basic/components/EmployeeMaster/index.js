@@ -15,6 +15,7 @@ import {
   DropdownInput,
   TextArea,
   DateInput,
+  ReusableTable,
   DisabledInput,
   ToggleButton,
 } from "../../../Inputs";
@@ -54,7 +55,10 @@ import {
 import Mastertable from "../MasterTable/Mastertable";
 import imageDefault from "../../../assets/default-dp.png";
 import { HiPlus } from "react-icons/hi";
-
+import { useGetdesignationQuery } from "../../../redux/services/DesignationMasterService";
+import { useGetShiftTemplateMasterQuery } from "../../../redux/services/ShiftTemplateMaster";
+import { useGetStateQuery } from "../../../redux/services/StateMasterService";
+import { useGetCountriesQuery } from "../../../redux/services/CountryMasterService";
 
 const MODEL = "Employee Master";
 export default function Form() {
@@ -82,14 +86,14 @@ export default function Form() {
   const [permAddress, setPermAddress] = useState("");
   const [permCity, setPermCity] = useState("");
   const [permPincode, setPermPincode] = useState("");
-  const [email, setEmail] = useState("");
+
   const [maritalStatus, setMaritalStatus] = useState("");
   const [consultFee, setConsultFee] = useState("");
   const [accountNo, setAccountNo] = useState("");
   const [ifscNo, setIfscNo] = useState("");
   const [branchName, setBranchName] = useState("");
   const [bloodGroup, setBloodGroup] = useState("");
-  const [department, setDepartment] = useState("");
+  // const [department, setDepartment] = useState("");
   const [employeeCategory, setEmployeeCategory] = useState("");
   const [permanent, setPermanent] = useState("");
   const [active, setActive] = useState(true);
@@ -115,8 +119,8 @@ export default function Form() {
   const [weight, setWeight] = useState("");
   const [payCategory, setPayCategory] = useState("");
   const [idNumber, setIdNumber] = useState("");
-  const [desigination, setDesigination] = useState("");
-  const [shiftTemplate, setShiftTemplate] = useState("");
+  const [desiginationId, setDesignationId] = useState("");
+  const [shiftTemplateId, setShiftTemplateId] = useState("");
   const [salaryMethod, setSalaryMethod] = useState("");
   const [pf, setPf] = useState("");
   const [religion, setReligion] = useState("");
@@ -125,23 +129,25 @@ export default function Form() {
   const [uanNo, setUanNo] = useState("");
   const [salary, setSalary] = useState("");
   const [esi, setEsi] = useState("");
+  const [email, setEmail] = useState("");
+  const [departmentId, setDepartmentId] = useState("");
 
   const [presentAddress, setPresentAddress] = useState({
     address: "",
-    city: "",
+    cityId: "",
     village: "",
-    state: "",
-    country: "",
+    stateId: "",
+    countryId: "",
     pincode: "",
     mobile: "",
   });
 
   const [permanentAddress, setPermanentAddress] = useState({
     address: "",
-    city: "",
+    cityId: "",
     village: "",
-    state: "",
-    country: "",
+    stateId: "",
+    countryId: "",
     pincode: "",
     mobile: "",
   });
@@ -167,22 +173,26 @@ export default function Form() {
   const companyId = secureLocalStorage.getItem(
     sessionStorage.getItem("sessionId") + "userCompanyId"
   );
-  const {
-    data: cityList,
-    isLoading: cityLoading,
-    isFetching: cityFetching,
-  } = useGetCityQuery({ params });
+  const { data: cityList } = useGetCityQuery({ params });
+
+  const { data: stateList } = useGetStateQuery({ params });
+
+  const { data: countryList } = useGetCountriesQuery({ params });
 
   const { data: employeeCategoryList } = useGetEmployeeCategoryQuery({
     params: companyId,
   });
 
-  const { data: departmentList } = useGetDepartmentQuery({ params });
+  const { data: desigination } = useGetdesignationQuery({ params });
+
+  const { data: department } = useGetDepartmentQuery({ params });
   const {
     data: allData,
     isLoading,
     isFetching,
   } = useGetEmployeeQuery({ params, searchParams: searchValue });
+
+  const { data: shiftTemplate } = useGetShiftTemplateMasterQuery({ params });
 
   const isCurrentEmployeeDoctor = (employeeCategory) =>
     employeeCategoryList.data
@@ -237,7 +247,7 @@ export default function Form() {
         setAccountNo("");
         setIfscNo("");
         setBloodGroup("");
-        setDepartment("");
+        setDepartmentId("");
         setImage(null);
         setEmployeeCategory("");
         setPermanent("");
@@ -279,7 +289,7 @@ export default function Form() {
       setIfscNo(data?.ifscNo || "");
       // setbranchName(data?.branchName || "");
       setBloodGroup(data?.bloodGroup || "");
-      setDepartment(data?.department?.id || "");
+      setDepartmentId(data?.departmentId || "");
       setImage(data?.imageBase64 ? viewBase64String(data?.imageBase64) : null);
       setEmployeeCategory(data?.employeeCategoryId || "");
       setPermanent(data?.permanent || "");
@@ -323,12 +333,12 @@ export default function Form() {
     maritalStatus,
 
     joiningDate,
-    department,
+    departmentId,
     employeeCategory,
     payCategory,
     idNumber,
-    desigination,
-    shiftTemplate,
+    desiginationId,
+    shiftTemplateId,
     pf,
     esi,
     salary,
@@ -521,7 +531,7 @@ export default function Form() {
     setIfscNo("");
     // setbranchName("");
     setBloodGroup("");
-    setDepartment("");
+    setDepartmentId("");
     setImage(null);
     setEmployeeCategory("");
     setPermanent("");
@@ -530,6 +540,17 @@ export default function Form() {
     setLeavingReason("");
     setCanRejoin(false);
     setRejoinReason("");
+    setPresentAddress("")
+    setPermAddress('')
+      setBankDetails([
+    { Sno: "", bankName: "", branchName: "", acountNumber: "", ifscCode: "" }
+  ]);
+  setEducationDetails([
+    { Sno: "", courseName: "", universityName: "", institutionName: "", yearOfPass: "" }
+  ]);
+  setFamilyDetails([
+    { Sno: "", name: "", dob: "", age: "", relationShip: "", occupation: "", nominee: "" }
+  ]);
   };
 
   function onDataClick(id) {
@@ -608,8 +629,7 @@ export default function Form() {
   const [educationDetails, setEducationDetails] = useState([]);
   const [familyDetails, setFamilyDetails] = useState([]);
 
-  console.log(familyDetails,"familyDetails");
-  
+  console.log(familyDetails, "familyDetails");
 
   useEffect(() => {
     if (bankDetails?.length >= 1) return;
@@ -684,7 +704,7 @@ export default function Form() {
       ...prev,
 
       {
-         Sno: "",
+        Sno: "",
         name: "",
         dob: "",
         age: "",
@@ -737,14 +757,46 @@ export default function Form() {
     if (readOnly) return toast.error("Turn on Edit Mode...");
 
     setFamilyDetails((prev) => {
-      const updated = structuredClone(prev); 
+      const updated = structuredClone(prev);
       updated.splice(rowIndex, 1);
       return updated;
     });
 
     console.log("FamilyDetails updated after delete");
   }
+  const handleView = (id) => {
+    setId(id);
+    setForm(true);
+    setReadOnly(true);
+    console.log("view");
+  };
+  const handleEdit = (id) => {
+    setId(id);
+    setForm(true);
+    setReadOnly(false);
+    console.log("Edit");
+  };
+  const columns = [
+    {
+      header: "S.No",
+      accessor: (item, index) => index + 1,
+      className: "font-medium text-gray-900 w-12  text-center",
+    },
 
+    {
+      header: "Employee Name",
+      accessor: (item) => item?.name,
+      //   cellClass: () => "font-medium  text-gray-900",
+      className: "font-medium text-gray-900 text-center uppercase w-72",
+    },
+
+    {
+      header: "",
+      accessor: (item) => "",
+      //   cellClass: () => "font-medium text-gray-900",
+      className: "font-medium text-gray-900 uppercase w-[75%]",
+    },
+  ];
   const handleCheckboxChange = (e) => {
     const checked = e.target.checked;
     setSameAsPresent(checked);
@@ -753,28 +805,60 @@ export default function Form() {
     } else {
       setPermanentAddress({
         address: "",
-        city: "",
+        cityId: "",
         village: "",
-        state: "",
-        country: "",
+        stateId: "",
+        countryId: "",
         pincode: "",
         mobile: "",
       }); // clear when unchecked
     }
   };
+  console.log(presentAddress, "presentAddress");
+
+  console.log(permanentAddress, "permanentAddress");
 
   const handlePresentChange = (field, value) => {
     setPresentAddress((prev) => {
       const updated = { ...prev, [field]: value };
+      // if (field === "cityId") {
+      //   updated.cityName =
+      //     cityList?.data?.find((c) => c.id === value)?.name || "";
+      // }
+      // if (field === "stateId") {
+      //   updated.stateName =
+      //     stateList?.data?.find((s) => s.id === value)?.name || "";
+      // }
+      // if (field === "countryId") {
+      //   updated.countryName =
+      //     countryList?.data?.find((c) => c.id === value)?.name || "";
+      // }
       if (sameAsPresent) {
-        setPermanentAddress(updated); // keep permanent in sync
+        setPermanentAddress(updated);
       }
       return updated;
     });
   };
 
   const handlePermanentChange = (field, value) => {
-    setPermanentAddress((prev) => ({ ...prev, [field]: value }));
+    setPermanentAddress((prev) => {
+      const updated = { ...prev, [field]: value };
+
+      // if (field === "cityId") {
+      //   updated.cityName =
+      //     cityList?.data?.find((c) => c.id === value)?.name || "";
+      // }
+      // if (field === "stateId") {
+      //   updated.stateName =
+      //     stateList?.data?.find((s) => s.id === value)?.name || "";
+      // }
+      // if (field === "countryId") {
+      //   updated.countryName =
+      //     countryList?.data?.find((c) => c.id === value)?.name || "";
+      // }
+
+      return updated;
+    });
   };
 
   return (
@@ -820,6 +904,18 @@ export default function Form() {
           </div>
         </div>
       </div>
+      
+        <div className="bg-white w-full rounded-xl shadow-sm overflow-hidden mt-3">
+          <ReusableTable
+            columns={columns}
+            data={allData?.data}
+            onView={handleView}
+            onEdit={handleEdit}
+            onDelete={deleteData}
+            itemsPerPage={10}
+          />
+        </div>
+      
 
       {form && (
         <Modal
@@ -908,7 +1004,7 @@ export default function Form() {
                   "Contact Details",
                   "Bank Details",
                   "Education Details",
-                  "Family Details"
+                  "Family Details",
                 ].map((tabNumber) => (
                   <button
                     key={tabNumber}
@@ -1034,6 +1130,23 @@ export default function Form() {
                         )}
                       </div>{" "}
                       <div className="col-span-1">
+                        <DateInput
+                          ref={input1Ref}
+                          name="Date of Birth"
+                          value={dob}
+                          setValue={setDob}
+                          required={true}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                        />
+                        {errors.name && (
+                          <span className="text-red-500 text-xs ml-1">
+                            {errors.name}
+                          </span>
+                        )}
+                      </div>{" "}
+                      <div className="col-span-1">
                         <DropdownInput
                           ref={input1Ref}
                           name="Gender"
@@ -1087,23 +1200,6 @@ export default function Form() {
                         )}
                       </div>{" "}
                       <div className="col-span-1">
-                        <DateInput
-                          ref={input1Ref}
-                          name="Date of Birth"
-                          value={dob}
-                          setValue={setDob}
-                          required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                        />
-                        {errors.name && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.name}
-                          </span>
-                        )}
-                      </div>{" "}
-                      <div className="col-span-1">
                         <DropdownInput
                           ref={input1Ref}
                           name="Blood Group"
@@ -1121,7 +1217,7 @@ export default function Form() {
                           </span>
                         )}
                       </div>{" "}
-                       <div className="col-span-1">
+                      <div className="col-span-1">
                         <DropdownInput
                           ref={input1Ref}
                           name="Marital Status"
@@ -1173,7 +1269,6 @@ export default function Form() {
                           </span>
                         )}
                       </div>{" "}
-                     
                     </div>
                   </div>
                 )}
@@ -1200,12 +1295,17 @@ export default function Form() {
                           )}
                         </div>
                         <div className="col-span-1">
-                          <TextInput
+                          <DropdownInput
                             ref={input1Ref}
-                            name="Department"
-                            value={department}
-                            setValue={setDepartment}
-                            required={true}
+                            name="Choose Department"
+                            value={departmentId}
+                            setValue={setDepartmentId}
+                            options={dropDownListObject(
+                              department?.data,
+                              "name",
+                              "id"
+                            )}
+                            // required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
@@ -1275,12 +1375,17 @@ export default function Form() {
                         </div>
 
                         <div className="col-span-1">
-                          <TextInput
+                          <DropdownInput
                             ref={input1Ref}
-                            name="Designation"
-                            value={desigination}
-                            setValue={setDesigination}
-                            required={true}
+                            name="Choose Designation"
+                            value={desiginationId}
+                            setValue={setDesignationId}
+                            options={dropDownListObject(
+                              desigination?.data,
+                              "name",
+                              "id"
+                            )}
+                            // required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
@@ -1293,12 +1398,17 @@ export default function Form() {
                         </div>
 
                         <div className="col-span-1">
-                          <TextInput
+                          <DropdownInput
                             ref={input1Ref}
-                            name="Shift Template"
-                            value={shiftTemplate}
-                            setValue={setShiftTemplate}
-                            required={true}
+                            name="Choose Shift Template"
+                            value={shiftTemplateId}
+                            setValue={setShiftTemplateId}
+                            options={dropDownListObject(
+                              shiftTemplate?.data,
+                              "name",
+                              "id"
+                            )}
+                            // required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
@@ -1484,6 +1594,21 @@ export default function Form() {
                           </span>
                         )}
                       </div>
+                      <div>
+                        <TextInput
+                          name="Email"
+                          value={email}
+                          setValue={setEmail}
+                          required
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                        />
+                        {errors.fatherName && (
+                          <span className="text-red-500 text-xs ml-1">
+                            {errors.fatherName}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -1514,23 +1639,6 @@ export default function Form() {
                           </div>
                           <div className="col-span-1">
                             <TextInput
-                              name="City"
-                              value={presentAddress.city}
-                              setValue={(val) =>
-                                handlePresentChange("city", val)
-                              }
-                              required
-                              readOnly={readOnly}
-                              disabled={childRecord.current > 0}
-                            />
-                            {errors.city && (
-                              <span className="text-red-500 text-xs ml-1">
-                                {errors.city}
-                              </span>
-                            )}
-                          </div>
-                          <div className="col-span-1">
-                            <TextInput
                               name="Village"
                               value={presentAddress.village}
                               setValue={(val) =>
@@ -1542,28 +1650,77 @@ export default function Form() {
                             />
                           </div>
                           <div className="col-span-1">
-                            <TextInput
-                              name="State"
-                              value={presentAddress.state}
+                            <DropdownInput
+                              ref={input1Ref}
+                              name="Choose City"
+                              value={presentAddress.cityId}
                               setValue={(val) =>
-                                handlePresentChange("state", val)
+                                handlePresentChange("cityId", val)
                               }
-                              required
+                              options={dropDownListObject(
+                                cityList?.data,
+                                "name",
+                                "id"
+                              )}
+                              // required={true}
                               readOnly={readOnly}
                               disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
+                            {errors.name && (
+                              <span className="text-red-500 text-xs ml-1">
+                                {errors.name}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="col-span-1">
+                            <DropdownInput
+                              ref={input1Ref}
+                              name="Choose State"
+                              value={presentAddress.stateId}
+                              setValue={(val) =>
+                                handlePresentChange("stateId", val)
+                              }
+                              options={dropDownListObject(
+                                stateList?.data,
+                                "name",
+                                "id"
+                              )}
+                              // required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                            {errors.name && (
+                              <span className="text-red-500 text-xs ml-1">
+                                {errors.name}
+                              </span>
+                            )}
                           </div>
                           <div className="col-span-1">
-                            <TextInput
-                              name="Country"
-                              value={presentAddress.country}
+                            <DropdownInput
+                              ref={input1Ref}
+                              name="Choose Country"
+                              value={presentAddress.countryId}
                               setValue={(val) =>
-                                handlePresentChange("country", val)
+                                handlePresentChange("countryId", val)
                               }
-                              required
+                              options={dropDownListObject(
+                                countryList?.data,
+                                "name",
+                                "id"
+                              )}
+                              // required={true}
                               readOnly={readOnly}
                               disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
+                            {errors.name && (
+                              <span className="text-red-500 text-xs ml-1">
+                                {errors.name}
+                              </span>
+                            )}
                           </div>
                           <div className="col-span-1">
                             <TextInput
@@ -1623,20 +1780,6 @@ export default function Form() {
                           </div>
                           <div className="col-span-1">
                             <TextInput
-                              name="City"
-                              value={permanentAddress.city}
-                              setValue={(val) =>
-                                handlePermanentChange("city", val)
-                              }
-                              required
-                              readOnly={readOnly}
-                              disabled={
-                                childRecord.current > 0 || sameAsPresent
-                              }
-                            />
-                          </div>
-                          <div className="col-span-1">
-                            <TextInput
                               name="Village"
                               value={permanentAddress.village}
                               setValue={(val) =>
@@ -1650,31 +1793,58 @@ export default function Form() {
                             />
                           </div>
                           <div className="col-span-1">
-                            <TextInput
-                              name="State"
-                              value={permanentAddress.state}
+                            <DropdownInput
+                              name="Choose City"
+                              value={permanentAddress.cityId}
                               setValue={(val) =>
-                                handlePermanentChange("state", val)
+                                handlePermanentChange("cityId", val)
                               }
-                              required
-                              readOnly={readOnly}
-                              disabled={
-                                childRecord.current > 0 || sameAsPresent
+                              options={dropDownListObject(
+                                cityList?.data,
+                                "name",
+                                "id"
+                              )}
+                              // readOnly={readOnly}
+                              // disabled={
+                              //   childRecord.current > 0 || sameAsPresent
+                              // }
+                            />
+                          </div>
+
+                          <div className="col-span-1">
+                            <DropdownInput
+                              name="Choose State"
+                              value={permanentAddress.stateId}
+                              setValue={(val) =>
+                                handlePermanentChange("stateId", val)
                               }
+                              options={dropDownListObject(
+                                stateList?.data,
+                                "name",
+                                "id"
+                              )}
+                              // readOnly={readOnly}
+                              // disabled={
+                              //   childRecord.current > 0 || sameAsPresent
+                              // }
                             />
                           </div>
                           <div className="col-span-1">
-                            <TextInput
-                              name="Country"
-                              value={permanentAddress.country}
+                            <DropdownInput
+                              name="Choose Country"
+                              value={permanentAddress.countryId}
                               setValue={(val) =>
-                                handlePermanentChange("country", val)
+                                handlePermanentChange("countryId", val)
                               }
-                              required
-                              readOnly={readOnly}
-                              disabled={
-                                childRecord.current > 0 || sameAsPresent
-                              }
+                              options={dropDownListObject(
+                                countryList?.data,
+                                "name",
+                                "id"
+                              )}
+                              // readOnly={readOnly}
+                              // disabled={
+                              //   childRecord.current > 0 || sameAsPresent
+                              // }
                             />
                           </div>
                           <div className="col-span-1">
