@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 async function get(req) {
   const { branchId, active } = req.query;
-  const data = await prisma.employeeSubCategory.findMany({
+  const data = await prisma.employeSubCategory.findMany({
     where: {
       // active: active ? Boolean(active) : undefined,
       branchId: branchId ? parseInt(branchId) : undefined,
@@ -23,7 +23,7 @@ async function get(req) {
 }
 
 async function getOne(id) {
-  const data = await prisma.employeeSubCategory.findUnique({
+  const data = await prisma.employeSubCategory.findUnique({
     where: {
       id: parseInt(id),
     }, include: {
@@ -42,7 +42,7 @@ async function getOne(id) {
 async function getSearch(req) {
   const { branchId, active } = req.query;
   const { searchKey } = req.params;
-  const data = await prisma.employeeSubCategory.findMany({
+  const data = await prisma.employeSubCategory.findMany({
     where: {
       branchId: branchId ? parseInt(branchId) : undefined,
       // active: active ? Boolean(active) : undefined,
@@ -67,7 +67,7 @@ async function create(body) {
   const { gradeName, active, employeeCategoryId, branchId, companyId } =
     await body;
 
-  const data = await prisma.employeeSubCategory.create({
+  const data = await prisma.employeSubCategory.create({
     data: {
       gradeName,
       active,
@@ -84,13 +84,13 @@ async function create(body) {
 async function update(id, body) {
   const { gradeName, active, employeeCategoryId, branchId, companyId } =
     await body;
-  const dataFound = await prisma.employeeSubCategory.findUnique({
+  const dataFound = await prisma.employeSubCategory.findUnique({
     where: {
       id: parseInt(id),
     },
   });
   if (!dataFound) return NoRecordFound("Employee Category");
-  const data = await prisma.employeeSubCategory.update({
+  const data = await prisma.employeSubCategory.update({
     where: {
       id: parseInt(id),
     },
@@ -108,7 +108,7 @@ async function update(id, body) {
 }
 
 async function remove(id) {
-  const data = await prisma.employeeSubCategory.delete({
+  const data = await prisma.employeSubCategory.delete({
     where: {
       id: parseInt(id),
     },

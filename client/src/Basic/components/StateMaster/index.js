@@ -123,7 +123,9 @@ export default function Form() {
         didOpen: () => {
           Swal.showLoading();
         }
-      }); dispatch({
+      });
+      setForm(false);
+      dispatch({
         type: `countryMaster/invalidateTags`,
         payload: ["Countries"],
       });
