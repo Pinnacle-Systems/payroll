@@ -204,57 +204,90 @@ model User {
 }
 
 model Employee {
-  id                 Int               @id @default(autoincrement())
-  name               String?
-  email              String?           @unique
-  regNo              String?           @unique
-  chamberNo          String?
-  department         Department?       @relation(fields: [departmentId], references: [id])
-  departmentId       Int?
-  designation        Designation?      @relation(fields: [designationId], references: [id])
-  designationId      Int?
-  joiningDate        DateTime?
-  fatherName         String?
-  dob                DateTime?
-  gender             Gender?
-  maritalStatus      MaritalStatus?
-  bloodGroup         BloodGroup?
-  panNo              String?
-  consultFee         String?
-  salaryPerMonth     String?
-  commissionCharges  String?
-  mobile             BigInt?
-  accountNo          String?
-  ifscNo             String?
-  branchName         String?
-  degree             String?
-  specialization     String?
-  localAddress       String?
-  localCity          City?             @relation("localCity", fields: [localCityId], references: [id])
-  localCityId        Int?
-  localPincode       Int?
-  permAddress        String?
-  permCity           City?             @relation("permCity", fields: [permCityId], references: [id])
-  permCityId         Int?
-  permPincode        Int?
-  active             Boolean?          @default(true)
-  image              Bytes?            @db.LongBlob
-  Branch             Branch?           @relation(fields: [branchId], references: [id])
-  branchId           Int?
-  EmployeeCategory   EmployeeCategory? @relation(fields: [employeeCategoryId], references: [id])
-  employeeCategoryId Int?
-  permanent          Boolean?          @default(false)
-  leavingReason      String?
-  leavingDate        DateTime?
-  canRejoin          Boolean?          @default(true)
-  rejoinReason       String?
-  createdAt          DateTime?         @default(now())
-  updatedAt          DateTime?         @updatedAt
-  createdBy          User?             @relation("createdBy", fields: [createdById], references: [id])
-  createdById        Int?
-  updatedBy          User?             @relation("updatedBy", fields: [updatedById], references: [id])
-  updatedById        Int?
-  User               User[]
+  id                       Int                        @id @default(autoincrement())
+  name                     String?
+  employeeType             String?
+  middleName               String?
+  lastName                 String?
+  email                    String?                    @unique
+  fatherName               String?
+  motherName               String?
+  gender                   String?
+  disability               String?
+  identificationMark       String?
+  dob                      DateTime?
+  bloodGroup               String?
+  height                   String?
+  weight                   String?
+  maritalStatus            String?
+  joiningDate              DateTime?
+  payCategory              String?
+  idNumber                 Int?
+  desigination             String?
+  shiftTemplate            Int?
+  pf                       String?
+  esi                      String?
+  salary                   String?
+  aadharNo                 String?
+  panNo                    String?
+  esiNo                    String?
+  pfNo                     String?
+  uanNo                    String?
+  permanentAddress         String?
+  permanentCity            String?
+  permanentVillage         String?
+  permanentState           String?
+  permanentCountry         String?
+  permanentPincode         String?
+  permanentMobile          String?
+  currentAddress           String?
+  currentVillage           String?
+  currentState             String?
+  currentCountry           String?
+  currentPincode           String?
+  currentMobile            String?
+  department               Department?                @relation(fields: [departmentId], references: [id])
+  departmentId             Int?
+  designation              Designation?               @relation(fields: [designationId], references: [id])
+  designationId            Int?
+  permanenetCity           City?                      @relation("permanentCityId", fields: [permanentCityId], references: [id])
+  permanentCityId          Int?
+  currentCity              City?                      @relation("currentCity", fields: [currentCityId], references: [id])
+  currentCityId            Int?
+  Branch                   Branch?                    @relation(fields: [branchId], references: [id])
+  branchId                 Int?
+  EmployeeCategory         EmployeeCategory?          @relation(fields: [employeeCategoryId], references: [id])
+  employeeCategoryId       Int?
+  createdBy                User?                      @relation("createdBy", fields: [createdById], references: [id])
+  createdById              Int?
+  updatedBy                User?                      @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById              Int?
+  User                     User[]
+  EmployeeBankDetails      EmployeeBankDetails[]
+  EmployeeEducationdetails EmployeeEducationDetails[]
+  EmployeeFamilyDetails    EmployeeFamilyDetails[]
+}
+
+model EmployeeBankDetails {
+  id            Int       @id @default(autoincrement())
+  employee      Employee? @relation(fields: [employeeId], references: [id])
+  employeeId    Int?
+  bankName      String?
+  branchName    String?
+  accountNumber String?
+  ifscCode      String?
+}
+
+model EmployeeEducationDetails {
+  id         Int       @id @default(autoincrement())
+  employee   Employee? @relation(fields: [employeeId], references: [id])
+  employeeId Int?
+}
+
+model EmployeeFamilyDetails {
+  id         Int       @id @default(autoincrement())
+  employee   Employee? @relation(fields: [employeeId], references: [id])
+  employeeId Int?
 }
 
 model FinYear {
@@ -309,8 +342,8 @@ model City {
   state           State?           @relation(fields: [stateId], references: [id])
   stateId         Int?
   active          Boolean?         @default(true)
-  doctorLocalCity Employee[]       @relation(name: "localCity")
-  doctorPermCity  Employee[]       @relation(name: "permCity")
+  doctorLocalCity Employee[]       @relation(name: "permanentCityId")
+  doctorPermCity  Employee[]       @relation(name: "currentCity")
   Party           Party[]
   PartyMasterNew  PartyMasterNew[]
 }
