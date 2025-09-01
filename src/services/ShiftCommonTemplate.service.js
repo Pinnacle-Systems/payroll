@@ -36,8 +36,8 @@ async function getNextDocId(
   const code = (
     typeof isTaxBill === "undefined" ? undefined : JSON.parse(isTaxBill)
   )
-    ? "TEM"
-    : "TEM";
+    ? "COM/TEM"
+    : "COM/TEM";
   const branchObj = await getTableRecordWithId(branchId, "branch");
   // let newDocId = `${branchObj.branchCode}/${shortCode}/${code}/1`;
   let newDocId = `${branchObj.branchCode}/${code}/1`;

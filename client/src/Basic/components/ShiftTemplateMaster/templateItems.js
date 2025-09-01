@@ -105,12 +105,14 @@ const TemplateItems = ({
                                         name="Doc Id"
                                         type="text"
                                         value={docId}
-                                        setValue={setDocId}
+                                        // setValue={setDocId}
                                         required={true}
-                                        // readOnly={readOnly}
-                                        disabled={true}
+                                        readOnly={readOnly}
+                                       disabled={childRecord.current > 0}
                                     />
                                 </div>
+                               {console.log(docId,"docIdreceived")}
+                                
                                 <div className="">
                                     <DropdownInput
                                         name="Category"

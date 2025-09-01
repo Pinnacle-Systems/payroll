@@ -204,56 +204,65 @@ model User {
 }
 
 model Employee {
-  id                       Int                        @id @default(autoincrement())
-  name                     String?
-  employeeType             String?
-  middleName               String?
-  lastName                 String?
-  email                    String?                    @unique
-  fatherName               String?
-  motherName               String?
-  gender                   String?
-  disability               String?
-  identificationMark       String?
-  dob                      DateTime?
-  bloodGroup               String?
-  height                   String?
-  weight                   String?
-  maritalStatus            String?
-  joiningDate              DateTime?
-  payCategory              String?
-  idNumber                 Int?
-  desigination             String?
-  shiftTemplate            Int?
-  pf                       String?
-  esi                      String?
-  salary                   String?
-  aadharNo                 String?
-  panNo                    String?
-  esiNo                    String?
-  pfNo                     String?
-  uanNo                    String?
-  permanentAddress         String?
-  permanentCity            String?
-  permanentVillage         String?
-  permanentState           String?
-  permanentCountry         String?
-  permanentPincode         String?
-  permanentMobile          String?
-  currentAddress           String?
-  currentVillage           String?
-  currentState             String?
-  currentCountry           String?
-  currentPincode           String?
-  currentMobile            String?
-  department               Department?                @relation(fields: [departmentId], references: [id])
-  departmentId             Int?
-  designation              Designation?               @relation(fields: [designationId], references: [id])
-  designationId            Int?
-  permanenetCity           City?                      @relation("permanentCityId", fields: [permanentCityId], references: [id])
-  permanentCityId          Int?
-  currentCity              City?                      @relation("currentCity", fields: [currentCityId], references: [id])
-  currentCityId            Int?
+  id                 Int       @id @default(autoincrement())
+  firstName          String?
+  employeeType       String?
+  middleName         String?
+  lastName           String?
+  email              String?   @unique
+  fatherName         String?
+  motherName         String?
+  gender             String?
+  disability         String?
+  identificationMark String?
+  dob                DateTime?
+  bloodGroup         String?
+  height             String?
+  weight             String?
+  maritalStatus      String?
+  joiningDate        DateTime?
+  payCategory        String?
+
+  pf               String?
+  esi              String?
+  salary           String?
+  aadharNo         String?
+  panNo            String?
+  esiNo            String?
+  pfNo             String?
+  uanNo            String?
+  salaryMethod     String?
+  religion         String?
+  idNumber         String?
+  permanentAddress String?
+  permanentVillage String?
+  permanentPincode String?
+  permanentMobile  String?
+
+  presentAddress String?
+  presentVillage String?
+  presentPincode String?
+  presentMobile  String?
+
+  shiftTemplate      ShiftTemplate? @relation(fields: [shiftTemplateId], references: [id])
+  shiftTemplateId    Int?
+  department         Department?    @relation(fields: [departmentId], references: [id])
+  departmentId       Int?
+  designation        Designation?   @relation(fields: [designationId], references: [id])
+  designationId      Int?
+  permanentCity      City?          @relation("permanentCityId", fields: [permanentCityId], references: [id])
+  permanentCityId    Int?
+  presentCity        City?          @relation("presentCityId", fields: [presentCityId], references: [id])
+  presentCityId      Int?
+  presentCountry     Country?       @relation("PresentCountryId", fields: [presentCountryId], references: [id])
+  presentCountryId   Int?
+  permanentCountry   Country?       @relation("PermanentCountryId", fields: [permanentCountryId], references: [id])
+  permanentCountryId Int?
+  presentState       State?         @relation("PresentStateId", fields: [presentStateId], references: [id])
+  presentStateId     Int?
+  permanentState     State?         @relation("PermanentStateId", fields: [permanentStateId], references: [id])
+  permanentStateId   Int?
+
   Branch                   Branch?                    @relation(fields: [branchId], references: [id])
   branchId                 Int?
   EmployeeCategory         EmployeeCategory?          @relation(fields: [employeeCategoryId], references: [id])
@@ -315,24 +324,28 @@ model EmployeeCategory {
 }
 
 model Country {
-  id        Int     @id @default(autoincrement())
-  name      String
-  code      String
-  state     State[]
-  active    Boolean @default(true)
-  Company   Company @relation(fields: [companyId], references: [id])
-  companyId Int
+  id                    Int        @id @default(autoincrement())
+  name                  String
+  code                  String
+  state                 State[]
+  active                Boolean    @default(true)
+  Company               Company    @relation(fields: [companyId], references: [id])
+  companyId             Int
+  employeePresentCity   Employee[] @relation(name: "PresentCountryId")
+  employeePermanentCity Employee[] @relation(name: "PermanentCountryId")
 }
 
 model State {
-  id        Int     @id @default(autoincrement())
-  name      String
-  code      String
-  gstNo     String
-  country   Country @relation(fields: [countryId], references: [id])
-  countryId Int
-  city      City[]
-  active    Boolean @default(true)
+  id                     Int        @id @default(autoincrement())
+  name                   String
+  code                   String
+  gstNo                  String
+  country                Country    @relation(fields: [countryId], references: [id])
+  countryId              Int
+  city                   City[]
+  active                 Boolean    @default(true)
+  employeePresentState   Employee[] @relation(name: "PresentStateId")
+  employeePermanentState Employee[] @relation(name: "PermanentStateId")
 }
 
 model City {
@@ -343,7 +356,7 @@ model City {
   stateId         Int?
   active          Boolean?         @default(true)
   doctorLocalCity Employee[]       @relation(name: "permanentCityId")
-  doctorPermCity  Employee[]       @relation(name: "currentCity")
+  doctorPermCity  Employee[]       @relation(name: "presentCityId")
   Party           Party[]
   PartyMasterNew  PartyMasterNew[]
 }
@@ -1237,6 +1250,7 @@ model ShiftTemplate {
   active             Boolean?             @default(true)
   category           String?
   ShiftTemplateItems ShiftTemplateItems[]
+  Employee           Employee[]
 }
 
 model ShiftTemplateItems {

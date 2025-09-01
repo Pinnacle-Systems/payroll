@@ -16,7 +16,7 @@ async function getNextDocId(
   isTaxBill
 ) {
 
-  let lastObject = await prisma.ShiftTemplate.findFirst({
+  let lastObject = await prisma.shiftTemplate.findFirst({
     where: {
       branchId: parseInt(branchId),
     },
@@ -31,7 +31,7 @@ async function getNextDocId(
   // let newDocId = `${branchObj.branchCode}/${shortCode}/${code}/1`;
   let newDocId = `${code}/1`;
   if (lastObject) {
-    newDocId = `${code}/${parseInt(lastObject.docId.split("/").at(-1)) + 1
+    newDocId = `${code}/${parseInt(lastObject?.docId?.split("/").at(-1)) + 1
       }`;
   }
 
@@ -42,7 +42,7 @@ async function getNextDocId(
 async function get(req) {
   const { companyId, active, branchId, finYearId, searchDocId, } = req.query;
 
-  console.log(companyId, active, finYearId, "received");
+  console.log(companyId, active, finYearId, "received--");
 
   const data = await prisma.shiftTemplate.findMany({
 
@@ -64,11 +64,12 @@ async function get(req) {
 
   });
 
-
+  console.log(data,"datasending");
   let finYearDate = await getFinYearStartTimeEndTime(finYearId);
   const shortCode = finYearDate ? getYearShortCodeForFinYear(finYearDate?.startDateStartTime, finYearDate?.endDateEndTime) : "";
   let newDocId = finYearDate ? await getNextDocId(branchId, shortCode, finYearDate?.startDateStartTime, finYearDate?.endDateEndTime,) : "";
-
+ 
+ 
 
   return { statusCode: 0, nextDocId: newDocId, data };
 }
@@ -90,7 +91,7 @@ async function getOne(id) {
 async function getSearch(req) {
   const { searchKey } = req.params;
   const { companyId, active } = req.query;
-  const data = await prisma.ShiftTemplate.findMany({
+  const data = await prisma.shiftTemplate.findMany({
     where: {
       companyId: companyId ? parseInt(companyId) : undefined,
       active: active ? Boolean(active) : undefined,
@@ -118,7 +119,7 @@ async function create(body) {
   let data;
 
   await prisma.$transaction(async (tx) => {
-    data = await tx.ShiftTemplate.create({
+    data = await tx.shiftTemplate.create({
       data: {
         docId: docId,
 

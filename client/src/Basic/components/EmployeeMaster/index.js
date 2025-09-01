@@ -69,7 +69,7 @@ export default function Form() {
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
   const [panNo, setPanNo] = useState("");
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
   const [dob, setDob] = useState("");
   const [chamberNo, setChamberNo] = useState("");
   const [localAddress, setlocalAddress] = useState("");
@@ -94,7 +94,7 @@ export default function Form() {
   const [branchName, setBranchName] = useState("");
   const [bloodGroup, setBloodGroup] = useState("");
   // const [department, setDepartment] = useState("");
-  const [employeeCategory, setEmployeeCategory] = useState("");
+  const [employeeCategoryId, setEmployeeCategoryId] = useState("");
   const [permanent, setPermanent] = useState("");
   const [active, setActive] = useState(true);
   const [branchPrefixCategory, setBranchPrefixCategory] = useState("");
@@ -131,6 +131,9 @@ export default function Form() {
   const [esi, setEsi] = useState("");
   const [email, setEmail] = useState("");
   const [departmentId, setDepartmentId] = useState("");
+  const [bankDetails, setBankDetails] = useState([]);
+  const [educationDetails, setEducationDetails] = useState([]);
+  const [familyDetails, setFamilyDetails] = useState([]);
 
   const [presentAddress, setPresentAddress] = useState({
     address: "",
@@ -223,7 +226,7 @@ export default function Form() {
       if (!id) {
         setReadOnly(false);
         setPanNo("");
-        setName("");
+        setFirstName("");
         setFatherName("");
         setDob("");
         setChamberNo("");
@@ -249,7 +252,7 @@ export default function Form() {
         setBloodGroup("");
         setDepartmentId("");
         setImage(null);
-        setEmployeeCategory("");
+        setEmployeeCategoryId("");
         setPermanent("");
         setActive(true);
         setLeavingDate("");
@@ -260,7 +263,7 @@ export default function Form() {
       }
       setReadOnly(true);
       setPanNo(data?.panNo || "");
-      setName(data?.name || "");
+
       setFatherName(data?.fatherName || "");
       setDob(data?.dob ? moment.utc(data?.dob).format("YYYY-MM-DD") : "");
       setChamberNo(data?.chamberNo || "");
@@ -291,7 +294,7 @@ export default function Form() {
       setBloodGroup(data?.bloodGroup || "");
       setDepartmentId(data?.departmentId || "");
       setImage(data?.imageBase64 ? viewBase64String(data?.imageBase64) : null);
-      setEmployeeCategory(data?.employeeCategoryId || "");
+      setEmployeeCategoryId(data?.employeeCategoryId || "");
       setPermanent(data?.permanent || "");
       setActive(data?.active ? data?.active : true);
 
@@ -318,23 +321,24 @@ export default function Form() {
       sessionStorage.getItem("sessionId") + "currentBranchId"
     ),
     employeeType,
-    name,
+    firstName,
     middleName,
     lastName,
     fatherName,
     motherName,
+    dob,
     gender,
     disability,
     identificationMark,
-    dob,
+
     bloodGroup,
+    maritalStatus,
     height,
     weight,
-    maritalStatus,
 
     joiningDate,
     departmentId,
-    employeeCategory,
+    employeeCategoryId,
     payCategory,
     idNumber,
     desiginationId,
@@ -350,38 +354,41 @@ export default function Form() {
     esiNo,
     pfNo,
     uanNo,
+    email,
 
     presentAddress,
-    permanentAddress,
-    sameAsPresent,
+    permanentAddress: sameAsPresent ? presentAddress : permanentAddress,
 
-    chamberNo,
-    localAddress,
-    localCity,
-    localPincode,
-    mobile,
-    degree,
-    specialization,
-    salaryPerMonth,
-    commissionCharges,
-    permAddress,
-    permCity,
-    permPincode,
-    email,
-    consultFee,
-    accountNo,
-    ifscNo,
-    branchName,
-    ...(department && { department }),
-    employeeCategoryId: employeeCategory,
-    permanent,
-    active,
-    id,
-    leavingReason,
-    leavingDate,
-    canRejoin,
-    rejoinReason,
-    regNo,
+    // chamberNo,
+    // localAddress,
+    // localCity,
+    // localPincode,
+    // mobile,
+    // degree,
+    // specialization,
+    // salaryPerMonth,
+    // commissionCharges,
+    // permAddress,
+    // permCity,
+    // permPincode,
+
+    // consultFee,
+    // accountNo,
+    // ifscNo,
+    // branchName,
+
+    // permanent,
+    // active,
+    // id,
+    // leavingReason,
+    // leavingDate,
+    // canRejoin,
+    // rejoinReason,
+    // regNo,
+
+    bankDetails,
+    educationDetails,
+    familyDetails,
   };
 
   const handleSubmitCustom = async (callback, data, text) => {
@@ -389,7 +396,8 @@ export default function Form() {
       let returnData;
       const formData = new FormData();
       for (let key in data) {
-        formData.append(key, data[key]);
+        // formData.append(key, data[key]);
+        formData.append(key, JSON.stringify(data[key])); 
       }
       if (image instanceof File) {
         formData.append("image", image);
@@ -506,7 +514,7 @@ export default function Form() {
     setForm(true);
     setSearchValue("");
     setPanNo("");
-    setName("");
+    setFirstName("");
     setFatherName("");
     setDob("");
     setChamberNo("");
@@ -533,24 +541,38 @@ export default function Form() {
     setBloodGroup("");
     setDepartmentId("");
     setImage(null);
-    setEmployeeCategory("");
+    setEmployeeCategoryId("");
     setPermanent("");
     setActive(true);
     setLeavingDate("");
     setLeavingReason("");
     setCanRejoin(false);
     setRejoinReason("");
-    setPresentAddress("")
-    setPermAddress('')
-      setBankDetails([
-    { Sno: "", bankName: "", branchName: "", acountNumber: "", ifscCode: "" }
-  ]);
-  setEducationDetails([
-    { Sno: "", courseName: "", universityName: "", institutionName: "", yearOfPass: "" }
-  ]);
-  setFamilyDetails([
-    { Sno: "", name: "", dob: "", age: "", relationShip: "", occupation: "", nominee: "" }
-  ]);
+    setPresentAddress("");
+    setPermAddress("");
+    setBankDetails([
+      { Sno: "", bankName: "", branchName: "", acountNumber: "", ifscCode: "" },
+    ]);
+    setEducationDetails([
+      {
+        Sno: "",
+        courseName: "",
+        universityName: "",
+        institutionName: "",
+        yearOfPass: "",
+      },
+    ]);
+    setFamilyDetails([
+      {
+        Sno: "",
+        name: "",
+        dob: "",
+        age: "",
+        relationShip: "",
+        occupation: "",
+        nominee: "",
+      },
+    ]);
   };
 
   function onDataClick(id) {
@@ -625,9 +647,6 @@ export default function Form() {
     setStep(tabNumber);
     // }
   };
-  const [bankDetails, setBankDetails] = useState([]);
-  const [educationDetails, setEducationDetails] = useState([]);
-  const [familyDetails, setFamilyDetails] = useState([]);
 
   console.log(familyDetails, "familyDetails");
 
@@ -821,18 +840,7 @@ export default function Form() {
   const handlePresentChange = (field, value) => {
     setPresentAddress((prev) => {
       const updated = { ...prev, [field]: value };
-      // if (field === "cityId") {
-      //   updated.cityName =
-      //     cityList?.data?.find((c) => c.id === value)?.name || "";
-      // }
-      // if (field === "stateId") {
-      //   updated.stateName =
-      //     stateList?.data?.find((s) => s.id === value)?.name || "";
-      // }
-      // if (field === "countryId") {
-      //   updated.countryName =
-      //     countryList?.data?.find((c) => c.id === value)?.name || "";
-      // }
+
       if (sameAsPresent) {
         setPermanentAddress(updated);
       }
@@ -843,19 +851,6 @@ export default function Form() {
   const handlePermanentChange = (field, value) => {
     setPermanentAddress((prev) => {
       const updated = { ...prev, [field]: value };
-
-      // if (field === "cityId") {
-      //   updated.cityName =
-      //     cityList?.data?.find((c) => c.id === value)?.name || "";
-      // }
-      // if (field === "stateId") {
-      //   updated.stateName =
-      //     stateList?.data?.find((s) => s.id === value)?.name || "";
-      // }
-      // if (field === "countryId") {
-      //   updated.countryName =
-      //     countryList?.data?.find((c) => c.id === value)?.name || "";
-      // }
 
       return updated;
     });
@@ -881,20 +876,22 @@ export default function Form() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setView("table")}
-              className={`px-3 py-1 rounded-md text-xs flex items-center gap-1 ${view === "table"
+              className={`px-3 py-1 rounded-md text-xs flex items-center gap-1 ${
+                view === "table"
                   ? "bg-indigo-100 text-indigo-600"
                   : "text-gray-600 hover:bg-gray-100"
-                }`}
+              }`}
             >
               <Table size={16} />
               Table
             </button>
             <button
               onClick={() => setView("card")}
-              className={`px-3 py-1 rounded-md text-xs flex items-center gap-1 ${view === "card"
+              className={`px-3 py-1 rounded-md text-xs flex items-center gap-1 ${
+                view === "card"
                   ? "bg-indigo-100 text-indigo-600"
                   : "text-gray-600 hover:bg-gray-100"
-                }`}
+              }`}
             >
               <LayoutGrid size={16} />
               Cards
@@ -902,18 +899,17 @@ export default function Form() {
           </div>
         </div>
       </div>
-      
-        <div className="bg-white w-full rounded-xl shadow-sm overflow-hidden mt-3">
-          <ReusableTable
-            columns={columns}
-            data={allData?.data}
-            onView={handleView}
-            onEdit={handleEdit}
-            onDelete={deleteData}
-            itemsPerPage={10}
-          />
-        </div>
-      
+
+      <div className="bg-white w-full rounded-xl shadow-sm overflow-hidden mt-3">
+        <ReusableTable
+          columns={columns}
+          data={allData?.data}
+          onView={handleView}
+          onEdit={handleEdit}
+          onDelete={deleteData}
+          itemsPerPage={10}
+        />
+      </div>
 
       {form && (
         <Modal
@@ -938,10 +934,11 @@ export default function Form() {
 
                 {regNo && (
                   <span
-                    className={`px-2 py-0.5 text-xs text-bold rounded-full ${active
+                    className={`px-2 py-0.5 text-xs text-bold rounded-full ${
+                      active
                         ? "bg-green-100 text-green-800"
                         : "bg-red-100 text-red-800"
-                      }`}
+                    }`}
                   >
                     {regNo}
                   </span>
@@ -1007,10 +1004,11 @@ export default function Form() {
                     key={tabNumber}
                     onClick={() => handleTabClick(tabNumber)}
                     className={`px-3 py-1 field-text border-b-2 rounded-t-md transition-colors duration-200
-                ${step === tabNumber
-                        ? "border-b-2 border-secondary text-secondary font-semibold bg-white"
-                        : "border-b-2 border-transparent text-gray-500 hover:border-secondary hover:text-secondary"
-                      }`}
+                ${
+                  step === tabNumber
+                    ? "border-b-2 border-secondary text-secondary font-semibold bg-white"
+                    : "border-b-2 border-transparent text-gray-500 hover:border-secondary hover:text-secondary"
+                }`}
                   >
                     {tabNumber}
                   </button>
@@ -1044,8 +1042,8 @@ export default function Form() {
                         <TextInput
                           ref={input1Ref}
                           name="First Name"
-                          value={name}
-                          setValue={setName}
+                          value={firstName}
+                          setValue={setFirstName}
                           required={true}
                           readOnly={readOnly}
                           disabled={childRecord.current > 0}
@@ -1293,7 +1291,7 @@ export default function Form() {
                         <div className="col-span-1">
                           <DropdownInput
                             ref={input1Ref}
-                            name="Choose Department"
+                            name=" Department"
                             value={departmentId}
                             setValue={setDepartmentId}
                             options={dropDownListObject(
@@ -1317,8 +1315,8 @@ export default function Form() {
                           <DropdownInput
                             ref={input1Ref}
                             name="Employee Category"
-                            value={employeeCategory}
-                            setValue={setEmployeeCategory}
+                            value={employeeCategoryId}
+                            setValue={setEmployeeCategoryId}
                             options={dropDownListObject(
                               employeeCategoryList?.data,
                               "name",
@@ -1373,7 +1371,7 @@ export default function Form() {
                         <div className="col-span-1">
                           <DropdownInput
                             ref={input1Ref}
-                            name="Choose Designation"
+                            name=" Designation"
                             value={desiginationId}
                             setValue={setDesignationId}
                             options={dropDownListObject(
@@ -1396,12 +1394,12 @@ export default function Form() {
                         <div className="col-span-1">
                           <DropdownInput
                             ref={input1Ref}
-                            name="Choose Shift Template"
+                            name="Shift Template"
                             value={shiftTemplateId}
                             setValue={setShiftTemplateId}
                             options={dropDownListObject(
                               shiftTemplate?.data,
-                              "name",
+                              "docId",
                               "id"
                             )}
                             // required={true}
