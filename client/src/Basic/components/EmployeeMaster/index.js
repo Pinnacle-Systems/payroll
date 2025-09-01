@@ -163,15 +163,15 @@ export default function Form() {
     companyId: secureLocalStorage.getItem(
       sessionStorage.getItem("sessionId") + "userCompanyId"
     ),
-    finYearId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "currentFinYear"
-    ),
-    userId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userId"
-    ),
-    branchId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "currentBranchId"
-    ),
+    // finYearId: secureLocalStorage.getItem(
+    //   sessionStorage.getItem("sessionId") + "currentFinYear"
+    // ),
+    // userId: secureLocalStorage.getItem(
+    //   sessionStorage.getItem("sessionId") + "userId"
+    // ),
+    // branchId: secureLocalStorage.getItem(
+    //   sessionStorage.getItem("sessionId") + "currentBranchId"
+    // ),
   };
   const companyId = secureLocalStorage.getItem(
     sessionStorage.getItem("sessionId") + "userCompanyId"
@@ -193,7 +193,10 @@ export default function Form() {
     data: allData,
     isLoading,
     isFetching,
-  } = useGetEmployeeQuery({ params, searchParams: searchValue });
+  } = useGetEmployeeQuery({ params});
+
+  console.log(allData,"allData");
+  
 
   const { data: shiftTemplate } = useGetShiftTemplateMasterQuery({ params });
 
@@ -223,45 +226,8 @@ export default function Form() {
 
   const syncFormWithDb = useCallback(
     (data) => {
-      if (!id) {
-        setReadOnly(false);
-        setPanNo("");
-        setFirstName("");
-        setFatherName("");
-        setDob("");
-        setChamberNo("");
-        setlocalAddress("");
-        setLocalCity("");
-        setLocalPincode("");
-        setMobile("");
-        setDegree("");
-        setSpecialization("");
-        setSalaryPerMonth("");
-        setCommissionCharges("");
-        setGender("");
-        setRegNo("");
-        setJoiningDate("");
-        setPermAddress("");
-        setPermCity("");
-        setPermPincode("");
-        setEmail("");
-        setMaritalStatus("");
-        setConsultFee("");
-        setAccountNo("");
-        setIfscNo("");
-        setBloodGroup("");
-        setDepartmentId("");
-        setImage(null);
-        setEmployeeCategoryId("");
-        setPermanent("");
-        setActive(true);
-        setLeavingDate("");
-        setLeavingReason("");
-        setCanRejoin(false);
-        setRejoinReason("");
-        return;
-      }
-      setReadOnly(true);
+      
+      
       setPanNo(data?.panNo || "");
 
       setFatherName(data?.fatherName || "");
@@ -312,9 +278,33 @@ export default function Form() {
     [id]
   );
 
+  const cleanData = (obj) => {
+  if (!obj || typeof obj !== "object") return obj;
+
+  return Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => {
+      if (typeof value === "string") {
+        // Remove surrounding quotes and any extra quotes inside
+        let cleaned = value.replace(/^"+|"+$/g, ""); // remove leading/trailing quotes
+        cleaned = cleaned.replace(/"+/g, ""); // remove remaining quotes inside
+        return [key, cleaned];
+      } else if (typeof value === "object" && value !== null) {
+        return [key, cleanData(value)]; // recurse
+      }
+      return [key, value];
+    })
+  );
+};
+
+
+
   useEffect(() => {
-    syncFormWithDb(singleData?.data);
-  }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
+  if (singleData?.data) {
+    const cleanedData = cleanData(singleData.data);
+    syncFormWithDb(cleanedData);
+  }
+}, [singleData, syncFormWithDb]);
+
 
   const data = {
     branchId: secureLocalStorage.getItem(
@@ -462,7 +452,7 @@ export default function Form() {
     }
   };
 
-  const deleteData = async () => {
+  const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
         return;
@@ -804,7 +794,7 @@ export default function Form() {
 
     {
       header: "Employee Name",
-      accessor: (item) => item?.name,
+      accessor: (item) => item?.firstName,
       //   cellClass: () => "font-medium  text-gray-900",
       className: "font-medium text-gray-900 text-center uppercase w-72",
     },

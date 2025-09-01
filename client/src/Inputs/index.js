@@ -1500,7 +1500,10 @@ export const DropdownInput = ({
   country
 }) => {
   const handleOnChange = (e) => {
-    setValue(e.target.value);
+    const val = e.target.value;
+    // parseInt only if the value is numeric
+    const parsedValue = !isNaN(parseInt(val)) ? parseInt(val) : val;
+    setValue(parsedValue);
   };
 
   const isDisabled = readOnly || disabled;

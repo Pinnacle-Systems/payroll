@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Check, Power } from "lucide-react";
 import Swal from "sweetalert2";
+import { useGetEmployeeQuery } from "../../../redux/services/EmployeeMasterService";
 
 const MODEL = "Country Master";
 
@@ -280,7 +281,7 @@ export default function Form() {
     " ",
     " ",
   ];
-
+const { data : employee} = useGetEmployeeQuery({params})
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
       <div className="w-full flex bg-white p-1 justify-between  items-center">

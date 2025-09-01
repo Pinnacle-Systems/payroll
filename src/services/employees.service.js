@@ -3,6 +3,7 @@ import { NoRecordFound } from "../configs/Responses.js";
 import { exclude, base64Tobuffer } from "../utils/helper.js";
 import { getFinYearStartTimeEndTime } from "../utils/finYearHelper.js";
 import { getTableRecordWithId } from "../utils/helperQueries.js";
+import { logging } from "googleapis/build/src/apis/logging/index.js";
 
 const prisma = new PrismaClient();
 
@@ -133,10 +134,12 @@ async function getEmployeeId(branchId, startTime, endTime) {
 async function get(req) {
   const { branchId, active, employeeCategory, finYearId, companyId } =
     req.query;
-  const data = await xprisma.employee.findMany({
+  console.log("API Calls");
+
+  const data = await prisma.employee.findMany({
     where: {
-      // branchId: branchId ? parseInt(branchId) : undefined,
-      active: active ? Boolean(active) : undefined,
+      branchId: branchId ? parseInt(branchId) : undefined,
+      // active: active ? Boolean(active) : undefined,
       // EmployeeCategory: {
       //     name: employeeCategory
       // }
@@ -150,6 +153,7 @@ async function get(req) {
       EmployeeCategory: true,
     },
   });
+  console.log(data, "apidata");
 
   let finYearDate = await getFinYearStartTimeEndTime(finYearId);
   console.log(finYearDate, "finYearDate");
@@ -286,19 +290,22 @@ async function create(req) {
     educationDetails,
     familyDetails,
   } = await req.body;
+  const presentAddressObj = presentAddress ? JSON.parse(presentAddress) : {};
+  const permanentAddressObj = permanentAddress
+    ? JSON.parse(permanentAddress)
+    : {};
 
-  console.log(JSON.parse(presentAddress?.address),"req.body");
-  
+  console.log(req.body, "form");
 
   const data = await prisma.employee.create({
     data: {
-      branchId: branchId ? parseInt(branchId) : null,
-      shiftTemplateId: shiftTemplateId ? parseInt(shiftTemplateId) : null,
-      employeeCategoryId: employeeCategoryId
-        ? parseInt(employeeCategoryId)
-        : null,
-      designationId: desiginationId ? parseInt(desiginationId) : null,
-      departmentId: departmentId ? parseInt(departmentId) : null,
+      // branchId: branchId ? parseInt(branchId) : null,
+      // shiftTemplateId: shiftTemplateId ? parseInt(shiftTemplateId) : null,
+      // employeeCategoryId: employeeCategoryId
+      //   ? parseInt(employeeCategoryId)
+      //   : null,
+      // designationId: desiginationId ? parseInt(desiginationId) : null,
+      // departmentId: departmentId ? parseInt(departmentId) : null,
       employeeType,
       firstName,
       middleName,
@@ -330,42 +337,92 @@ async function create(req) {
       pfNo,
       email,
       uanNo,
-      presentAddress: presentAddress?.address  ? JSON.parse(presentAddress?.address) : "",
-      presentVillage: presentAddress?.village || "",
-      presentCityId: presentAddress?.cityId
-        ? parseInt(presentAddress.cityId)
-        : null,
-      presentStateId: presentAddress?.stateId
-        ? parseInt(presentAddress.stateId)
-        : null,
-      presentCountryId: presentAddress?.countryId
-        ? parseInt(presentAddress.countryId)
-        : null,
-      presentPincode: presentAddress?.pincode || "",
-      presentMobile: presentAddress?.mobile || "",
 
-      permanentAddress:
-        permanentAddress?.address || presentAddress?.address || "",
-      permanentVillage:
-        permanentAddress?.village || presentAddress?.village || "",
-      permanentCityId: permanentAddress?.cityId
-        ? parseInt(permanentAddress.cityId)
-        : presentAddress?.cityId
-        ? parseInt(presentAddress.cityId)
-        : null,
-      permanentStateId: permanentAddress?.stateId
-        ? parseInt(permanentAddress.stateId)
-        : presentAddress?.stateId
-        ? parseInt(presentAddress.stateId)
-        : null,
-      permanentCountryId: permanentAddress?.countryId
-        ? parseInt(permanentAddress.countryId)
-        : presentAddress?.countryId
-        ? parseInt(presentAddress.countryId)
-        : null,
-      permanentPincode:
-        permanentAddress?.pincode || presentAddress?.pincode || "",
-      permanentMobile: permanentAddress?.mobile || presentAddress?.mobile || "",
+      presentAddress: presentAddressObj.address || "",
+      presentVillage: presentAddressObj.village || "",
+      // presentCityId: presentAddressObj.cityId
+      //   ? parseInt(presentAddressObj.cityId)
+      //   : null,
+      // presentStateId: presentAddressObj.stateId
+      //   ? parseInt(presentAddressObj.stateId)
+      //   : null,
+      // presentCountryId: presentAddressObj.countryId
+      //   ? parseInt(presentAddressObj.countryId)
+      //   : null,
+      presentPincode: presentAddressObj.pincode || "",
+      presentMobile: presentAddressObj.mobile || "",
+
+      permanentAddress: permanentAddressObj.address || "",
+      permanentVillage: permanentAddressObj.village || "",
+      // permanentCityId: permanentAddressObj.cityId
+      //   ? parseInt(permanentAddressObj.cityId)
+      //   : null,
+      // permanentStateId: permanentAddressObj.stateId
+      //   ? parseInt(permanentAddressObj.stateId)
+      //   : null,
+      // permanentCountryId: permanentAddressObj.countryId
+      //   ? parseInt(permanentAddressObj.countryId)
+      //   : null,
+      permanentPincode: permanentAddressObj.pincode || "",
+      permanentMobile: permanentAddressObj.mobile || "",
+
+      Branch: branchId ? { connect: { id: parseInt(branchId) } } : undefined,
+      shiftTemplate: shiftTemplateId
+        ? { connect: { id: parseInt(shiftTemplateId) } }
+        : undefined,
+      designation: desiginationId
+        ? { connect: { id: parseInt(desiginationId) } }
+        : undefined,
+      department: departmentId
+        ? { connect: { id: parseInt(departmentId) } }
+        : undefined,
+      EmployeeCategory: employeeCategoryId
+        ? { connect: { id: parseInt(employeeCategoryId) } }
+        : undefined,
+      presentCity: presentAddressObj.cityId
+        ? { connect: { id: parseInt(presentAddressObj.cityId) } }
+        : undefined,
+      presentState: presentAddressObj.stateId
+        ? { connect: { id: parseInt(presentAddressObj.stateId) } }
+        : undefined,
+      presentCountry: presentAddressObj.countryId
+        ? { connect: { id: parseInt(presentAddressObj.countryId) } }
+        : undefined,
+      permanentCity: permanentAddressObj.cityId
+        ? { connect: { id: parseInt(permanentAddressObj.cityId) } }
+        : undefined,
+      permanentState: permanentAddressObj.stateId
+        ? { connect: { id: parseInt(permanentAddressObj.stateId) } }
+        : undefined,
+      permanentCountry: permanentAddressObj.countryId
+        ? { connect: { id: parseInt(permanentAddressObj.countryId) } }
+        : undefined,
+      EmployeeBankDetails: {
+        createMany: bankDetails.map((b) => ({
+          bankName: b.bankName,
+          branchName: b.branchName,
+          accountNumber: b.accountNumber,
+          ifscCode: b.ifscCode,
+        })),
+      },
+      EmployeeEducationdetails: {
+        createMany: educationDetails.map((e) => ({
+          courseName: e.courseName,
+          universityName: e.universityName,
+          institutionName: e.institutionName,
+          yearOfPass: e.yearOfPass,
+        })),
+      },
+      EmployeeFamilyDetails: {
+        createMany: familyDetails.map((f) => ({
+          name: f.name,
+          dob: f.dob ? new Date(f.dob) : null,
+          age: f.age ? parseInt(f.age) : null,
+          relationShip: f.relationShip,
+          occupation: f.occupation,
+          nominee: f.nominee,
+        })),
+      },
     },
   });
   return { statusCode: 0, data: exclude({ ...data }, ["image"]) };
