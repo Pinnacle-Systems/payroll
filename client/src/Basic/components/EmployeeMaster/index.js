@@ -881,22 +881,20 @@ export default function Form() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setView("table")}
-              className={`px-3 py-1 rounded-md text-xs flex items-center gap-1 ${
-                view === "table"
+              className={`px-3 py-1 rounded-md text-xs flex items-center gap-1 ${view === "table"
                   ? "bg-indigo-100 text-indigo-600"
                   : "text-gray-600 hover:bg-gray-100"
-              }`}
+                }`}
             >
               <Table size={16} />
               Table
             </button>
             <button
               onClick={() => setView("card")}
-              className={`px-3 py-1 rounded-md text-xs flex items-center gap-1 ${
-                view === "card"
+              className={`px-3 py-1 rounded-md text-xs flex items-center gap-1 ${view === "card"
                   ? "bg-indigo-100 text-indigo-600"
                   : "text-gray-600 hover:bg-gray-100"
-              }`}
+                }`}
             >
               <LayoutGrid size={16} />
               Cards
@@ -940,11 +938,10 @@ export default function Form() {
 
                 {regNo && (
                   <span
-                    className={`px-2 py-0.5 text-xs text-bold rounded-full ${
-                      active
+                    className={`px-2 py-0.5 text-xs text-bold rounded-full ${active
                         ? "bg-green-100 text-green-800"
                         : "bg-red-100 text-red-800"
-                    }`}
+                      }`}
                   >
                     {regNo}
                   </span>
@@ -1010,11 +1007,10 @@ export default function Form() {
                     key={tabNumber}
                     onClick={() => handleTabClick(tabNumber)}
                     className={`px-3 py-1 field-text border-b-2 rounded-t-md transition-colors duration-200
-                ${
-                  step === tabNumber
-                    ? "border-b-2 border-secondary text-secondary font-semibold bg-white"
-                    : "border-b-2 border-transparent text-gray-500 hover:border-secondary hover:text-secondary"
-                }`}
+                ${step === tabNumber
+                        ? "border-b-2 border-secondary text-secondary font-semibold bg-white"
+                        : "border-b-2 border-transparent text-gray-500 hover:border-secondary hover:text-secondary"
+                      }`}
                   >
                     {tabNumber}
                   </button>
