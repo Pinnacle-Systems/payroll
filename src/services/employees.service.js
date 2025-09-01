@@ -227,32 +227,94 @@ async function getSearch(req) {
 }
 
 async function create(req) {
-    const image = req.file
-    const { branchId, name, email, chamberNo, joiningDate, fatherName, dob, gender, maritalStatus, bloodGroup,
-        panNo, consultFee, salaryPerMonth, commissionCharges, mobile, accountNo, ifscNo, branchName, degree,
-        specialization, localAddress, localCity, localPincode, permAddress, permCity, regNo, leavingDate,
-        permPincode, department, employeeCategoryId, permanent, active } = await req.body
+    const { employeeType,
+        middleName,
+        lastName,
+        fatherName,
+        motherName,
+        gender,
+        disability,
+        identificationMark,
+        dob,
+        bloodGroup,
+        height,
+        weight,
+        maritalStatus,
+        joiningDate,
+        department,
+        employeeCategoryId,
+        payCategory,
+        idNumber,
+        desigination,
+        shiftTemplate,
+        pf,
+        esi,
+        salary,
+        aadharNo,
+        panNo,
+        esiNo,
+        pfNo,
+        uanNo,
+        presentAddress,
+        presentCity,
+        presentVillage,
+        presentState,
+        presentCountry,
+        prsentPincode,
+        presentMobile,
+        currentAddress,
+        currentCity,
+        currentVillage,
+        currentState,
+        currentCountry,
+        currentPincode,
+        currentMobile } = await req.body
 
     const data = await prisma.employee.create(
         {
             data: {
-                email: email ? email : null, regNo: regNo ? regNo : null,
-                chamberNo: chamberNo ? chamberNo : null,
-                fatherName: fatherName ? fatherName : null, dob: dob ? new Date(dob) : undefined, joiningDate: dob ? new Date(joiningDate) : undefined,
-                gender: gender ? gender : null, maritalStatus: maritalStatus ? maritalStatus : null,
-                bloodGroup: bloodGroup ? bloodGroup : null,
-                panNo: panNo ? panNo : null, consultFee, salaryPerMonth, commissionCharges, mobile: mobile ? parseInt(mobile) : undefined, accountNo: accountNo ? accountNo : null,
-                ifscNo, branchName, degree, specialization, localAddress,
-                image: image ? image.buffer : null,
-                localCityId: localCity ? parseInt(localCity) : undefined,
-                permCityId: permCity ? parseInt(permCity) : undefined,
-                departmentId: department ? parseInt(department) : undefined,
-                localPincode: localPincode ? parseInt(localPincode) : undefined, permAddress,
-                permPincode: permPincode ? parseInt(permPincode) : undefined,
-                employeeCategoryId: employeeCategoryId ? parseInt(employeeCategoryId) : undefined, active: active ? JSON.parse(active) : undefined,
-                leavingDate: leavingDate ? new Date(leavingDate) : undefined,
-                branchId: branchId ? parseInt(branchId) : null,
-                name: name ? name : undefined,
+                employeeType,
+                middleName,
+                lastName,
+                fatherName,
+                motherName,
+                gender,
+                disability,
+                identificationMark,
+                dob,
+                bloodGroup,
+                height,
+                weight,
+                maritalStatus,
+                joiningDate,
+                department,
+                employeeCategoryId,
+                payCategory,
+                idNumber,
+                desigination,
+                shiftTemplate,
+                pf,
+                esi,
+                salary,
+                aadharNo,
+                panNo,
+                esiNo,
+                pfNo,
+                uanNo,
+                presentAddress,
+                presentCity,
+                presentVillage,
+                presentState,
+                presentCountry,
+                prsentPincode,
+                presentMobile,
+                currentAddress,
+                currentCity,
+                currentVillage,
+                currentState,
+                currentCountry,
+                currentPincode,
+                currentMobile
 
             }
         }
@@ -261,17 +323,57 @@ async function create(req) {
 }
 
 async function update(id, req) {
-    const image = req.file
-    const { name, email, regNo, chamberNo, joiningDate, fatherName, dob, gender, maritalStatus, bloodGroup,
-        panNo, consultFee, salaryPerMonth, commissionCharges, mobile, accountNo, ifscNo, branchName, degree,
-        specialization, localAddress, localCity, localPincode, permAddress, permCity, permPincode, department, employeeCategoryId, active,
-        leavingReason, leavingDate, canRejoin, rejoinReason, isDeleteImage, branchId } = await req.body
+    const {
+
+        employeeType,
+        middleName,
+        lastName,
+        fatherName,
+        motherName,
+        gender,
+        disability,
+        identificationMark,
+        dob,
+        bloodGroup,
+        height,
+        weight,
+        maritalStatus,
+        joiningDate,
+        department,
+        employeeCategoryId,
+        payCategory,
+        idNumber,
+        desigination,
+        shiftTemplate,
+        pf,
+        esi,
+        salary,
+        aadharNo,
+        panNo,
+        esiNo,
+        pfNo,
+        uanNo,
+        presentAddress,
+        presentCity,
+        presentVillage,
+        presentState,
+        presentCountry,
+        prsentPincode,
+        presentMobile,
+        currentAddress,
+        currentCity,
+        currentVillage,
+        currentState,
+        currentCountry,
+        currentPincode,
+        currentMobile
+    } = await req.body
+
     const dataFound = await prisma.employee.findFirst({
         where: {
             id: parseInt(id),
         },
     })
-    let removeImage = isDeleteImage ? JSON.parse(isDeleteImage) : false;
     if (!dataFound) return NoRecordFound("Employee");
     const data = await prisma.employee.update({
         where: {
@@ -310,6 +412,7 @@ async function update(id, req) {
             esiNo,
             pfNo,
             uanNo,
+
             presentAddress,
             presentCity,
             presentVillage,
@@ -324,7 +427,7 @@ async function update(id, req) {
             currentCountry,
             currentPincode,
             currentMobile,
-          
+
         },
     })
     return { statusCode: 0, data: exclude({ ...data }, ["image"]) };
