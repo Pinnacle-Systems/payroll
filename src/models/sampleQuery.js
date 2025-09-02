@@ -9,16 +9,18 @@
 // console.log(poInwardReturnItemsCount)
 
 // prismaClient.js
-const { PrismaClient } = require('@prisma/client');
+import pkg from '@prisma/client';
 
-const globalForPrisma = global;
+const { PrismaClient } = pkg;
+
+const globalForPrisma = globalThis;
 
 const prisma =
   globalForPrisma.prisma ||
   new PrismaClient({
-    log: ['error', 'warn'], // Optional: logs queries & warnings
+    log: ['error', 'warn'],
   });
 
 globalForPrisma.prisma = prisma;
 
-module.exports = { prisma };
+export { prisma };
