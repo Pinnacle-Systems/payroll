@@ -59,6 +59,7 @@ import { useGetdesignationQuery } from "../../../redux/services/DesignationMaste
 import { useGetShiftTemplateMasterQuery } from "../../../redux/services/ShiftTemplateMaster";
 import { useGetStateQuery } from "../../../redux/services/StateMasterService";
 import { useGetCountriesQuery } from "../../../redux/services/CountryMasterService";
+import { log } from "util";
 
 const MODEL = "Employee Master";
 export default function Form() {
@@ -193,10 +194,9 @@ export default function Form() {
     data: allData,
     isLoading,
     isFetching,
-  } = useGetEmployeeQuery({ params});
+  } = useGetEmployeeQuery({ params });
 
-  console.log(allData,"allData");
-  
+  console.log(allData, "allData");
 
   const { data: shiftTemplate } = useGetShiftTemplateMasterQuery({ params });
 
@@ -226,50 +226,140 @@ export default function Form() {
 
   const syncFormWithDb = useCallback(
     (data) => {
-      
-      
-      setPanNo(data?.panNo || "");
-
+      // Basic Info
+      setFirstName(data?.firstName || "");
+      setMiddleName(data?.middleName || "");
+      setLastName(data?.lastName || "");
       setFatherName(data?.fatherName || "");
-      setDob(data?.dob ? moment.utc(data?.dob).format("YYYY-MM-DD") : "");
-      setChamberNo(data?.chamberNo || "");
-      setlocalAddress(data?.localAddress || "");
-      setLocalCity(data?.localCity?.id || "");
-      setLocalPincode(data?.localPincode || "");
-      setMobile(data?.mobile || "");
-      setDegree(data?.degree || "");
-      setSpecialization(data?.specialization || "");
-      setSalaryPerMonth(data?.salaryPerMonth || "");
-      setCommissionCharges(data?.commissionCharges || "");
+      setMotherName(data?.motherName || "");
       setGender(data?.gender || "");
+      setMaritalStatus(data?.maritalStatus || "");
+      setDob(data?.dob ? moment.utc(data?.dob).format("YYYY-MM-DD") : "");
+      setIdentificationMark(data?.identificationMark || "");
+      setDisability(data?.disability || "");
+      setHeight(data?.height || "");
+      setWeight(data?.weight || "");
+
+      // IDs & Numbers
+      setPanNo(data?.panNo || "");
+      setAadharNo(data?.aadharNo || "");
+      setEsiNo(data?.esiNo || "");
+      setPfNo(data?.pfNo || "");
+      setUanNo(data?.uanNo || "");
+      setIdNumber(data?.idNumber || "");
       setRegNo(data?.regNo || "");
+
+      // Employment Info
+      setEmployeeType(data?.employeeType || "");
+      setPayCategory(data?.payCategory || "");
+      setSalary(data?.salary || "");
+      setSalaryMethod(data?.salaryMethod || "");
       setJoiningDate(
         data?.joiningDate
           ? moment.utc(data?.joiningDate).format("YYYY-MM-DD")
           : ""
       );
-      setPermAddress(data?.permAddress || "");
-      setPermCity(data?.permCity?.id || "");
-      setPermPincode(data?.permPincode || "");
-      setEmail(data?.email || "");
-      setMaritalStatus(data?.maritalStatus || "");
-      setConsultFee(data?.consultFee || "");
-      setAccountNo(data?.accountNo || "");
-      setIfscNo(data?.ifscNo || "");
-      // setbranchName(data?.branchName || "");
-      setBloodGroup(data?.bloodGroup || "");
-      setDepartmentId(data?.departmentId || "");
-      setImage(data?.imageBase64 ? viewBase64String(data?.imageBase64) : null);
-      setEmployeeCategoryId(data?.employeeCategoryId || "");
-      setPermanent(data?.permanent || "");
-      setActive(data?.active ? data?.active : true);
-
-      // Employee Leaving Form states
-      setLeavingDate(data?.leavingDate || "");
+      setLeavingDate(
+        data?.leavingDate
+          ? moment.utc(data?.leavingDate).format("YYYY-MM-DD")
+          : ""
+      );
       setLeavingReason(data?.leavingReason || "");
       setCanRejoin(data?.canRejoin || false);
       setRejoinReason(data?.rejoinReason || "");
+      setActive(data?.active !== undefined ? data?.active : true);
 
+      // Contact Info (Present)
+      // For Present Address
+      setPresentAddress((prev) => ({
+        ...prev,
+        address: data?.presentAddress || "",
+        cityId: data?.presentCity?.id || "",
+        pincode: data?.presentPincode || "",
+        mobile: data?.presentMobile || "",
+        village: data?.presentVillage || "",
+      }));
+
+      // For Permanent Address
+      setPermanentAddress((prev) => ({
+        ...prev,
+        address: data?.permanentAddress || "",
+        cityId: data?.permanentCity?.id || "",
+        pincode: data?.permanentPincode || "",
+        mobile: data?.permanentMobile || "",
+        village: data?.permanentVillage || "",
+      }));
+
+      // Other Info
+      setReligion(data?.religion || "");
+      setBloodGroup(data?.bloodGroup || "");
+      setEmail(data?.email || "");
+      setDepartmentId(data?.departmentId || "");
+      setShiftTemplateId(data?.shiftTemplateId || "");
+      setEmployeeCategoryId(data?.employeeCategoryId || "");
+      // setBranchId(data?.branchId || "");
+      setImage(data?.imageBase64 ? viewBase64String(data.imageBase64) : null);
+
+      // setBankDetails(
+      //   (data?.EmployeeBankDetails || []).map((b, i) => ({
+      //     Sno: i + 1,
+      //     bankName: b.bankName || "",
+      //     branchName: b.branchName || "",
+      //     accountNumber: b.accountNumber || "",
+      //     ifscCode: b.ifscCode || "",
+      //   }))
+      // );
+
+      // console.log(data?.EmployeeBankDetails,"data?.EmployeeBankDetails");
+      
+
+      // Education Details
+      // setEducationDetails(
+      //   data?.EmployeeEducationdetails?.length
+      //     ? data.EmployeeEducationdetails.map((e, i) => ({
+      //         Sno: i + 1,
+      //         courseName: e.courseName || "",
+      //         universityName: e.universityName || "",
+      //         institutionName: e.institutionName || "",
+      //         yearOfPass: e.yearOfPass || "",
+      //       }))
+      //     : [
+      //         {
+      //           Sno: "",
+      //           courseName: "",
+      //           universityName: "",
+      //           institutionName: "",
+      //           yearOfPass: "",
+      //         },
+      //       ]
+      // );
+
+      // // Family Details
+      // setFamilyDetails(
+      //   data?.EmployeeFamilyDetails?.length
+      //     ? data.EmployeeFamilyDetails.map((f, i) => ({
+      //         Sno: i + 1,
+      //         name: f.name || "",
+      //         dob: f.dob ? moment.utc(f.dob).format("YYYY-MM-DD") : "",
+      //         age: f.age || "",
+      //         relationShip: f.relationShip || "",
+      //         occupation: f.occupation || "",
+      //         nominee: f.nominee || "",
+      //       }))
+      //     : [
+      //         {
+      //           Sno: "",
+      //           name: "",
+      //           dob: "",
+      //           age: "",
+      //           relationShip: "",
+      //           occupation: "",
+      //           nominee: "",
+      //         },
+      //       ]
+      // );
+
+      // Save selected employee ID
       secureLocalStorage.setItem(
         sessionStorage.getItem("sessionId") + "currentEmployeeSelected",
         data?.id
@@ -279,32 +369,31 @@ export default function Form() {
   );
 
   const cleanData = (obj) => {
-  if (!obj || typeof obj !== "object") return obj;
+    if (!obj || typeof obj !== "object") return obj;
 
-  return Object.fromEntries(
-    Object.entries(obj).map(([key, value]) => {
-      if (typeof value === "string") {
-        // Remove surrounding quotes and any extra quotes inside
-        let cleaned = value.replace(/^"+|"+$/g, ""); // remove leading/trailing quotes
-        cleaned = cleaned.replace(/"+/g, ""); // remove remaining quotes inside
-        return [key, cleaned];
-      } else if (typeof value === "object" && value !== null) {
-        return [key, cleanData(value)]; // recurse
-      }
-      return [key, value];
-    })
-  );
-};
-
-
+    return Object.fromEntries(
+      Object.entries(obj).map(([key, value]) => {
+        if (typeof value === "string") {
+          // Remove surrounding quotes and any extra quotes inside
+          let cleaned = value.replace(/^"+|"+$/g, ""); // remove leading/trailing quotes
+          cleaned = cleaned.replace(/"+/g, ""); // remove remaining quotes inside
+          return [key, cleaned];
+        } else if (typeof value === "object" && value !== null) {
+          return [key, cleanData(value)]; // recurse
+        }
+        return [key, value];
+      })
+    );
+  };
 
   useEffect(() => {
-  if (singleData?.data) {
-    const cleanedData = cleanData(singleData.data);
-    syncFormWithDb(cleanedData);
-  }
-}, [singleData, syncFormWithDb]);
+    if (singleData?.data) {
+      const cleanedData = cleanData(singleData?.data);
+      syncFormWithDb(cleanedData);
+    }
+  }, [singleData, syncFormWithDb]);
 
+  console.log(singleData, "single");
 
   const data = {
     branchId: secureLocalStorage.getItem(
@@ -387,7 +476,7 @@ export default function Form() {
       const formData = new FormData();
       for (let key in data) {
         // formData.append(key, data[key]);
-        formData.append(key, JSON.stringify(data[key])); 
+        formData.append(key, JSON.stringify(data[key]));
       }
       if (image instanceof File) {
         formData.append("image", image);
@@ -415,6 +504,7 @@ export default function Form() {
         type: `CityMaster/invalidateTags`,
         payload: ["City/State Name"],
       });
+      setForm(false);
     } catch (error) {
       console.log("handle");
     }
@@ -502,47 +592,77 @@ export default function Form() {
     setId("");
     setReadOnly(false);
     setForm(true);
+
+    // Basic Info
     setSearchValue("");
-    setPanNo("");
     setFirstName("");
     setFatherName("");
-    setDob("");
-    setChamberNo("");
-    setlocalAddress("");
-    setLocalCity("");
-    setLocalPincode("");
-    setMobile("");
-    setDegree("");
-    setSpecialization("");
+    setMotherName("");
+    setGender("");
+    setDob(null); // better than empty string
+    setIdentificationMark("");
+    setDisability("");
+    setHeight("");
+    setWeight("");
+    setIdNumber("");
+    setRegNo("");
+
+    // Employment Info
+    setShiftTemplateId("");
+    setPf("");
+    setEsi("");
+    setSalary("");
+    setSalaryMethod("");
     setSalaryPerMonth("");
     setCommissionCharges("");
-    setGender("");
-    setRegNo("");
-    setJoiningDate("");
-    setPermAddress("");
-    setPermCity("");
-    setPermPincode("");
-    setEmail("");
-    setMaritalStatus("");
-    setConsultFee("");
-    setAccountNo("");
-    setIfscNo("");
-    // setbranchName("");
-    setBloodGroup("");
     setDepartmentId("");
-    setImage(null);
     setEmployeeCategoryId("");
-    setPermanent("");
     setActive(true);
-    setLeavingDate("");
+    setJoiningDate(null);
+    setLeavingDate(null);
     setLeavingReason("");
     setCanRejoin(false);
     setRejoinReason("");
-    setPresentAddress("");
+    setDesignationId("");
+    setEmployeeCategoryId("");
+    setDepartmentId("");
+
+    // Contact Info
+    // fixed camelCase
+    setLocalCity("");
+    setLocalPincode("");
+    setMobile("");
     setPermAddress("");
+    setPermCity("");
+    setPermPincode("");
+    setPresentAddress("");
+    setPermanent("");
+
+    // Identity Info
+    setAadharNo("");
+    setEsiNo("");
+    setPfNo("");
+    setUanNo("");
+    setPanNo("");
+    setReligion("");
+    setEmail("");
+
+    // Banking & Financial Info
+    setChamberNo("");
+    setAccountNo("");
+    setIfscNo("");
+    setBloodGroup("");
     setBankDetails([
-      { Sno: "", bankName: "", branchName: "", acountNumber: "", ifscCode: "" },
+      {
+        Sno: "",
+        bankName: "",
+        branchName: "",
+        accountNumber: "",
+        ifscCode: "",
+      },
     ]);
+
+    // Education & Family Info
     setEducationDetails([
       {
         Sno: "",
@@ -556,13 +676,17 @@ export default function Form() {
       {
         Sno: "",
         name: "",
-        dob: "",
+        dob: null, // better as null
         age: "",
         relationShip: "",
         occupation: "",
         nominee: "",
       },
     ]);
+
+    // Misc
+    setImage(null);
+    setConsultFee("");
   };
 
   function onDataClick(id) {
@@ -794,7 +918,7 @@ export default function Form() {
 
     {
       header: "Employee Name",
-      accessor: (item) => item?.firstName,
+      accessor: (item) => JSON.parse(item?.firstName),
       //   cellClass: () => "font-medium  text-gray-900",
       className: "font-medium text-gray-900 text-center uppercase w-72",
     },
@@ -863,7 +987,7 @@ export default function Form() {
             <Plus size={16} />
             Add New Employee
           </button>
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <button
               onClick={() => setView("table")}
               className={`px-3 py-1 rounded-md text-xs flex items-center gap-1 ${
@@ -886,7 +1010,7 @@ export default function Form() {
               <LayoutGrid size={16} />
               Cards
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
 

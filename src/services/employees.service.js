@@ -151,6 +151,18 @@ async function get(req) {
         },
       },
       EmployeeCategory: true,
+      shiftTemplate: { select: { name: true } }, // optional
+      designation: { select: { name: true } }, // optional
+      presentCity: { select: { name: true } }, // optional
+      permanentCity: { select: { name: true } }, // optional
+      presentState: { select: { name: true } }, // optional
+      permanentState: { select: { name: true } }, // optional
+      presentCountry: { select: { name: true } }, // optional
+      permanentCountry: { select: { name: true } },
+      EmployeeCategory: true,
+      EmployeeBankDetails: true, // include all bank details
+      EmployeeEducationdetails: true, // include all education details
+      EmployeeFamilyDetails: true,
     },
   });
   console.log(data, "apidata");
@@ -193,6 +205,18 @@ async function getOne(id) {
         },
       },
       EmployeeCategory: true,
+      shiftTemplate: { select: { name: true } }, // optional
+      designation: { select: { name: true } }, // optional
+      presentCity: { select: { name: true } }, // optional
+      permanentCity: { select: { name: true } }, // optional
+      presentState: { select: { name: true } }, // optional
+      permanentState: { select: { name: true } }, // optional
+      presentCountry: { select: { name: true } }, // optional
+      permanentCountry: { select: { name: true } },
+      EmployeeCategory: true,
+      EmployeeBankDetails: true, // include all bank details
+      EmployeeEducationdetails: true, // include all education details
+      EmployeeFamilyDetails: true,
     },
   });
   if (!data) return NoRecordFound("Employee");
@@ -398,7 +422,7 @@ async function create(req) {
         ? { connect: { id: parseInt(permanentAddressObj.countryId) } }
         : undefined,
       EmployeeBankDetails: {
-        createMany: bankDetails.map((b) => ({
+        create: JSON.parse(bankDetails).map((b) => ({
           bankName: b.bankName,
           branchName: b.branchName,
           accountNumber: b.accountNumber,
@@ -406,7 +430,7 @@ async function create(req) {
         })),
       },
       EmployeeEducationdetails: {
-        createMany: educationDetails.map((e) => ({
+        create: JSON.parse(educationDetails).map((e) => ({
           courseName: e.courseName,
           universityName: e.universityName,
           institutionName: e.institutionName,
@@ -414,7 +438,7 @@ async function create(req) {
         })),
       },
       EmployeeFamilyDetails: {
-        createMany: familyDetails.map((f) => ({
+        create: JSON.parse(familyDetails).map((f) => ({
           name: f.name,
           dob: f.dob ? new Date(f.dob) : null,
           age: f.age ? parseInt(f.age) : null,
@@ -430,8 +454,10 @@ async function create(req) {
 
 async function update(id, req) {
   const {
+   branchId,
     employeeType,
     middleName,
+    firstName,
     lastName,
     fatherName,
     motherName,
@@ -443,8 +469,9 @@ async function update(id, req) {
     height,
     weight,
     maritalStatus,
+
     joiningDate,
-    department,
+    departmentId,
     employeeCategoryId,
     payCategory,
     idNumber,
@@ -453,26 +480,29 @@ async function update(id, req) {
     pf,
     esi,
     salary,
+    salaryMethod,
+
+    religion,
     aadharNo,
     panNo,
     esiNo,
     pfNo,
     uanNo,
+    email,
+
     presentAddress,
-    presentCity,
-    presentVillage,
-    presentState,
-    presentCountry,
-    prsentPincode,
-    presentMobile,
-    currentAddress,
-    currentCity,
-    currentVillage,
-    currentState,
-    currentCountry,
-    currentPincode,
-    currentMobile,
+    permanentAddress,
+    bankDetails,
+    educationDetails,
+    familyDetails
   } = await req.body;
+
+   const presentAddressObj = presentAddress ? JSON.parse(presentAddress) : {};
+  const permanentAddressObj = permanentAddress
+    ? JSON.parse(permanentAddress)
+    : {};
+
+  console.log(req.body, "form");
 
   const dataFound = await prisma.employee.findFirst({
     where: {
@@ -485,14 +515,15 @@ async function update(id, req) {
       id: parseInt(id),
     },
     data: {
-      branchId: branchId ? parseInt(branchId) : null,
-      shiftTemplateId: shiftTemplateId ? parseInt(shiftTemplateId) : null,
-      employeeCategoryId: employeeCategoryId
-        ? parseInt(employeeCategoryId)
-        : null,
-      desiginationId: desiginationId ? parseInt(desiginationId) : null,
+      // branchId: branchId ? parseInt(branchId) : null,
+      // shiftTemplateId: shiftTemplateId ? parseInt(shiftTemplateId) : null,
+      // employeeCategoryId: employeeCategoryId
+      //   ? parseInt(employeeCategoryId)
+      //   : null,
+      // designationId: desiginationId ? parseInt(desiginationId) : null,
+      // departmentId: departmentId ? parseInt(departmentId) : null,
       employeeType,
-
+      firstName,
       middleName,
       lastName,
       fatherName,
@@ -500,40 +531,114 @@ async function update(id, req) {
       gender,
       disability,
       identificationMark,
-      dob,
+      dob: dob ? new Date(dob) : null,
       bloodGroup,
       height,
       weight,
       maritalStatus,
-      joiningDate,
-      department,
+
+      joiningDate: joiningDate ? new Date(joiningDate) : null,
 
       payCategory,
       idNumber,
-
       pf,
       esi,
       salary,
+      salaryMethod,
+
+      religion,
       aadharNo,
       panNo,
       esiNo,
       pfNo,
+      email,
       uanNo,
 
-      presentAddress,
-      presentCity,
-      presentVillage,
-      presentState,
-      presentCountry,
-      prsentPincode,
-      presentMobile,
-      currentAddress,
-      currentCity,
-      currentVillage,
-      currentState,
-      currentCountry,
-      currentPincode,
-      currentMobile,
+      presentAddress: presentAddressObj.address || "",
+      presentVillage: presentAddressObj.village || "",
+      // presentCityId: presentAddressObj.cityId
+      //   ? parseInt(presentAddressObj.cityId)
+      //   : null,
+      // presentStateId: presentAddressObj.stateId
+      //   ? parseInt(presentAddressObj.stateId)
+      //   : null,
+      // presentCountryId: presentAddressObj.countryId
+      //   ? parseInt(presentAddressObj.countryId)
+      //   : null,
+      presentPincode: presentAddressObj.pincode || "",
+      presentMobile: presentAddressObj.mobile || "",
+
+      permanentAddress: permanentAddressObj.address || "",
+      permanentVillage: permanentAddressObj.village || "",
+      // permanentCityId: permanentAddressObj.cityId
+      //   ? parseInt(permanentAddressObj.cityId)
+      //   : null,
+      // permanentStateId: permanentAddressObj.stateId
+      //   ? parseInt(permanentAddressObj.stateId)
+      //   : null,
+      // permanentCountryId: permanentAddressObj.countryId
+      //   ? parseInt(permanentAddressObj.countryId)
+      //   : null,
+      permanentPincode: permanentAddressObj.pincode || "",
+      permanentMobile: permanentAddressObj.mobile || "",
+
+      Branch: branchId ? { connect: { id: parseInt(branchId) } } : undefined,
+      shiftTemplate: shiftTemplateId
+        ? { connect: { id: parseInt(shiftTemplateId) } }
+        : undefined,
+      designation: desiginationId
+        ? { connect: { id: parseInt(desiginationId) } }
+        : undefined,
+      department: departmentId
+        ? { connect: { id: parseInt(departmentId) } }
+        : undefined,
+      EmployeeCategory: employeeCategoryId
+        ? { connect: { id: parseInt(employeeCategoryId) } }
+        : undefined,
+      presentCity: presentAddressObj.cityId
+        ? { connect: { id: parseInt(presentAddressObj.cityId) } }
+        : undefined,
+      presentState: presentAddressObj.stateId
+        ? { connect: { id: parseInt(presentAddressObj.stateId) } }
+        : undefined,
+      presentCountry: presentAddressObj.countryId
+        ? { connect: { id: parseInt(presentAddressObj.countryId) } }
+        : undefined,
+      permanentCity: permanentAddressObj.cityId
+        ? { connect: { id: parseInt(permanentAddressObj.cityId) } }
+        : undefined,
+      permanentState: permanentAddressObj.stateId
+        ? { connect: { id: parseInt(permanentAddressObj.stateId) } }
+        : undefined,
+      permanentCountry: permanentAddressObj.countryId
+        ? { connect: { id: parseInt(permanentAddressObj.countryId) } }
+        : undefined,
+      EmployeeBankDetails: {
+        create: JSON.parse(bankDetails).map((b) => ({
+          bankName: b.bankName,
+          branchName: b.branchName,
+          accountNumber: b.accountNumber,
+          ifscCode: b.ifscCode,
+        })),
+      },
+      EmployeeEducationdetails: {
+        create: JSON.parse(educationDetails).map((e) => ({
+          courseName: e.courseName,
+          universityName: e.universityName,
+          institutionName: e.institutionName,
+          yearOfPass: e.yearOfPass,
+        })),
+      },
+      EmployeeFamilyDetails: {
+        create: JSON.parse(familyDetails).map((f) => ({
+          name: f.name,
+          dob: f.dob ? new Date(f.dob) : null,
+          age: f.age ? parseInt(f.age) : null,
+          relationShip: f.relationShip,
+          occupation: f.occupation,
+          nominee: f.nominee,
+        })),
+      },
     },
   });
   return { statusCode: 0, data: exclude({ ...data }, ["image"]) };
