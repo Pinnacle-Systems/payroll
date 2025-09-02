@@ -202,6 +202,7 @@ async function getOne(id) {
       department: {
         select: {
           id: true,
+          name:true
         },
       },
       EmployeeCategory: true,

@@ -918,12 +918,14 @@ export default function Form() {
     setForm(true);
     setReadOnly(true);
     console.log("view");
+    setStep("Basic Details");
   };
   const handleEdit = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(false);
     console.log("Edit");
+    setStep("Basic Details");
   };
   const columns = [
     {
@@ -939,10 +941,28 @@ export default function Form() {
       className: "font-medium text-gray-900 text-center uppercase w-72",
     },
     {
+      header: "ID Card Number",
+      accessor: (item) => JSON.parse(item?.idNumber),
+      //   cellClass: () => "font-medium  text-gray-900",
+      className: "font-medium text-gray-900 text-center uppercase w-72",
+    },
+    {
+      header: "Department",
+      accessor: (item) => (item?.department?.name),
+      //   cellClass: () => "font-medium  text-gray-900",
+      className: "font-medium text-gray-900 text-center uppercase w-72",
+    },
+    {
+      header: "Designation",
+      accessor: (item) => (item?.designation?.name),
+      //   cellClass: () => "font-medium  text-gray-900",
+      className: "font-medium text-gray-900 text-center uppercase w-72",
+    },
+    {
       header: "Mobile",
       accessor: (item) => item?.permanentMobile,
       //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-72",
+      className: "font-medium text-gray-900 text-center uppercase w-44",
     },
     {
       header: "Email",
@@ -951,12 +971,12 @@ export default function Form() {
       className: "font-medium text-gray-900 text-center uppercase w-72",
     },
 
-    {
-      header: "",
-      accessor: (item) => "",
-      //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 uppercase w-[45%]",
-    },
+    // {
+    //   header: "",
+    //   accessor: (item) => "",
+    //     cellClass: () => "font-medium text-gray-900",
+    //   className: "font-medium text-gray-900 uppercase w-[15%]",
+    // },
   ];
   const handleCheckboxChange = (e) => {
     const checked = e.target.checked;

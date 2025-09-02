@@ -90,14 +90,14 @@ const TemplateItems = ({
   return (
     <div className='h-[90vh] flex flex-col bg-[f1f1f0] overflow-x-auto'>
       {/* Header */}
-      <div className='border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white '>
-        <h2 className='text-lg px-2 py-0.5 font-semibold text-gray-800'>
+      <div className='border-b flex  justify-between items-center sticky top-0 z-10 '>
+        <h1 className='text-2xl mx-4 font-semibold text-gray-800'>
           {id
             ? !readOnly
-              ? 'Edit Shift Template Master'
-              : 'Shift Template Master'
-            : 'Add New Shift Template'}
-        </h2>
+              ? 'Edit Pay Frequency Master'
+              : 'Pay Frequency Master'
+            : 'Add New Pay Frequency'}
+        </h1>
         <div className='flex gap-2'>
           <button
             type='button'
@@ -120,7 +120,7 @@ const TemplateItems = ({
 
       <div className='flex-1 overflow-auto p-3 '>
         <div className='grid grid-cols-1 gap-3 h-full '>
-          <div className='bg-white p-3 rounded-md border border-gray-200 h-full w-full'>
+          <div className='bg-white p-3 rounded-md border  border-gray-200 h-[100px] w-full'>
             <div className='flex gap-x-8 mb-4'>
               <DropdownInput
                 name='Fin Year'
@@ -168,8 +168,8 @@ const TemplateItems = ({
                 disabled={true}
               />
             </div>
-
-            <div className='p-1'>
+        </div>
+            <div className='bg-white -mt-52  rounded-md border border-gray-200 h-full w-full p-3'>
               {/* Tabs */}
               <div className='flex border-b '>
                 {payFrequencyType?.map((t) => (
@@ -314,7 +314,7 @@ const TemplateItems = ({
                 </div>
               )}
             </div>
-          </div>
+          
         </div>
       </div>
     </div>

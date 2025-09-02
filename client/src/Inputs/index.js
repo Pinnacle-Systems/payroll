@@ -2248,7 +2248,7 @@ export const ReusableTable = ({
                 {columns?.map((column, colIndex) => (
                   <td
                     key={colIndex}
-                    className={` ${column.className ? column.className : ""} ${column.header !== "" ? 'border-r border-white/50' : ''} h-8 `}
+                    className={` ${column.className ? column.className : ""} ${column.header !== "" ? 'border-r text-dark border-white/50' : ''} h-8 `}
                   >
                     {column.accessor(item, index)}
                   </td>

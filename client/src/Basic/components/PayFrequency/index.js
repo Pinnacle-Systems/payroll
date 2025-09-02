@@ -16,7 +16,7 @@ import { useGetCompanyQuery } from '../../../redux/services/CompanyMasterService
 import Modal from '../../../UiComponents/Modal';
 import { Check, Power } from 'lucide-react';
 
-import { getCommonParams } from '../../../Utils/helper';
+import { findFromList, getCommonParams } from '../../../Utils/helper';
 
 import { useGetshiftMasterQuery } from '../../../redux/services/ShiftMasterService';
 import TemplateItems from './templateItems';
@@ -104,7 +104,7 @@ const PayFrequencymaster = () => {
       if (!id) {
         setActive(true);
         setCompanyCode(company?.data?.[0]?.code || '');
-        setPayFrequencyType([]);
+        // setPayFrequencyType([]);
       } else if (data) {
         // Edit Mode
 
@@ -147,7 +147,7 @@ const PayFrequencymaster = () => {
     id,
     branchId,
     payFrequencyType,
-    payFrequencyType,
+    
     finYearId,
   };
 
@@ -216,15 +216,17 @@ const PayFrequencymaster = () => {
     }
   };
 
-  // const onNew = () => {
-  //     setId("");
-  //     setReadOnly(false);
-  //     setForm(true);
-  //     setSearchValue("");
-  //     // setCompanyName(company.data[0].name);
-  //     setCompanyCode(company?.data[0]?.code);
+  const onNew = () => {
+      setId("");
+      setReadOnly(false);
+      setFinYearId("")
+      setReadOnly(false)
+      setForm(true);
+      setSearchValue("");
+      // setCompanyName(company.data[0].name);
+      setCompanyCode(company?.data[0]?.code);
 
-  // };
+  };
   const handleView = (id) => {
     setId(id);
     setForm(true);
@@ -255,11 +257,12 @@ const PayFrequencymaster = () => {
     },
 
     {
-      header: 'Pay frequency',
-      accessor: (item) => item?.name,
+      header: 'FIn Year',
+      accessor: (item) => findFromList(item?.finYearId,yearData?.data,"code"),
       //   cellClass: () => "font-medium  text-gray-900",
-      className: 'font-medium text-gray-900 text-center uppercase w-72',
+      className: 'font-medium text-gray-900 text-center uppercase w-32',
     },
+   
 
     {
       header: 'Status',
@@ -271,7 +274,7 @@ const PayFrequencymaster = () => {
       header: '',
       accessor: (item) => '',
       //   cellClass: () => "font-medium text-gray-900",
-      className: 'font-medium text-gray-900 uppercase w-[65%]',
+      className: 'font-medium text-gray-900 uppercase w-[75%]',
     },
   ];
   function onDataClick(id) {
@@ -316,11 +319,11 @@ const PayFrequencymaster = () => {
                 <button
                   onClick={() => {
                     setForm(true);
-                    // onNew();
+                    onNew();
                   }}
                   className='bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2'
                 >
-                  + Add Pay Frequency
+                  + Add New Pay Frequency
                 </button>
               </div>
             </div>

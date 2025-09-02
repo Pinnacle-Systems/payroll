@@ -60,6 +60,15 @@ async function get(req) {
           }
         : undefined,
     },
+     include: {
+      PayFrequencyType: {
+        include: {
+          PayFrequencyItems: true,
+          
+        },
+
+      },
+    },
   });
   let finYearDate = await getFinYearStartTimeEndTime(finYearId);
 
@@ -92,7 +101,9 @@ async function getOne(id) {
       PayFrequencyType: {
         include: {
           PayFrequencyItems: true,
+
         },
+
       },
     },
   });
