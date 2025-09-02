@@ -614,6 +614,7 @@ async function update(id, req) {
         ? { connect: { id: parseInt(permanentAddressObj.countryId) } }
         : undefined,
       EmployeeBankDetails: {
+        deleteMany: {},
         create: JSON.parse(bankDetails).map((b) => ({
           bankName: b.bankName,
           branchName: b.branchName,
@@ -622,6 +623,7 @@ async function update(id, req) {
         })),
       },
       EmployeeEducationdetails: {
+        deleteMany: {},
         create: JSON.parse(educationDetails).map((e) => ({
           courseName: e.courseName,
           universityName: e.universityName,
@@ -630,6 +632,7 @@ async function update(id, req) {
         })),
       },
       EmployeeFamilyDetails: {
+        deleteMany: {},
         create: JSON.parse(familyDetails).map((f) => ({
           name: f.name,
           dob: f.dob ? new Date(f.dob) : null,

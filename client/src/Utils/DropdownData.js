@@ -263,6 +263,11 @@ export const common = [
     { show: "Yes", value: "Yes" },
     { show: "No", value: "No" },
 ]
+
+export const married = [
+     { show: "Married", value: "Married" },
+    { show: "Single", value: "Single" },
+]
 export const commonNew = [
     { show: "Both", value: "Both" },
     { show: "Yes", value: "Yes" },

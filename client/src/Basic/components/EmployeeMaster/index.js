@@ -33,6 +33,7 @@ import {
   bloodList,
   common,
   SalaryMethod,
+  married,
 } from "../../../Utils/DropdownData";
 import moment from "moment";
 import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCategoryMasterService";
@@ -60,6 +61,7 @@ import { useGetShiftTemplateMasterQuery } from "../../../redux/services/ShiftTem
 import { useGetStateQuery } from "../../../redux/services/StateMasterService";
 import { useGetCountriesQuery } from "../../../redux/services/CountryMasterService";
 import { log } from "util";
+import Swal from "sweetalert2";
 
 const MODEL = "Employee Master";
 export default function Form() {
@@ -227,6 +229,7 @@ export default function Form() {
   const syncFormWithDb = useCallback(
     (data) => {
       // Basic Info
+      setEmployeeType(data?.employeeType)
       setFirstName(data?.firstName || "");
       setMiddleName(data?.middleName || "");
       setLastName(data?.lastName || "");
@@ -239,6 +242,7 @@ export default function Form() {
       setDisability(data?.disability || "");
       setHeight(data?.height || "");
       setWeight(data?.weight || "");
+      setBloodGroup(data?.bloodGroup)
 
       // IDs & Numbers
       setPanNo(data?.panNo || "");
@@ -248,9 +252,14 @@ export default function Form() {
       setUanNo(data?.uanNo || "");
       setIdNumber(data?.idNumber || "");
       setRegNo(data?.regNo || "");
+      setReligion(data?.religion)
+     
+      setEmail(data?.email || "");
 
       // Employment Info
-      setEmployeeType(data?.employeeType || "");
+       setDepartmentId(data?.departmentId || "");
+      setShiftTemplateId(data?.shiftTemplateId || "");
+      setEmployeeCategoryId(data?.employeeCategoryId || "");
       setPayCategory(data?.payCategory || "");
       setSalary(data?.salary || "");
       setSalaryMethod(data?.salaryMethod || "");
@@ -259,11 +268,14 @@ export default function Form() {
           ? moment.utc(data?.joiningDate).format("YYYY-MM-DD")
           : ""
       );
+      setDesignationId(data?.designationId);
       setLeavingDate(
         data?.leavingDate
           ? moment.utc(data?.leavingDate).format("YYYY-MM-DD")
           : ""
       );
+       setPf(data?.pf);
+      setEsi(data?.esi);
       setLeavingReason(data?.leavingReason || "");
       setCanRejoin(data?.canRejoin || false);
       setRejoinReason(data?.rejoinReason || "");
@@ -274,8 +286,10 @@ export default function Form() {
       setPresentAddress((prev) => ({
         ...prev,
         address: data?.presentAddress || "",
-        cityId: data?.presentCity?.id || "",
+        cityId: data?.presentCityId || "",
         pincode: data?.presentPincode || "",
+        stateId: data?.presentStateId || "",
+        countryId: data?.presentCountryId || "",
         mobile: data?.presentMobile || "",
         village: data?.presentVillage || "",
       }));
@@ -284,80 +298,54 @@ export default function Form() {
       setPermanentAddress((prev) => ({
         ...prev,
         address: data?.permanentAddress || "",
-        cityId: data?.permanentCity?.id || "",
+        cityId: data?.permanentCityId || "",
         pincode: data?.permanentPincode || "",
         mobile: data?.permanentMobile || "",
+        stateId: data?.permanentStateId || "",
+        countryId: data?.permanentCountryId || "",
         village: data?.permanentVillage || "",
       }));
 
       // Other Info
-      setReligion(data?.religion || "");
-      setBloodGroup(data?.bloodGroup || "");
-      setEmail(data?.email || "");
-      setDepartmentId(data?.departmentId || "");
-      setShiftTemplateId(data?.shiftTemplateId || "");
-      setEmployeeCategoryId(data?.employeeCategoryId || "");
+     
+      
+      
       // setBranchId(data?.branchId || "");
       setImage(data?.imageBase64 ? viewBase64String(data.imageBase64) : null);
 
-      // setBankDetails(
-      //   (data?.EmployeeBankDetails || []).map((b, i) => ({
-      //     Sno: i + 1,
-      //     bankName: b.bankName || "",
-      //     branchName: b.branchName || "",
-      //     accountNumber: b.accountNumber || "",
-      //     ifscCode: b.ifscCode || "",
-      //   }))
-      // );
+      // setBankDetails(data?.EmployeeBankDetails)
 
-      // console.log(data?.EmployeeBankDetails,"data?.EmployeeBankDetails");
-      
+      setBankDetails(
+        (data?.EmployeeBankDetails || [])?.map((b, i) => ({
+          Sno: i + 1,
+          bankName: b.bankName || "",
+          branchName: b.branchName || "",
+          accountNumber: b.accountNumber || "",
+          ifscCode: b.ifscCode || "",
+        }))
+      );
 
-      // Education Details
-      // setEducationDetails(
-      //   data?.EmployeeEducationdetails?.length
-      //     ? data.EmployeeEducationdetails.map((e, i) => ({
-      //         Sno: i + 1,
-      //         courseName: e.courseName || "",
-      //         universityName: e.universityName || "",
-      //         institutionName: e.institutionName || "",
-      //         yearOfPass: e.yearOfPass || "",
-      //       }))
-      //     : [
-      //         {
-      //           Sno: "",
-      //           courseName: "",
-      //           universityName: "",
-      //           institutionName: "",
-      //           yearOfPass: "",
-      //         },
-      //       ]
-      // );
+      setEducationDetails(
+        (data?.EmployeeEducationdetails || [])?.map((e, i) => ({
+          Sno: i + 1,
+          courseName: e.courseName || "",
+          universityName: e.universityName || "",
+          institutionName: e.institutionName || "",
+          yearOfPass: e.yearOfPass || "",
+        }))
+      );
 
-      // // Family Details
-      // setFamilyDetails(
-      //   data?.EmployeeFamilyDetails?.length
-      //     ? data.EmployeeFamilyDetails.map((f, i) => ({
-      //         Sno: i + 1,
-      //         name: f.name || "",
-      //         dob: f.dob ? moment.utc(f.dob).format("YYYY-MM-DD") : "",
-      //         age: f.age || "",
-      //         relationShip: f.relationShip || "",
-      //         occupation: f.occupation || "",
-      //         nominee: f.nominee || "",
-      //       }))
-      //     : [
-      //         {
-      //           Sno: "",
-      //           name: "",
-      //           dob: "",
-      //           age: "",
-      //           relationShip: "",
-      //           occupation: "",
-      //           nominee: "",
-      //         },
-      //       ]
-      // );
+      setFamilyDetails(
+        data?.EmployeeFamilyDetails?.map((f, i) => ({
+          Sno: i + 1,
+          name: f.name || "",
+          dob: f.dob ? moment.utc(f.dob).format("YYYY-MM-DD") : "",
+          age: f.age || "",
+          relationShip: f.relationShip || "",
+          occupation: f.occupation || "",
+          nominee: f.nominee || "",
+        }))
+      );
 
       // Save selected employee ID
       secureLocalStorage.setItem(
@@ -369,6 +357,9 @@ export default function Form() {
   );
 
   const cleanData = (obj) => {
+    if (Array.isArray(obj)) {
+      return obj.map(cleanData); // process each item
+    }
     if (!obj || typeof obj !== "object") return obj;
 
     return Object.fromEntries(
@@ -389,6 +380,8 @@ export default function Form() {
   useEffect(() => {
     if (singleData?.data) {
       const cleanedData = cleanData(singleData?.data);
+      console.log(cleanedData, "cleanedData");
+
       syncFormWithDb(cleanedData);
     }
   }, [singleData, syncFormWithDb]);
@@ -489,7 +482,7 @@ export default function Form() {
         returnData = await callback(formData).unwrap();
       }
       setId(returnData.data.id);
-      toast.success(text + "Successfully");
+
       setSearchValue("");
       setStep(1);
       dispatch({
@@ -505,7 +498,18 @@ export default function Form() {
         payload: ["City/State Name"],
       });
       setForm(false);
+      Swal.fire({
+        icon: "success",
+        title: `${text || "saved"}   Successfully`,
+        showConfirmButton: false,
+        timer: 2000,
+      });
     } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission Failed",
+        text: error.data?.message || "Something went wrong!",
+      });
       console.log("handle");
     }
   };
@@ -562,11 +566,22 @@ export default function Form() {
           type: `cityMaster/invalidateTags`,
           payload: ["City/State Name"],
         });
-        toast.success("Deleted Successfully");
+
         setForm(false);
+        Swal.fire({
+          icon: "success",
+          title: "Deleted successfully",
+          timer: 1500,
+          showConfirmButton: false,
+        });
         setSearchValue("");
         setStep(1);
       } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Delete Failed",
+          text: error?.data?.message || "Something went wrong!",
+        });
         toast.error("something went wrong");
       }
     }
@@ -592,10 +607,13 @@ export default function Form() {
     setId("");
     setReadOnly(false);
     setForm(true);
-
+    setStep("Basic Details");
     // Basic Info
+    setEmployeeType("");
     setSearchValue("");
     setFirstName("");
+    setMiddleName("");
+    setLastName("");
     setFatherName("");
     setMotherName("");
     setGender("");
@@ -604,8 +622,10 @@ export default function Form() {
     setDisability("");
     setHeight("");
     setWeight("");
-    setIdNumber("");
+
+    setMaritalStatus("");
     setRegNo("");
+    setBloodGroup("");
 
     // Employment Info
     setShiftTemplateId("");
@@ -625,7 +645,9 @@ export default function Form() {
     setRejoinReason("");
     setDesignationId("");
     setEmployeeCategoryId("");
-    setDepartmentId("");
+ 
+    setPayCategory("");
+    setIdNumber("");
 
     // Contact Info
     // fixed camelCase
@@ -635,10 +657,30 @@ export default function Form() {
     setPermAddress("");
     setPermCity("");
     setPermPincode("");
-    setPresentAddress("");
-    setPermanent("");
+    setPresentAddress([
+      {
+        address: "",
+        cityId: "",
+        village: "",
+        stateId: "",
+        countryId: "",
+        pincode: "",
+        mobile: "",
+      },
+    ]);
+    setPermanent([
+      {
+        address: "",
+        cityId: "",
+        village: "",
+        stateId: "",
+        countryId: "",
+        pincode: "",
+        mobile: "",
+      },
+    ]);
 
-    // Identity Info
+    // Personal Info
     setAadharNo("");
     setEsiNo("");
     setPfNo("");
@@ -647,11 +689,8 @@ export default function Form() {
     setReligion("");
     setEmail("");
 
-    // Banking & Financial Info
-    setChamberNo("");
-    setAccountNo("");
-    setIfscNo("");
-    setBloodGroup("");
+    
+
     setBankDetails([
       {
         Sno: "",
@@ -689,32 +728,9 @@ export default function Form() {
     setConsultFee("");
   };
 
-  function onDataClick(id) {
-    setId(id);
-    setForm(true);
-  }
-  const tableHeaders = [
-    "S.NO",
-    "Employee Id",
-    "Employee name",
-    "Employee Category",
-    "Gender",
-    "Contact",
-    "Email",
-    "Employee status",
-  ];
-  const tableDataNames = [
-    "index+1",
-    "dataObj.regNo",
-    "dataObj.name",
-    "dataObj?.EmployeeCategory?.name",
-    "dataObj?.gender",
-    "dataObj?.mobile",
-    "dataObj?.email",
-    "dataObj.active ? ACTIVE : INACTIVE",
-  ];
+
   const submitLeavingForm = () => {
-    console.log("sdfsdfsdfsdf");
+    
     if (id) {
       console.log("called id");
       handleSubmitCustom(updateData, data, "Updated");
@@ -922,12 +938,24 @@ export default function Form() {
       //   cellClass: () => "font-medium  text-gray-900",
       className: "font-medium text-gray-900 text-center uppercase w-72",
     },
+    {
+      header: "Mobile",
+      accessor: (item) => item?.permanentMobile,
+      //   cellClass: () => "font-medium  text-gray-900",
+      className: "font-medium text-gray-900 text-center uppercase w-72",
+    },
+    {
+      header: "Email",
+      accessor: (item) => JSON.parse(item?.email),
+      //   cellClass: () => "font-medium  text-gray-900",
+      className: "font-medium text-gray-900 text-center uppercase w-72",
+    },
 
     {
       header: "",
       accessor: (item) => "",
       //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 uppercase w-[75%]",
+      className: "font-medium text-gray-900 uppercase w-[45%]",
     },
   ];
   const handleCheckboxChange = (e) => {
@@ -1206,7 +1234,7 @@ export default function Form() {
                       <div className="col-span-1">
                         <TextInput
                           ref={input1Ref}
-                          name="Father/Husband Name"
+                          name="Father Name"
                           value={fatherName}
                           setValue={setFatherName}
                           // required={true}
@@ -1332,7 +1360,7 @@ export default function Form() {
                           value={maritalStatus}
                           setValue={setMaritalStatus}
                           // required={true}
-                          options={common}
+                          options={married}
                           readOnly={readOnly}
                           disabled={childRecord.current > 0}
                           onKeyDown={(e) => handleKeyNext(e, input2Ref)}
@@ -2085,11 +2113,11 @@ export default function Form() {
                                 <input
                                   // name="Account Number"
                                   type="text"
-                                  value={item.acountNumber}
+                                  value={item.accountNumber}
                                   onChange={(e) =>
                                     handleBankDetailsChange(
                                       index,
-                                      "acountNumber",
+                                      "accountNumber",
                                       e.target.value
                                     )
                                   }
