@@ -268,6 +268,17 @@ export const married = [
      { show: "Married", value: "Married" },
     { show: "Single", value: "Single" },
 ]
+
+export const earningsTypes = [
+    {show:"NONE",value:"NONE"},
+    {show : "REIMBURSEMENT", value:"REIMBURSEMENT"},     
+    
+    {show:"DEDUCTION",value:"DEDUCTION"},
+    {show:"EARNING",value:"EARNING"},
+
+    
+]
+
 export const commonNew = [
     { show: "Both", value: "Both" },
     { show: "Yes", value: "Yes" },

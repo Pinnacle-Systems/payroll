@@ -48,6 +48,7 @@ export { default as ShiftCommonTemplateMasterAPi } from './ShiftCommonTemplate.s
 export { default as ShiftTemplateMasterApi } from './ShiftTemplateMaster'
 export { default as employeeSubCategoryApi } from './EmployeeSubCategoryservice'
 export { default as payFrequencyApi } from './PayFrequencyService'
+export {default as payComponentApi} from './PayComponentsService'
 
 
 

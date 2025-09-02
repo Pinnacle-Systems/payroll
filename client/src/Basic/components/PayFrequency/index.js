@@ -1,49 +1,50 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import secureLocalStorage from 'react-secure-storage';
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import secureLocalStorage from "react-secure-storage";
 
-import { toast } from 'react-toastify';
+import { toast } from "react-toastify";
 import {
   TextInput,
   ToggleButton,
   ReusableTable,
   TextAreaInput,
   DropdownInput,
-} from '../../../Inputs';
+} from "../../../Inputs";
 
-import { common, commonNew, statusDropdown } from '../../../Utils/DropdownData';
+import { common, commonNew, statusDropdown } from "../../../Utils/DropdownData";
 
-import { useGetCompanyQuery } from '../../../redux/services/CompanyMasterService';
-import Modal from '../../../UiComponents/Modal';
-import { Check, Power } from 'lucide-react';
+import { useGetCompanyQuery } from "../../../redux/services/CompanyMasterService";
+import Modal from "../../../UiComponents/Modal";
+import { Check, Power } from "lucide-react";
 
-import { findFromList, getCommonParams } from '../../../Utils/helper';
+import { findFromList, getCommonParams } from "../../../Utils/helper";
 
-import { useGetshiftMasterQuery } from '../../../redux/services/ShiftMasterService';
-import TemplateItems from './templateItems';
+import { useGetshiftMasterQuery } from "../../../redux/services/ShiftMasterService";
+import TemplateItems from "./templateItems";
 import {
   useAddPayFrequencyMutation,
   useDeletePayFrequencyMutation,
   useGetPayFrequencyByIdQuery,
   useGetPayFrequencyQuery,
   useUpdatePayFrequencyMutation,
-} from '../../../redux/services/PayFrequencyService';
-import { useGetShiftCommonTemplateQuery } from '../../../redux/services/ShiftCommonTemplate.service';
-import { useGetFinYearQuery } from '../../../redux/services/FinYearMasterService';
+} from "../../../redux/services/PayFrequencyService";
+import { useGetShiftCommonTemplateQuery } from "../../../redux/services/ShiftCommonTemplate.service";
+import { useGetFinYearQuery } from "../../../redux/services/FinYearMasterService";
+import Swal from "sweetalert2";
 
 const PayFrequencymaster = () => {
   const [readOnly, setReadOnly] = useState(false);
-  const [id, setId] = useState('');
+  const [id, setId] = useState("");
 
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [docId, setDocId] = useState('');
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [docId, setDocId] = useState("");
   const [active, setActive] = useState(true);
   const [errors, setErrors] = useState({});
   const [form, setForm] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
   const [payFrequencyType, setPayFrequencyType] = useState([]);
-  const [finYearId, setFinYearId] = useState('');
+  const [finYearId, setFinYearId] = useState("");
 
   const params = getCommonParams();
 
@@ -61,7 +62,7 @@ const PayFrequencymaster = () => {
     params,
     searchParams: searchValue,
   });
-  console.log(allData, 'allData');
+  console.log(allData, "allData");
 
   const {
     data: singleData,
@@ -93,7 +94,7 @@ const PayFrequencymaster = () => {
     if (payFrequencyType?.length >= 1) return;
     setPayFrequencyType((prev) => {
       let newArray = Array.from({ length: 1 - prev.length }, (i) => {
-        return { templateId: '' };
+        return { templateId: "" };
       });
       return [...prev, ...newArray];
     });
@@ -103,13 +104,13 @@ const PayFrequencymaster = () => {
     (data) => {
       if (!id) {
         setActive(true);
-        setCompanyCode(company?.data?.[0]?.code || '');
+        setCompanyCode(company?.data?.[0]?.code || "");
         // setPayFrequencyType([]);
       } else if (data) {
         // Edit Mode
 
         setActive(data?.active ?? true);
-        setFinYearId(data?.finYearId || '');
+        setFinYearId(data?.finYearId || "");
 
         // ✅ Normalize PayFrequencyType from backend
         const normalized = data?.PayFrequencyType?.map((type) => ({
@@ -118,15 +119,15 @@ const PayFrequencymaster = () => {
           payFrequencyItems:
             type.PayFrequencyItems?.map((item) => ({
               id: item.id,
-              startDate: item.startDate ? item.startDate.slice(0, 10) : '', // format YYYY-MM-DD
-              endDate: item.endDate ? item.endDate.slice(0, 10) : '',
-              salaryDate: item.salaryDate ? item.salaryDate.slice(0, 10) : '',
-              notes: item.notes || '',
+              startDate: item.startDate ? item.startDate.slice(0, 10) : "", // format YYYY-MM-DD
+              endDate: item.endDate ? item.endDate.slice(0, 10) : "",
+              salaryDate: item.salaryDate ? item.salaryDate.slice(0, 10) : "",
+              notes: item.notes || "",
             })) || [],
         }));
 
         setPayFrequencyType(normalized || []);
-        setCompanyCode(data?.companyCode || company?.data?.[0]?.code || '');
+        setCompanyCode(data?.companyCode || company?.data?.[0]?.code || "");
       }
     },
     [id, company]
@@ -142,16 +143,16 @@ const PayFrequencymaster = () => {
     docId,
     active,
     companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem('sessionId') + 'userCompanyId'
+      sessionStorage.getItem("sessionId") + "userCompanyId"
     ),
     id,
     branchId,
     payFrequencyType,
-    
+
     finYearId,
   };
 
-  console.log(payFrequencyType, 'payFrequencyType  ');
+  console.log(payFrequencyType, "payFrequencyType  ");
 
   const validateData = (data) => {
     if (data.name && data.code) {
@@ -164,9 +165,24 @@ const PayFrequencymaster = () => {
     try {
       let returnData = await callback(data).unwrap();
       setId(returnData.data.id);
-      toast.success(text + 'Successfully');
+      Swal.fire({
+        title: text + "  " + "Successfully",
+        icon: "success",
+        draggable: true,
+        timer: 1000,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+      setForm(false);
     } catch (error) {
-      console.log('handle');
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: error.data?.message || "Something went wrong!",
+      });
+      console.log("handle");
     }
   };
 
@@ -177,105 +193,115 @@ const PayFrequencymaster = () => {
     //   });
     //   return;
     // }
-    if (!window.confirm('Are you sure save the details ...?')) {
+    if (!window.confirm("Are you sure save the details ...?")) {
       return;
     }
     if (id) {
-      handleSubmitCustom(updateData, data, 'Updated');
+      handleSubmitCustom(updateData, data, "Updated");
     } else {
-      handleSubmitCustom(addData, data, 'Added');
+      handleSubmitCustom(addData, data, "Added");
     }
   };
 
-  const deleteData = async () => {
+  const deleteData = async (id) => {
     if (id) {
-      if (!window.confirm('Are you sure to delete...?')) {
+      if (!window.confirm("Are you sure to delete...?")) {
         return;
       }
       try {
         const deldata = await removeData(id).unwrap();
         if (deldata?.statusCode == 1) {
-          toast.error(deldata?.message);
+          Swal.fire({
+            title: "Deleted Successfully",
+            icon: "success",
+            timer: 1000,
+          });
           setForm(false);
           return;
         }
-        setId('');
-        toast.success('Deleted Successfully');
+        setId("");
+        Swal.fire({
+          title: "Deleted Successfully",
+          icon: "success",
+          timer: 1000,
+        });
         setForm(false);
       } catch (error) {
-        toast.error('something went wrong');
+        Swal.fire({
+          title: "Deleted Successfully",
+          icon: "success",
+          timer: 1000,
+        });
       }
     }
   };
 
   const handleKeyDown = (event) => {
     let charCode = String.fromCharCode(event.which).toLowerCase();
-    if ((event.ctrlKey || event.metaKey) && charCode === 's') {
+    if ((event.ctrlKey || event.metaKey) && charCode === "s") {
       event.preventDefault();
       // saveData();
     }
   };
 
   const onNew = () => {
-      setId("");
-      setReadOnly(false);
-      setFinYearId("")
-      setReadOnly(false)
-      setForm(true);
-      setSearchValue("");
-      setPayFrequencyType([])
-      // setCompanyName(company.data[0].name);
-      setCompanyCode(company?.data[0]?.code);
-
+    setId("");
+    setReadOnly(false);
+    setFinYearId("");
+    setReadOnly(false);
+    setForm(true);
+    setSearchValue("");
+    setPayFrequencyType([]);
+    // setCompanyName(company.data[0].name);
+    setCompanyCode(company?.data[0]?.code);
   };
   const handleView = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(true);
-    console.log('view');
+    console.log("view");
   };
   const handleEdit = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(false);
-    console.log('Edit');
+    console.log("Edit");
   };
   const ACTIVE = (
-    <div className='bg-gradient-to-r from-green-200 to-green-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-green-500 shadow-lg text-white hover:scale-110 transition-transform duration-300'>
+    <div className="bg-gradient-to-r from-green-200 to-green-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-green-500 shadow-lg text-white hover:scale-110 transition-transform duration-300">
       <Power size={10} />
     </div>
   );
   const INACTIVE = (
-    <div className='bg-gradient-to-r from-red-200 to-red-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-red-500 shadow-lg text-white hover:scale-110 transition-transform duration-300'>
+    <div className="bg-gradient-to-r from-red-200 to-red-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-red-500 shadow-lg text-white hover:scale-110 transition-transform duration-300">
       <Power size={10} />
     </div>
   );
   const columns = [
     {
-      header: 'S.No',
+      header: "S.No",
       accessor: (item, index) => index + 1,
-      className: 'font-medium text-gray-900 w-12  text-center',
+      className: "font-medium text-gray-900 w-12  text-center",
     },
 
     {
-      header: 'FIn Year',
-      accessor: (item) => findFromList(item?.finYearId,yearData?.data,"code"),
+      header: "FIn Year",
+      accessor: (item) => findFromList(item?.finYearId, yearData?.data, "code"),
       //   cellClass: () => "font-medium  text-gray-900",
-      className: 'font-medium text-gray-900 text-center uppercase w-32',
+      className: "font-medium text-gray-900 text-center uppercase w-32",
     },
-   
 
     {
-      header: 'Status',
+      header: "Status",
       accessor: (item) => (item.active ? ACTIVE : INACTIVE),
       //   cellClass: () => "font-medium text-gray-900",
-      className: 'font-medium text-gray-900 text-center uppercase w-36',
+      className: "font-medium text-gray-900 text-center uppercase w-36",
     },
     {
-      header: '',
-      accessor: (item) => '',
+      header: "",
+      accessor: (item) => "",
       //   cellClass: () => "font-medium text-gray-900",
-      className: 'font-medium text-gray-900 uppercase w-[75%]',
+      className: "font-medium text-gray-900 uppercase w-[75%]",
     },
   ];
   function onDataClick(id) {
@@ -292,7 +318,7 @@ const PayFrequencymaster = () => {
 
   return (
     <div>
-      <div onKeyDown={handleKeyDown} className='p-1 '>
+      <div onKeyDown={handleKeyDown} className="p-1 ">
         {form === true ? (
           <TemplateItems
             yearData={yearData}
@@ -312,24 +338,24 @@ const PayFrequencymaster = () => {
           />
         ) : (
           <>
-            <div className='w-full flex bg-white p-1 justify-between  items-center'>
-              <h1 className='text-2xl font-bold text-gray-800'>
+            <div className="w-full flex bg-white p-1 justify-between  items-center">
+              <h1 className="text-2xl font-bold text-gray-800">
                 Pay Frequency
               </h1>
-              <div className='flex items-center gap-4'>
+              <div className="flex items-center gap-4">
                 <button
                   onClick={() => {
                     setForm(true);
                     onNew();
                   }}
-                  className='bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2'
+                  className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
                 >
                   + Add New Pay Frequency
                 </button>
               </div>
             </div>
 
-            <div className='bg-white rounded-xl shadow-sm overflow-hidden mt-3'>
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-3">
               <ReusableTable
                 columns={columns}
                 data={allData?.data}

@@ -43,6 +43,7 @@ export { default as ShiftCommonTemplate } from './ShiftCommontemplate.route.js'
 export { default as ShiftTemplate } from './shiftTemplate.route.js'
 export { default as employeeSubCategory } from './employeeSubCategory.route.js'
 export { default as payfrequency } from "./payFrequency.route.js"
+export {default as payComponents} from './payComponents.route.js'
 
 
 
