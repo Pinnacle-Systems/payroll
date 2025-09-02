@@ -223,6 +223,7 @@ const PayFrequencymaster = () => {
       setReadOnly(false)
       setForm(true);
       setSearchValue("");
+      setPayFrequencyType([])
       // setCompanyName(company.data[0].name);
       setCompanyCode(company?.data[0]?.code);
 
