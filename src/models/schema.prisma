@@ -63,6 +63,7 @@ model Company {
   ShiftTemplate       ShiftTemplate[]
   PayFrequency        PayFrequency[]
   EmployeSubCategory  EmployeSubCategory[]
+  PayComponents       PayComponents[]
 }
 
 model Subscription {
@@ -107,6 +108,7 @@ model Branch {
   ShiftTemplate       ShiftTemplate[]
   PayFrequency        PayFrequency[]
   EmployeSubCategory  EmployeSubCategory[]
+  PayComponents       PayComponents[]
 }
 
 model UserOnBranch {
@@ -201,6 +203,8 @@ model User {
   PayFrequencyupdatedBy        PayFrequency[]        @relation(name: "updatedBy")
   ShiftTemplateItemsCreatedBy  ShiftTemplateItems[]  @relation(name: "createdBy")
   ShiftTemplateItemsupdatedBy  ShiftTemplateItems[]  @relation(name: "updatedBy")
+  PayComponentsCreatedBy       PayComponents[]       @relation(name: "createdBy")
+  PayComponentsupdatedBy       PayComponents[]       @relation(name: "updatedBy")
 }
 
 model Employee {
@@ -1347,4 +1351,23 @@ model PayFrequencyItems {
   endDate            DateTime?
   salaryDate         DateTime?
   notes              String?
+}
+
+model PayComponents {
+  id             Int      @id @default(autoincrement())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  createdBy      User?    @relation("createdBy", fields: [createdById], references: [id])
+  createdById    Int?
+  updatedBy      User?    @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById    Int?
+  companyId      Int?
+  company        Company? @relation(fields: [companyId], references: [id])
+  branch         Branch?  @relation(fields: [branchId], references: [id])
+  branchId       Int?
+  payCode        String?
+  payDescription String?  @db.Text
+  earningsType   String?
+  taxable        String?
+  notes          String?  @db.Text
 }

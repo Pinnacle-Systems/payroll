@@ -28,6 +28,7 @@ import {
   employeeSubCategoryApi,
   payFrequency,
   payFrequencyApi,
+  payComponentApi,
 
 } from "./services"
 import projectPaymentFormApi from "./services/ProjectPaymentService";
@@ -166,7 +167,8 @@ const commonReducers = {
   [ShiftMasterApi.reducerPath]: ShiftMasterApi.reducer,
   [ShiftCommonTemplateMasterAPi.reducerPath]: ShiftCommonTemplateMasterAPi.reducer,
   ShiftTemplateMaster: ShiftTemplateMasterApi.reducer,
-  [employeeSubCategoryApi.reducerPath]: employeeSubCategoryApi.reducer
+  [employeeSubCategoryApi.reducerPath]: employeeSubCategoryApi.reducer,
+  [payComponentApi.reducerPath]:payComponentApi.reducer
 
 
 
@@ -264,7 +266,8 @@ ShiftMasterApi.middleware,
 ShiftCommonTemplateMasterAPi.middleware,
 ShiftTemplateMasterApi.middleware,
 employeeSubCategoryApi.middleware,
-payFrequencyApi.middleware
+payFrequencyApi.middleware,
+payComponentApi.middleware
 ];
 
 

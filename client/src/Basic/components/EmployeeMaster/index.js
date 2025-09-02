@@ -668,7 +668,8 @@ export default function Form() {
         mobile: "",
       },
     ]);
-    setPermanent([
+    setSameAsPresent(false)
+    setPermanentAddress([
       {
         address: "",
         cityId: "",
@@ -1915,6 +1916,7 @@ export default function Form() {
                                 type="checkbox"
                                 checked={sameAsPresent}
                                 onChange={handleCheckboxChange}
+                                disabled={readOnly}
                               />
                               Same as Present
                             </label>

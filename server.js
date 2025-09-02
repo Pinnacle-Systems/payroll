@@ -39,7 +39,8 @@ import {
   ShiftCommonTemplate,
   shiftMaster,
   employeeSubCategory,
-  payfrequency
+  payfrequency,
+  payComponents
 
 } from './src/routes/index.js';
 
@@ -129,6 +130,7 @@ app.use('/shiftCommonTemplate', ShiftCommonTemplate)
 app.use('/ShiftTemplate', ShiftTemplate)
 app.use('/employeeSubcategory', employeeSubCategory)
 app.use('/payFrequency', payfrequency)
+app.use('/payComponent',payComponents)
 
 
 
