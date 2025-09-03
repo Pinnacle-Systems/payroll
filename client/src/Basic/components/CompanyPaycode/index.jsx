@@ -22,7 +22,7 @@ import {
   useUpdatePayComponentMutation,
 } from "../../../redux/services/PayComponentsService";
 
-const PayComponents = () => {
+const CompanyPaycode = () => {
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
 
@@ -267,7 +267,7 @@ const PayComponents = () => {
                 setErrors({});
               }}
             >
-              <div className="h-full flex flex-col bg-gray-100">
+              <div className="h-full flex flex-col bg-[f1f1f0]">
                 <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                   <div className="flex items-center gap-2">
                     <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
@@ -386,4 +386,4 @@ const PayComponents = () => {
   );
 };
 
-export default PayComponents;
+export default CompanyPaycode;

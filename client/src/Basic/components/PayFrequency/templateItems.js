@@ -89,7 +89,7 @@ const TemplateItems = ({
 
   return (
     <>
-      <div className="h-[90vh] flex flex-col bg-[f1f1f0] overflow-x-auto">
+      <div className="h-[90vh] flex flex-col bg-gray-100 overflow-x-auto">
         {/* Header */}
         <div className=" flex  justify-between items-center  ">
           <h1 className="text-2xl font-semibold text-gray-800">

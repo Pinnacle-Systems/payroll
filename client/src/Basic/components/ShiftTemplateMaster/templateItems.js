@@ -57,7 +57,7 @@ const TemplateItems = ({
     return (
         <>
 
-            <div className="w-full bg-[#f1f1f0] mx-auto rounded-md shadow-md px-2 py-1">
+            <div className="w-full bg-gray-100 mx-auto rounded-md shadow-md px-2 py-1">
                 <div className="flex justify-between items-center mb-1">
                     <h1 className="text-2xl font-bold text-gray-800">Shift Template </h1>
                     <div className="gpa-4">
