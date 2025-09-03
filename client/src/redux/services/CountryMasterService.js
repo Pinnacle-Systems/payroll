@@ -80,6 +80,7 @@ const countryMasterApi = createApi({
 export const {
   useGetCountriesQuery,
   useGetCountryByIdQuery,
+  useLazyGetCountryByIdQuery,
   useAddCountryMutation,
   useUpdateCountryMutation,
   useDeleteCountryMutation,

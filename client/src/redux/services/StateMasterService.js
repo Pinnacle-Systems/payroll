@@ -80,6 +80,7 @@ const stateMasterApi = createApi({
 export const {
   useGetStateQuery,
   useGetStateByIdQuery,
+  useLazyGetStateByIdQuery,
   useAddStateMutation,
   useUpdateStateMutation,
   useDeleteStateMutation,

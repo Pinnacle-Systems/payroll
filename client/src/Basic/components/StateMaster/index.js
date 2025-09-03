@@ -6,6 +6,7 @@ import {
   useAddStateMutation,
   useUpdateStateMutation,
   useDeleteStateMutation,
+  useLazyGetStateByIdQuery,
 } from "../../../redux/services/StateMasterService";
 import { useGetCountriesQuery } from "../../../redux/services/CountryMasterService";
 
@@ -45,9 +46,10 @@ export default function Form() {
   const [gstNo, setGstNo] = useState("");
 
   const [searchValue, setSearchValue] = useState("");
-
+  const stateNameRef = useRef(null);
   const childRecord = useRef(0);
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
+  const [getStateById] = useLazyGetStateByIdQuery();
 
   const params = {
     companyId: secureLocalStorage.getItem(
@@ -88,7 +90,7 @@ export default function Form() {
     [id]
   );
 
-  console.log(childRecord.current);
+  console.log(childRecord.current, "childRecord.current");
 
   useEffect(() => {
     syncFormWithDb(singleData?.data);
@@ -102,9 +104,13 @@ export default function Form() {
     gstNo,
     id,
   };
-
+  useEffect(() => {
+    if (form && !readOnly && stateNameRef.current) {
+      stateNameRef.current.focus();
+    }
+  }, [form, readOnly]);
   const validateData = (data) => {
-    if (data.name && data.code) {
+    if (data.name && data.country) {
       return true;
     }
     return false;
@@ -122,19 +128,19 @@ export default function Form() {
         showConfirmButton: false,
         didOpen: () => {
           Swal.showLoading();
-        }
+        },
       });
       setForm(false);
-      dispatch({
-        type: `countryMaster/invalidateTags`,
-        payload: ["Countries"],
-      });
+      // dispatch({
+      //   type: `countryMaster/invalidateTags`,
+      //   payload: ["Countries"],
+      // });
     } catch (error) {
       console.log(error);
       Swal.fire({
-        icon: 'error',
-        title: 'Submission error',
-        text: error.data?.message || 'Something went wrong!',
+        icon: "error",
+        title: "Submission error",
+        text: error.data?.message || "Something went wrong!",
       });
     }
   };
@@ -142,15 +148,13 @@ export default function Form() {
   const saveData = () => {
     if (!validateData(data)) {
       Swal.fire({
-        icon: 'error',
-        title: 'Submission error',
-        text: 'Please fill all required fields...!',
+        icon: "error",
+        title: "Submission error",
+        text: "Please fill all required fields...!",
       });
       return;
     }
-    if (!window.confirm("Are you sure save the details ...?")) {
-      return;
-    }
+    
     if (id) {
       handleSubmitCustom(updateData, data, "Updated");
     } else {
@@ -158,34 +162,75 @@ export default function Form() {
     }
   };
 
-  const deleteData = async (id) => {
+  // const deleteData = async (id) => {
+  //   // if (!id) return;
+  //   // const result = await getStateById(id).unwrap();
+
+  //   // if (result?.data?.childRecord > 0) {
+  //   //   toast.info("Child Record Exist", { position: "top-center" });
+  //   //   return;
+  //   // }
+
+  //   if (!window.confirm("Are you sure to delete...?")) {
+  //     return;
+  //   }
+  //   try {
+  //     let deldata = await removeData(id).unwrap();
+  //     if (deldata?.statusCode == 1) {
+  //       toast.info("Child Record Exist", { position: "top-center" });
+  //       return;
+  //     }
+  //     setId("");
+  //     // dispatch({
+  //     //   type: `countryMaster/invalidateTags`,
+  //     //   payload: ["Countries"],
+  //     // });
+  //     Swal.fire({
+  //       title: "Deleted Successfully",
+  //       icon: "success",
+  //       timer: 1000,
+  //     });
+  //     setForm(false);
+  //   } catch (error) {
+  //     Swal.fire({
+  //       icon: "error",
+  //       title: "Submission error",
+  //       text: error.data?.message || "Something went wrong!",
+  //     });
+  //   }
+  // };
+const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
         return;
       }
       try {
-        await removeData(id);
+        let deldata = await removeData(id).unwrap();
+        if (deldata?.statusCode == 1) {
+          Swal.fire({
+            icon: "error",
+            title: "Child record Exists",
+            text: deldata.data?.message || "Data cannot be deleted!",
+          });
+          return;
+        }
         setId("");
-        dispatch({
-          type: `countryMaster/invalidateTags`,
-          payload: ["Countries"],
-        });
         Swal.fire({
           title: "Deleted Successfully",
           icon: "success",
           timer: 1000,
-
-        }); setForm(false);
+        });
+        setForm(false);
       } catch (error) {
         Swal.fire({
-          icon: 'error',
-          title: 'Submission error',
-          text: error.data?.message || 'Something went wrong!',
+          icon: "error",
+          title: "Submission error",
+          text: error.data?.message || "Something went wrong!",
         });
+        setForm(false);
       }
     }
   };
-
   const handleKeyDown = (event) => {
     let charCode = String.fromCharCode(event.which).toLowerCase();
     if ((event.ctrlKey || event.metaKey) && charCode === "s") {
@@ -196,6 +241,9 @@ export default function Form() {
 
   const onNew = () => {
     setId("");
+    setName("")
+    setCode("")
+    setCountry("")
     setReadOnly(false);
     setForm(true);
     setSearchValue("");
@@ -238,7 +286,7 @@ export default function Form() {
       header: "State Name",
       accessor: (item) => item?.name,
       //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-72",
+      className: "font-medium text-gray-900 text-left  pl-2 uppercase w-72",
     },
 
     {
@@ -246,12 +294,6 @@ export default function Form() {
       accessor: (item) => (item.active ? ACTIVE : INACTIVE),
       //   cellClass: () => "font-medium text-gray-900",
       className: "font-medium text-gray-900 text-center uppercase w-16",
-    },
-    {
-      header: "",
-      accessor: (item) => "",
-      //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 uppercase w-[65%]",
     },
   ];
   const tableHeaders = [
@@ -298,7 +340,7 @@ export default function Form() {
               setForm(true);
               onNew();
             }}
-            className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+            className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
           >
             + Add New State
           </button>
@@ -325,32 +367,32 @@ export default function Form() {
             onClose={() => {
               setForm(false);
               setErrors({});
+              setId('')
             }}
           >
             <div className="h-full flex flex-col bg-gray-100">
               <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
-                    {id
-                      ? !readOnly
-                        ? "Edit State Master"
-                        : "State Master"
-                      : "Add New State"}
+                    
+                       State Master
+                      
+                     
                   </h2>
                 </div>
                 <div className="flex gap-2">
                   <div>
-                    {readOnly && (
+                     {readOnly && (
                       <button
                         type="button"
                         onClick={() => {
-                          setForm(false);
-                          setSearchValue("");
-                          setId(false);
+                          
+                          
+                          setReadOnly(false)
                         }}
                         className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
                       >
-                        Cancel
+                        Edit
                       </button>
                     )}
                   </div>
@@ -384,7 +426,10 @@ export default function Form() {
                               setValue={setName}
                               required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              disabled={
+                                childRecord.current > 0 ? true : undefined
+                              }
+                                ref={stateNameRef}
                             />
                           </div>
                           <div className="mb-3 ms-3">
@@ -393,26 +438,17 @@ export default function Form() {
                               type="text"
                               value={code}
                               setValue={setCode}
-                              required={true}
+                              // required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              disabled={
+                                childRecord.current > 0 
+                              }
                             />
                           </div>
                         </div>
 
                         <div className="flex">
-                          {/* <div className="mb-3 w-[200px]">
-                            <TextInput
-                              name="GST No"
-                              type="text"
-                              value={gstNo}
-                              setValue={setGstNo}
-                              readOnly={readOnly}
-                              disabled={childRecord.current > 0}
-                              width={"w-[200px]"}
-                            />
-                          </div> */}
-                          {console.log(country, "countrycehck")}
+                         
 
                           <div className="w-[200px] mb-3 ">
                             <DropdownInput
@@ -421,22 +457,23 @@ export default function Form() {
                                 id
                                   ? countriesList?.data
                                   : countriesList?.data?.filter(
-                                    (item) => item.active
-                                  ),
+                                      (item) => item.active
+                                    ),
                                 "name",
                                 "id"
                               )}
+                              className={`w-[150px]`}
                               value={country}
                               setValue={setCountry}
                               required={true}
                               readOnly={readOnly}
-                              className={`w-[150px]`}
+                              
+                               disabled={
+                                childRecord.current > 0 ? true : undefined
+                              }
                             />
-
-
                           </div>
                         </div>
-
 
                         <div>
                           <ToggleButton

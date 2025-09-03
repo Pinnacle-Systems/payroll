@@ -994,7 +994,7 @@
 
 
 import validator from "validator";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState,forwardRef } from "react";
 import { MultiSelect } from "react-multi-select-component";
 import Select from "react-dropdown-select";
 import { findFromList } from "../Utils/helper";
@@ -1176,7 +1176,7 @@ export const MultiSelectDropdown = ({
     </div>
   );
 };
-export const TextInput = ({
+export const TextInput = forwardRef(({
   name,
   label,
   type = "text",
@@ -1190,7 +1190,7 @@ export const TextInput = ({
   onBlur = null,
   width = "full",
 
-}) => {
+},ref) => {
   return (
     <div className={`mb-2 ${width}`}>
       {name && (
@@ -1199,6 +1199,7 @@ export const TextInput = ({
         </label>
       )}
       <input
+      ref={ref} 
         type={type}
         value={value}
         onChange={(e) =>
@@ -1224,7 +1225,7 @@ export const TextInput = ({
       />
     </div>
   );
-};
+});
 
 export const PasswordTextInput = ({
   name,
@@ -1501,14 +1502,14 @@ export const DropdownInput = ({
 }) => {
   const handleOnChange = (e) => {
     const val = e.target.value;
-    // parseInt only if the value is numeric
+    
     const parsedValue = !isNaN(parseInt(val)) ? parseInt(val) : val;
     setValue(parsedValue);
   };
 
   const isDisabled = readOnly || disabled;
 
-  console.log(options, '134');
+  
 
 
   return (
@@ -1524,11 +1525,12 @@ export const DropdownInput = ({
         tabIndex={tabIndex ?? undefined}
         defaultValue={defaultValue}
         required={required}
+        readOnly={readOnly}
         className={`w-full px-1 py-0.5 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
-          ${disabled
-            ? "bg-gray-100 text-gray-100 cursor-not-allowed"
+          ${isDisabled
+            ? "bg-gray-100 text-black-100 cursor-not-allowed"
             : "bg-white text-gray-900 hover:border-gray-400"}
           ${className}`}
         value={value}
@@ -1536,7 +1538,7 @@ export const DropdownInput = ({
           beforeChange();
           handleOnChange(e);
         }}
-        disabled={readOnly}
+        disabled={isDisabled}
       >
         <option value="" hidden={!clear} className="text-gray-800">
           Select {name || "option"}
@@ -2220,14 +2222,14 @@ export const ReusableTable = ({
             {columns?.map((column, index) => (
               <th
                 key={index}
-                className={` ${column.className ? column.className : ""} py-2  font-medium   ${column.header !== "" ? 'border-r border-white/50' : ''} text-[13px]`}
+                className={` font-medium text-gray-900 py-2  text-center  ${column.header !== "" ? 'border-r border-white/50' : ''} `}
 
               >
                 {column.header}
               </th>
             ))}
             {rowActions && (
-              <th className="px-4 py-2 text-center  font-medium text-[13px] justify-end">Actions</th>
+              <th className="px-4 py-2 text-center  font-medium justify-end">Actions</th>
             )}
           </tr>
         </thead>

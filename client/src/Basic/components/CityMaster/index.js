@@ -94,7 +94,7 @@ export default function Form() {
   };
 
   const validateData = (data) => {
-    if (data.name && data.code) {
+    if (data.name && data.state) {
       return true;
     }
     return false;
@@ -112,8 +112,9 @@ export default function Form() {
         showConfirmButton: false,
         didOpen: () => {
           Swal.showLoading();
-        }
-      }); setForm(false);
+        },
+      });
+      setForm(false);
       dispatch({
         type: `StateMaster/invalidateTags`,
         payload: ["State"],
@@ -126,15 +127,13 @@ export default function Form() {
   const saveData = () => {
     if (!validateData(data)) {
       Swal.fire({
-        icon: 'error',
-        title: 'Submission error',
-        text: 'Please fill all required fields...!',
+        icon: "error",
+        title: "Submission error",
+        text: "Please fill all required fields...!",
       });
       return;
     }
-    if (!window.confirm("Are you sure save the details ...?")) {
-      return;
-    }
+   
     if (id) {
       handleSubmitCustom(updateData, data, "Updated");
     } else {
@@ -163,7 +162,6 @@ export default function Form() {
           title: "Deleted Successfully",
           icon: "success",
           timer: 1000,
-
         });
         setForm(false);
       } catch (error) {
@@ -171,7 +169,6 @@ export default function Form() {
           title: "Deleted Successfully",
           icon: "success",
           timer: 1000,
-
         });
       }
     }
@@ -191,6 +188,9 @@ export default function Form() {
     setForm(true);
     setSearchValue("");
     setActive(true);
+    setName("");
+    setCode("");
+    setState("");
   };
   const handleView = (id) => {
     setId(id);
@@ -225,7 +225,7 @@ export default function Form() {
       header: "City Name",
       accessor: (item) => item?.name,
       //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-72",
+      className: "font-medium text-gray-900 text-left pl-2 uppercase w-72",
     },
 
     {
@@ -233,12 +233,6 @@ export default function Form() {
       accessor: (item) => (item.active ? ACTIVE : INACTIVE),
       //   cellClass: () => "font-medium text-gray-900",
       className: "font-medium text-gray-900 text-center uppercase w-16",
-    },
-    {
-      header: "",
-      accessor: (item) => "",
-      //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 uppercase w-[65%]",
     },
   ];
   function onDataClick(id) {
@@ -284,7 +278,8 @@ export default function Form() {
 
   function countryFromState() {
     return state
-      ? stateList.data.find((item) => item.id === parseInt(state)).country?.name
+      ? stateList?.data?.find((item) => item?.id === parseInt(state)).country
+          ?.name
       : "";
   }
 
@@ -299,7 +294,7 @@ export default function Form() {
                 setForm(true);
                 onNew();
               }}
-              className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+              className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
             >
               + Add New City
             </button>
@@ -325,17 +320,16 @@ export default function Form() {
               onClose={() => {
                 setForm(false);
                 setErrors({});
+                setId("");
               }}
             >
               <div className="h-full flex flex-col bg-gray-100">
                 <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                   <div className="flex items-center gap-2">
                     <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
-                      {id
-                        ? !readOnly
-                          ? "Edit City Master"
-                          : "City Master"
-                        : "Add New City"}
+                      
+                          City Master
+                        
                     </h2>
                   </div>
                   <div className="flex gap-2">
@@ -344,13 +338,11 @@ export default function Form() {
                         <button
                           type="button"
                           onClick={() => {
-                            setForm(false);
-                            setSearchValue("");
-                            setId(false);
+                            setReadOnly(false);
                           }}
                           className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
                         >
-                          Cancel
+                          Edit
                         </button>
                       )}
                     </div>
@@ -385,19 +377,22 @@ export default function Form() {
                                   setValue={setName}
                                   required={true}
                                   readOnly={readOnly}
-                                  disabled={childRecord.current > 0}
+                                  disabled={
+                                    childRecord.current > 0 ? true : undefined
+                                  }
                                 />
                               </div>
                               <div className="mb-3  ml-6">
                                 <TextInput
                                   name="Code"
-
                                   type="text"
                                   value={code}
                                   setValue={setCode}
-                                  required={true}
+                                  // required={true}
                                   readOnly={readOnly}
-                                  disabled={childRecord.current > 0}
+                                  disabled={
+                                    childRecord.current > 0 ? true : undefined
+                                  }
                                 />
                               </div>
                             </div>
@@ -409,8 +404,8 @@ export default function Form() {
                                     id
                                       ? stateList?.data
                                       : stateList?.data?.filter(
-                                        (item) => item.active
-                                      ),
+                                          (item) => item.active
+                                        ),
                                     "name",
                                     "id"
                                   )}
@@ -418,16 +413,23 @@ export default function Form() {
                                   setValue={setState}
                                   required={true}
                                   readOnly={readOnly}
-                                  disabled={childRecord.current > 0}
+                                  disabled={
+                                    childRecord.current > 0 ? true : undefined
+                                  }
+                                  // disabled={true}
                                 />
                               </div>
-                              <div className="-mt-1 w-[48%]">
+                              <div className="w-[48%]">
                                 <TextInput
                                   name="Country"
                                   width={"w-[150px]"}
                                   type="text"
                                   value={countryFromState()}
-                                  disabled={childRecord.current > 0}
+                                  readOnly={readOnly}
+                                  disabled={
+                                    childRecord.current > 0 ? true : undefined
+                                  }
+                                  // disabled={true}
                                 />
                               </div>
                             </div>

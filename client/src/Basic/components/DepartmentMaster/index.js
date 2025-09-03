@@ -89,7 +89,7 @@ export default function Form() {
   };
 
   const validateData = (data) => {
-    if (data.name && data.code) {
+    if (data.name ) {
       return true;
     }
     return false;
@@ -125,9 +125,7 @@ export default function Form() {
       });
       return;
     }
-    if (!window.confirm("Are you sure save the details ...?")) {
-      return;
-    }
+  
     if (id) {
       handleSubmitCustom(updateData, data, "Updated");
     } else {
@@ -174,6 +172,9 @@ export default function Form() {
 
   const onNew = () => {
     setId("");
+    setName('')
+    setCode('')
+    setActive(true)
     setReadOnly(false);
     setForm(true);
     setSearchValue("");
@@ -239,21 +240,16 @@ export default function Form() {
       header: "Department Name",
       accessor: (item) => item?.name,
       //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-72",
+      className: "font-medium text-gray-900 text-left pl-2 uppercase w-72",
     },
 
     {
       header: "Status",
       accessor: (item) => (item.active ? ACTIVE : INACTIVE),
       //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-36",
+      className: "font-medium text-gray-900 text-center uppercase w-16",
     },
-    {
-      header: "",
-      accessor: (item) => "",
-      //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 uppercase w-[65%]",
-    },
+   
   ];
   const handleView = (id) => {
     setId(id);
@@ -277,7 +273,7 @@ export default function Form() {
               setForm(true);
               onNew();
             }}
-            className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+            className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
           >
             + Add New Department
           </button>
@@ -314,34 +310,33 @@ export default function Form() {
           onClose={() => {
             setForm(false);
             setErrors({});
+            setId("")
           }}
         >
           <div className="h-full flex flex-col bg-gray-100">
             <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
               <div className="flex items-center gap-2">
                 <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
-                  {id
-                    ? !readOnly
-                      ? "Edit Department Master"
-                      : " Department Master"
-                    : "Add New Department"}
+                  
+                      Department Master
+                    
                 </h2>
               </div>
               <div className="flex gap-2">
                 <div>
-                  {readOnly && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setForm(false);
-                        setSearchValue("");
-                        setId(false);
-                      }}
-                      className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
-                    >
-                      Cancel
-                    </button>
-                  )}
+                     {readOnly && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          
+                          
+                          setReadOnly(false)
+                        }}
+                        className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
+                      >
+                        Edit
+                      </button>
+                    )}
                 </div>
                 <div className="flex gap-2">
                   {!readOnly && (
@@ -382,7 +377,7 @@ export default function Form() {
                             type="text"
                             value={code}
                             setValue={setCode}
-                            required={true}
+                            // required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
                           />

@@ -366,8 +366,8 @@ model City {
   id              Int              @id @default(autoincrement())
   name            String?
   code            String?
-  state           State?           @relation(fields: [stateId], references: [id])
-  stateId         Int?
+  state           State           @relation(fields: [stateId], references: [id])
+  stateId         Int
   active          Boolean?         @default(true)
   doctorLocalCity Employee[]       @relation(name: "permanentCityId")
   doctorPermCity  Employee[]       @relation(name: "presentCityId")

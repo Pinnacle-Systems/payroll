@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import secureLocalStorage from "react-secure-storage";
-import { toast } from "react-toastify";
+
 import {
   useAddCountryMutation,
   useDeleteCountryMutation,
   useGetCountriesQuery,
   useGetCountryByIdQuery,
+  useLazyGetCountryByIdQuery,
   useUpdateCountryMutation,
 } from "../../../redux/services/CountryMasterService";
 
@@ -13,16 +14,12 @@ import { TextInput, ToggleButton, ReusableTable } from "../../../Inputs";
 import { statusDropdown } from "../../../Utils/DropdownData";
 import Modal from "../../../UiComponents/Modal";
 
-import Mastertable from "../MasterTable/Mastertable";
-import MasterForm from "../MastersForm/MastersForm";
-import { push } from "../../../redux/features/opentabs";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Check, Power } from "lucide-react";
 import Swal from "sweetalert2";
-import { useGetEmployeeQuery } from "../../../redux/services/EmployeeMasterService";
 
-const MODEL = "Country Master";
+import { toast } from "react-toastify";
 
 export default function Form() {
   const openTabs = useSelector((state) => state.openTabs);
@@ -34,7 +31,9 @@ export default function Form() {
   const [code, setCode] = useState("");
   const [active, setActive] = useState(false);
   const [errors, setErrors] = useState({});
-
+  // const [childRecord,setChildRecord]  = useState("")
+  const countryNameRef = useRef(null);
+  const [getCountryId] = useLazyGetCountryByIdQuery();
   const [searchValue, setSearchValue] = useState("");
 
   const childRecord = useRef(0);
@@ -65,17 +64,23 @@ export default function Form() {
   //   dispatch(push({ name: "COUNTRY MASTER" }))
 
   // }, [ dispatch,openTabs])
+  useEffect(() => {
+    if (form && !readOnly && countryNameRef.current) {
+      countryNameRef.current.focus();
+    }
+  }, [form, readOnly]);
 
   const syncFormWithDb = useCallback(
     (data) => {
       setName(data?.name || "");
       setCode(data?.code || "");
       setActive(id ? data?.active ?? false : true);
+      // setChildRecord(data?.childRecord ? data?.childRecord : 0);
       childRecord.current = data?.childRecord ? data?.childRecord : 0;
     },
     [id]
   );
-  console.log(childRecord.current, "childRecord");
+  console.log(childRecord, "childRecord");
 
   useEffect(() => {
     syncFormWithDb(singleData?.data);
@@ -92,7 +97,7 @@ export default function Form() {
   };
 
   const validateData = (data) => {
-    if (data.name && data.code) {
+    if (data.name ) {
       return true;
     }
     return false;
@@ -110,14 +115,14 @@ export default function Form() {
         showConfirmButton: false,
         didOpen: () => {
           Swal.showLoading();
-        }
+        },
       });
       setForm(false);
     } catch (error) {
       Swal.fire({
-        icon: 'error',
-        title: 'Submission error',
-        text: error.data?.message || 'Something went wrong!',
+        icon: "error",
+        title: "Submission error",
+        text: error.data?.message || "Something went wrong!",
       });
     }
   };
@@ -125,19 +130,15 @@ export default function Form() {
   const saveData = () => {
     console.log("saveData hit");
     if (!validateData(data)) {
-      // toast.error("Please fill all required fields...!", {
-      //   position: "top-center",
-      // });
+      
       Swal.fire({
-        icon: 'error',
-        title: 'Submission error',
-        text: 'Please fill all required fields...!',
+        icon: "error",
+        title: "Submission error",
+        text: "Please fill all required fields...!",
       });
       return;
     }
-    if (!window.confirm("Are you sure save the details ...?")) {
-      return;
-    }
+    
     if (id) {
       handleSubmitCustom(updateData, data, "Updated");
       console.log("updateData hit");
@@ -146,6 +147,41 @@ export default function Form() {
     }
   };
 
+  // const deleteData = async (id) => {
+  //   if (!id) return;
+  //   const result = await getCountryId(id).unwrap();
+
+  //   if (result?.data?.childRecord > 0) {
+  //     toast.info("Child Record Exist", { position: "top-center" });
+  //     return;
+  //   }
+
+  //     if (!window.confirm("Are you sure to delete...?")) {
+  //       return;
+  //     }
+  //     try {
+  //       let deldata = await removeData(id).unwrap();
+  //       if (deldata?.statusCode == 1) {
+  //         toast.info("Child Record Exist", { position: "top-center" });
+  //         return;
+  //       }
+  //       setId("");
+  //       Swal.fire({
+  //         title: "Deleted Successfully",
+  //         icon: "success",
+  //         timer: 1000,
+  //       });
+  //       setForm(false);
+  //     } catch (error) {
+  //       Swal.fire({
+  //         icon: "error",
+  //         title: "Submission error",
+  //         text: error.data?.message || "Something went wrong!",
+  //       });
+  //       setForm(false);
+
+  //   }
+  // };
   const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
@@ -155,9 +191,9 @@ export default function Form() {
         let deldata = await removeData(id).unwrap();
         if (deldata?.statusCode == 1) {
           Swal.fire({
-            icon: 'error',
-            title: 'Submission error',
-            text: deldata.data?.message || 'Something went wrong!',
+            icon: "error",
+            title: "Child record Exists",
+            text: deldata.data?.message || "Data cannot be deleted!",
           });
           return;
         }
@@ -166,20 +202,18 @@ export default function Form() {
           title: "Deleted Successfully",
           icon: "success",
           timer: 1000,
-
         });
         setForm(false);
       } catch (error) {
         Swal.fire({
-          icon: 'error',
-          title: 'Submission error',
-          text: error.data?.message || 'Something went wrong!',
+          icon: "error",
+          title: "Submission error",
+          text: error.data?.message || "Something went wrong!",
         });
         setForm(false);
       }
     }
   };
-
   const handleKeyDown = (event) => {
     let charCode = String.fromCharCode(event.which).toLowerCase();
     if ((event.ctrlKey || event.metaKey) && charCode === "s") {
@@ -190,6 +224,9 @@ export default function Form() {
 
   const onNew = () => {
     setId("");
+    setName("");
+    setCode("");
+    setActive(true);
     setReadOnly(false);
     setForm(true);
     setSearchValue("");
@@ -227,7 +264,7 @@ export default function Form() {
       header: "Country Name",
       accessor: (item) => item?.name,
       //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-72",
+      className: "font-medium text-gray-900 pl-2 text-left uppercase w-72",
     },
 
     {
@@ -236,12 +273,12 @@ export default function Form() {
       //   cellClass: () => "font-medium text-gray-900",
       className: "font-medium text-gray-900 text-center uppercase w-16",
     },
-    {
-      header: "",
-      accessor: (item) => "",
-      //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 uppercase w-[65%]",
-    },
+    // {
+    //   header: "",
+    //   accessor: (item) => "",
+    //   //   cellClass: () => "font-medium text-gray-900",
+    //   className: "font-medium text-gray-900 uppercase w-[65%]",
+    // },
   ];
   function onDataClick(id) {
     setId(id);
@@ -281,7 +318,7 @@ export default function Form() {
     " ",
     " ",
   ];
-const { data : employee} = useGetEmployeeQuery({params})
+
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
       <div className="w-full flex bg-white p-1 justify-between  items-center">
@@ -292,7 +329,7 @@ const { data : employee} = useGetEmployeeQuery({params})
               setForm(true);
               onNew();
             }}
-            className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+            className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
           >
             + Add New Country
           </button>
@@ -319,17 +356,15 @@ const { data : employee} = useGetEmployeeQuery({params})
             onClose={() => {
               setForm(false);
               setErrors({});
+
+              setId("");
             }}
           >
             <div className="h-full flex flex-col bg-gray-100">
               <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
-                    {id
-                      ? !readOnly
-                        ? "Edit Country Master"
-                        : "Country Master"
-                      : "Add New Country"}
+                    Country Master
                   </h2>
                 </div>
                 <div className="flex gap-2">
@@ -338,13 +373,13 @@ const { data : employee} = useGetEmployeeQuery({params})
                       <button
                         type="button"
                         onClick={() => {
-                          setForm(false);
-                          setSearchValue("");
-                          setId(false);
+                          
+                          
+                          setReadOnly(false)
                         }}
                         className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
                       >
-                        Cancel
+                        Edit
                       </button>
                     )}
                   </div>
@@ -377,8 +412,13 @@ const { data : employee} = useGetEmployeeQuery({params})
                                 type="text"
                                 value={name}
                                 setValue={setName}
+                                ref={countryNameRef}
                                 required={true}
                                 readOnly={readOnly}
+                                // disabled={ childRecord > 0 ? true : undefined}
+                                disabled={
+                                  childRecord.current > 0 ? true : undefined
+                                }
                               />
                             </div>
                             <div className="mb-3 ml-5 ">
@@ -387,8 +427,11 @@ const { data : employee} = useGetEmployeeQuery({params})
                                 type="text"
                                 value={code}
                                 setValue={setCode}
-                                required={true}
+                                // required={true}
                                 readOnly={readOnly}
+                                disabled={
+                                  childRecord.current > 0 ? true : undefined
+                                }
                               />
                             </div>
                           </div>

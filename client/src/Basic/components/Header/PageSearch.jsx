@@ -48,18 +48,18 @@ const PageSearch = ({ pageList }) => {
         setFilteredPages(pageList.filter(page => page.name.toLowerCase().includes(search.toLowerCase())))
     }, [search])
     return (
-        <div id='pageSearch' className="relative flex flex-col text-base text-black font-['Times_New_Roman']  z-10" ref={inputRef}>
+        <div id='pageSearch' className="relative flex flex-col text-base text-black font-medium  z-10" ref={inputRef}>
             <input
                 type="text"
                 placeholder="Search here"
-                className="text-black p-2 w-[350px]  h-[30px] rounded-lg focus:border-0 focus:outline-none"
+                className="text-black p-2 w-[350px]  h-[30px] rounded-lg focus:border-0 font-medium  focus:outline-none"
                 tabIndex={0}
                 onChange={(e) => { setSearch(e.target.value)}}
                 value={search} onFocus={() => { setIsListShow(true) }} />
             {isListShow &&
                 <ul className='absolute max-h-[300px] overflow-auto bg-gray-100 top-7  w-[350px] '>
 
-                    {filteredPages.map((page) => <li className="cursor-pointer text-base  font-['Times_New_Roman']"
+                    {filteredPages.map((page) => <li className="cursor-pointer text-base  "
                         key={page.id}
                         tabIndex={0}
                         onKeyDown={(e) => {

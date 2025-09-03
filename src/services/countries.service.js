@@ -19,6 +19,8 @@ async function get(req) {
 
 async function getOne(id) {
     const childRecord = await prisma.state.count({ where: { countryId: parseInt(id) } });
+    console.log(childRecord,"childRecordincountry");
+    
     const data = await prisma.country.findUnique({
         where: {
             id: parseInt(id)
