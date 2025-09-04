@@ -51,7 +51,7 @@ const EmployeeSubCategory = () => {
 
   const syncFormWithDb = useCallback(
     (data) => {
-        setGradeName(data?.gradeName || "")
+      setGradeName(data?.gradeName || "");
       setEmployeeCategoryId(data?.employeeCategoryId || "");
       setActive(id ? data?.active ?? false : true);
     },
@@ -61,8 +61,6 @@ const EmployeeSubCategory = () => {
   useEffect(() => {
     syncFormWithDb(singleData?.data);
   }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
-
-  
 
   const data = {
     gradeName,
@@ -87,7 +85,7 @@ const EmployeeSubCategory = () => {
       let returnData = await callback(data).unwrap();
       setId(returnData.data.id);
       toast.success(text + "Successfully");
-      setForm(false)
+      setForm(false);
     } catch (error) {
       console.log("handle");
     }
@@ -141,6 +139,8 @@ const EmployeeSubCategory = () => {
 
   const onNew = () => {
     setId("");
+    setEmployeeCategoryId("");
+    setGradeName("");
     setReadOnly(false);
     setForm(true);
     setSearchValue("");
@@ -195,12 +195,7 @@ const EmployeeSubCategory = () => {
       //   cellClass: () => "font-medium text-gray-900",
       className: "font-medium text-gray-900 text-center uppercase w-36",
     },
-    {
-      header: "",
-      accessor: (item) => "",
-      //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 uppercase w-[55%]",
-    },
+   
   ];
   function onDataClick(id) {
     setId(id);
@@ -219,7 +214,7 @@ const EmployeeSubCategory = () => {
                 setForm(true);
                 onNew();
               }}
-              className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+              className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
             >
               + Add New Employee Sub Category
             </button>
@@ -240,21 +235,18 @@ const EmployeeSubCategory = () => {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[40%]  h-[55%]"}
+            widthClass={"w-[40%]  h-[45%]"}
             onClose={() => {
               setForm(false);
               setErrors({});
+              setId("");
             }}
           >
             <div className="h-full flex flex-col bg-gray-100">
               <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
-                    {id
-                      ? !readOnly
-                        ? "Edit Employee Sub Category Master"
-                        : "Shift Employee Sub Category Master"
-                      : "Add  New Employee Sub Category"}
+                    Employee Sub Category Master
                   </h2>
                 </div>
                 <div className="flex gap-2">
@@ -263,13 +255,11 @@ const EmployeeSubCategory = () => {
                       <button
                         type="button"
                         onClick={() => {
-                          setForm(false);
-                          setSearchValue("");
-                          setId(false);
+                          setReadOnly(false);
                         }}
                         className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
                       >
-                        Cancel
+                        Edit
                       </button>
                     )}
                   </div>
@@ -293,46 +283,52 @@ const EmployeeSubCategory = () => {
                 <div className="grid grid-cols-1  gap-3  h-full">
                   <div className="lg:col-span- space-y-3">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
-                      <div className="space-y-4 w-[40%]">
-                        <div className="w-42">
-                          <label className="block text-xs font-bold text-slate-700 mb-2">
-                            Choose Employee Category{" "}
-                            <span className="text-red-500">*</span>{" "}
-                          </label>
-                          <select
-                            className="w-full px-2 h-[26px] text-[12px] border border-slate-300 rounded-md 
-                    focus:border-indigo-300 focus:outline-none transition-all duration-200
-                     hover:border-slate-400"
-                            value={employeeCategoryId}
-                            onChange={(e) => {
-                              setEmployeeCategoryId(Number(e.target.value));
-                            }}
-                            disabled={readOnly}
-                          >
-                            <option value="">Select Category</option>
+                      <div className="space-y-4 ">
+                        <div className="flex gap-x-8">
+                          <div className="w-44">
+                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                              Employee Category{" "}
+                              <span className="text-red-500">*</span>{" "}
+                            </label>
+                            <select
+                              className={`w-full px-2 h-[20px] text-[12px] border border-slate-300 rounded-md 
+  focus:border-indigo-300 focus:outline-none transition-all duration-200
+  hover:border-slate-400
+  ${
+    readOnly
+      ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+      : "bg-white hover:border-gray-400"
+  }`}
+                              value={employeeCategoryId}
+                              onChange={(e) => {
+                                setEmployeeCategoryId(Number(e.target.value));
+                              }}
+                              disabled={readOnly}
+                            >
+                              <option value="">Select Category</option>
 
-                            {console.log(employeeCategory?.data, "dropdown")}
+                              {console.log(employeeCategory?.data, "dropdown")}
 
-                            {employeeCategory?.data?.map((doc) => (
-                              <option value={doc?.id} key={doc.id}>
-                                {doc.name}
-                              </option>
-                            ))}
-                          </select>
+                              {employeeCategory?.data?.map((doc) => (
+                                <option value={doc?.id} key={doc.id}>
+                                  {doc.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div className="w-42">
+                            <TextInput
+                              name="Grade Name"
+                              type="text"
+                              value={gradeName}
+                              setValue={setGradeName}
+                              required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                          </div>
                         </div>
-
-                        <div className="w-42">
-                          <TextInput
-                            name="Grade Name"
-                            type="text"
-                            value={gradeName}
-                            setValue={setGradeName}
-                            required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                          />
-                        </div>
-
                         <div className="mt-5">
                           <ToggleButton
                             name="Status"

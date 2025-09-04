@@ -323,16 +323,16 @@ useEffect(() => {
     },
 
     {
-      header: "docId",
+      header: "DocId",
       accessor: (item) => item?.docId,
       //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-72",
+      className: "font-medium text-gray-900 text-center uppercase w-32",
     },
     {
       header: "Category",
       accessor: (item) => item?.category,
       //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-72",
+      className: "font-medium text-gray-900 text-center uppercase w-32",
     },
     {
       header: "Status",
@@ -340,12 +340,7 @@ useEffect(() => {
       //   cellClass: () => "font-medium text-gray-900",
       className: "font-medium text-gray-900 text-center uppercase w-36",
     },
-    {
-      header: "",
-      accessor: (item) => "",
-      //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 uppercase w-[65%]",
-    },
+   
   ];
 
   return (
@@ -387,7 +382,7 @@ useEffect(() => {
                     setForm(true);
                     onNew();
                   }}
-                  className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+                   className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
                 >
                   + Add Shift Template Master
                 </button>

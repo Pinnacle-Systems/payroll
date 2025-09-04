@@ -102,7 +102,6 @@ const ShiftCommonTemplateMaster = () => {
 
   console.log(singleData?.data, "singleData?.data");
 
-
   const data = {
     docId,
     employeeCategoryId,
@@ -133,15 +132,14 @@ const ShiftCommonTemplateMaster = () => {
         showConfirmButton: false,
         didOpen: () => {
           Swal.showLoading();
-        }
-       
+        },
       });
-       setForm(false)
+      setForm(false);
     } catch (error) {
       Swal.fire({
-        icon: 'error',
-        title: 'Submission error',
-        text: error.data?.message || 'Something went wrong!',
+        icon: "error",
+        title: "Submission error",
+        text: error.data?.message || "Something went wrong!",
       });
     }
   };
@@ -149,9 +147,9 @@ const ShiftCommonTemplateMaster = () => {
   const saveData = () => {
     if (!validateData(data)) {
       Swal.fire({
-        icon: 'error',
-        title: 'Submission error',
-        text: 'Please fill all required fields...!',
+        icon: "error",
+        title: "Submission error",
+        text: "Please fill all required fields...!",
       });
       return;
     }
@@ -174,10 +172,11 @@ const ShiftCommonTemplateMaster = () => {
         const deldata = await removeData(id).unwrap();
         if (deldata?.statusCode == 1) {
           Swal.fire({
-            icon: 'error',
-            title: 'Submission error',
-            text: deldata.data?.message || 'Something went wrong!',
-          }); setForm(false);
+            icon: "error",
+            title: "Submission error",
+            text: deldata.data?.message || "Something went wrong!",
+          });
+          setForm(false);
           return;
         }
         setId("");
@@ -185,13 +184,13 @@ const ShiftCommonTemplateMaster = () => {
           title: "Deleted Successfully",
           icon: "success",
           timer: 1000,
-
-        }); setForm(false);
+        });
+        setForm(false);
       } catch (error) {
         Swal.fire({
-          icon: 'error',
-          title: 'Submission error',
-          text: error.data?.message || 'Something went wrong!',
+          icon: "error",
+          title: "Submission error",
+          text: error.data?.message || "Something went wrong!",
         });
       }
     }
@@ -255,12 +254,6 @@ const ShiftCommonTemplateMaster = () => {
       //   cellClass: () => "font-medium text-gray-900",
       className: "font-medium text-gray-900 text-center uppercase w-36",
     },
-    {
-      header: "",
-      accessor: (item) => "",
-      //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 uppercase w-[65%]",
-    },
   ];
   function onDataClick(id) {
     setId(id);
@@ -280,7 +273,7 @@ const ShiftCommonTemplateMaster = () => {
                 setForm(true);
                 onNew();
               }}
-              className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+              className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
             >
               + Add New Shift Common Template
             </button>
@@ -301,21 +294,18 @@ const ShiftCommonTemplateMaster = () => {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[45%]  h-[65%]"}
+            widthClass={"w-[45%]  h-[50%]"}
             onClose={() => {
               setForm(false);
               setErrors({});
+              setId("");
             }}
           >
             <div className="h-full flex flex-col bg-gray-100">
               <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
-                    {id
-                      ? !readOnly
-                        ? "Edit Shift Common Template Master"
-                        : "Shift Common Template Master"
-                      : "Add  New Shift Common  Template"}
+                    Shift Common Template Master
                   </h2>
                 </div>
                 <div className="flex gap-2">
@@ -324,13 +314,11 @@ const ShiftCommonTemplateMaster = () => {
                       <button
                         type="button"
                         onClick={() => {
-                          setForm(false);
-                          setSearchValue("");
-                          setId(false);
+                          setReadOnly(false);
                         }}
                         className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
                       >
-                        Cancel
+                        Edit
                       </button>
                     )}
                   </div>
@@ -354,91 +342,51 @@ const ShiftCommonTemplateMaster = () => {
                 <div className="grid grid-cols-1  gap-3  h-full">
                   <div className="lg:col-span- space-y-3">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
-                      <div className="space-y-4 w-[40%]">
-                        {/* <div className="w-72">
+                      <div className="space-y-4 ">
+                        <div className="flex gap-x-6">
+                          <div className="w-42">
                             <TextInput
-                              name="Company Name"
+                              name="Shift Common Template Code"
                               type="text"
-                              value={companyName}
-                              setValue={setCompanyName}
-                              required={true}
-                              // readOnly={readOnly}
-                              disabled={true}
-                            />
-                          </div> */}
-
-                        <TextInput
-                          name="Company Code"
-                          type="text"
-                          value={companyCode}
-                          setValue={setCompanyCode}
-                          required={true}
-                          // readOnly={readOnly}
-                          disabled={true}
-                        />
-
-                        <div className="w-42">
-                          <TextInput
-                            name="Shift Common Template Code"
-                            type="text"
-                            value={docId}
-                            // setValue={setDocId}
-                            required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                          />
-                        </div>
-                        {/* <div className="w-72">
-                            <TextInput
-                              name="Shift Common Template Name"
-                              type="text"
-                              value={name}
-                              setValue={setName}
+                              value={docId}
+                              // setValue={setDocId}
                               required={true}
                               readOnly={readOnly}
                               disabled={childRecord.current > 0}
                             />
-                    
-                        </div> */}
-                        <div className="w-42">
-                          <label className="block text-xs text-black mb-1">
-                            Choose Template
-                          </label>
-                          <select
-                            className="w-full px-2 h-[26px] text-[12px] border border-slate-300 rounded-md 
-                    focus:border-indigo-300 focus:outline-none transition-all duration-200
-                     hover:border-slate-400"
-                            value={employeeCategoryId}
-                            onChange={(e) => {
-                              setEmployeeCategoryId(e.target.value);
-                            }}
-                            disabled={readOnly}
-                          >
-                            <option value="">Select Category</option>
+                          </div>
 
-                            {console.log(employeeCategory?.data, "dropdown")}
+                          <div className="w-44">
+                            <label className="block text-xs text-black mb-1">
+                              Choose Template
+                            </label>
+                            <select
+                              className={`w-full px-2 h-[23px] text-[12px] border border-slate-300 rounded-md 
+  focus:border-indigo-300 focus:outline-none transition-all duration-200
+  hover:border-slate-400
+  ${
+    readOnly
+      ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+      : "bg-white hover:border-gray-400"
+  }`}
+                              value={employeeCategoryId}
+                              onChange={(e) => {
+                                setEmployeeCategoryId(e.target.value);
+                              }}
+                              disabled={readOnly}
+                            >
+                              <option value="">Select Category</option>
 
-                            {employeeCategory?.data?.map((doc) => (
-                              <option value={doc?.id} key={doc.id}>
-                                {doc.name}
-                              </option>
-                            ))}
-                          </select>
+                              {console.log(employeeCategory?.data, "dropdown")}
+
+                              {employeeCategory?.data?.map((doc) => (
+                                <option value={doc?.id} key={doc.id}>
+                                  {doc.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
                         </div>
-                        {/* <div className="w-60">
-                          <label className="block text-xs text-black mb-1">
-                            Common Template Description
-                          </label>
-                          <TextAreaInput
-                            name=""
-                            type="text"
-                            value={description}
-                            setValue={setDescription}
-                            // required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                          />
-                        </div> */}
 
                         <div className="mt-5">
                           <ToggleButton

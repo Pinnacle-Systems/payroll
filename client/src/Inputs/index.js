@@ -2222,7 +2222,7 @@ export const ReusableTable = ({
             {columns?.map((column, index) => (
               <th
                 key={index}
-                className={` font-medium text-gray-900 py-2  text-center  ${column.header !== "" ? 'border-r border-white/50' : ''} `}
+                className={` font-medium text-gray-900 py-2 px-8 text-center  ${column.header !== "" ? 'border-r border-white/50' : ''} `}
 
               >
                 {column.header}

@@ -16,9 +16,27 @@ const TemplateItems = ({
   setFinYearId,
   payFrequencyType,
   setPayFrequencyType,
+  setReadOnly,
+  setId,
 }) => {
   console.log(payFrequencyType, "payFrequencyType");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedRowIndex, setSelectedRowIndex] = useState(null);
 
+  const [contextMenu, setContextMenu] = useState(null);
+  const handleRightClick = (event, rowIndex, type) => {
+    event.preventDefault();
+    setContextMenu({
+      mouseX: event.clientX,
+      mouseY: event.clientY,
+      rowId: rowIndex,
+      type,
+    });
+  };
+
+  const handleCloseContextMenu = () => {
+    setContextMenu(null);
+  };
   useEffect(() => {
     const normalized = payCategory.map((cat) => {
       const existing = payFrequencyType?.find((t) => t.type === cat.value);
@@ -29,7 +47,7 @@ const TemplateItems = ({
     });
     setPayFrequencyType(normalized);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // 👈 run only once
+  }, []);
 
   const [activeTab, setActiveTab] = useState(payCategory[0].value);
 
@@ -93,20 +111,31 @@ const TemplateItems = ({
         {/* Header */}
         <div className=" flex  justify-between items-center  ">
           <h1 className="text-2xl font-semibold text-gray-800">
-            {id
-              ? !readOnly
-                ? "Edit Pay Frequency Master"
-                : "Pay Frequency Master"
-              : "Add New Pay Frequency"}
+            Pay Frequency Master
           </h1>
           <div className="flex gap-2">
+            {readOnly && (
+              <button
+                type="button"
+                onClick={() => {
+                  setReadOnly(false);
+                }}
+                className="px-3 py-1 text-indigo-600 hover:bg-indigo-600 hover:text-white border border-indigo-600 text-xs rounded"
+              >
+                Edit
+              </button>
+            )}
             <button
               type="button"
-              onClick={() => setForm(false)}
+              onClick={() => {
+                setForm(false);
+                setId("");
+              }}
               className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
             >
               Back
             </button>
+
             {!readOnly && (
               <button
                 type="button"
@@ -190,156 +219,201 @@ const TemplateItems = ({
             {/* Active Tab Table */}
             {activeType && (
               <div className="w-full  overflow-x-auto">
-                <table className="w-full border-collapse table-fixed">
-                  <thead className="bg-gray-200 text-gray-800">
-                    <tr>
-                      <th className="px-2 py-2 w-12 text-center">S.No</th>
-                      <th className="px-2 py-2 w-44 text-center">Start Date</th>
-                      <th className="px-2 py-2 w-44 text-center">End Date</th>
-                      <th className="px-2 py-2 w-44 text-center">
-                        Salary Date
-                      </th>
-                      <th className="px-2 py-2 w-36 text-center">
-                        Pay Period Days
-                      </th>
-                      <th className="px-2 py-2 w-36 text-center">Holidays</th>
-                      <th className="px-2 py-2 w-[350px] text-center">Notes</th>
+                <div
+                  className="w-full overflow-x-auto"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !readOnly) {
+                      e.preventDefault(); // prevent accidental form submission
+                      addNewRow(activeType.type);
+                    }
+                  }}
+                >
+                  <table className="w-full border-collapse table-fixed">
+                    <thead className="bg-gray-200 text-gray-800">
+                      <tr>
+                        <th className="px-2 py-2 w-12 text-center">S.No</th>
+                        <th className="px-2 py-2 w-36 text-center">
+                          Start Date
+                        </th>
+                        <th className="px-2 py-2 w-36 text-center">End Date</th>
+                        <th className="px-2 py-2 w-36 text-center">
+                          Salary Date
+                        </th>
+                        <th className="px-2 py-2 w-44 text-center">
+                          Pay Month
+                        </th>
+                        <th className="px-2 py-2 w-36 text-center">
+                          Pay Period Days
+                        </th>
+                        <th className="px-2 py-2 w-32 text-center">Holidays</th>
+                        <th className="px-2 py-2 w-[310px] text-center">
+                          Notes
+                        </th>
 
-                      <th className="px-2 py-2 w-full">
-                        <button
-                          onClick={() => addNewRow(activeType.type)}
-                          disabled={readOnly}
-                          className={`px-2 py-1 rounded-md flex items-center text-xs border
+                        {/* <th className="px-2 py-2 w-full">
+                          <button
+                            onClick={() => addNewRow(activeType.type)}
+                            disabled={readOnly}
+                            className={`px-2 py-1 rounded-md flex items-center text-xs border
       ${
         readOnly
           ? "cursor-not-allowed opacity-50 border-gray-400 text-gray-400"
           : "hover:bg-green-600 text-green-600 hover:text-white border-green-600"
       }`}
-                        >
-                          <HiPlus className="w-3 h-3" />
-                        </button>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {activeType?.payFrequencyItems?.map((item, index) => {
-                      const { totalDays, sundays } = calculatePayPeriod(
-                        item.startDate,
-                        item.endDate
-                      );
-                      return (
-                        <tr key={index} className="w-full table-row">
-                          <td className="text-left px-2 border border-gray-300">
-                            {index + 1}
-                          </td>
-                          <td className="border border-gray-300">
-                            <input
-                              type="date"
-                              value={item.startDate}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  activeType.type,
-                                  index,
-                                  "startDate",
-                                  e.target.value
-                                )
-                              }
-                              className="pl-1"
-                              disabled={readOnly}
-                            />
-                          </td>
-                          <td className="border border-gray-300">
-                            <input
-                              type="date"
-                              value={item.endDate}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  activeType.type,
-                                  index,
-                                  "endDate",
-                                  e.target.value
-                                )
-                              }
-                              className="pl-1"
-                              disabled={readOnly}
-                            />
-                          </td>
-                          <td className="border border-gray-300">
-                            <input
-                              type="date"
-                              value={item.salaryDate}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  activeType.type,
-                                  index,
-                                  "salaryDate",
-                                  e.target.value
-                                )
-                              }
-                              className="pl-1"
-                              disabled={readOnly}
-                            />
-                          </td>
-                          <td className="border border-gray-300 p-1">
-                            {totalDays}
-                          </td>
-                          <td className="border border-gray-300 p-1">
-                            {sundays}
-                          </td>
-                          <td className="border border-gray-300 bg-transparent">
-                            <input
-                              type="text"
-                              value={item.notes}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  activeType.type,
-                                  index,
-                                  "notes",
-                                  e.target.value
-                                )
-                              }
-                              className="focus:outline-none focus:border-transparent bg-transparent p-1"
-                              disabled={readOnly}
-                            />
-                          </td>
-                          {/* <td className='border border-gray-300 text-center'></td> */}
+                          >
+                            <HiPlus className="w-3 h-3" />
+                          </button>
+                        </th> */}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {activeType?.payFrequencyItems?.map((item, index) => {
+                        const { totalDays, sundays } = calculatePayPeriod(
+                          item.startDate,
+                          item.endDate
+                        );
+                        return (
+                          <tr key={index} className="w-full table-row  ">
+                            <td className="text-left px-2 border border-gray-300">
+                              {index + 1}
+                            </td>
+                            <td className="border border-gray-300">
+                              <input
+                                type="date"
+                                value={item.startDate}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    activeType.type,
+                                    index,
+                                    "startDate",
+                                    e.target.value
+                                  )
+                                }
+                                className="pl-1 bg-transparent  focus:outline-none focus:border-transparent"
+                                disabled={readOnly}
+                              />
+                            </td>
+                            <td className="border border-gray-300">
+                              <input
+                                type="date"
+                                value={item.endDate}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    activeType.type,
+                                    index,
+                                    "endDate",
+                                    e.target.value
+                                  )
+                                }
+                                className="pl-1 bg-transparent focus:outline-none focus:border-transparent"
+                                disabled={readOnly}
+                              />
+                            </td>
+                            <td className="border border-gray-300">
+                              <input
+                                type="date"
+                                value={item.salaryDate}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    activeType.type,
+                                    index,
+                                    "salaryDate",
+                                    e.target.value
+                                  )
+                                }
+                                className="pl-1 bg-transparent focus:outline-none focus:border-transparent"
+                                disabled={readOnly}
+                              />
+                            </td>
+                            <td className="border border-gray-300 p-1">
+                              {item.salaryDate
+                                ? new Date(item.salaryDate).toLocaleString(
+                                    "default",
+                                    { month: "long" }
+                                  )
+                                : ""}
+                            </td>
+                            <td className="border border-gray-300 text-right p-1">
+                              {totalDays}
+                            </td>
+                            <td className="border border-gray-300 text-right  p-1">
+                              {sundays}
+                            </td>
+                            <td
+                              className="border border-gray-300 bg-transparent"
+                              onContextMenu={(e) => {
+                                if (!readOnly) {
+                                  handleRightClick(e, index, activeType.type);
+                                }
+                              }}
+                            >
+                              <input
+                                type="text"
+                                value={item.notes}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    activeType.type,
+                                    index,
+                                    "notes",
+                                    e.target.value
+                                  )
+                                }
+                                className="focus:outline-none focus:border-transparent bg-transparent p-1"
+                                disabled={readOnly}
+                              />
+                            </td>
+                          </tr>
+                        );
+                      })}
+
+                      {/* Show empty row message */}
+                      {activeType?.payFrequencyItems?.length === 0 && (
+                        <tr>
                           <td
                             colSpan={8}
-                            className="border border-gray-300 text-center"
+                            className="text-center py-4 text-gray-500 border"
                           >
-                            <button
-                              onClick={() =>
-                                handleDeleteRow(activeType.type, index)
-                              }
-                              disabled={readOnly}
-                              className={`text-red-600 hover:text-red-800 bg-red-50 px-2 py-1 ml-2 rounded text-xs flex justify-center ${
-                                readOnly ? "pointer-events-none cursor-not-allowed  opacity-50" : ""
-                              }`}
-                            >
-                              <HiTrash className="w-4 h-4 text-center" />
-                            </button>
+                            No records yet. Click + to add a row.
                           </td>
                         </tr>
-                      );
-                    })}
-                    {/* Show empty row message */}
-                    {activeType?.payFrequencyItems?.length === 0 && (
-                      <tr>
-                        <td
-                          colSpan={8}
-                          className="text-center py-4 text-gray-500 border"
-                        >
-                          No records yet. Click + to add a row.
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </div>
         </div>
       </div>
+      {contextMenu && (
+        <div
+          style={{
+            position: "absolute",
+            top: `${contextMenu.mouseY - 50}px`,
+            left: `${contextMenu.mouseX + 20}px`,
+
+            background: "white",
+            boxShadow: "0px 0px 5px rgba(0,0,0,0.3)",
+            padding: "8px",
+            borderRadius: "4px",
+            zIndex: 1000,
+          }}
+          onMouseLeave={handleCloseContextMenu} // Close when the mouse leaves
+        >
+          <div className="flex flex-col gap-1">
+            <button
+              className="bg-red-600 text-white rounded px-1"
+              onClick={() => {
+                handleDeleteRow(contextMenu.type, contextMenu.rowId);
+                handleCloseContextMenu();
+              }}
+            >
+              Delete{" "}
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };

@@ -66,7 +66,7 @@ const PayComponents = () => {
       setPayDescription(data?.payDescription);
       setTaxable(data?.taxable);
       setEarningsType(data?.earningsType);
-      setNotes(data?.notes)
+      setNotes(data?.notes);
     },
     [id]
   );
@@ -120,7 +120,6 @@ const PayComponents = () => {
   };
 
   const saveData = () => {
-   
     if (!window.confirm("Are you sure save the details ...?")) {
       return;
     }
@@ -177,10 +176,10 @@ const PayComponents = () => {
     setReadOnly(false);
     setForm(true);
     setSearchValue("");
-    setPayCode("")
-    setPayDescription('')
-    setTaxable('')
-    setNotes('')
+    setPayCode("");
+    setPayDescription("");
+    setTaxable("");
+    setNotes("");
   };
   const handleView = (id) => {
     setId(id);
@@ -215,16 +214,7 @@ const PayComponents = () => {
       header: "Pay Code",
       accessor: (item) => item?.payCode,
       //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-72",
-    },
-   
-
-   
-    {
-      header: "",
-      accessor: (item) => "",
-      //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 uppercase w-[75%]",
+      className: "font-medium text-gray-900 text-center uppercase w-44",
     },
   ];
 
@@ -240,7 +230,7 @@ const PayComponents = () => {
                   setForm(true);
                   onNew();
                 }}
-                className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+                   className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
               >
                 + Add Pay Component
               </button>
@@ -261,38 +251,35 @@ const PayComponents = () => {
             <Modal
               isOpen={form}
               form={form}
-              widthClass={"w-[50%]  h-[80%]"}
+              widthClass={"w-[40%]  h-[65%]"}
               onClose={() => {
                 setForm(false);
                 setErrors({});
+                setId('')
               }}
             >
               <div className="h-full flex flex-col bg-gray-100">
                 <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                   <div className="flex items-center gap-2">
                     <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
-                      {id
-                        ? !readOnly
-                          ? "Edit Pay Component"
-                          : "Pay Component"
-                        : "Add New Pay Component"}
+                     
+                          Pay Component
+                        
                     </h2>
                   </div>
                   <div className="flex gap-2">
                     <div>
-                      {readOnly && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setForm(false);
-                            setSearchValue("");
-                            setId(false);
-                          }}
-                          className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
-                        >
-                          Cancel
-                        </button>
-                      )}
+                       {readOnly && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setReadOnly(false);
+                        }}
+                        className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
+                      >
+                        Edit
+                      </button>
+                    )}
                     </div>
                     <div className="flex gap-2">
                       {!readOnly && (
@@ -314,20 +301,35 @@ const PayComponents = () => {
                   <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
                     <div className="space-y-4 ">
                       <div className="flex gap-x-6">
-                        <TextInput
-                          name="Pay Code"
-                          type="text"
-                          value={payCode}
-                          setValue={setPayCode}
-                          required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                        />
+                        <div className="w-[181px]">
+                          <TextInput
+                            name="Pay Component"
+                            type="text"
+                            value={payDescription}
+                            setValue={setPayDescription}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                          />
+                        </div>
+                        <div className="w-[105px]">
+                          <TextInput
+                            name="Pay Code"
+                            type="text"
+                            value={payCode}
+                            setValue={setPayCode}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                          />{" "}
+                        </div>
+                      </div>
+                      <div className="flex gap-x-6">
                         <DropdownInput
                           name="Earnings / Deductions"
                           value={earningsType}
                           setValue={setEarningsType}
-                          // required={true}
+                          required={true}
                           options={earningsTypes}
                           readOnly={readOnly}
                           disabled={childRecord.current > 0}
@@ -342,7 +344,7 @@ const PayComponents = () => {
                           name="Taxable"
                           value={taxable}
                           setValue={setTaxable}
-                          // required={true}
+                          required={true}
                           options={common}
                           readOnly={readOnly}
                           disabled={childRecord.current > 0}
@@ -353,24 +355,15 @@ const PayComponents = () => {
                             {errors.name}
                           </span>
                         )}
-                      </div>
+                      </div>{" "}
                     </div>
                     <div className="w-72 mt-8">
-                      <TextArea
-                        name="Pay Description"
-                        type="text"
-                        value={payDescription}
-                        setValue={setPayDescription}
-                        required={true}
-                        readOnly={readOnly}
-                        disabled={childRecord.current > 0}
-                      />
                       <TextArea
                         name="Notes"
                         type="text"
                         value={notes}
                         setValue={setNotes}
-                        required={true}
+                        // required={true}
                         readOnly={readOnly}
                         disabled={childRecord.current > 0}
                       />

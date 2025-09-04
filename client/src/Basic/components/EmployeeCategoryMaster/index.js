@@ -174,6 +174,8 @@ export default function Form() {
   };
 
   const onNew = () => {
+    setName('')
+    setCode('')
     setId("");
     setReadOnly(false);
     setForm(true);
@@ -214,12 +216,7 @@ export default function Form() {
       //   cellClass: () => "font-medium text-gray-900",
       className: "font-medium text-gray-900 text-center uppercase w-36",
     },
-    {
-      header: "",
-      accessor: (item) => "",
-      //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 uppercase w-[65%]",
-    },
+   
   ];
   const handleView = (id) => {
     setId(id);
@@ -277,9 +274,9 @@ export default function Form() {
               setForm(true);
               onNew();
             }}
-            className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+            className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
           >
-            +Add New Employee Category
+            + Add New Employee Category
           </button>
         </div>
       </div>
@@ -314,32 +311,29 @@ export default function Form() {
             onClose={() => {
               setForm(false);
               setErrors({});
+              setId("")
             }}
           >
             <div className="h-full flex flex-col bg-gray-100">
               <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
-                    {id
-                      ? !readOnly
-                        ? "Edit Employee Category"
-                        : "Employee Category"
-                      : "Add New Employee Category"}
+                 
+                        Employee Category
+                     
                   </h2>
                 </div>
                 <div className="flex gap-2">
                   <div>
-                    {readOnly && (
+                     {readOnly && (
                       <button
                         type="button"
                         onClick={() => {
-                          setForm(false);
-                          setSearchValue("");
-                          setId(false);
+                          setReadOnly(false);
                         }}
                         className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
                       >
-                        Cancel
+                        Edit
                       </button>
                     )}
                   </div>

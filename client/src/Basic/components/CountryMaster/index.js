@@ -1,6 +1,12 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import secureLocalStorage from "react-secure-storage";
-
+import Select from "react-select";
 import {
   useAddCountryMutation,
   useDeleteCountryMutation,
@@ -9,7 +15,7 @@ import {
   useLazyGetCountryByIdQuery,
   useUpdateCountryMutation,
 } from "../../../redux/services/CountryMasterService";
-
+import { Country } from "country-state-city";
 import { TextInput, ToggleButton, ReusableTable } from "../../../Inputs";
 import { statusDropdown } from "../../../Utils/DropdownData";
 import Modal from "../../../UiComponents/Modal";
@@ -20,6 +26,8 @@ import { Check, Power } from "lucide-react";
 import Swal from "sweetalert2";
 
 import { toast } from "react-toastify";
+import { text } from "@fortawesome/fontawesome-svg-core";
+import { capitalize } from "@mui/material";
 
 export default function Form() {
   const openTabs = useSelector((state) => state.openTabs);
@@ -33,9 +41,11 @@ export default function Form() {
   const [errors, setErrors] = useState({});
   // const [childRecord,setChildRecord]  = useState("")
   const countryNameRef = useRef(null);
-  const [getCountryId] = useLazyGetCountryByIdQuery();
-  const [searchValue, setSearchValue] = useState("");
 
+  const [searchValue, setSearchValue] = useState("");
+  const [countries, setCountries] = useState([]);
+  const [countryCode, setCountryCode] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState("");
   const childRecord = useRef(0);
 
   const params = {
@@ -72,23 +82,26 @@ export default function Form() {
 
   const syncFormWithDb = useCallback(
     (data) => {
-      setName(data?.name || "");
-      setCode(data?.code || "");
+      // setName(data?.name || "");
+      // setCode(data?.code || "");
+      const matchedCountry = countries?.find((c) => c?.label === data?.name);
+
+      setSelectedCountry(matchedCountry || null);
+      setCountryCode(data?.code);
       setActive(id ? data?.active ?? false : true);
       // setChildRecord(data?.childRecord ? data?.childRecord : 0);
       childRecord.current = data?.childRecord ? data?.childRecord : 0;
     },
-    [id]
+    [id, countries]
   );
-  console.log(childRecord, "childRecord");
 
   useEffect(() => {
     syncFormWithDb(singleData?.data);
   }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
 
   const data = {
-    name,
-    code,
+    name: selectedCountry,
+    code: countryCode,
     companyId: secureLocalStorage.getItem(
       sessionStorage.getItem("sessionId") + "userCompanyId"
     ),
@@ -97,7 +110,7 @@ export default function Form() {
   };
 
   const validateData = (data) => {
-    if (data.name ) {
+    if (data.countries) {
       return true;
     }
     return false;
@@ -129,16 +142,15 @@ export default function Form() {
 
   const saveData = () => {
     console.log("saveData hit");
-    if (!validateData(data)) {
-      
-      Swal.fire({
-        icon: "error",
-        title: "Submission error",
-        text: "Please fill all required fields...!",
-      });
-      return;
-    }
-    
+    // if (!validateData(data)) {
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Submission error",
+    //     text: "Please fill all required fields...!",
+    //   });
+    //   return;
+    // }
+
     if (id) {
       handleSubmitCustom(updateData, data, "Updated");
       console.log("updateData hit");
@@ -230,6 +242,8 @@ export default function Form() {
     setReadOnly(false);
     setForm(true);
     setSearchValue("");
+    setSelectedCountry("")
+    setCountryCode("")
   };
   const handleView = (id) => {
     setId(id);
@@ -318,7 +332,31 @@ export default function Form() {
     " ",
     " ",
   ];
+  useEffect(() => {
+    fetch("https://restcountries.com/v3.1/all?fields=name,cca3")
+      .then((res) => res.json())
+      .then((data) => {
+        const formatted = data
+          .map((c) => ({
+            value: c.cca3, // ISO Alpha-3 code (for your input)
+            label: c.name?.common, // Only country name for dropdown
+          }))
+          .sort((a, b) => a.label.localeCompare(b.label));
 
+        setCountries(formatted);
+      })
+      .catch(console.error);
+  }, []);
+
+  const handleSelect = (selectedOption) => {
+    if (selectedOption) {
+      setSelectedCountry(selectedOption); // Country name
+      setCountryCode(selectedOption.value); // Country code
+    } else {
+      setSelectedCountry("");
+      setCountryCode("");
+    }
+  };
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
       <div className="w-full flex bg-white p-1 justify-between  items-center">
@@ -356,7 +394,7 @@ export default function Form() {
             onClose={() => {
               setForm(false);
               setErrors({});
-
+              setCountryCode("");
               setId("");
             }}
           >
@@ -373,9 +411,7 @@ export default function Form() {
                       <button
                         type="button"
                         onClick={() => {
-                          
-                          
-                          setReadOnly(false)
+                          setReadOnly(false);
                         }}
                         className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
                       >
@@ -405,7 +441,7 @@ export default function Form() {
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
                       <div className="space-y-4 ">
                         <div className="p-2">
-                          <div className="flex">
+                          {/* <div className="flex">
                             <div className="mb-3 w-[60%]">
                               <TextInput
                                 name="Country Name"
@@ -434,15 +470,87 @@ export default function Form() {
                                 }
                               />
                             </div>
+                          </div> */}
+                          <div className="flex gap-x-3">
+                            <div className="w-72">
+                              <label className="block text-xs font-bold text-slate-700 mb-1">
+                                Select Country{" "}
+                                <span className="text-red-500">*</span>
+                              </label>
+
+                              <Select
+                                options={countries}
+                                ref={countryNameRef}
+                                onChange={handleSelect}
+                                value={selectedCountry}
+                                placeholder="Type to search..."
+                                isDisabled={readOnly || childRecord.current > 0}
+                                isSearchable
+                                isClearable
+                                menuShouldScrollIntoView={false}
+                                maxMenuHeight={1000}
+                                onInputChange={(value) => value.toUpperCase()}
+                                className="w-full px-1    text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                                styles={{
+                                  control: (base) => ({
+                                    ...base,
+                                    minHeight: "22px", // Reduce overall height
+                                    height: "22px", // Force height
+                                    padding: "0 4px", // Adjust padding inside
+                                    fontSize: "12px", // Make text smaller
+                                    borderRadius: "8px",
+                                  }),
+                                  valueContainer: (base) => ({
+                                    ...base,
+                                    padding: "0 6px", // Space for text
+                                    marginTop: "-4px",
+                                  }),
+                                  input: (base) => ({
+                                    ...base,
+                                    margin: 0,
+                                    padding: 0,
+                                  }),
+                                  indicatorsContainer: (base) => ({
+                                    ...base,
+                                    height: "28px", // Align dropdown arrow
+                                    marginTop: "-4px",
+                                  }),
+                                }}
+                              />
+                            </div>
+                            <div className="w-16">
+                              <label className="block text-xs font-bold text-slate-700 mb-1">
+                                Code
+                              </label>
+                              <input
+                                type="text"
+                                value={countryCode}
+                               readOnly={readOnly || childRecord.current > 0}
+                                className={`w-full px-1 py-0.5 text-xs border border-gray-300 rounded-lg
+  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+  transition-all duration-150 shadow-sm
+  ${
+    readOnly ||  childRecord.current > 0
+      ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+      : "bg-white hover:border-gray-400"
+  }`}
+                                 disabled={readOnly || childRecord.current > 0}
+
+                              />
+                            </div>
                           </div>
-                          <ToggleButton
-                            name="Status"
-                            options={statusDropdown}
-                            value={active}
-                            setActive={setActive}
-                            required={true}
-                            readOnly={readOnly}
-                          />
+                          <div className="mt-5">
+                            <ToggleButton
+                              name="Status"
+                              options={statusDropdown}
+                              value={active}
+                              setActive={setActive}
+                              required={true}
+                              readOnly={readOnly}
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>

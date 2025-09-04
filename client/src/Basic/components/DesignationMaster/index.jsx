@@ -36,7 +36,7 @@ const Designation = () => {
   const [id, setId] = useState("");
 
   const [name, setName] = useState("");
-
+  const [code, setCode] = useState("");
   const [active, setActive] = useState(true);
   const [errors, setErrors] = useState({});
   const [form, setForm] = useState(false);
@@ -77,17 +77,12 @@ const Designation = () => {
 
   const syncFormWithDb = useCallback(
     (data) => {
-      if (!id) {
-        // setReadOnly(false);
-        setName("");
-
-        setActive(true);
-      } else {
-        // setReadOnly(true);
+      
+        
         setName(data?.name || "");
-
+        setCode(data?.code)
         setActive(id ? data?.active ?? false : true);
-      }
+      
     },
     [id]
   );
@@ -98,7 +93,7 @@ const Designation = () => {
 
   const data = {
     name,
-
+    code,
     active,
     companyId: secureLocalStorage.getItem(
       sessionStorage.getItem("sessionId") + "userCompanyId"
@@ -125,14 +120,14 @@ const Designation = () => {
         showConfirmButton: false,
         didOpen: () => {
           Swal.showLoading();
-        }
+        },
       });
       setForm(false);
     } catch (error) {
       Swal.fire({
-        icon: 'error',
-        title: 'Submission error',
-        text: error.data?.message || 'Something went wrong!',
+        icon: "error",
+        title: "Submission error",
+        text: error.data?.message || "Something went wrong!",
       });
     }
   };
@@ -140,9 +135,9 @@ const Designation = () => {
   const saveData = () => {
     if (!validateData(data)) {
       Swal.fire({
-        icon: 'error',
-        title: 'Submission error',
-        text: 'Please fill all required fields...!',
+        icon: "error",
+        title: "Submission error",
+        text: "Please fill all required fields...!",
       });
       return;
     }
@@ -165,10 +160,11 @@ const Designation = () => {
         const deldata = await removeData(id).unwrap();
         if (deldata?.statusCode == 1) {
           Swal.fire({
-            icon: 'error',
-            title: 'Submission error',
-            text: deldata.data?.message || 'Something went wrong!',
-          }); setForm(false);
+            icon: "error",
+            title: "Submission error",
+            text: deldata.data?.message || "Something went wrong!",
+          });
+          setForm(false);
           return;
         }
         setId("");
@@ -176,13 +172,13 @@ const Designation = () => {
           title: "Deleted Successfully",
           icon: "success",
           timer: 1000,
-
-        }); setForm(false);
+        });
+        setForm(false);
       } catch (error) {
         Swal.fire({
-          icon: 'error',
-          title: 'Submission error',
-          text: error.data?.message || 'Something went wrong!',
+          icon: "error",
+          title: "Submission error",
+          text: error.data?.message || "Something went wrong!",
         });
       }
     }
@@ -198,6 +194,8 @@ const Designation = () => {
 
   const onNew = () => {
     setId("");
+    setName("");
+    setCode("")
     setReadOnly(false);
     setForm(true);
     setSearchValue("");
@@ -240,15 +238,9 @@ const Designation = () => {
 
     {
       header: "Status",
-      accessor: (item) => item.active ? ACTIVE : INACTIVE,
+      accessor: (item) => (item.active ? ACTIVE : INACTIVE),
       //   cellClass: () => "font-medium text-gray-900",
       className: "font-medium text-gray-900 text-center uppercase w-36",
-    },
-    {
-      header: "",
-      accessor: (item) => "",
-      //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 uppercase w-[65%]",
     },
   ];
   function onDataClick(id) {
@@ -303,9 +295,9 @@ const Designation = () => {
                 setForm(true);
                 onNew();
               }}
-              className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+              className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
             >
-              +Add New Designation
+              + Add New Designation
             </button>
           </div>
         </div>
@@ -337,21 +329,18 @@ const Designation = () => {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[45%]  h-[60%]"}
+            widthClass={"w-[40%]  h-[45%]"}
             onClose={() => {
               setForm(false);
               setErrors({});
+              setId("");
             }}
           >
             <div className="h-full flex flex-col bg-gray-100">
               <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
-                    {id
-                      ? !readOnly
-                        ? "Edit Designation Master"
-                        : "Designation Master"
-                      : "Add New Designation"}
+                    Designation Master
                   </h2>
                 </div>
                 <div className="flex gap-2">
@@ -360,13 +349,11 @@ const Designation = () => {
                       <button
                         type="button"
                         onClick={() => {
-                          setForm(false);
-                          setSearchValue("");
-                          setId(false);
+                          setReadOnly(false);
                         }}
                         className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
                       >
-                        Cancel
+                        Edit
                       </button>
                     )}
                   </div>
@@ -390,11 +377,9 @@ const Designation = () => {
                 <div className="grid grid-cols-1  gap-3  h-full">
                   <div className="lg:col-span- space-y-3">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
-                      <div className="space-y-4 w-[50%]">
-
-
-
-
+                      <div className="space-y-4 ">
+                        <div className="flex flex-wrap">
+                          {/* 
                         <TextInput
                           name="Company Code"
                           type="text"
@@ -402,17 +387,28 @@ const Designation = () => {
                           setValue={setCompanyCode}
                           required={true}
                           disabled={true}
-                        />
-
-                        <TextInput
-                          name="Designation Name"
-                          type="text"
-                          value={name}
-                          setValue={setName}
-                          required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                        />
+                        /> */}
+                          <TextInput
+                            name="Designation Name"
+                            type="text"
+                            value={name}
+                            setValue={setName}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                          />
+                          <div className="mb-3 w-[20%] ml-6">
+                            <TextInput
+                              name="Code"
+                              type="text"
+                              value={code}
+                              setValue={setCode}
+                              // required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                          </div>{" "}
+                        </div>
                         <div className="mt-5">
                           <ToggleButton
                             name="Status"

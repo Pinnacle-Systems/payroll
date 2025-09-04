@@ -59,7 +59,7 @@ async function create(body) {
     const data = await prisma.country.create(
         {
             data: {
-                name, code, companyId: parseInt(companyId), active
+                name : name?.label, code, companyId: parseInt(companyId), active
             }
         }
     )
@@ -80,7 +80,7 @@ async function update(id, body) {
         },
         data:
         {
-            name, code, active
+            name : name?.label,code, active
         },
     })
     return { statusCode: 0, data };

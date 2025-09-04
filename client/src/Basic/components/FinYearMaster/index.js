@@ -45,7 +45,6 @@ export default function Form() {
   const childRecord = useRef(0);
   const [errors, setErrors] = useState({});
 
-
   const params = {
     companyId: secureLocalStorage.getItem(
       sessionStorage.getItem("sessionId") + "userCompanyId"
@@ -123,14 +122,14 @@ export default function Form() {
         showConfirmButton: false,
         didOpen: () => {
           Swal.showLoading();
-        }
+        },
       });
-      setForm(false)
+      setForm(false);
     } catch (error) {
       Swal.fire({
-        icon: 'error',
-        title: 'Submission error',
-        text: error.data?.message || 'Something went wrong!',
+        icon: "error",
+        title: "Submission error",
+        text: error.data?.message || "Something went wrong!",
       });
     }
   };
@@ -138,9 +137,9 @@ export default function Form() {
   const saveData = () => {
     if (!validateOneActiveFinYear(data.active)) {
       Swal.fire({
-        icon: 'error',
-        title: 'Submission error',
-        text: 'Please fill all required fields...!',
+        icon: "error",
+        title: "Submission error",
+        text: "Please fill all required fields...!",
       });
       return;
     }
@@ -160,7 +159,7 @@ export default function Form() {
     }
   };
 
-  const deleteData = async () => {
+  const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
         return;
@@ -169,24 +168,24 @@ export default function Form() {
         let deldata = await removeData(id).unwrap();
         if (deldata?.statusCode == 1) {
           Swal.fire({
-            icon: 'error',
-            title: 'Submission error',
-            text: deldata.data?.message || 'Something went wrong!',
-          }); return;
+            icon: "error",
+            title: "Submission error",
+            text: deldata.data?.message || "Something went wrong!",
+          });
+          return;
         }
         setId("");
         Swal.fire({
           title: "Deleted Successfully",
           icon: "success",
           timer: 1000,
-
         });
         setForm(false);
       } catch (error) {
         Swal.fire({
-          icon: 'error',
-          title: 'Submission error',
-          text: error.data?.message || 'Something went wrong!',
+          icon: "error",
+          title: "Submission error",
+          text: error.data?.message || "Something went wrong!",
         });
       }
     }
@@ -207,7 +206,7 @@ export default function Form() {
     setSearchValue("");
     setTo("");
     setFrom("");
-    setCode('')
+    setCode("");
   };
 
   function onDataClick(id) {
@@ -283,32 +282,26 @@ export default function Form() {
       accessor: (item) =>
         item.from ? new Date(item.from).toISOString().split("T")[0] : "",
       //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-36",
+      className: "font-medium text-gray-900 text-center uppercase w-28",
     },
     {
       header: "To",
       accessor: (item) =>
         item.to ? new Date(item.to).toISOString().split("T")[0] : "",
       //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-36",
+      className: "font-medium text-gray-900 text-center uppercase w-28",
     },
     {
       header: "Code",
       accessor: (item) => item.code,
       //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-36",
+      className: "font-medium text-gray-900 text-center uppercase w-28",
     },
     {
       header: "Status",
-      accessor: (item) => item.active ? ACTIVE : INACTIVE,
+      accessor: (item) => (item.active ? ACTIVE : INACTIVE),
       //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-36",
-    },
-    {
-      header: "",
-      accessor: (item) => "",
-      //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 uppercase w-[60%]",
+      className: "font-medium text-gray-900 text-center uppercase w-28",
     },
   ];
   return (
@@ -320,8 +313,9 @@ export default function Form() {
             onClick={() => {
               setForm(true);
               onNew();
+              setId("");
             }}
-            className="bg-white border  border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+            className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
           >
             + Add New Fin Year
           </button>
@@ -350,8 +344,7 @@ export default function Form() {
           itemsPerPage={10}
         />
       </div>
-      {console.log(readOnly, "con")
-      }
+      {console.log(readOnly, "con")}
       {form === true && (
         <Modal
           isOpen={form}
@@ -360,18 +353,14 @@ export default function Form() {
           onClose={() => {
             setForm(false);
             setErrors({});
-
+            setId("");
           }}
         >
           <div className="h-full flex flex-col bg-gray-100">
             <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
               <div className="flex items-center gap-2">
                 <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
-                  {id
-                    ? !readOnly
-                      ? "Edit Fin year Master"
-                      : "Fin year Master"
-                    : "Add New Fin year"}
+                  Fin year Master
                 </h2>
               </div>
               <div className="flex gap-2">
@@ -380,13 +369,11 @@ export default function Form() {
                     <button
                       type="button"
                       onClick={() => {
-                        setForm(false);
-                        setSearchValue("");
-                        setId(false);
+                        setReadOnly(false);
                       }}
                       className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
                     >
-                      Cancel
+                      Edit
                     </button>
                   )}
                 </div>
@@ -410,33 +397,34 @@ export default function Form() {
               <div className="grid grid-cols-1  gap-3  h-full">
                 <div className="lg:col-span- space-y-3">
                   <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
-                    <div className="space-y-2 w-[50%]">
-
-                      <DateInput
-                        name="From"
-                        value={from}
-                        setValue={setFrom}
-                        required={true}
-                        readOnly={readOnly}
-
-                        disabled={childRecord.current > 0}
-                      />
-
-                      {errors.name && (
-                        <span className="text-red-500 text-xs ml-1">
-                          {errors.name}
-                        </span>
-                      )}
-
-                      <div className="">
+                    <div className="space-y-2">
+                      <div className="flex gap-x-3">
+                        <div className="w-32">
                         <DateInput
-                          name="To"
-                          value={to}
-                          setValue={setTo}
+                          name="From"
+                          value={from}
+                          setValue={setFrom}
                           required={true}
                           readOnly={readOnly}
                           disabled={childRecord.current > 0}
                         />
+
+                        {errors.name && (
+                          <span className="text-red-500 text-xs ml-1">
+                            {errors.name}
+                          </span>
+                        )}</div>
+
+                        <div className="">
+                          <DateInput
+                            name="To"
+                            value={to}
+                            setValue={setTo}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                          />
+                        </div>
                       </div>
                       <div>
                         <label className="block text-xs text-black mb-1">
@@ -445,11 +433,17 @@ export default function Form() {
                             name="code"
                             className={`w-full px-2  py-1 mt-2 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-          transition-all duration-150 shadow-sm`}
+          transition-all duration-150 shadow-sm
+           ${
+             readOnly || childRecord.current > 0
+               ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+               : "bg-white hover:border-gray-400"
+           }
+          
+          `}
                             value={code}
-
                             onChange={(e) => setCode(e.target.value)}
-                            readOnly={readOnly}
+                            readOnly={readOnly || childRecord.current > 0}
                             disabled={childRecord.current > 0}
                           />
                         </label>

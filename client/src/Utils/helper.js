@@ -2,7 +2,7 @@ import moment from "moment";
 import secureLocalStorage from "react-secure-storage";
 import { IMAGE_UPLOAD_URL } from "../Constants";
 import { toast } from "react-toastify";
-import { useState } from "react";
+import React, { useState } from "react";
 import Swal from "sweetalert2";
 import "./swalStyles.css";
 
@@ -513,6 +513,77 @@ export function handleMailSendWithMultipleAttachments(
 }
 
 
+
+
+export default function RightClickMenu({ data, setData, rowKey = "id", actions }) {
+  const [contextMenu, setContextMenu] = useState(null);
+
+  const handleRightClick = (event, rowIndex) => {
+    event.preventDefault();
+    setContextMenu({
+      mouseX: event.clientX,
+      mouseY: event.clientY,
+      rowIndex,
+    });
+  };
+
+  const handleCloseContextMenu = () => setContextMenu(null);
+
+  const handleDelete = () => {
+    if (contextMenu) {
+      const updated = [...data];
+      updated.splice(contextMenu.rowIndex, 1);
+      setData(updated);
+      handleCloseContextMenu();
+    }
+  };
+
+  return (
+    <>
+      {/* Render children with right-click support */}
+      {React.Children.map(actions, (child) =>
+        React.cloneElement(child, { onContextMenu: (e) => handleRightClick(e, child.props.index) })
+      )}
+
+      {/* Context Menu */}
+      {contextMenu && (
+        <div
+          style={{
+            position: "absolute",
+            top: `${contextMenu.mouseY}px`,
+            left: `${contextMenu.mouseX}px`,
+            background: "white",
+            boxShadow: "0px 0px 5px rgba(0,0,0,0.3)",
+            padding: "8px",
+            borderRadius: "4px",
+            zIndex: 1000,
+          }}
+          onMouseLeave={handleCloseContextMenu}
+        >
+          <div className="flex flex-col gap-1">
+            <button
+              className="bg-red-600 text-white rounded px-1"
+              onClick={handleDelete}
+            >
+              Delete
+            </button>
+            {actions?.map?.((action, i) =>
+              action.render ? (
+                <button
+                  key={i}
+                  className="bg-green-600 text-white rounded px-1"
+                  onClick={() => action.onClick(contextMenu.rowIndex)}
+                >
+                  {action.label}
+                </button>
+              ) : null
+            )}
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
 
 
 

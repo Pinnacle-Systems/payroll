@@ -18,14 +18,14 @@ async function get(req) {
 }
 
 async function getOne(id) {
-
+      const childRecord = await prisma.payFrequency.count({ where: { finYearId: parseInt(id) } });
     const data = await prisma.finYear.findUnique({
         where: {
             id: parseInt(id)
         },
     })
     if (!data) return NoRecordFound("FinYear");
-    return { statusCode: 0, data };
+    return { statusCode: 0, data: { ...data, ...{ childRecord } } };
 }
 
 async function getSearch(req) {

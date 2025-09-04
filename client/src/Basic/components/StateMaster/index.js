@@ -28,6 +28,7 @@ import MastersForm from "../MastersForm/MastersForm";
 import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
 import Swal from "sweetalert2";
+import Select from "react-dropdown-select";
 
 const MODEL = "State Master";
 
@@ -48,19 +49,15 @@ export default function Form() {
   const [searchValue, setSearchValue] = useState("");
   const stateNameRef = useRef(null);
   const childRecord = useRef(0);
-  // const dispatch = useDispatch();
-  const [getStateById] = useLazyGetStateByIdQuery();
+  const dispatch = useDispatch();
+  const [states, setStates] = useState([]);
 
   const params = {
     companyId: secureLocalStorage.getItem(
       sessionStorage.getItem("sessionId") + "userCompanyId"
     ),
   };
-  const {
-    data: countriesList,
-    isLoading: isCountryLoading,
-    isFetching: isCountryFetching,
-  } = useGetCountriesQuery({ params });
+  const { data: countriesList } = useGetCountriesQuery({ params });
 
   const {
     data: allData,
@@ -131,10 +128,10 @@ export default function Form() {
         },
       });
       setForm(false);
-      // dispatch({
-      //   type: `countryMaster/invalidateTags`,
-      //   payload: ["Countries"],
-      // });
+      dispatch({
+        type: `countryMaster/invalidateTags`,
+        payload: ["Countries"],
+      });
     } catch (error) {
       console.log(error);
       Swal.fire({
@@ -154,7 +151,7 @@ export default function Form() {
       });
       return;
     }
-    
+
     if (id) {
       handleSubmitCustom(updateData, data, "Updated");
     } else {
@@ -199,7 +196,7 @@ export default function Form() {
   //     });
   //   }
   // };
-const deleteData = async (id) => {
+  const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
         return;
@@ -221,6 +218,10 @@ const deleteData = async (id) => {
           timer: 1000,
         });
         setForm(false);
+        dispatch({
+          type: `countryMaster/invalidateTags`,
+          payload: ["Countries"],
+        });
       } catch (error) {
         Swal.fire({
           icon: "error",
@@ -241,9 +242,9 @@ const deleteData = async (id) => {
 
   const onNew = () => {
     setId("");
-    setName("")
-    setCode("")
-    setCountry("")
+    setName("");
+    setCode("");
+    setCountry("");
     setReadOnly(false);
     setForm(true);
     setSearchValue("");
@@ -328,7 +329,25 @@ const deleteData = async (id) => {
     " ",
     " ",
   ];
-  console.log(country, "check");
+  
+  useEffect(() => {
+    if (!country) {
+      setStates([]);
+      return;
+    }
+
+    fetch(`https://countrystatecity.in/api/states/${country}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setStates(
+          data.map((s) => ({
+            value: s.id,
+            label: s.name,
+          }))
+        );
+      })
+      .catch(console.error);
+  }, [country]);
 
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
@@ -367,28 +386,23 @@ const deleteData = async (id) => {
             onClose={() => {
               setForm(false);
               setErrors({});
-              setId('')
+              setId("");
             }}
           >
             <div className="h-full flex flex-col bg-gray-100">
               <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center gap-2">
                   <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
-                    
-                       State Master
-                      
-                     
+                    State Master
                   </h2>
                 </div>
                 <div className="flex gap-2">
                   <div>
-                     {readOnly && (
+                    {readOnly && (
                       <button
                         type="button"
                         onClick={() => {
-                          
-                          
-                          setReadOnly(false)
+                          setReadOnly(false);
                         }}
                         className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
                       >
@@ -429,7 +443,7 @@ const deleteData = async (id) => {
                               disabled={
                                 childRecord.current > 0 ? true : undefined
                               }
-                                ref={stateNameRef}
+                              ref={stateNameRef}
                             />
                           </div>
                           <div className="mb-3 ms-3">
@@ -440,16 +454,12 @@ const deleteData = async (id) => {
                               setValue={setCode}
                               // required={true}
                               readOnly={readOnly}
-                              disabled={
-                                childRecord.current > 0 
-                              }
+                              disabled={childRecord.current > 0}
                             />
                           </div>
                         </div>
 
                         <div className="flex">
-                         
-
                           <div className="w-[200px] mb-3 ">
                             <DropdownInput
                               name="Country"
@@ -467,14 +477,18 @@ const deleteData = async (id) => {
                               setValue={setCountry}
                               required={true}
                               readOnly={readOnly}
-                              
-                               disabled={
+                              disabled={
                                 childRecord.current > 0 ? true : undefined
                               }
                             />
                           </div>
                         </div>
-
+                        {/* <Select
+                          options={states}
+                          placeholder="Select State"
+                          isClearable
+                          isDisabled={!country}
+                        /> */}
                         <div>
                           <ToggleButton
                             name="Status"

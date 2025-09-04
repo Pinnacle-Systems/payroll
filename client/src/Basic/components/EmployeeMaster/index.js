@@ -516,6 +516,7 @@ export default function Form() {
   console.log(employeeCategoryList?.data, "employeeCategoryList?.data");
 
   const saveData = () => {
+    
     if (!JSON.parse(active)) {
       setLeavingForm(true);
     } else {
@@ -524,10 +525,12 @@ export default function Form() {
       } else {
         handleSubmitCustom(addData, data, "Added");
       }
+      setId('')
+      
     }
   };
   const saveDataandExit = async (exitAfterSave = false) => {
-    if (!window.confirm("Are you sure save the details ...?")) return;
+   
 
     try {
       if (id) {
@@ -942,7 +945,7 @@ export default function Form() {
       className: "font-medium text-gray-900 text-center uppercase w-72",
     },
     {
-      header: "ID Card Number",
+      header: "ID Number",
       accessor: (item) => JSON.parse(item?.idNumber),
       //   cellClass: () => "font-medium  text-gray-900",
       className: "font-medium text-gray-900 text-center uppercase w-72",
@@ -1031,10 +1034,10 @@ export default function Form() {
               onNew();
               setNewForm(true);
             }}
-            className="bg-white border text-xs border-indigo-600 text-indigo-600 hover:bg-indigo-700 hover:text-white text-sm px-4 py-1 rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+         className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
           >
-            <Plus size={16} />
-            Add New Employee
+            
+           + Add New Employee
           </button>
           {/* <div className="flex items-center gap-2">
             <button
@@ -1082,17 +1085,16 @@ export default function Form() {
           onClose={() => {
             setForm(false);
             setErrors({});
+            setId('')
           }}
         >
           <div className="h-full flex flex-col bg-gray-100">
             <div className="border-b py-2 px-4 mx-3 flex justify-between items-center sticky top-0 z-10 bg-white mt-4">
               <div className="flex items-center gap-2">
                 <h2 className="text-lg font-semibold text-gray-800">
-                  {id
-                    ? !readOnly
-                      ? "Edit Employee"
-                      : "Employee Master"
-                    : "Add New Employee"}
+                  
+                      Employee Master
+                    
                 </h2>
 
                 {regNo && (
@@ -1109,6 +1111,19 @@ export default function Form() {
               </div>
 
               <div className="flex gap-2">
+                  <div>
+                    {readOnly && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setReadOnly(false);
+                        }}
+                        className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
+                      >
+                        Edit
+                      </button>
+                    )}
+                  </div>
                 <div>
                   {!readOnly && (
                     <button
@@ -2109,7 +2124,7 @@ export default function Form() {
                                       e.target.value
                                     )
                                   }
-                                  // readOnly={readOnly}
+                                  readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                   className="w-full focus:outline-none focus:border-none"
                                 />
@@ -2127,7 +2142,7 @@ export default function Form() {
                                     )
                                   }
                                   className="w-full focus:outline-none focus:border-none"
-                                  // readOnly={readOnly}
+                                  readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
@@ -2144,7 +2159,7 @@ export default function Form() {
                                     )
                                   }
                                   className="w-full focus:outline-none focus:border-none"
-                                  // readOnly={readOnly}
+                                  readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
@@ -2161,7 +2176,7 @@ export default function Form() {
                                     )
                                   }
                                   className="w-full focus:outline-none focus:border-none"
-                                  // readOnly={readOnly}
+                                  readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
@@ -2274,7 +2289,7 @@ export default function Form() {
                                       e.target.value
                                     )
                                   }
-                                  // readOnly={readOnly}
+                                  readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                   className="w-full pl-1 focus:outline-none focus:border-none"
                                 />
@@ -2292,7 +2307,7 @@ export default function Form() {
                                     )
                                   }
                                   className="w-full pl-1 focus:outline-none focus:border-none"
-                                  // readOnly={readOnly}
+                                  readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
@@ -2309,7 +2324,7 @@ export default function Form() {
                                     )
                                   }
                                   className="w-full pl-1 focus:outline-none focus:border-none"
-                                  // readOnly={readOnly}
+                                  readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
@@ -2326,7 +2341,7 @@ export default function Form() {
                                     )
                                   }
                                   className="w-full pl-1 focus:outline-none focus:border-none"
-                                  // readOnly={readOnly}
+                                  readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
@@ -2343,7 +2358,7 @@ export default function Form() {
                                     )
                                   }
                                   className="w-full pl-1 focus:outline-none focus:border-none"
-                                  // readOnly={readOnly}
+                                  readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
@@ -2360,7 +2375,7 @@ export default function Form() {
                                     )
                                   }
                                   className="w-full pl-1 focus:outline-none focus:border-none"
-                                  // readOnly={readOnly}
+                                  readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
@@ -2463,7 +2478,7 @@ export default function Form() {
                                       e.target.value
                                     )
                                   }
-                                  // readOnly={readOnly}
+                                  readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                   className="w-full pl-1 focus:outline-none focus:border-none"
                                 />
@@ -2481,7 +2496,7 @@ export default function Form() {
                                     )
                                   }
                                   className="w-full pl-1 focus:outline-none focus:border-none"
-                                  // readOnly={readOnly}
+                                  readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
@@ -2498,7 +2513,7 @@ export default function Form() {
                                     )
                                   }
                                   className="w-full pl-1 focus:outline-none focus:border-none"
-                                  // readOnly={readOnly}
+                                  readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
@@ -2515,7 +2530,7 @@ export default function Form() {
                                     )
                                   }
                                   className="w-full pl-1 focus:outline-none focus:border-none"
-                                  // readOnly={readOnly}
+                                  readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
