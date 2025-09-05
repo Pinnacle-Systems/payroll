@@ -366,7 +366,7 @@ model City {
   id              Int              @id @default(autoincrement())
   name            String?
   code            String?
-  state           State           @relation(fields: [stateId], references: [id])
+  state           State            @relation(fields: [stateId], references: [id])
   stateId         Int
   active          Boolean?         @default(true)
   doctorLocalCity Employee[]       @relation(name: "permanentCityId")
@@ -1263,6 +1263,7 @@ model ShiftTemplate {
   docId              String?
   active             Boolean?             @default(true)
   category           String?
+  date               DateTime?
   ShiftTemplateItems ShiftTemplateItems[]
   Employee           Employee[]
 }
@@ -1277,8 +1278,6 @@ model ShiftTemplateItems {
   createdById             Int?
   updatedBy               User?          @relation("updatedBy", fields: [updatedById], references: [id])
   updatedById             Int?
-  name                    String?
-  docId                   String?
   active                  Boolean?       @default(true)
   templateId              Int?
   shiftId                 Int?
@@ -1301,6 +1300,7 @@ model ShiftTemplateItems {
   shiftTimeHrs            String?
   otHrs                   String?
   quater                  String?
+  date                    DateTime?
 }
 
 model PayFrequency {

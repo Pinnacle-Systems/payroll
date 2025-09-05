@@ -20,8 +20,7 @@ const TemplateItems = ({
   setId,
 }) => {
   console.log(payFrequencyType, "payFrequencyType");
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedRowIndex, setSelectedRowIndex] = useState(null);
+ 
 
   const [contextMenu, setContextMenu] = useState(null);
   const handleRightClick = (event, rowIndex, type) => {
@@ -61,15 +60,21 @@ const TemplateItems = ({
     }
   };
 
-  const handleDeleteRow = (type, index) => {
-    const updated = structuredClone(payFrequencyType);
-    const typeIndex = updated.findIndex((t) => t.type === type);
+ const handleDeleteRow = (type, index) => {
+  const updated = structuredClone(payFrequencyType);
+  const typeIndex = updated.findIndex((t) => t.type === type);
 
-    if (typeIndex !== -1) {
-      updated[typeIndex].payFrequencyItems.splice(index, 1);
-      setPayFrequencyType(updated);
+  if (typeIndex !== -1) {
+    // Prevent deletion if only one row left
+    if (updated[typeIndex].payFrequencyItems.length <= 1) {
+      return; // Do nothing
     }
-  };
+
+    updated[typeIndex].payFrequencyItems.splice(index, 1);
+    setPayFrequencyType(updated);
+  }
+};
+
 
   const addNewRow = (type) => {
     const updated = structuredClone(payFrequencyType);
@@ -85,6 +90,48 @@ const TemplateItems = ({
       setPayFrequencyType(updated);
     }
   };
+
+useEffect(() => {
+  if (!payFrequencyType || payFrequencyType.length === 0) {
+    setPayFrequencyType([
+      {
+        type: "Monthly - 2 Pay Frequency",
+        payFrequencyItems: [
+          {
+            startDate: "",
+            endDate: "",
+            salaryDate: "",
+            notes: "",
+          },
+        ],
+      },
+      {
+        type: "Monthly Pay Frequency",
+        payFrequencyItems: [
+          {
+            startDate: "",
+            endDate: "",
+            salaryDate: "",
+            notes: "",
+          },
+        ],
+      },
+      {
+        type: "Weekly Pay Frequency",
+        payFrequencyItems: [
+          {
+            startDate: "",
+            endDate: "",
+            salaryDate: "",
+            notes: "",
+          },
+        ],
+      },
+    ]);
+  }
+}, []); // run only once on mount
+
+
 
   const calculatePayPeriod = (startDate, endDate) => {
     if (!startDate || !endDate) return { totalDays: 0, sundays: 0 };
@@ -221,13 +268,13 @@ const TemplateItems = ({
               <div className="w-full  overflow-x-auto">
                 <div
                   className="w-full overflow-x-auto"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && !readOnly) {
-                      e.preventDefault(); // prevent accidental form submission
-                      addNewRow(activeType.type);
-                    }
-                  }}
+                  // tabIndex={0}
+                  // onKeyDown={(e) => {
+                  //   if (e.key === "Enter" && !readOnly) {
+                  //     e.preventDefault(); // prevent accidental form submission
+                  //     addNewRow(activeType.type);
+                  //   }
+                  // }}
                 >
                   <table className="w-full border-collapse table-fixed">
                     <thead className="bg-gray-200 text-gray-800">
@@ -347,6 +394,7 @@ const TemplateItems = ({
                                   handleRightClick(e, index, activeType.type);
                                 }
                               }}
+                             
                             >
                               <input
                                 type="text"
@@ -359,6 +407,12 @@ const TemplateItems = ({
                                     e.target.value
                                   )
                                 }
+                                 onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  e.preventDefault();
+                                  addNewRow(activeType.type);
+                                }
+                              }}
                                 className="focus:outline-none focus:border-transparent bg-transparent p-1"
                                 disabled={readOnly}
                               />
@@ -367,17 +421,7 @@ const TemplateItems = ({
                         );
                       })}
 
-                      {/* Show empty row message */}
-                      {activeType?.payFrequencyItems?.length === 0 && (
-                        <tr>
-                          <td
-                            colSpan={8}
-                            className="text-center py-4 text-gray-500 border"
-                          >
-                            No records yet. Click + to add a row.
-                          </td>
-                        </tr>
-                      )}
+                   
                     </tbody>
                   </table>
                 </div>

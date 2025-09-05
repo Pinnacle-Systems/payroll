@@ -186,6 +186,7 @@ const PayFrequencymaster = () => {
     }
   };
 
+
   const saveData = () => {
     // if (!validateData(data)) {
     //   toast.error("Please fill all required fields...!", {

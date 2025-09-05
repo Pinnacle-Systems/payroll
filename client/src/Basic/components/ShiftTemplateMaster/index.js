@@ -28,6 +28,7 @@ import { useGetShiftCommonTemplateQuery } from "../../../redux/services/ShiftCom
 import { useGetshiftMasterQuery } from "../../../redux/services/ShiftMasterService";
 import TemplateItems from "./templateItems";
 import Swal from "sweetalert2";
+import { log } from "util";
 
 const ShiftTemplateMaster = () => {
   const [readOnly, setReadOnly] = useState(false);
@@ -43,7 +44,7 @@ const ShiftTemplateMaster = () => {
   const childRecord = useRef(0);
   const [ShiftTemplateItems, setShiftTemplateItems] = useState([]);
   const [categoryId, setCategoryId] = useState("");
-
+  const[date,setDate] = useState(null)
   const params = getCommonParams();
 
   const { branchId } = params;
@@ -55,15 +56,7 @@ const ShiftTemplateMaster = () => {
     params,
     searchParams: searchValue,
   });
-  const getNextDocId = useCallback(() => {
-    if (id) return;
-    if (!id  && allData?.nextDocId) {
-      setDocId(allData?.nextDocId);
-    }
-  }, [allData, id]);
-console.log(allData?.nextDocId,"allData?.nextDocId");
 
-  useEffect(getNextDocId, [getNextDocId]);
   const {
     data: singleData,
     isFetching: isSingleFetching,
@@ -83,12 +76,12 @@ console.log(allData?.nextDocId,"allData?.nextDocId");
     searchParams: searchValue,
   });
 
-  useEffect(() => {
-    if (company?.data?.length > 0) {
-      // setCompanyName(company.data[0].name);
-      setCompanyCode(company.data[0].code);
-    }
-  }, [company]);
+  // useEffect(() => {
+  //   if (company?.data?.length > 0) {
+  //     // setCompanyName(company.data[0].name);
+  //     setCompanyCode(company.data[0].code);
+  //   }
+  // }, [company]);
 
   useEffect(() => {
     if (ShiftTemplateItems?.length >= 1) return;
@@ -104,18 +97,18 @@ console.log(allData?.nextDocId,"allData?.nextDocId");
 
   const syncFormWithDb = useCallback(
     (data) => {
-      // setReadOnly(true);
+      
       setName(data?.name || "");
-      setDocId(data?.docId || "");
+      setDocId(data?.docId);
+   
       setDescription(data?.description || "");
       setActive(id ? data?.active ?? false : true);
       setShiftTemplateItems(
         data?.ShiftTemplateItems ? data?.ShiftTemplateItems : []
       );
       setCategoryId(data?.category ? data?.category : "");
-      setDocId(data?.docId);
     },
-    [id, company]
+    [id]
   );
 
   useEffect(() => {
@@ -124,6 +117,7 @@ console.log(allData?.nextDocId,"allData?.nextDocId");
 
   const data = {
     name,
+    date,
     description,
     docId,
     active,
@@ -146,9 +140,9 @@ console.log(allData?.nextDocId,"allData?.nextDocId");
 
   //     return true;
   // };
-useEffect(() => {
-  console.log("allData", allData);
-}, [allData]);
+  useEffect(() => {
+    console.log("allData", allData);
+  }, [allData]);
 
   const handleSubmitCustom = async (callback, data, text) => {
     try {
@@ -224,9 +218,7 @@ useEffect(() => {
     if (!validateData(data)) {
       return;
     }
-    if (!window.confirm("Are you sure save the details ...?")) {
-      return;
-    }
+   
     if (id) {
       handleSubmitCustom(updateData, data, "Updated");
     } else {
@@ -235,8 +227,6 @@ useEffect(() => {
   };
 
   console.log(id, "id");
-  console.log(allData);
-  
 
   const deleteData = async (id) => {
     if (id) {
@@ -279,16 +269,24 @@ useEffect(() => {
     }
   };
 
-  console.log(allData , "alldata");
-  
+  console.log(allData, "alldata");
 
+  const getNextDocId = useCallback(() => {
+    if (id) return;
+    if (allData?.nextDocId) {
+      setDocId(allData?.nextDocId);
+    }
+  }, [allData, id]);
+
+  useEffect(getNextDocId, [getNextDocId]);
+  console.log(allData, "alldata");
   const onNew = () => {
     console.log("Hitr");
     setId("");
 
     setReadOnly(false);
     setSearchValue("");
-    setCompanyCode(company?.data[0]?.code);
+    // setCompanyCode(company?.data[0]?.code);
     setShiftTemplateItems([]);
     setCategoryId("");
     refetch();
@@ -340,9 +338,8 @@ useEffect(() => {
       //   cellClass: () => "font-medium text-gray-900",
       className: "font-medium text-gray-900 text-center uppercase w-36",
     },
-   
   ];
-
+  console.log(docId, "docIdreceived");
   return (
     <div>
       <div onKeyDown={handleKeyDown} className="p-1 ">
@@ -350,6 +347,8 @@ useEffect(() => {
           <TemplateItems
             saveData={saveData}
             setForm={setForm}
+            setReadOnly={setReadOnly}
+            setId={setId}
             ShitCommonData={ShitCommonData}
             shiftData={shiftData}
             readOnly={readOnly}
@@ -359,6 +358,8 @@ useEffect(() => {
             companyCode={companyCode}
             setCompanyCode={setCompanyCode}
             docId={docId}
+            setDate={setDate}
+            date={date}
             setDocId={setDocId}
             categoryId={categoryId}
             setCategoryId={setCategoryId}
@@ -382,7 +383,7 @@ useEffect(() => {
                     setForm(true);
                     onNew();
                   }}
-                   className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+                  className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
                 >
                   + Add Shift Template Master
                 </button>

@@ -136,6 +136,7 @@ async function create(body) {
           ShiftTemplateItems?.length > 0
             ? {
               create: ShiftTemplateItems?.map((item) => ({
+                date:item?.date ? new Date(item?.date) : null ,
                 templateId: item?.templateId ? parseInt(item.templateId) : undefined,
                 shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
                 inNextDay: item?.inNextDay ? item.inNextDay : undefined,
@@ -195,7 +196,9 @@ async function updateShiftTemplateItems(tx, ShiftTemplateItems, data) {
           id: parseInt(item.id)
         },
         data: {
+          
           shiftTemplateId: data?.id ? data?.id : undefined,
+           date:item?.date ? new Date(item?.date) : null ,
           templateId: item?.templateId ? parseInt(item.templateId) : undefined,
           shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
           inNextDay: item?.inNextDay ? item.inNextDay : undefined,
@@ -254,7 +257,7 @@ async function updateShiftTemplateItems(tx, ShiftTemplateItems, data) {
 
 
 async function update(id, body) {
-  const { name, branchId, companyId, active, categoryId, docId, ShiftTemplateItems } = await body;
+  const { branchId, companyId, active, categoryId, docId, ShiftTemplateItems } = await body;
   const dataFound = await prisma.shiftTemplate.findUnique({
     where: {
       id: parseInt(id),
