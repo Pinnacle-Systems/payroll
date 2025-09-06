@@ -283,7 +283,7 @@ model Employee {
 
 model EmployeeBankDetails {
   id            Int       @id @default(autoincrement())
-  employee      Employee? @relation(fields: [employeeId], references: [id])
+  employee      Employee? @relation(fields: [employeeId], references: [id] ,onDelete: Cascade)
   employeeId    Int?
   bankName      String?
   branchName    String?
@@ -293,7 +293,7 @@ model EmployeeBankDetails {
 
 model EmployeeEducationDetails {
   id              Int       @id @default(autoincrement())
-  employee        Employee? @relation(fields: [employeeId], references: [id])
+  employee        Employee? @relation(fields: [employeeId], references: [id],onDelete: Cascade)
   employeeId      Int?
   courseName      String?
   universityName  String?
@@ -303,7 +303,7 @@ model EmployeeEducationDetails {
 
 model EmployeeFamilyDetails {
   id           Int       @id @default(autoincrement())
-  employee     Employee? @relation(fields: [employeeId], references: [id])
+  employee     Employee? @relation(fields: [employeeId], references: [id],onDelete: Cascade)
   employeeId   Int?
   name         String?
   dob          DateTime?

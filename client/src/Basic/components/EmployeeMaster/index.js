@@ -229,7 +229,7 @@ export default function Form() {
   const syncFormWithDb = useCallback(
     (data) => {
       // Basic Info
-      setEmployeeType(data?.employeeType)
+      setEmployeeType(data?.employeeType);
       setFirstName(data?.firstName || "");
       setMiddleName(data?.middleName || "");
       setLastName(data?.lastName || "");
@@ -242,7 +242,7 @@ export default function Form() {
       setDisability(data?.disability || "");
       setHeight(data?.height || "");
       setWeight(data?.weight || "");
-      setBloodGroup(data?.bloodGroup)
+      setBloodGroup(data?.bloodGroup);
 
       // IDs & Numbers
       setPanNo(data?.panNo || "");
@@ -252,12 +252,12 @@ export default function Form() {
       setUanNo(data?.uanNo || "");
       setIdNumber(data?.idNumber || "");
       setRegNo(data?.regNo || "");
-      setReligion(data?.religion)
-     
+      setReligion(data?.religion);
+
       setEmail(data?.email || "");
 
       // Employment Info
-       setDepartmentId(data?.departmentId || "");
+      setDepartmentId(data?.departmentId || "");
       setShiftTemplateId(data?.shiftTemplateId || "");
       setEmployeeCategoryId(data?.employeeCategoryId || "");
       setPayCategory(data?.payCategory || "");
@@ -274,7 +274,7 @@ export default function Form() {
           ? moment.utc(data?.leavingDate).format("YYYY-MM-DD")
           : ""
       );
-       setPf(data?.pf);
+      setPf(data?.pf);
       setEsi(data?.esi);
       setLeavingReason(data?.leavingReason || "");
       setCanRejoin(data?.canRejoin || false);
@@ -307,9 +307,7 @@ export default function Form() {
       }));
 
       // Other Info
-     
-      
-      
+
       // setBranchId(data?.branchId || "");
       setImage(data?.imageBase64 ? viewBase64String(data.imageBase64) : null);
 
@@ -468,9 +466,14 @@ export default function Form() {
       let returnData;
       const formData = new FormData();
       for (let key in data) {
-        // formData.append(key, data[key]);
-        formData.append(key, JSON.stringify(data[key]));
+        formData.append(
+          key,
+          typeof data[key] === "object" && data[key] !== null
+            ? JSON.stringify(data[key])
+            : data[key]
+        );
       }
+
       if (image instanceof File) {
         formData.append("image", image);
       } else if (!image) {
@@ -514,39 +517,59 @@ export default function Form() {
     }
   };
   console.log(employeeCategoryList?.data, "employeeCategoryList?.data");
+  const validateData = (data) => {
+    console.log(data, "data--");
 
-  const saveData = () => {
-    
-    if (!JSON.parse(active)) {
-      setLeavingForm(true);
-    } else {
-      if (id) {
-        handleSubmitCustom(updateData, data, "Updated");
-      } else {
-        handleSubmitCustom(addData, data, "Added");
-      }
-      setId('')
-      
+    if (
+      data?.firstName &&
+      data?.departmentId &&
+      data?.desiginationId &&
+      data?.dob &&
+      data?.joiningDate &&
+      data?.shiftTemplateId
+    ) {
+      return true;
     }
+    return false;
+  };
+  const saveData = () => {
+    if (!validateData(data)) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Please fill all required fields...!",
+      });
+      return;
+    }
+
+    if (id) {
+      handleSubmitCustom(updateData, data, "Updated");
+    } else {
+      handleSubmitCustom(addData, data, "Added");
+    }
+    setId("");
+    setForm(true)
+    
+    
   };
   const saveDataandExit = async (exitAfterSave = false) => {
+    if (!validateData(data)) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Please fill all required fields...!",
+      });
+      return;
+    }
    
-
-    try {
       if (id) {
         await handleSubmitCustom(updateData, data, "Updated");
       } else {
         await handleSubmitCustom(addData, data, "Added");
       }
-      if (!exitAfterSave) {
-        onNew();
-      } else {
-        setForm(false);
-        setId("");
-      }
-    } catch (error) {
-      console.error("Save failed:", error);
-    }
+      setId('')
+     setForm(false)
+   
   };
 
   const deleteData = async (id) => {
@@ -648,7 +671,7 @@ export default function Form() {
     setRejoinReason("");
     setDesignationId("");
     setEmployeeCategoryId("");
- 
+
     setPayCategory("");
     setIdNumber("");
 
@@ -671,7 +694,7 @@ export default function Form() {
         mobile: "",
       },
     ]);
-    setSameAsPresent(false)
+    setSameAsPresent(false);
     setPermanentAddress([
       {
         address: "",
@@ -692,8 +715,6 @@ export default function Form() {
     setPanNo("");
     setReligion("");
     setEmail("");
-
-    
 
     setBankDetails([
       {
@@ -732,9 +753,7 @@ export default function Form() {
     setConsultFee("");
   };
 
-
   const submitLeavingForm = () => {
-    
     if (id) {
       console.log("called id");
       handleSubmitCustom(updateData, data, "Updated");
@@ -935,44 +954,44 @@ export default function Form() {
     {
       header: "S.No",
       accessor: (item, index) => index + 1,
-      className: "font-medium text-gray-900 w-12  text-center",
+      className: "text-gray-900 w-12  text-center",
     },
 
     {
       header: "Employee Name",
-      accessor: (item) => JSON.parse(item?.firstName),
-      //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-72",
+      accessor: (item) => item?.firstName || "",
+      //   cellClass: () => " text-gray-900",
+      className: "text-gray-900 text-left pl-2 uppercase w-72",
     },
     {
       header: "ID Number",
-      accessor: (item) => JSON.parse(item?.idNumber),
-      //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-72",
+      accessor: (item) => item?.idNumber,
+      //   cellClass: () => " text-gray-900",
+      className: "text-gray-900  text-left pl-2 uppercase w-72",
     },
     {
       header: "Department",
-      accessor: (item) => (item?.department?.name),
-      //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-72",
+      accessor: (item) => item?.department?.name,
+      //   cellClass: () => " text-gray-900",
+      className: "text-gray-900  text-left pl-2 uppercase w-72",
     },
     {
       header: "Designation",
-      accessor: (item) => (item?.designation?.name),
-      //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-72",
+      accessor: (item) => item?.designation?.name,
+      //   cellClass: () => " text-gray-900",
+      className: "text-gray-900  text-left pl-2 uppercase w-72",
     },
     {
       header: "Mobile",
       accessor: (item) => item?.permanentMobile,
-      //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-44",
+      //   cellClass: () => " text-gray-900",
+      className: "text-gray-900 pr-2 text-right uppercase w-36",
     },
     {
       header: "Email",
-      accessor: (item) => JSON.parse(item?.email),
-      //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-72",
+      accessor: (item) => item?.email,
+      //   cellClass: () => " text-gray-900",
+      className: "text-gray-900 text-center uppercase w-80",
     },
 
     // {
@@ -1034,10 +1053,9 @@ export default function Form() {
               onNew();
               setNewForm(true);
             }}
-         className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+            className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
           >
-            
-           + Add New Employee
+            + Add New Employee
           </button>
           {/* <div className="flex items-center gap-2">
             <button
@@ -1085,16 +1103,14 @@ export default function Form() {
           onClose={() => {
             setForm(false);
             setErrors({});
-            setId('')
+            setId("");
           }}
         >
           <div className="h-full flex flex-col bg-gray-100">
             <div className="border-b py-2 px-4 mx-3 flex justify-between items-center sticky top-0 z-10 bg-white mt-4">
               <div className="flex items-center gap-2">
                 <h2 className="text-lg font-semibold text-gray-800">
-                  
-                      Employee Master
-                    
+                  Employee Master
                 </h2>
 
                 {regNo && (
@@ -1111,19 +1127,19 @@ export default function Form() {
               </div>
 
               <div className="flex gap-2">
-                  <div>
-                    {readOnly && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setReadOnly(false);
-                        }}
-                        className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
-                      >
-                        Edit
-                      </button>
-                    )}
-                  </div>
+                <div>
+                  {readOnly && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setReadOnly(false);
+                      }}
+                      className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
+                    >
+                      Edit
+                    </button>
+                  )}
+                </div>
                 <div>
                   {!readOnly && (
                     <button
@@ -1149,10 +1165,10 @@ export default function Form() {
       border border-green-600 flex items-center gap-1 text-xs"
                       >
                         <Check size={14} />
-                        {id ? "Update And Add" : "Save And Add"}
+                        {id ? "Update " : "Save "}
                       </button>
 
-                      <button
+                      {/* <button
                         type="button"
                         onClick={saveDataandExit}
                         className="px-3 py-1 hover:bg-green-600 hover:text-white rounded text-green-600 
@@ -1160,7 +1176,7 @@ export default function Form() {
                       >
                         <Check size={14} />
                         {id ? "Update & Exit" : "Save & Exit"}
-                      </button>
+                      </button> */}
                     </div>
                   )}
                 </div>
@@ -1168,7 +1184,7 @@ export default function Form() {
             </div>
 
             <div className="flex-1  p-3 h-[100%]">
-              <div className="flex gap-x-1">
+              <div className="flex text-blue-600 text-[14px] gap-x-1">
                 {[
                   "Basic Details",
                   "Employment Details",
@@ -1195,8 +1211,8 @@ export default function Form() {
 
               <div className="grid grid-cols-1 gap-2 h-[90%] mt-2 overflow-y-auto">
                 {step === "Basic Details" && (
-                  <div className=" bg-white p-4 rounded-md border border-gray-200 overflow-y-auto">
-                    <h1 className=" text-gray-800 mb-2 ">Basic Details</h1>
+                  <div className=" bg-white p-3 rounded-md border border-gray-200 overflow-y-auto">
+                    {/* <h1 className=" text-gray-800 mb-2 ">Basic Details</h1> */}
                     <div className="grid grid-cols-6 gap-4 ">
                       <div className="col-span-1">
                         <DropdownInput
@@ -1447,9 +1463,9 @@ export default function Form() {
                 {step === "Employment Details" && (
                   <div className="flex flex-col  gap-4  h-full">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
-                      <h3 className="font-medium text-gray-800 mb-2 text-sm">
+                      {/* <h3 className="font-medium text-gray-800 mb-2 text-sm">
                         Employment Details
-                      </h3>
+                      </h3> */}
                       <div className="grid grid-cols-5 md:grid-cols-5 gap-2">
                         <div className="">
                           <DateInput
@@ -1787,13 +1803,14 @@ export default function Form() {
                 {step === "Contact Details" && (
                   <div className="flex flex-col  gap-4  h-full">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full overflow-y-auto ">
-                      <div className="grid grid-cols-2 gap-3 justify-between ">
+                      <div className="grid grid-cols-2 gap-2 justify-between ">
                         <div className="grid grid-cols-2 gap-3 border-r border-gray-300  pr-3">
                           <h3 className="font-medium text-gray-800 mb-2 text-sm">
                             PRESENT ADDRESS
                           </h3>
-                          <div className="col-span-2 -mt-2">
+                          <div className="col-span-2 -mt-2 ">
                             <TextArea
+                              inputClass="h-12"
                               name="Address"
                               value={presentAddress.address}
                               setValue={(val) =>
@@ -1836,7 +1853,9 @@ export default function Form() {
                               )}
                               // required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              disabled={
+                                childRecord.current > 0 ? true : undefined
+                              }
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                             {errors.name && (
@@ -1921,7 +1940,7 @@ export default function Form() {
                         </div>
 
                         {/* PERMANENT ADDRESS */}
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-2 gap-2">
                           <div className="col-span-2 flex items-center gap-2">
                             <h3 className="font-medium text-gray-800 text-sm">
                               PERMANENT ADDRESS
@@ -1939,6 +1958,7 @@ export default function Form() {
 
                           <div className="col-span-2">
                             <TextArea
+                              inputClass="h-12"
                               name="Address"
                               value={permanentAddress.address}
                               setValue={(val) =>
@@ -1977,10 +1997,10 @@ export default function Form() {
                                 "name",
                                 "id"
                               )}
-                              // readOnly={readOnly}
-                              // disabled={
-                              //   childRecord.current > 0 || sameAsPresent
-                              // }
+                              readOnly={readOnly}
+                              disabled={
+                                childRecord.current > 0 || sameAsPresent
+                              }
                             />
                           </div>
 
@@ -1996,10 +2016,10 @@ export default function Form() {
                                 "name",
                                 "id"
                               )}
-                              // readOnly={readOnly}
-                              // disabled={
-                              //   childRecord.current > 0 || sameAsPresent
-                              // }
+                              readOnly={readOnly}
+                              disabled={
+                                childRecord.current > 0 || sameAsPresent
+                              }
                             />
                           </div>
                           <div className="col-span-1">
@@ -2014,10 +2034,10 @@ export default function Form() {
                                 "name",
                                 "id"
                               )}
-                              // readOnly={readOnly}
-                              // disabled={
-                              //   childRecord.current > 0 || sameAsPresent
-                              // }
+                              readOnly={readOnly}
+                              disabled={
+                                childRecord.current > 0 || sameAsPresent
+                              }
                             />
                           </div>
                           <div className="col-span-1">
@@ -2109,10 +2129,10 @@ export default function Form() {
                           {bankDetails.map((item, index) => (
                             <tr
                               key={index}
-                              className=" border border-gray-300 text-[11px] py-0.5 px-1 text-center"
+                              className=" border border-gray-300 text-[13px] py-0.5 px-1 text-center"
                             >
                               <td className=" text-center px-1">{index + 1}</td>
-                              <td className="border border-gray-300 text-[11px] py-0.5 px-1 item-center">
+                              <td className="border border-gray-300 text-[13px] py-1.5 px-1 item-center">
                                 <input
                                   // name="Bank Name"
                                   type="text"
@@ -2126,10 +2146,10 @@ export default function Form() {
                                   }
                                   readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
-                                  className="w-full focus:outline-none focus:border-none"
+                                  className="w-full focus:outline-none uppercase focus:border-none pl-2"
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
                                 <input
                                   // name="Branch Name"
                                   type="text"
@@ -2141,15 +2161,15 @@ export default function Form() {
                                       e.target.value
                                     )
                                   }
-                                  className="w-full focus:outline-none focus:border-none"
+                                  className="w-full focus:outline-none uppercase focus:border-none pl-3"
                                   readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
                                 <input
                                   // name="Account Number"
-                                  type="text"
+                                  type="number"
                                   value={item.accountNumber}
                                   onChange={(e) =>
                                     handleBankDetailsChange(
@@ -2158,12 +2178,12 @@ export default function Form() {
                                       e.target.value
                                     )
                                   }
-                                  className="w-full focus:outline-none focus:border-none"
+                                  className="w-full focus:outline-none uppercase focus:border-none text-right pr-3"
                                   readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+                              <td className=" border border-gray-300 text-[13px] py-1.5 items-center">
                                 <input
                                   // name="IFSC CODE"
                                   type="text"
@@ -2175,16 +2195,171 @@ export default function Form() {
                                       e.target.value
                                     )
                                   }
-                                  className="w-full focus:outline-none focus:border-none"
+                                  className="w-full focus:outline-none uppercase focus:border-none text-left pl-2"
                                   readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
                                 <button
                                   type="button"
                                   title="Delete Row"
                                   onClick={() => deleteRow(index)}
+                                  className="text-red-600 hover:text-red-800"
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 inline-block"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+                {step === "Education Details" && (
+                  <div className="flex flex-col gap-4 h-full">
+                    <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
+                      <div className="flex justify-between items-center mb-3">
+                        <h3 className="font-medium text-gray-800 text-sm">
+                          Education Details
+                        </h3>
+                        <button
+                          onClick={() => addEducationNewRow()}
+                          disabled={readOnly}
+                          className="hover:bg-green-600 text-green-600 hover:text-white border border-green-600 px-2 py-1 rounded-md flex items-center text-xs"
+                        >
+                          <HiPlus className="w-3 h-3 mr-1" />
+                          Add Item
+                        </button>
+                      </div>
+
+                      <table className="w-full border-collapse table-fixed ">
+                        <thead className="bg-gray-200 text-gray-800">
+                          <tr>
+                            <th
+                              className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
+                            >
+                              S.No
+                            </th>
+                            <th
+                              className={`w-44 px-4 py-2 text-center font-medium text-[13px] `}
+                            >
+                              Course / Degree
+                            </th>
+                            <th
+                              className={` px-4 py-2 text-center font-medium text-[13px] `}
+                            >
+                              Board / University
+                            </th>
+                            <th
+                              className={` px-4 py-2 text-center font-medium text-[13px] `}
+                            >
+                              Institution
+                            </th>
+                            <th
+                              className={`w-52 px-4 py-2 text-center font-medium text-[13px] `}
+                            >
+                              Year & Month of Passing
+                            </th>
+                            <th
+                              className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
+                            >
+                              Action
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {educationDetails.map((item, index) => (
+                            <tr
+                              key={index}
+                              className=" border border-gray-300 text-[11px] py-1.5 px-1 text-center"
+                            >
+                              <td className=" text-center px-1">{index + 1}</td>
+                              <td className="border border-gray-300 text-[13px] py-1.5 px-1 item-center">
+                                <input
+                                  // name="Bank Name"
+                                  type="text"
+                                  value={item?.courseName}
+                                  onChange={(e) =>
+                                    handleEDucationDetailsChange(
+                                      index,
+                                      "courseName",
+                                      e.target.value
+                                    )
+                                  }
+                                  readOnly={readOnly}
+                                  // disabled={childRecord.current > 0}
+                                  className="w-full pl-2 focus:outline-none uppercase focus:border-none"
+                                />
+                              </td>
+                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
+                                <input
+                                  // name="Branch Name"
+                                  type="text"
+                                  value={item?.universityName}
+                                  onChange={(e) =>
+                                    handleEDucationDetailsChange(
+                                      index,
+                                      "universityName",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full pl-2 focus:outline-none  uppercase focus:border-none"
+                                  readOnly={readOnly}
+                                  // disabled={childRecord.current > 0}
+                                />
+                              </td>
+                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
+                                <input
+                                  // name="Account Number"
+                                  type="text"
+                                  value={item?.institutionName}
+                                  onChange={(e) =>
+                                    handleEDucationDetailsChange(
+                                      index,
+                                      "institutionName",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full pl-2 focus:outline-none uppercase focus:border-none"
+                                  readOnly={readOnly}
+                                  // disabled={childRecord.current > 0}
+                                />
+                              </td>
+                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
+                                <input
+                                  // name="IFSC CODE"
+                                  type="text"
+                                  value={item.yearOfPass}
+                                  onChange={(e) =>
+                                    handleEDucationDetailsChange(
+                                      index,
+                                      "yearOfPass",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full pl-2 focus:outline-none uppercase focus:border-none"
+                                  readOnly={readOnly}
+                                  // disabled={childRecord.current > 0}
+                                />
+                              </td>
+                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
+                                <button
+                                  type="button"
+                                  title="Delete Row"
+                                  onClick={() => deleteEducationRow(index)}
                                   className="text-red-600 hover:text-red-800"
                                 >
                                   <svg
@@ -2277,7 +2452,7 @@ export default function Form() {
                               className=" border border-gray-300 text-[11px] py-0.5 px-1 text-center"
                             >
                               <td className=" text-center px-1">{index + 1}</td>
-                              <td className="border border-gray-300 text-[11px] py-0.5 px-1 item-center">
+                              <td className="border border-gray-300 text-[11px] py-1.5 px-1 item-center">
                                 <input
                                   // name="Bank Name"
                                   type="text"
@@ -2291,10 +2466,10 @@ export default function Form() {
                                   }
                                   readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
-                                  className="w-full pl-1 focus:outline-none focus:border-none"
+                                  className="w-full pl-2 focus:outline-none uppercase focus:border-none"
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
                                 <input
                                   // name="Branch Name"
                                   type="date"
@@ -2306,15 +2481,15 @@ export default function Form() {
                                       e.target.value
                                     )
                                   }
-                                  className="w-full pl-1 focus:outline-none focus:border-none"
+                                  className="w-full pl-1 focus:outline-none uppercase  focus:border-none"
                                   readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
                                 <input
                                   // name="Account Number"
-                                  type="text"
+                                  type="number"
                                   value={item?.age}
                                   onChange={(e) =>
                                     handleFamilyDetailsChange(
@@ -2323,12 +2498,12 @@ export default function Form() {
                                       e.target.value
                                     )
                                   }
-                                  className="w-full pl-1 focus:outline-none focus:border-none"
+                                  className="w-full pr-2 text-right focus:outline-none uppercase  focus:border-none"
                                   readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
                                 <input
                                   // name="IFSC CODE"
                                   type="text"
@@ -2340,12 +2515,12 @@ export default function Form() {
                                       e.target.value
                                     )
                                   }
-                                  className="w-full pl-1 focus:outline-none focus:border-none"
+                                  className="w-full pl-2 focus:outline-none uppercase  focus:border-none"
                                   readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
                                 <input
                                   // name="IFSC CODE"
                                   type="text"
@@ -2357,12 +2532,12 @@ export default function Form() {
                                       e.target.value
                                     )
                                   }
-                                  className="w-full pl-1 focus:outline-none focus:border-none"
+                                  className="w-full pl-2 focus:outline-none uppercase  focus:border-none"
                                   readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
                                 <input
                                   // name="IFSC CODE"
                                   type="text"
@@ -2374,171 +2549,16 @@ export default function Form() {
                                       e.target.value
                                     )
                                   }
-                                  className="w-full pl-1 focus:outline-none focus:border-none"
+                                  className="w-full pl-2 focus:outline-none uppercase  focus:border-none"
                                   readOnly={readOnly}
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
                                 <button
                                   type="button"
                                   title="Delete Row"
                                   onClick={() => deleteFamilyRow(index)}
-                                  className="text-red-600 hover:text-red-800"
-                                >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-4 w-4 inline-block"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                  >
-                                    <path
-                                      fillRule="evenodd"
-                                      d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                      clipRule="evenodd"
-                                    />
-                                  </svg>
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
-                {step === "Education Details" && (
-                  <div className="flex flex-col gap-4 h-full">
-                    <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
-                      <div className="flex justify-between items-center mb-3">
-                        <h3 className="font-medium text-gray-800 text-sm">
-                          Education Details
-                        </h3>
-                        <button
-                          onClick={() => addEducationNewRow()}
-                          disabled={readOnly}
-                          className="hover:bg-green-600 text-green-600 hover:text-white border border-green-600 px-2 py-1 rounded-md flex items-center text-xs"
-                        >
-                          <HiPlus className="w-3 h-3 mr-1" />
-                          Add Item
-                        </button>
-                      </div>
-
-                      <table className="w-full border-collapse table-fixed ">
-                        <thead className="bg-gray-200 text-gray-800">
-                          <tr>
-                            <th
-                              className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              S.No
-                            </th>
-                            <th
-                              className={`w-44 px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              Course / Degree
-                            </th>
-                            <th
-                              className={` px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              Board / University
-                            </th>
-                            <th
-                              className={` px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              Institution
-                            </th>
-                            <th
-                              className={`w-52 px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              Year & Month of Passing
-                            </th>
-                            <th
-                              className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              Action
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {educationDetails.map((item, index) => (
-                            <tr
-                              key={index}
-                              className=" border border-gray-300 text-[11px] py-0.5 px-1 text-center"
-                            >
-                              <td className=" text-center px-1">{index + 1}</td>
-                              <td className="border border-gray-300 text-[11px] py-0.5 px-1 item-center">
-                                <input
-                                  // name="Bank Name"
-                                  type="text"
-                                  value={item?.courseName}
-                                  onChange={(e) =>
-                                    handleEDucationDetailsChange(
-                                      index,
-                                      "courseName",
-                                      e.target.value
-                                    )
-                                  }
-                                  readOnly={readOnly}
-                                  // disabled={childRecord.current > 0}
-                                  className="w-full pl-1 focus:outline-none focus:border-none"
-                                />
-                              </td>
-                              <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
-                                <input
-                                  // name="Branch Name"
-                                  type="text"
-                                  value={item?.universityName}
-                                  onChange={(e) =>
-                                    handleEDucationDetailsChange(
-                                      index,
-                                      "universityName",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full pl-1 focus:outline-none focus:border-none"
-                                  readOnly={readOnly}
-                                  // disabled={childRecord.current > 0}
-                                />
-                              </td>
-                              <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
-                                <input
-                                  // name="Account Number"
-                                  type="text"
-                                  value={item?.institutionName}
-                                  onChange={(e) =>
-                                    handleEDucationDetailsChange(
-                                      index,
-                                      "institutionName",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full pl-1 focus:outline-none focus:border-none"
-                                  readOnly={readOnly}
-                                  // disabled={childRecord.current > 0}
-                                />
-                              </td>
-                              <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
-                                <input
-                                  // name="IFSC CODE"
-                                  type="text"
-                                  value={item.yearOfPass}
-                                  onChange={(e) =>
-                                    handleEDucationDetailsChange(
-                                      index,
-                                      "yearOfPass",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full pl-1 focus:outline-none focus:border-none"
-                                  readOnly={readOnly}
-                                  // disabled={childRecord.current > 0}
-                                />
-                              </td>
-                              <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
-                                <button
-                                  type="button"
-                                  title="Delete Row"
-                                  onClick={() => deleteEducationRow(index)}
                                   className="text-red-600 hover:text-red-800"
                                 >
                                   <svg

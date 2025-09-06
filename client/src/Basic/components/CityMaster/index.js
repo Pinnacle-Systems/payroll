@@ -218,21 +218,21 @@ export default function Form() {
     {
       header: "S.No",
       accessor: (item, index) => index + 1,
-      className: "font-medium text-gray-900 w-12  text-center",
+      className: " text-gray-900 w-12  text-center",
     },
 
     {
       header: "City Name",
       accessor: (item) => item?.name,
       //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-left pl-2 uppercase w-72",
+      className: " text-gray-900 text-left pl-2 uppercase w-72",
     },
 
     {
       header: "Status",
       accessor: (item) => (item.active ? ACTIVE : INACTIVE),
       //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-16",
+      className: "text-gray-900 text-center uppercase w-16",
     },
   ];
   function onDataClick(id) {

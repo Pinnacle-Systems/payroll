@@ -109,12 +109,14 @@ export default function Form() {
     id,
   };
 
-  const validateData = (data) => {
-    if (data.countries) {
-      return true;
-    }
-    return false;
-  };
+const validateData = (data) => {
+  
+  if (data?.name?.value) {
+    return true;
+  }
+  return false;
+};
+
 
   const handleSubmitCustom = async (callback, data, text) => {
     try {
@@ -142,58 +144,24 @@ export default function Form() {
 
   const saveData = () => {
     console.log("saveData hit");
-    // if (!validateData(data)) {
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Submission error",
-    //     text: "Please fill all required fields...!",
-    //   });
-    //   return;
-    // }
+    if (!validateData(data)) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Please fill all required fields...!",
+      });
+      return;
+    }
 
     if (id) {
       handleSubmitCustom(updateData, data, "Updated");
-      console.log("updateData hit");
+     
     } else {
       handleSubmitCustom(addData, data, "Added");
     }
   };
 
-  // const deleteData = async (id) => {
-  //   if (!id) return;
-  //   const result = await getCountryId(id).unwrap();
-
-  //   if (result?.data?.childRecord > 0) {
-  //     toast.info("Child Record Exist", { position: "top-center" });
-  //     return;
-  //   }
-
-  //     if (!window.confirm("Are you sure to delete...?")) {
-  //       return;
-  //     }
-  //     try {
-  //       let deldata = await removeData(id).unwrap();
-  //       if (deldata?.statusCode == 1) {
-  //         toast.info("Child Record Exist", { position: "top-center" });
-  //         return;
-  //       }
-  //       setId("");
-  //       Swal.fire({
-  //         title: "Deleted Successfully",
-  //         icon: "success",
-  //         timer: 1000,
-  //       });
-  //       setForm(false);
-  //     } catch (error) {
-  //       Swal.fire({
-  //         icon: "error",
-  //         title: "Submission error",
-  //         text: error.data?.message || "Something went wrong!",
-  //       });
-  //       setForm(false);
-
-  //   }
-  // };
+  
   const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
@@ -269,23 +237,23 @@ export default function Form() {
   );
   const columns = [
     {
-      header: "S.No",
+      header: "S.NO",
       accessor: (item, index) => index + 1,
-      className: "font-medium text-gray-900 w-12  text-center",
+      className: " text-gray-900  uppercase  text-center",
     },
 
     {
-      header: "Country Name",
+      header: "COUNTRY NAME",
       accessor: (item) => item?.name,
       //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 pl-2 text-left uppercase w-72",
+      className: " text-gray-900 pl-2 text-left uppercase w-72",
     },
 
     {
-      header: "Status",
+      header: "STATUS",
       accessor: (item) => (item.active ? ACTIVE : INACTIVE),
       //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-16",
+      className: " text-gray-900 text-center uppercase w-16",
     },
     // {
     //   header: "",
@@ -390,7 +358,7 @@ export default function Form() {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[40%] h-[45%]"}
+            widthClass={"w-[40%] h-[60%]"}
             onClose={() => {
               setForm(false);
               setErrors({});
@@ -435,7 +403,7 @@ export default function Form() {
                 </div>
               </div>
 
-              <div className="flex-1 overflow-auto p-3">
+              <div className="flex-1  p-3">
                 <div className="grid grid-cols-1  gap-3  h-full">
                   <div className="lg:col-span- space-y-3">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
@@ -471,8 +439,8 @@ export default function Form() {
                               />
                             </div>
                           </div> */}
-                          <div className="flex gap-x-3">
-                            <div className="w-72">
+                          <div className="flex gap-x-3 ">
+                            <div className="w-72 ">
                               <label className="block text-xs font-bold text-slate-700 mb-1">
                                 Select Country{" "}
                                 <span className="text-red-500">*</span>
@@ -486,11 +454,11 @@ export default function Form() {
                                 placeholder="Type to search..."
                                 isDisabled={readOnly || childRecord.current > 0}
                                 isSearchable
-                                isClearable
+                                isClearable={false}
                                 menuShouldScrollIntoView={false}
-                                maxMenuHeight={1000}
+  maxMenuHeight={150} // <-- Reduce height here
                                 onInputChange={(value) => value.toUpperCase()}
-                                className="w-full px-1    text-xs rounded-lg
+                                className="w-full px-1   text-xs rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
                                 styles={{
@@ -498,24 +466,26 @@ export default function Form() {
                                     ...base,
                                     minHeight: "22px", // Reduce overall height
                                     height: "22px", // Force height
-                                    padding: "0 4px", // Adjust padding inside
+                                    padding: "14px 4px", // Adjust padding inside
                                     fontSize: "12px", // Make text smaller
                                     borderRadius: "8px",
                                   }),
                                   valueContainer: (base) => ({
                                     ...base,
                                     padding: "0 6px", // Space for text
-                                    marginTop: "-4px",
+                                    marginTop:'-8px'
                                   }),
                                   input: (base) => ({
                                     ...base,
                                     margin: 0,
                                     padding: 0,
+
                                   }),
                                   indicatorsContainer: (base) => ({
                                     ...base,
+                               display: "none" ,
                                     height: "28px", // Align dropdown arrow
-                                    marginTop: "-4px",
+                                     marginTop: "-12px",
                                   }),
                                 }}
                               />
@@ -528,7 +498,7 @@ export default function Form() {
                                 type="text"
                                 value={countryCode}
                                readOnly={readOnly || childRecord.current > 0}
-                                className={`w-full px-1 py-0.5 text-xs border border-gray-300 rounded-lg
+                                className={`w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg
   focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
   transition-all duration-150 shadow-sm
   ${
@@ -541,7 +511,7 @@ export default function Form() {
                               />
                             </div>
                           </div>
-                          <div className="mt-5">
+                          <div className=" pt-10">
                             <ToggleButton
                               name="Status"
                               options={statusDropdown}

@@ -89,7 +89,7 @@ const PayComponents = () => {
   };
 
   const validateData = (data) => {
-    if (data.name) {
+    if (data?.payCode && data?.payDescription) {
       return true;
     }
     return false;
@@ -120,9 +120,15 @@ const PayComponents = () => {
   };
 
   const saveData = () => {
-    if (!window.confirm("Are you sure save the details ...?")) {
+    if (!validateData(data)) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Please fill all required fields...!",
+      });
       return;
     }
+
     if (id) {
       handleSubmitCustom(updateData, data, "Updated");
     } else {
@@ -178,6 +184,7 @@ const PayComponents = () => {
     setSearchValue("");
     setPayCode("");
     setPayDescription("");
+    setEarningsType('')
     setTaxable("");
     setNotes("");
   };
@@ -207,14 +214,14 @@ const PayComponents = () => {
     {
       header: "S.No",
       accessor: (item, index) => index + 1,
-      className: "font-medium text-gray-900 w-12  text-center",
+      className: " text-gray-900 w-12  text-center",
     },
 
     {
       header: "Pay Code",
       accessor: (item) => item?.payCode,
-      //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-44",
+      //   cellClass: () => "  text-gray-900",
+      className: " text-gray-900 text-center uppercase w-44",
     },
   ];
 
@@ -230,7 +237,7 @@ const PayComponents = () => {
                   setForm(true);
                   onNew();
                 }}
-                   className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+                className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
               >
                 + Add Pay Component
               </button>
@@ -255,31 +262,29 @@ const PayComponents = () => {
               onClose={() => {
                 setForm(false);
                 setErrors({});
-                setId('')
+                setId("");
               }}
             >
               <div className="h-full flex flex-col bg-gray-100">
                 <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                   <div className="flex items-center gap-2">
                     <h2 className="text-lg py-0.5 font-semibold  text-gray-800">
-                     
-                          Pay Component
-                        
+                      Pay Component
                     </h2>
                   </div>
                   <div className="flex gap-2">
                     <div>
-                       {readOnly && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setReadOnly(false);
-                        }}
-                        className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
-                      >
-                        Edit
-                      </button>
-                    )}
+                      {readOnly && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setReadOnly(false);
+                          }}
+                          className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
+                        >
+                          Edit
+                        </button>
+                      )}
                     </div>
                     <div className="flex gap-2">
                       {!readOnly && (
@@ -301,7 +306,7 @@ const PayComponents = () => {
                   <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
                     <div className="space-y-4 ">
                       <div className="flex gap-x-6">
-                        <div className="w-[181px]">
+                        <div className="w-[198px]">
                           <TextInput
                             name="Pay Component"
                             type="text"
@@ -312,7 +317,7 @@ const PayComponents = () => {
                             disabled={childRecord.current > 0}
                           />
                         </div>
-                        <div className="w-[105px]">
+                        <div className="w-[120px]">
                           <TextInput
                             name="Pay Code"
                             type="text"
@@ -329,7 +334,7 @@ const PayComponents = () => {
                           name="Earnings / Deductions"
                           value={earningsType}
                           setValue={setEarningsType}
-                          required={true}
+                          // required={true}
                           options={earningsTypes}
                           readOnly={readOnly}
                           disabled={childRecord.current > 0}
@@ -344,7 +349,7 @@ const PayComponents = () => {
                           name="Taxable"
                           value={taxable}
                           setValue={setTaxable}
-                          required={true}
+                          // required={true}
                           options={common}
                           readOnly={readOnly}
                           disabled={childRecord.current > 0}
@@ -357,7 +362,7 @@ const PayComponents = () => {
                         )}
                       </div>{" "}
                     </div>
-                    <div className="w-72 mt-8">
+                    <div className="w-72 ">
                       <TextArea
                         name="Notes"
                         type="text"

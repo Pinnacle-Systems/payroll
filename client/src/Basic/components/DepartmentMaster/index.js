@@ -45,10 +45,10 @@ export default function Form() {
       sessionStorage.getItem("sessionId") + "userCompanyId"
     ),
   };
-  const {
-    data: allData,
-
-  } = useGetDepartmentQuery({ params, searchParams: searchValue });
+  const { data: allData } = useGetDepartmentQuery({
+    params,
+    searchParams: searchValue,
+  });
   const {
     data: singleData,
     isFetching: isSingleFetching,
@@ -61,12 +61,10 @@ export default function Form() {
 
   const syncFormWithDb = useCallback(
     (data) => {
-
       // setReadOnly(true);
       setName(data?.name || "");
       setCode(data?.code || "");
       setActive(id ? data?.active ?? false : true);
-
     },
     [id]
   );
@@ -76,7 +74,6 @@ export default function Form() {
   }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
 
   console.log(singleData?.data, "singleData?.data");
-
 
   const data = {
     name,
@@ -89,7 +86,7 @@ export default function Form() {
   };
 
   const validateData = (data) => {
-    if (data.name ) {
+    if (data.name) {
       return true;
     }
     return false;
@@ -107,25 +104,28 @@ export default function Form() {
         showConfirmButton: false,
         didOpen: () => {
           Swal.showLoading();
-        }
-        
+        },
       });
       setForm(false);
     } catch (error) {
-      console.log("handle");
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: error.data?.message || "Something went wrong!",
+      });
     }
   };
 
   const saveData = () => {
     if (!validateData(data)) {
       Swal.fire({
-        icon: 'error',
-        title: 'Submission error',
-        text: 'Please fill all required fields...!',
+        icon: "error",
+        title: "Submission error",
+        text: "Please fill all required fields...!",
       });
       return;
     }
-  
+
     if (id) {
       handleSubmitCustom(updateData, data, "Updated");
     } else {
@@ -150,13 +150,13 @@ export default function Form() {
           title: "Deleted Successfully",
           icon: "success",
           timer: 1000,
-
-        }); setForm(false);
+        });
+        setForm(false);
       } catch (error) {
         Swal.fire({
-          icon: 'error',
-          title: 'Submission error',
-          text: error.data?.message || 'Something went wrong!',
+          icon: "error",
+          title: "Submission error",
+          text: error.data?.message || "Something went wrong!",
         });
       }
     }
@@ -172,9 +172,9 @@ export default function Form() {
 
   const onNew = () => {
     setId("");
-    setName('')
-    setCode('')
-    setActive(true)
+    setName("");
+    setCode("");
+    setActive(true);
     setReadOnly(false);
     setForm(true);
     setSearchValue("");
@@ -233,23 +233,22 @@ export default function Form() {
     {
       header: "S.No",
       accessor: (item, index) => index + 1,
-      className: "font-medium text-gray-900 w-12  text-center",
+      className: " text-gray-900 w-12  text-center",
     },
 
     {
       header: "Department Name",
       accessor: (item) => item?.name,
       //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-left pl-2 uppercase w-72",
+      className: " text-gray-900 text-left pl-2 uppercase w-72",
     },
 
     {
       header: "Status",
       accessor: (item) => (item.active ? ACTIVE : INACTIVE),
       //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-16",
+      className: " text-gray-900 text-center uppercase w-16",
     },
-   
   ];
   const handleView = (id) => {
     setId(id);
@@ -310,33 +309,29 @@ export default function Form() {
           onClose={() => {
             setForm(false);
             setErrors({});
-            setId("")
+            setId("");
           }}
         >
           <div className="h-full flex flex-col bg-gray-100">
             <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
               <div className="flex items-center gap-2">
                 <h2 className="text-lg  py-0.5 font-semibold  text-gray-800">
-                  
-                      Department Master
-                    
+                  Department Master
                 </h2>
               </div>
               <div className="flex gap-2">
                 <div>
-                     {readOnly && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          
-                          
-                          setReadOnly(false)
-                        }}
-                        className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
-                      >
-                        Edit
-                      </button>
-                    )}
+                  {readOnly && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setReadOnly(false);
+                      }}
+                      className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
+                    >
+                      Edit
+                    </button>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   {!readOnly && (

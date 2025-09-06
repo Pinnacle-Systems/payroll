@@ -139,19 +139,19 @@ export default function Form() {
       Swal.fire({
         icon: "error",
         title: "Submission error",
-        text: "Please fill all required fields...!",
+        text: "Only one Fin year can be active",
       });
       return;
     }
     if (!validateData(data)) {
-      toast.error("Please fill all required fields...!", {
-        position: "top-center",
-      });
-      return;
-    }
-    if (!window.confirm("Are you sure save the details ...?")) {
-      return;
-    }
+         Swal.fire({
+           icon: "error",
+           title: "Submission error",
+           text: "Please fill all required fields...!",
+         });
+         return;
+       }
+    
     if (id) {
       handleSubmitCustom(updateData, data, "Updated");
     } else {
@@ -207,6 +207,7 @@ export default function Form() {
     setTo("");
     setFrom("");
     setCode("");
+    setActive(true)
   };
 
   function onDataClick(id) {
@@ -274,7 +275,7 @@ export default function Form() {
     {
       header: "S.No",
       accessor: (item, index) => index + 1,
-      className: "font-medium text-gray-900 w-12  text-center",
+      className: " text-gray-900 w-12  text-center",
     },
 
     {
@@ -282,26 +283,26 @@ export default function Form() {
       accessor: (item) =>
         item.from ? new Date(item.from).toISOString().split("T")[0] : "",
       //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-28",
+      className: " text-gray-900 text-center uppercase w-28",
     },
     {
       header: "To",
       accessor: (item) =>
         item.to ? new Date(item.to).toISOString().split("T")[0] : "",
       //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-28",
+      className: " text-gray-900 text-center uppercase w-28",
     },
     {
       header: "Code",
       accessor: (item) => item.code,
       //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-28",
+      className: " text-gray-900 text-center uppercase w-28",
     },
     {
       header: "Status",
       accessor: (item) => (item.active ? ACTIVE : INACTIVE),
       //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-28",
+      className: " text-gray-900 text-center uppercase w-28",
     },
   ];
   return (
@@ -349,7 +350,7 @@ export default function Form() {
         <Modal
           isOpen={form}
           form={form}
-          widthClass={"w-[40%] h-[60%]"}
+          widthClass={"w-[40%] h-[50%]"}
           onClose={() => {
             setForm(false);
             setErrors({});
@@ -398,22 +399,23 @@ export default function Form() {
                 <div className="lg:col-span- space-y-3">
                   <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
                     <div className="space-y-2">
-                      <div className="flex gap-x-3">
+                      <div className="flex gap-x-6">
                         <div className="w-32">
-                        <DateInput
-                          name="From"
-                          value={from}
-                          setValue={setFrom}
-                          required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                        />
+                          <DateInput
+                            name="From"
+                            value={from}
+                            setValue={setFrom}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                          />
 
-                        {errors.name && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.name}
-                          </span>
-                        )}</div>
+                          {errors.name && (
+                            <span className="text-red-500 text-xs ml-1">
+                              {errors.name}
+                            </span>
+                          )}
+                        </div>
 
                         <div className="">
                           <DateInput
@@ -425,15 +427,14 @@ export default function Form() {
                             disabled={childRecord.current > 0}
                           />
                         </div>
-                      </div>
-                      <div>
-                        <label className="block text-xs text-black mb-1">
-                          Short Code
-                          <input
-                            name="code"
-                            className={`w-full px-2  py-1 mt-2 text-xs border border-gray-300 rounded-lg
+                        <div className="w-32">
+                          <label className="block text-xs font-bold text-slate-700 ">
+                            Short Code
+                            <input
+                              name="code"
+                              className={`w-full px-3 font-normal  py-1.5 mt-1 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-          transition-all duration-150 shadow-sm
+          transition-all duration-150 shadow-sm 
            ${
              readOnly || childRecord.current > 0
                ? "bg-gray-100 text-gray-500 cursor-not-allowed"
@@ -441,15 +442,16 @@ export default function Form() {
            }
           
           `}
-                            value={code}
-                            onChange={(e) => setCode(e.target.value)}
-                            readOnly={readOnly || childRecord.current > 0}
-                            disabled={childRecord.current > 0}
-                          />
-                        </label>
+                              value={code}
+                              onChange={(e) => setCode(e.target.value)}
+                              readOnly={readOnly || childRecord.current > 0}
+                              disabled={childRecord.current > 0}
+                            />
+                          </label>
+                        </div>
                       </div>
 
-                      <div>
+                      <div className=" pt-5">
                         <ToggleButton
                           name="Status"
                           options={statusDropdown}

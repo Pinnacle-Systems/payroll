@@ -317,29 +317,29 @@ const ShiftTemplateMaster = () => {
     {
       header: "S.No",
       accessor: (item, index) => index + 1,
-      className: "font-medium text-gray-900 w-12  text-center",
+      className: " text-gray-900 w-12  text-center",
     },
 
     {
       header: "DocId",
       accessor: (item) => item?.docId,
-      //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-32",
+      //   cellClass: () => "  text-gray-900",
+      className: " text-gray-900 text-center uppercase w-32",
     },
     {
       header: "Category",
       accessor: (item) => item?.category,
-      //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-32",
+      //   cellClass: () => "  text-gray-900",
+      className: " text-gray-900 text-center uppercase w-32",
     },
     {
       header: "Status",
       accessor: (item) => (item.active ? ACTIVE : INACTIVE),
-      //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-36",
+      //   cellClass: () => " text-gray-900",
+      className: " text-gray-900 text-center uppercase w-36",
     },
   ];
-  console.log(docId, "docIdreceived");
+ 
   return (
     <div>
       <div onKeyDown={handleKeyDown} className="p-1 ">

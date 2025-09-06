@@ -202,7 +202,7 @@ async function getOne(id) {
       department: {
         select: {
           id: true,
-          name:true
+          name: true,
         },
       },
       EmployeeCategory: true,
@@ -315,83 +315,70 @@ async function create(req) {
     educationDetails,
     familyDetails,
   } = await req.body;
-  const presentAddressObj = presentAddress ? JSON.parse(presentAddress) : {};
-  const permanentAddressObj = permanentAddress
-    ? JSON.parse(permanentAddress)
-    : {};
+  const presentAddressObj = presentAddress ? presentAddress : {};
+  const permanentAddressObj = permanentAddress ? permanentAddress : {};
 
   console.log(req.body, "form");
 
   const data = await prisma.employee.create({
     data: {
-      // branchId: branchId ? parseInt(branchId) : null,
-      // shiftTemplateId: shiftTemplateId ? parseInt(shiftTemplateId) : null,
-      // employeeCategoryId: employeeCategoryId
-      //   ? parseInt(employeeCategoryId)
-      //   : null,
-      // designationId: desiginationId ? parseInt(desiginationId) : null,
-      // departmentId: departmentId ? parseInt(departmentId) : null,
-      employeeType,
-      firstName,
-      middleName,
-      lastName,
-      fatherName,
-      motherName,
-      gender,
-      disability,
-      identificationMark,
+      employeeType: employeeType ? employeeType : "",
+      firstName: firstName ? firstName : "",
+      middleName: middleName ? middleName : "",
+      lastName: lastName ? lastName : "",
+      fatherName: fatherName ? fatherName : "",
+      motherName: motherName ? motherName : "",
+      gender: gender ? gender : "",
+      disability: disability ? disability : "",
+      identificationMark: identificationMark ? identificationMark : "",
       dob: dob ? new Date(dob) : null,
-      bloodGroup,
-      height,
-      weight,
-      maritalStatus,
-
+      bloodGroup: bloodGroup ? bloodGroup : "",
+      height: height ? height : "",
+      weight: weight ? weight : "",
+      maritalStatus: maritalStatus ? maritalStatus : "",
       joiningDate: joiningDate ? new Date(joiningDate) : null,
+      payCategory: payCategory ? payCategory : "",
+      idNumber: idNumber ? idNumber : "",
+      pf: pf ? pf : "",
+      esi: esi ? esi : "",
+      salary: salary ? salary : "",
+      salaryMethod: salaryMethod ? salaryMethod : "",
+      religion: religion ? religion : "",
+      aadharNo: aadharNo ? aadharNo : "",
+      panNo: panNo ? panNo : "",
+      esiNo: esiNo ? esiNo : "",
+      pfNo: pfNo ? pfNo : "",
+      email: email ? email : "",
+      uanNo: uanNo ? uanNo : "",
 
-      payCategory,
-      idNumber,
-      pf,
-      esi,
-      salary,
-      salaryMethod,
+      presentAddress: presentAddressObj.address
+        ? presentAddressObj.address
+        : undefined,
+      presentVillage: presentAddressObj.village
+        ? presentAddressObj.village
+        : undefined,
+      presentPincode: presentAddressObj.pincode
+        ? presentAddressObj.pincode
+        : undefined,
+      presentMobile: presentAddressObj.mobile
+        ? presentAddressObj.mobile
+        : undefined,
 
-      religion,
-      aadharNo,
-      panNo,
-      esiNo,
-      pfNo,
-      email,
-      uanNo,
-
-      presentAddress: presentAddressObj.address || "",
-      presentVillage: presentAddressObj.village || "",
-      // presentCityId: presentAddressObj.cityId
-      //   ? parseInt(presentAddressObj.cityId)
-      //   : null,
-      // presentStateId: presentAddressObj.stateId
-      //   ? parseInt(presentAddressObj.stateId)
-      //   : null,
-      // presentCountryId: presentAddressObj.countryId
-      //   ? parseInt(presentAddressObj.countryId)
-      //   : null,
-      presentPincode: presentAddressObj.pincode || "",
-      presentMobile: presentAddressObj.mobile || "",
-
-      permanentAddress: permanentAddressObj.address || "",
-      permanentVillage: permanentAddressObj.village || "",
-      // permanentCityId: permanentAddressObj.cityId
-      //   ? parseInt(permanentAddressObj.cityId)
-      //   : null,
-      // permanentStateId: permanentAddressObj.stateId
-      //   ? parseInt(permanentAddressObj.stateId)
-      //   : null,
-      // permanentCountryId: permanentAddressObj.countryId
-      //   ? parseInt(permanentAddressObj.countryId)
-      //   : null,
-      permanentPincode: permanentAddressObj.pincode || "",
-      permanentMobile: permanentAddressObj.mobile || "",
+      permanentAddress: permanentAddressObj.address
+        ? permanentAddressObj.address
+        : undefined,
+      permanentVillage: permanentAddressObj.village
+        ? permanentAddressObj.village
+        : undefined,
+      permanentPincode: permanentAddressObj.pincode
+        ? permanentAddressObj.pincode
+        : undefined,
+      permanentMobile: permanentAddressObj.mobile
+        ? permanentAddressObj.mobile
+        : undefined,
 
       Branch: branchId ? { connect: { id: parseInt(branchId) } } : undefined,
+      // shiftTemplateId: shiftTemplateId ? parseInt(shiftTemplateId) : null,
       shiftTemplate: shiftTemplateId
         ? { connect: { id: parseInt(shiftTemplateId) } }
         : undefined,
@@ -404,6 +391,7 @@ async function create(req) {
       EmployeeCategory: employeeCategoryId
         ? { connect: { id: parseInt(employeeCategoryId) } }
         : undefined,
+
       presentCity: presentAddressObj.cityId
         ? { connect: { id: parseInt(presentAddressObj.cityId) } }
         : undefined,
@@ -413,6 +401,7 @@ async function create(req) {
       presentCountry: presentAddressObj.countryId
         ? { connect: { id: parseInt(presentAddressObj.countryId) } }
         : undefined,
+
       permanentCity: permanentAddressObj.cityId
         ? { connect: { id: parseInt(permanentAddressObj.cityId) } }
         : undefined,
@@ -422,32 +411,44 @@ async function create(req) {
       permanentCountry: permanentAddressObj.countryId
         ? { connect: { id: parseInt(permanentAddressObj.countryId) } }
         : undefined,
-      EmployeeBankDetails: {
-        create: JSON.parse(bankDetails).map((b) => ({
-          bankName: b.bankName,
-          branchName: b.branchName,
-          accountNumber: b.accountNumber,
-          ifscCode: b.ifscCode,
-        })),
-      },
-      EmployeeEducationdetails: {
-        create: JSON.parse(educationDetails).map((e) => ({
-          courseName: e.courseName,
-          universityName: e.universityName,
-          institutionName: e.institutionName,
-          yearOfPass: e.yearOfPass,
-        })),
-      },
-      EmployeeFamilyDetails: {
-        create: JSON.parse(familyDetails).map((f) => ({
-          name: f.name,
-          dob: f.dob ? new Date(f.dob) : null,
-          age: f.age ? parseInt(f.age) : null,
-          relationShip: f.relationShip,
-          occupation: f.occupation,
-          nominee: f.nominee,
-        })),
-      },
+
+      EmployeeBankDetails:
+        bankDetails && JSON.parse(bankDetails).length > 0
+          ? {
+              create: JSON.parse(bankDetails).map((b) => ({
+                bankName: b.bankName ? b.bankName : "",
+                branchName: b.branchName ? b.branchName : "",
+                accountNumber: b.accountNumber ? b.accountNumber : "",
+                ifscCode: b.ifscCode ? b.ifscCode : "",
+              })),
+            }
+          : "",
+
+      EmployeeEducationdetails:
+        educationDetails && JSON.parse(educationDetails).length > 0
+          ? {
+              create: JSON.parse(educationDetails).map((e) => ({
+                courseName: e.courseName ? e.courseName : "",
+                universityName: e.universityName ? e.universityName : "",
+                institutionName: e.institutionName ? e.institutionName : "",
+                yearOfPass: e.yearOfPass ? e.yearOfPass : "",
+              })),
+            }
+          : "",
+
+      EmployeeFamilyDetails:
+        familyDetails && JSON.parse(familyDetails).length > 0
+          ? {
+              create: JSON.parse(familyDetails).map((f) => ({
+                name: f.name ? f.name : "",
+                dob: f.dob ? new Date(f.dob) : null,
+                age: f.age ? parseInt(f.age) : null,
+                relationShip: f.relationShip ? f.relationShip : "",
+                occupation: f.occupation ? f.occupation : "",
+                nominee: f.nominee ? f.nominee : "",
+              })),
+            }
+          : undefined,
     },
   });
   return { statusCode: 0, data: exclude({ ...data }, ["image"]) };
@@ -455,7 +456,7 @@ async function create(req) {
 
 async function update(id, req) {
   const {
-   branchId,
+    branchId,
     employeeType,
     middleName,
     firstName,
@@ -495,10 +496,10 @@ async function update(id, req) {
     permanentAddress,
     bankDetails,
     educationDetails,
-    familyDetails
+    familyDetails,
   } = await req.body;
 
-   const presentAddressObj = presentAddress ? JSON.parse(presentAddress) : {};
+  const presentAddressObj = presentAddress ? JSON.parse(presentAddress) : {};
   const permanentAddressObj = permanentAddress
     ? JSON.parse(permanentAddress)
     : {};
@@ -516,74 +517,63 @@ async function update(id, req) {
       id: parseInt(id),
     },
     data: {
-      // branchId: branchId ? parseInt(branchId) : null,
-      // shiftTemplateId: shiftTemplateId ? parseInt(shiftTemplateId) : null,
-      // employeeCategoryId: employeeCategoryId
-      //   ? parseInt(employeeCategoryId)
-      //   : null,
-      // designationId: desiginationId ? parseInt(desiginationId) : null,
-      // departmentId: departmentId ? parseInt(departmentId) : null,
-      employeeType,
-      firstName,
-      middleName,
-      lastName,
-      fatherName,
-      motherName,
-      gender,
-      disability,
-      identificationMark,
+      employeeType: employeeType ? employeeType : "",
+      firstName: firstName ? firstName : "",
+      middleName: middleName ? middleName : "",
+      lastName: lastName ? lastName : "",
+      fatherName: fatherName ? fatherName : "",
+      motherName: motherName ? motherName : "",
+      gender: gender ? gender : "",
+      disability: disability ? disability : "",
+      identificationMark: identificationMark ? identificationMark : "",
       dob: dob ? new Date(dob) : null,
-      bloodGroup,
-      height,
-      weight,
-      maritalStatus,
-
+      bloodGroup: bloodGroup ? bloodGroup : "",
+      height: height ? height : "",
+      weight: weight ? weight : "",
+      maritalStatus: maritalStatus ? maritalStatus : "",
       joiningDate: joiningDate ? new Date(joiningDate) : null,
+      payCategory: payCategory ? payCategory : "",
+      idNumber: idNumber ? idNumber : "",
+      pf: pf ? pf : "",
+      esi: esi ? esi : "",
+      salary: salary ? salary : "",
+      salaryMethod: salaryMethod ? salaryMethod : "",
+      religion: religion ? religion : "",
+      aadharNo: aadharNo ? aadharNo : "",
+      panNo: panNo ? panNo : "",
+      esiNo: esiNo ? esiNo : "",
+      pfNo: pfNo ? pfNo : "",
+      email: email ? email : "",
+      uanNo: uanNo ? uanNo : "",
 
-      payCategory,
-      idNumber,
-      pf,
-      esi,
-      salary,
-      salaryMethod,
+      presentAddress: presentAddressObj.address
+        ? presentAddressObj.address
+        : undefined,
+      presentVillage: presentAddressObj.village
+        ? presentAddressObj.village
+        : undefined,
+      presentPincode: presentAddressObj.pincode
+        ? presentAddressObj.pincode
+        : undefined,
+      presentMobile: presentAddressObj.mobile
+        ? presentAddressObj.mobile
+        : undefined,
 
-      religion,
-      aadharNo,
-      panNo,
-      esiNo,
-      pfNo,
-      email,
-      uanNo,
-
-      presentAddress: presentAddressObj.address || "",
-      presentVillage: presentAddressObj.village || "",
-      // presentCityId: presentAddressObj.cityId
-      //   ? parseInt(presentAddressObj.cityId)
-      //   : null,
-      // presentStateId: presentAddressObj.stateId
-      //   ? parseInt(presentAddressObj.stateId)
-      //   : null,
-      // presentCountryId: presentAddressObj.countryId
-      //   ? parseInt(presentAddressObj.countryId)
-      //   : null,
-      presentPincode: presentAddressObj.pincode || "",
-      presentMobile: presentAddressObj.mobile || "",
-
-      permanentAddress: permanentAddressObj.address || "",
-      permanentVillage: permanentAddressObj.village || "",
-      // permanentCityId: permanentAddressObj.cityId
-      //   ? parseInt(permanentAddressObj.cityId)
-      //   : null,
-      // permanentStateId: permanentAddressObj.stateId
-      //   ? parseInt(permanentAddressObj.stateId)
-      //   : null,
-      // permanentCountryId: permanentAddressObj.countryId
-      //   ? parseInt(permanentAddressObj.countryId)
-      //   : null,
-      permanentPincode: permanentAddressObj.pincode || "",
-      permanentMobile: permanentAddressObj.mobile || "",
+      permanentAddress: permanentAddressObj.address
+        ? permanentAddressObj.address
+        : undefined,
+      permanentVillage: permanentAddressObj.village
+        ? permanentAddressObj.village
+        : undefined,
+      permanentPincode: permanentAddressObj.pincode
+        ? permanentAddressObj.pincode
+        : undefined,
+      permanentMobile: permanentAddressObj.mobile
+        ? permanentAddressObj.mobile
+        : undefined,
 
       Branch: branchId ? { connect: { id: parseInt(branchId) } } : undefined,
+      // shiftTemplateId: shiftTemplateId ? parseInt(shiftTemplateId) : null,
       shiftTemplate: shiftTemplateId
         ? { connect: { id: parseInt(shiftTemplateId) } }
         : undefined,
@@ -596,6 +586,7 @@ async function update(id, req) {
       EmployeeCategory: employeeCategoryId
         ? { connect: { id: parseInt(employeeCategoryId) } }
         : undefined,
+
       presentCity: presentAddressObj.cityId
         ? { connect: { id: parseInt(presentAddressObj.cityId) } }
         : undefined,
@@ -605,6 +596,7 @@ async function update(id, req) {
       presentCountry: presentAddressObj.countryId
         ? { connect: { id: parseInt(presentAddressObj.countryId) } }
         : undefined,
+
       permanentCity: permanentAddressObj.cityId
         ? { connect: { id: parseInt(permanentAddressObj.cityId) } }
         : undefined,
@@ -614,35 +606,49 @@ async function update(id, req) {
       permanentCountry: permanentAddressObj.countryId
         ? { connect: { id: parseInt(permanentAddressObj.countryId) } }
         : undefined,
-      EmployeeBankDetails: {
-        deleteMany: {},
-        create: JSON.parse(bankDetails).map((b) => ({
-          bankName: b.bankName,
-          branchName: b.branchName,
-          accountNumber: b.accountNumber,
-          ifscCode: b.ifscCode,
-        })),
-      },
-      EmployeeEducationdetails: {
-        deleteMany: {},
-        create: JSON.parse(educationDetails).map((e) => ({
-          courseName: e.courseName,
-          universityName: e.universityName,
-          institutionName: e.institutionName,
-          yearOfPass: e.yearOfPass,
-        })),
-      },
-      EmployeeFamilyDetails: {
-        deleteMany: {},
-        create: JSON.parse(familyDetails).map((f) => ({
-          name: f.name,
-          dob: f.dob ? new Date(f.dob) : null,
-          age: f.age ? parseInt(f.age) : null,
-          relationShip: f.relationShip,
-          occupation: f.occupation,
-          nominee: f.nominee,
-        })),
-      },
+
+      EmployeeBankDetails:
+        bankDetails && JSON.parse(bankDetails).length > 0
+          ? {
+              deleteMany: {},
+              create: JSON.parse(bankDetails).map((b) => ({
+                bankName: b.bankName || "",
+                branchName: b.branchName || "",
+                accountNumber: b.accountNumber || "",
+                ifscCode: b.ifscCode || "",
+              })),
+            }
+          : undefined,
+
+      // Education Details
+      EmployeeEducationdetails:
+        educationDetails && JSON.parse(educationDetails).length > 0
+          ? {
+              deleteMany: {},
+              create: JSON.parse(educationDetails).map((e) => ({
+                courseName: e.courseName || "",
+                universityName: e.universityName || "",
+                institutionName: e.institutionName || "",
+                yearOfPass: e.yearOfPass || "",
+              })),
+            }
+          : undefined,
+
+      // Family Details
+      EmployeeFamilyDetails:
+        familyDetails && JSON.parse(familyDetails).length > 0
+          ? {
+              deleteMany: {},
+              create: JSON.parse(familyDetails).map((f) => ({
+                name: f.name || "",
+                dob: f.dob ? new Date(f.dob) : null,
+                age: f.age ? parseInt(f.age) || null : null,
+                relationShip: f.relationShip || "",
+                occupation: f.occupation || "",
+                nominee: f.nominee || "",
+              })),
+            }
+          : undefined,
     },
   });
   return { statusCode: 0, data: exclude({ ...data }, ["image"]) };

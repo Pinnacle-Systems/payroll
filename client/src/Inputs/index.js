@@ -1213,7 +1213,7 @@ export const TextInput = forwardRef(({
         disabled={disabled}
         tabIndex={tabIndex ?? undefined}
 
-        className={`w-full px-1 py-0.5 text-xs border border-gray-300 rounded-lg
+        className={`w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
           ${readOnly || disabled
@@ -1526,7 +1526,7 @@ export const DropdownInput = ({
         defaultValue={defaultValue}
         required={required}
         readOnly={readOnly}
-        className={`w-full px-1 py-0.5 text-xs border border-gray-300 rounded-lg
+        className={`w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
           ${isDisabled
@@ -1788,11 +1788,11 @@ export const DateInput = ({
           value={value}
           onChange={(e) => setValue(e.target.value)}
           className={`
-         w-full px-1 py-0.5 text-xs border border-gray-300 rounded-lg
+         w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
-            ${readOnly ? "bg-gray-100 cursor-not-allowed" : "bg-white"}
-            ${disabled ? "opacity-50 cursor-not-allowed" : ""}
+            ${readOnly ? "bg-gray-100 text-gray-500 cursor-not-allowed" : "bg-white"}
+            ${disabled ? "opacity-50 bg-gray-100 cursor-not-allowed" : ""}
             ${inputClass}
           `}
         />
@@ -2222,14 +2222,14 @@ export const ReusableTable = ({
             {columns?.map((column, index) => (
               <th
                 key={index}
-                className={` font-medium text-gray-900 py-2 px-8 text-center  ${column.header !== "" ? 'border-r border-white/50' : ''} `}
+                className={` font-medium text-gray-900 py-2 text-[12px] px-8 text-center uppercase  ${column.header !== "" ? 'border-r border-white/50' : ''} `}
 
               >
                 {column.header}
               </th>
             ))}
             {rowActions && (
-              <th className="px-4 py-2 text-center  font-medium justify-end">Actions</th>
+              <th className="px-4 py-2 text-center text-[12px] font-medium justify-end">ACTIONS</th>
             )}
           </tr>
         </thead>
@@ -2250,7 +2250,7 @@ export const ReusableTable = ({
                 {columns?.map((column, colIndex) => (
                   <td
                     key={colIndex}
-                    className={` ${column.className ? column.className : ""} ${column.header !== "" ? 'border-r text-dark border-white/50' : ''} h-8 `}
+                    className={` ${column.className ? column.className : ""} ${column.header !== "" ? 'border-r  border-white/50' : ''} h-8 `}
                   >
                     {column.accessor(item, index)}
                   </td>

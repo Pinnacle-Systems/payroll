@@ -80,6 +80,12 @@ const TemplateItems = ({
       return yarnBlend.filter((_, index) => index !== parseInt(id));
     });
   };
+  const handleDeleteAllRows = () => {
+    setShiftTemplateItems((prevRows) => {
+      if (prevRows.length <= 1) return prevRows;
+      return [prevRows[0]];
+    });
+  };
 
   return (
     <>
@@ -196,28 +202,10 @@ const TemplateItems = ({
                     Shift
                   </th>
 
-                  {/* <th
-
-                                        className={`w-28 px-3 py-2 text-center font-medium text-[13px] `}
-                                    >
-                                        Quater(Y/N)
-                                    </th> */}
-                  {/* <th
-
-                                        className={`w-14 px-3 py-2 text-center font-medium text-[13px] `}
-                                    >
-                                        SubFill
-                                    </th> */}
+              
                   <th className={`w-12  item-center font-medium text-[13px] `}>
                     Other Data
-                    {/* <button
-                      onClick={() => {
-                        addNewRow();
-                      }}
-                      className="hover:bg-green-600 text-green-600 hover:text-white border border-green-600 px-2 py-1 ml-5 rounded-md flex items-center text-xs"
-                    >
-                      <HiPlus className="w-3 h-3" />
-                    </button> */}
+                   
                   </th>
                   <th
                     className={`w-72  item-center font-medium text-[13px] `}
@@ -252,10 +240,7 @@ const TemplateItems = ({
                           handleInputChange(e.target.value, index, "templateId")
                         }
 
-                        // onBlur={(e) => {
-                        //     handleInputChange(e.target.value, index, "accessoryGroupId")
-                        // }
-                        // }
+                       
                       >
                         <option>Select Shift Common Template</option>
                         {(id
@@ -273,7 +258,6 @@ const TemplateItems = ({
 
                     <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
                       <select
-                        // onKeyDown={e => { if (e.key === "Delete") { handleInputChange("", index, "accessoryGroupId") } }}
                         disabled={readOnly}
                         className="text-left focus:outline-none w-full rounded py-1 "
                         onKeyDown={(e) => {
@@ -828,44 +812,6 @@ const TemplateItems = ({
                         </div>
                       </>
                     )}
-                    {/* <td className='w-40 border border-gray-300 text-[11px] py-0.5 item-center '>
-
-                                            <select
-                                                // onKeyDown={e => { if (e.key === "Delete") { handleInputChange("", index, "accessoryGroupId") } }}
-                                                disabled={readOnly} className='text-left w-full  py-1 '
-                                                value={item.quater}
-                                                onChange={(e) => handleInputChange(e.target.value, index, "quater")}
-
-                                            >
-                                                <option>
-                                                </option>
-                                                {(common).map((blend) =>
-                                                    <option value={blend.value} key={blend.value}>
-                                                        {blend?.show}
-                                                    </option>
-                                                )}
-                                            </select>
-
-                                        </td> */}
-                    {/* <td className="w-40 border border-gray-300 text-[11px] py-0.5 item-center">
-                                            <button
-                                                // onClick={() => handleView(index)}
-                                                // onMouseEnter={() => setTooltipVisible(true)}
-                                                // onMouseLeave={() => setTooltipVisible(false)}
-                                                className="text-blue-800 py-1.5 flex items-center bg-blue-50 rounded"
-                                            >
-                                                👁 <span className="text-xs"></span>
-                                            </button>
-                                        </td> */}
-
-                    {/* <td className=" border border-gray-300 text-[11px] py-0.5 flex items-center justify-center">
-                      <button
-                        onClick={() => handleDeleteRow(index)}
-                        className="text-red-600 hover:text-red-800 bg-red-50 py-1 rounded text-xs flex items-center"
-                      >
-                        <HiTrash className="w-4 h-4" />
-                      </button>
-                    </td> */}
                   </tr>
                 ))}
               </tbody>
@@ -873,26 +819,6 @@ const TemplateItems = ({
           </div>
         </div>
 
-        {/* <div className="flex flex-col md:flex-row gap-2 justify-between mt-4">
-          Left Buttons
-          <div className="flex gap-2 flex-wrap">
-            <button
-              onClick={() => saveData()}
-              className="bg-indigo-500 text-white px-4 py-1 rounded-md hover:bg-indigo-600 flex items-center text-sm"
-            >
-              <FiSave className="w-4 h-4 mr-2" />
-              {id ? "Update" : "Save"}
-            </button>
-            <button onClick={() => saveData("close")} className="bg-indigo-500 text-white px-4 py-1 rounded-md hover:bg-indigo-600 flex items-center text-sm">
-                                <HiOutlineRefresh className="w-4 h-4 mr-2" />
-                                Save & Close
-                            </button>
-                            <button onClick={() => saveData("draft")} className="bg-indigo-500 text-white px-4 py-1 rounded-md hover:bg-indigo-600 flex items-center text-sm">
-                                <HiOutlineRefresh className="w-4 h-4 mr-2" />
-                                Draft Save
-                            </button>
-          </div>
-        </div> */}
         {contextMenu && (
           <div
             style={{
@@ -900,23 +826,33 @@ const TemplateItems = ({
               top: `${contextMenu.mouseY - 50}px`,
               left: `${contextMenu.mouseX + 20}px`,
 
-              background: "white",
+              // background: "gray",
               boxShadow: "0px 0px 5px rgba(0,0,0,0.3)",
               padding: "8px",
               borderRadius: "4px",
               zIndex: 1000,
             }}
+            className="bg-gray-100"
             onMouseLeave={handleCloseContextMenu} // Close when the mouse leaves
           >
             <div className="flex flex-col gap-1">
               <button
-                className="bg-red-600 text-white rounded px-1"
+                className=" text-black text-[12px] text-left rounded px-1"
                 onClick={() => {
                   handleDeleteRow(contextMenu.rowId);
                   handleCloseContextMenu();
                 }}
               >
                 Delete{" "}
+              </button>
+              <button
+                className=" text-black text-[12px] text-left rounded px-1"
+                onClick={() => {
+                  handleDeleteAllRows();
+                  handleCloseContextMenu();
+                }}
+              >
+                Delete All
               </button>
             </div>
           </div>

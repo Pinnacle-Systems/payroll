@@ -155,7 +155,7 @@ const PayFrequencymaster = () => {
   console.log(payFrequencyType, "payFrequencyType  ");
 
   const validateData = (data) => {
-    if (data.name && data.code) {
+    if (data.finYearId) {
       return true;
     }
     return false;
@@ -186,15 +186,16 @@ const PayFrequencymaster = () => {
     }
   };
 
-
   const saveData = () => {
-    // if (!validateData(data)) {
-    //   toast.error("Please fill all required fields...!", {
-    //     position: "top-center",
-    //   });
-    //   return;
-    // }
-   
+    if (!validateData(data)) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text:  "Please fill all required Details!",
+      });
+      return;
+    }
+
     if (id) {
       handleSubmitCustom(updateData, data, "Updated");
     } else {
@@ -227,9 +228,9 @@ const PayFrequencymaster = () => {
         setForm(false);
       } catch (error) {
         Swal.fire({
-          title: "Deleted Successfully",
-          icon: "success",
-          timer: 1000,
+          icon: "error",
+          title: "Submission error",
+          text: error.data?.message || "Something went wrong!",
         });
       }
     }
@@ -280,23 +281,22 @@ const PayFrequencymaster = () => {
     {
       header: "S.No",
       accessor: (item, index) => index + 1,
-      className: "font-medium text-gray-900 w-12  text-center",
+      className: " text-gray-900 w-12  text-center",
     },
 
     {
       header: "FIn Year",
       accessor: (item) => findFromList(item?.finYearId, yearData?.data, "code"),
-      //   cellClass: () => "font-medium  text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-32",
+      //   cellClass: () => "  text-gray-900",
+      className: " text-gray-900 text-center uppercase w-32",
     },
 
     {
       header: "Status",
       accessor: (item) => (item.active ? ACTIVE : INACTIVE),
-      //   cellClass: () => "font-medium text-gray-900",
-      className: "font-medium text-gray-900 text-center uppercase w-36",
+      //   cellClass: () => " text-gray-900",
+      className: " text-gray-900 text-center uppercase w-36",
     },
-   
   ];
   function onDataClick(id) {
     setId(id);
@@ -344,7 +344,7 @@ const PayFrequencymaster = () => {
                     setForm(true);
                     onNew();
                   }}
-                 className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+                  className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
                 >
                   + Add New Pay Frequency
                 </button>

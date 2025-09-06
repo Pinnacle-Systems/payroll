@@ -20,7 +20,6 @@ const TemplateItems = ({
   setId,
 }) => {
   console.log(payFrequencyType, "payFrequencyType");
- 
 
   const [contextMenu, setContextMenu] = useState(null);
   const handleRightClick = (event, rowIndex, type) => {
@@ -60,21 +59,37 @@ const TemplateItems = ({
     }
   };
 
- const handleDeleteRow = (type, index) => {
-  const updated = structuredClone(payFrequencyType);
-  const typeIndex = updated.findIndex((t) => t.type === type);
+  const handleDeleteRow = (type, index) => {
+    const updated = structuredClone(payFrequencyType);
+    const typeIndex = updated.findIndex((t) => t.type === type);
 
-  if (typeIndex !== -1) {
-    // Prevent deletion if only one row left
-    if (updated[typeIndex].payFrequencyItems.length <= 1) {
-      return; // Do nothing
+    if (typeIndex !== -1) {
+      // Prevent deletion if only one row left
+      if (updated[typeIndex].payFrequencyItems.length <= 1) {
+        return; // Do nothing
+      }
+
+      updated[typeIndex].payFrequencyItems.splice(index, 1);
+      setPayFrequencyType(updated);
     }
+  };
+  const handleDeleteAllRows = (type) => {
+    const updated = structuredClone(payFrequencyType);
+    const typeIndex = updated.findIndex((t) => t.type === type);
 
-    updated[typeIndex].payFrequencyItems.splice(index, 1);
-    setPayFrequencyType(updated);
-  }
-};
+    if (typeIndex !== -1) {
+      // Prevent deleting all rows if only one row exists
+      if (updated[typeIndex].payFrequencyItems.length <= 1) {
+        return; // Do nothing
+      }
 
+      // Keep only the first row
+      updated[typeIndex].payFrequencyItems = [
+        updated[typeIndex].payFrequencyItems[0],
+      ];
+      setPayFrequencyType(updated);
+    }
+  };
 
   const addNewRow = (type) => {
     const updated = structuredClone(payFrequencyType);
@@ -92,45 +107,62 @@ const TemplateItems = ({
   };
 
 useEffect(() => {
-  if (!payFrequencyType || payFrequencyType.length === 0) {
-    setPayFrequencyType([
-      {
-        type: "Monthly - 2 Pay Frequency",
-        payFrequencyItems: [
-          {
-            startDate: "",
-            endDate: "",
-            salaryDate: "",
-            notes: "",
-          },
-        ],
-      },
-      {
-        type: "Monthly Pay Frequency",
-        payFrequencyItems: [
-          {
-            startDate: "",
-            endDate: "",
-            salaryDate: "",
-            notes: "",
-          },
-        ],
-      },
-      {
-        type: "Weekly Pay Frequency",
-        payFrequencyItems: [
-          {
-            startDate: "",
-            endDate: "",
-            salaryDate: "",
-            notes: "",
-          },
-        ],
-      },
-    ]);
-  }
-}, []); // run only once on mount
+  const defaultTypes = [
+    "Monthly - 2 Pay Frequency",
+    "Monthly Pay Frequency",
+    "Weekly Pay Frequency",
+  ];
 
+  if (id) {
+    // Edit/View Mode: Ensure all types exist and have at least one row
+    if (payFrequencyType && payFrequencyType.length > 0) {
+      const updatedTypes = defaultTypes.map((typeName) => {
+        const existingType = payFrequencyType.find((t) => t.type === typeName);
+
+        return existingType
+          ? {
+              ...existingType,
+              payFrequencyItems:
+                existingType.payFrequencyItems?.length > 0
+                  ? existingType.payFrequencyItems
+                  : [
+                      {
+                        startDate: "",
+                        endDate: "",
+                        salaryDate: "",
+                        notes: "",
+                      },
+                    ],
+            }
+          : {
+              type: typeName,
+              payFrequencyItems: [
+                {
+                  startDate: "",
+                  endDate: "",
+                  salaryDate: "",
+                  notes: "",
+                },
+              ],
+            };
+      });
+
+      setPayFrequencyType(updatedTypes);
+    }
+  } else {
+    // New form: Initialize if empty
+    if (!payFrequencyType || payFrequencyType.length === 0) {
+      setPayFrequencyType(
+        defaultTypes.map((type) => ({
+          type,
+          payFrequencyItems: [
+            { startDate: "", endDate: "", salaryDate: "", notes: "" },
+          ],
+        }))
+      );
+    }
+  }
+}, [id, payFrequencyType]);
 
 
   const calculatePayPeriod = (startDate, endDate) => {
@@ -394,7 +426,6 @@ useEffect(() => {
                                   handleRightClick(e, index, activeType.type);
                                 }
                               }}
-                             
                             >
                               <input
                                 type="text"
@@ -407,12 +438,12 @@ useEffect(() => {
                                     e.target.value
                                   )
                                 }
-                                 onKeyDown={(e) => {
-                                if (e.key === "Enter") {
-                                  e.preventDefault();
-                                  addNewRow(activeType.type);
-                                }
-                              }}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    addNewRow(activeType.type);
+                                  }
+                                }}
                                 className="focus:outline-none focus:border-transparent bg-transparent p-1"
                                 disabled={readOnly}
                               />
@@ -420,8 +451,6 @@ useEffect(() => {
                           </tr>
                         );
                       })}
-
-                   
                     </tbody>
                   </table>
                 </div>
@@ -437,23 +466,29 @@ useEffect(() => {
             top: `${contextMenu.mouseY - 50}px`,
             left: `${contextMenu.mouseX + 20}px`,
 
-            background: "white",
             boxShadow: "0px 0px 5px rgba(0,0,0,0.3)",
             padding: "8px",
             borderRadius: "4px",
             zIndex: 1000,
           }}
           onMouseLeave={handleCloseContextMenu} // Close when the mouse leaves
+              className="bg-gray-100"
         >
           <div className="flex flex-col gap-1">
             <button
-              className="bg-red-600 text-white rounded px-1"
+             className=" text-black text-[12px] text-left rounded px-1"
               onClick={() => {
                 handleDeleteRow(contextMenu.type, contextMenu.rowId);
                 handleCloseContextMenu();
               }}
             >
               Delete{" "}
+            </button>
+            <button
+           className=" text-black text-[12px] text-left rounded px-1"
+              onClick={() => handleDeleteAllRows(contextMenu.type)}
+            >
+              Delete All
             </button>
           </div>
         </div>
