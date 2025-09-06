@@ -54,15 +54,29 @@ async function getSearch(req) {
     return { statusCode: 0, data: data };
 }
 
+// async function create(body) {
+//     const { name, code, companyId, active } = await body
+//     const data = await prisma.country.create(
+//         {
+//             data: {
+//                 name : name?.label, code, companyId: parseInt(companyId), active
+//             }
+//         }
+//     )
+//     return { statusCode: 0, data };
+// }
 async function create(body) {
-    const { name, code, companyId, active } = await body
-    const data = await prisma.country.create(
-        {
-            data: {
-                name : name?.label, code, companyId: parseInt(companyId), active
-            }
+    const { name, code, companyId, active } = body;
+
+    const data = await prisma.country.create({
+        data: {
+            name: typeof name === "object" && name?.label ? name.label : String(name),
+            code: typeof code === "object" && code?.value ? code.value : String(code),
+            companyId: parseInt(companyId),
+            active
         }
-    )
+    });
+
     return { statusCode: 0, data };
 }
 
