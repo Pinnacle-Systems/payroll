@@ -339,7 +339,7 @@ export default function Form() {
         const formatted = data
           .map((c) => ({
             value: c.cca3, // ISO Alpha-3 code (for your input)
-            label: c.name?.common, // Only country name for dropdown
+            label: c.name?.common?.toUpperCase() || "", // Only country name for dropdown
           }))
           .sort((a, b) => a.label.localeCompare(b.label));
 
