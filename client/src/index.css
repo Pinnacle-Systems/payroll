@@ -2,16 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+/* @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,600;1,400;1,600&display=swap'); */
 
-html,
+/* html,
 body {
   background-color: #F1F1F0 !important;
+   font-family: "Segoe UI" !important;
+} */
+ * {
+  font-family: 'Segoe UI' !important;
 }
+html, body {
+  font-family: "Segoe UI" !important;
+  background-color: #F1F1F0;
+  
+}
+.font-segoe {
+  font-family: 'Segoe UI';
+}
+@font-face {
+  font-family: "Segoe UI";
+  /* src: url("/fonts/SegoeUI-Regular.ttf") format("truetype"); */
 
-label {
-  font-family: 'Roboto', sans-serif;
-  z-index: 0;
+}
+label,input,h1,h2,h3,h4,h5,h6,header,nav,ul,li,a,table,thead,tbody,th,tr,td,p,span,button,form,select {
+  font-family: 'Segoe UI' !important;
+  z-index: 0; 
 }
 .scrollbar-hide {
   scrollbar-width: none;       /* Firefox */
@@ -262,7 +278,7 @@ label {
 }
 
 .form-font {
-  font-family: "Inter", serif;
+  font-family: "Segoe UI", serif;
   font-size: 13px;
 }
 
@@ -284,12 +300,12 @@ label {
 }
 
 .font-2 {
-  font-family: "Montserrat", serif;
+  font-family: "Segoe UI";
 
 }
 
 .font-1 {
-  font-family: "Inter", serif;
+  font-family: "Segoe UI";
   font-size: 13px;
 }
 

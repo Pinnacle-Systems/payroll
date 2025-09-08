@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { DropdownInput, TextInput } from "../../../Inputs";
+import { DateInput, DropdownInput, TextInput } from "../../../Inputs";
 import { getCommonParams } from "../../../Utils/helper";
 import { useGetCompanyQuery } from "../../../redux/services/CompanyMasterService";
 import { useGetShiftCommonTemplateQuery } from "../../../redux/services/ShiftCommonTemplate.service";
@@ -19,7 +19,6 @@ import { DELETE, PLUS } from "../../../icons";
 import { HiPlus, HiTrash } from "react-icons/hi";
 import { FaFileAlt } from "react-icons/fa";
 import { FiSave } from "react-icons/fi";
-import moment from "moment";
 
 const TemplateItems = ({
   saveData,
@@ -30,10 +29,11 @@ const TemplateItems = ({
   ShiftTemplateItems,
   setShiftTemplateItems,
   id,
-  shiftId,
-  setShiftId,
   setDate,
   date,
+  payComponent,
+  setPayComponentId,
+  payComponentId,
   companyCode,
   setCompanyCode,
   docId,
@@ -48,7 +48,7 @@ const TemplateItems = ({
   refetch,
 }) => {
   const [modal, setModal] = useState(false);
-  const [secondModal, setSecondModal] = useState(false);
+  const [errors, setErrors] = useState({});
   const [contextMenu, setContextMenu] = useState(null);
   const handleRightClick = (event, rowIndex, type) => {
     event.preventDefault();
@@ -95,7 +95,7 @@ const TemplateItems = ({
     <>
       <div className="w-full bg-gray-100 mx-auto rounded-md shadow-md px-2 py-1">
         <div className="flex justify-between items-center mb-1">
-          <h1 className="text-2xl font-bold text-gray-800">Shift Template </h1>
+          <h1 className="text-2xl font-bold text-gray-800">Company Paycode </h1>
           <div className="flex gap-2">
             {readOnly && (
               <button
@@ -155,15 +155,12 @@ const TemplateItems = ({
                     disabled={childRecord.current > 0}
                   />
                 </div>
-                {console.log(docId, "docIdreceived")}
 
                 <div className="">
-                  <DropdownInput
-                    name="Category"
-                    type="text"
-                    options={ShowShiftData}
-                    value={categoryId}
-                    setValue={setCategoryId}
+                  <DateInput
+                    name="Date"
+                    value={date.toISOString().substring(0, 10)}
+                    setValue={setDate}
                     required={true}
                     readOnly={readOnly}
                     disabled={childRecord.current > 0}
@@ -186,7 +183,7 @@ const TemplateItems = ({
               <thead className="bg-gray-200 text-gray-800">
                 <tr>
                   <th
-                    className={`w-[4px] px-4 py-2 text-center font-medium text-[13px] `}
+                    className={`w-[8px] px-4 py-2 text-center font-medium text-[13px] `}
                   >
                     S.No
                   </th>
@@ -196,7 +193,7 @@ const TemplateItems = ({
                     Applied On
                   </th>
                   <th
-                    className={`w-28 px-4 py-2 text-center font-medium text-[13px] `}
+                    className={`w-32 px-4 py-2 text-center font-medium text-[13px] `}
                   >
                     Shift Common Template
                   </th>
@@ -206,66 +203,34 @@ const TemplateItems = ({
                     Shift
                   </th>
 
-                  <th
-                    className={`w-8 px-4 py-2 text-center font-medium text-[13px] `}
-                  >
-                    From
-                  </th>
-
-                  <th className={`w-8  item-center font-medium text-[13px] `}>
-                    To
+                  <th className={`w-12  item-center font-medium text-[13px] `}>
+                    Other Data
                   </th>
                   <th
-                    className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
-                  >
-                    Next Day
-                  </th>
-                  <th
-                    className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
-                  >
-                    Tolerance
-                  </th>
-                  <th
-                    className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
-                  >
-                    Break
-                  </th>
-                  <th
-                    className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
-                  >
-                    Out Next Day
-                  </th>
-                  <th
-                    className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
-                  >
-                    Shift Hrs
-                  </th>
-                  <th
-                    className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
-                  >
-                    OT Hrs
-                  </th>
-                  {/* <th
                     className={`w-72  item-center font-medium text-[13px] `}
-                  ></th> */}
+                  ></th>
                 </tr>
               </thead>
               <tbody>
                 {ShiftTemplateItems?.map((item, index) => (
                   <tr className=" border border-gray-300 text-[11px] py-0.5 px-1 text-center">
-                    <td className="  w-[4px] text-center px-1">{index + 1}</td>
+                    <td className="  w-2 text-center px-1">{index + 1}</td>
 
-                    <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
-                      <input
-                        type="date"
-                        value={
-                          item?.date
-                            ? new Date(item.date).toISOString().split("T")[0]
-                            : ""
-                        }
-                        onChange={(e) =>
-                          handleInputChange(e.target.value, index, "date")
-                        }
+                    <td className=" border border-gray-300 text-[11px] py-0.5 px-1 item-center">
+                      <DropdownInput
+                       
+                        name="Select payCode"
+                        value={payComponentId}
+                        setValue={setPayComponentId}
+                        // options={dropDownListObject(
+                        //   payComponent?.data,
+                        //   "name",
+                        //   "id"
+                        // )}
+                        // required={true}
+                        readOnly={readOnly}
+                        disabled={childRecord.current > 0}
+                        // onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                       />
                     </td>
                     <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
@@ -295,13 +260,22 @@ const TemplateItems = ({
                     <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
                       <select
                         disabled={readOnly}
-                        
+                        ref={selectRef}
                         className="text-left focus:outline-none w-full rounded py-1 "
-                       
+                        onClick={() => {
+                          // Refocus select after left click to ensure Enter works
+                          selectRef.current?.focus();
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            addNewRow();
+                          }
+                        }}
                         value={item.shiftId}
-                        onChange={(e) =>
-                          handleInputChange(e.target.value, index, "shiftId")
-                        }
+                        onChange={(e) => {
+                          handleInputChange(e.target.value, index, "shiftId");
+                        }}
                       >
                         <option>Select Shift</option>
                         {(id
@@ -314,53 +288,7 @@ const TemplateItems = ({
                         ))}
                       </select>
                     </td>
-                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
-                      <input
-                        type="text"
-                        value={
-                          shiftData?.data?.find((i) => i.id == item?.shiftId)
-                            ?.from
-                        }
-                        onChange={(e) =>
-                          handleInputChange(e.target.value, index, "shiftFrom")
-                        }
-                        className="w-full bg-transparent text-center  focus:outline-none focus:border-transparent"
-                        disabled={true}
-                      />
-                    </td>
-                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
-                      <input
-                        type="text"
-                        value={
-                          shiftData?.data?.find((i) => i.id == item?.shiftId)
-                            ?.to
-                        }
-                        onChange={(e) =>
-                          handleInputChange(e.target.value, index, "shiftTo")
-                        }
-                        className="w-full bg-transparent text-center  focus:outline-none focus:border-transparent"
-                        disabled={true}
-                      />
-                    </td>
-                    {/* In Next Day */}
-                    <td className="border border-gray-300 text-[11px] py-0.5 item-center">
-                      <select
-                        disabled={readOnly}
-                        className="text-left w-full focus:outline-none rounded py-1"
-                        value={item.inNextDay}
-                        onChange={(e) =>
-                          handleInputChange(e.target.value, index, "inNextDay")
-                        }
-                      >
-                        <option>Select</option>
-                        {commonNew.map((blend) => (
-                          <option value={blend.value} key={blend.value}>
-                            {blend?.show}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td className="border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td>
                       <button
                         className="text-blue-600   bg-blue-50 rounded"
                         onClick={() => setModal(true)}
@@ -381,32 +309,20 @@ const TemplateItems = ({
                         </svg>
                       </button>
                     </td>
-                    <td>
-                      <button
-                        className="text-blue-600   bg-blue-50 rounded"
-                        onClick={() => setSecondModal(true)}
-                        title="Open"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                          <path
-                            fillRule="evenodd"
-                            d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
+                    <td
+                      className="  border border-gray-300 text-[11px] py-0.5 item-center"
+                      onContextMenu={(e) => {
+                        if (!readOnly) {
+                          handleRightClick(e, index, "notes");
+                        }
+                      }}
+                    >
+                      {" "}
                     </td>
-
                     {modal && (
                       <>
                         <div className="fixed overflow-x-auto h-auto p-4 inset-0 flex  items-center justify-center bg-black bg-opacity-20 z-[9999]">
-                          <div className="bg-white rounded-lg shadow-xl w-[450px] p-4 relative">
+                          <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full p-4 relative">
                             {/* Close Button */}
                             <button
                               onClick={() => setModal(false)}
@@ -426,7 +342,7 @@ const TemplateItems = ({
                             </button>
 
                             <h2 className="text-lg text-left pb-2 font-semibold">
-                              Tolerance
+                              Row Details
                             </h2>
                             <div className=" bg-gray-100">
                               .
@@ -434,6 +350,37 @@ const TemplateItems = ({
                                 <table className="w-full bg-white border-collapse table-fixed ">
                                   <tbody>
                                     <tr className="flex flex-wrap gap-x-3 ml-6 pb-4">
+                                      {/* In Next Day */}
+                                      <td className="flex flex-col w-40 text-[11px] py-0.5">
+                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
+                                          In Next Day
+                                        </th>
+                                        <select
+                                          disabled={readOnly}
+                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
+  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+  transition-all duration-150 shadow-sm"
+                                          value={item.inNextDay}
+                                          onChange={(e) =>
+                                            handleInputChange(
+                                              e.target.value,
+                                              index,
+                                              "inNextDay"
+                                            )
+                                          }
+                                        >
+                                          <option>Select</option>
+                                          {commonNew.map((blend) => (
+                                            <option
+                                              value={blend.value}
+                                              key={blend.value}
+                                            >
+                                              {blend?.show}
+                                            </option>
+                                          ))}
+                                        </select>
+                                      </td>
+
                                       {/* Tolerance Before Start */}
                                       <td className="flex flex-col w-40 text-[11px] py-0.5 ">
                                         <th className=" py-2 text-left block text-xs font-bold text-slate-700">
@@ -459,7 +406,7 @@ const TemplateItems = ({
                                       </td>
 
                                       {/* Start Time */}
-                                      {/* <td className="flex flex-col w-40 text-[11px] py-0.5 ">
+                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
                                         <th className=" py-2 text-left block text-xs font-bold text-slate-700">
                                           Start Time
                                         </th>
@@ -480,7 +427,7 @@ const TemplateItems = ({
   transition-all duration-150 shadow-sm"
                                           disabled={readOnly}
                                         />
-                                      </td> */}
+                                      </td>
 
                                       {/* Tolerance After End */}
                                       <td className="flex flex-col w-40 text-[11px] py-0.5 ">
@@ -506,125 +453,6 @@ const TemplateItems = ({
                                         />
                                       </td>
 
-                                    
-
-                                
-
-                                
-
-                                      {/* Tolerance Before Start (Out) */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          Tolerance Before Start
-                                        </th>
-                                        <input
-                                          min={"0"}
-                                          type="text"
-                                          value={item?.toleranceOutBeforeStart}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "toleranceOutBeforeStart"
-                                            )
-                                          }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
-                                        />
-                                      </td>
-
-                                      {/* End Time
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          End Time
-                                        </th>
-                                        <input
-                                          min={"0"}
-                                          type="text"
-                                          value={item?.endTime}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "endTime"
-                                            )
-                                          }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
-                                        />
-                                      </td> */}
-
-                                      {/* Tolerance After End */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          Tolerance After End
-                                        </th>
-                                        <input
-                                          min={"0"}
-                                          type="text"
-                                          value={item?.toleranceOutAfterEnd}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "toleranceOutAfterEnd"
-                                            )
-                                          }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
-                                        />
-                                      </td>
-
-                                  
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </div>
-                            </div>
-                          </div>{" "}
-                        </div>
-                      </>
-                    )}
-                    {secondModal && (
-                      <>
-                        <div className="fixed overflow-x-auto h-auto p-4 inset-0 flex  items-center justify-center bg-black bg-opacity-20 z-[9999]">
-                          <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full p-4 relative">
-                            {/* Close Button */}
-                            <button
-                              onClick={() => setSecondModal(false)}
-                              className="absolute top-2 right-2 text-white bg-red-600 "
-                            >
-                              <svg
-                                className="h-6 w-6 fill-current"
-                                viewBox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <title>Close</title>
-                                <path
-                                  d="M14.348 5.652a.999.999 0 00-1.414 0L10 8.586l-2.93-2.93a.999.999 0 10-1.414 1.414L8.586 10l-2.93 2.93a.999.999 0 101.414 1.414L10 11.414l2.93 2.93a.999.999 0 101.414-1.414L11.414 10l2.93-2.93a.999.999 0 000-1.414z"
-                                  fillRule="evenodd"
-                                />
-                              </svg>
-                            </button>
-
-                            <h2 className="text-lg text-left pb-2 font-semibold">
-                              Row Details
-                            </h2>
-                            <div className=" bg-gray-100">
-                              .
-                              <div className="overflow-x-auto mx-4  pb-4 ">
-                                <table className="w-full bg-white border-collapse table-fixed ">
-                                  <tbody>
-                                    <tr className="flex flex-wrap gap-x-3 ml-6 pb-4">
                                       {/* FB OUT */}
                                       <td className="flex flex-col w-40 text-[11px] py-0.5 ">
                                         <th className=" py-2 text-left block text-xs font-bold text-slate-700">
@@ -830,6 +658,157 @@ const TemplateItems = ({
                                           disabled={readOnly}
                                         />
                                       </td>
+
+                                      {/* Tolerance Before Start (Out) */}
+                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
+                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
+                                          Tolerance Before Start
+                                        </th>
+                                        <input
+                                          min={"0"}
+                                          type="text"
+                                          value={item?.toleranceOutBeforeStart}
+                                          onFocus={(e) => e.target.select()}
+                                          onChange={(e) =>
+                                            handleInputChange(
+                                              e.target.value,
+                                              index,
+                                              "toleranceOutBeforeStart"
+                                            )
+                                          }
+                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
+  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+  transition-all duration-150 shadow-sm"
+                                          disabled={readOnly}
+                                        />
+                                      </td>
+
+                                      {/* End Time */}
+                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
+                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
+                                          End Time
+                                        </th>
+                                        <input
+                                          min={"0"}
+                                          type="text"
+                                          value={item?.endTime}
+                                          onFocus={(e) => e.target.select()}
+                                          onChange={(e) =>
+                                            handleInputChange(
+                                              e.target.value,
+                                              index,
+                                              "endTime"
+                                            )
+                                          }
+                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
+  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+  transition-all duration-150 shadow-sm"
+                                          disabled={readOnly}
+                                        />
+                                      </td>
+
+                                      {/* Tolerance After End */}
+                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
+                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
+                                          Tolerance After End
+                                        </th>
+                                        <input
+                                          min={"0"}
+                                          type="text"
+                                          value={item?.toleranceOutAfterEnd}
+                                          onFocus={(e) => e.target.select()}
+                                          onChange={(e) =>
+                                            handleInputChange(
+                                              e.target.value,
+                                              index,
+                                              "toleranceOutAfterEnd"
+                                            )
+                                          }
+                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
+  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+  transition-all duration-150 shadow-sm"
+                                          disabled={readOnly}
+                                        />
+                                      </td>
+
+                                      {/* Out Next Day */}
+                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
+                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
+                                          Out Next Day
+                                        </th>
+                                        <select
+                                          disabled={readOnly}
+                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
+  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+  transition-all duration-150 shadow-sm"
+                                          value={item.outNxtDay}
+                                          onChange={(e) =>
+                                            handleInputChange(
+                                              e.target.value,
+                                              index,
+                                              "outNxtDay"
+                                            )
+                                          }
+                                        >
+                                          <option>Select</option>
+                                          {commonNew.map((blend) => (
+                                            <option
+                                              value={blend.value}
+                                              key={blend.value}
+                                            >
+                                              {blend?.show}
+                                            </option>
+                                          ))}
+                                        </select>
+                                      </td>
+
+                                      {/* Shift Time Hrs */}
+                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
+                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
+                                          Shift Time Hrs
+                                        </th>
+                                        <input
+                                          min={"0"}
+                                          type="text"
+                                          value={item?.shiftTimeHrs}
+                                          onFocus={(e) => e.target.select()}
+                                          onChange={(e) =>
+                                            handleInputChange(
+                                              e.target.value,
+                                              index,
+                                              "shiftTimeHrs"
+                                            )
+                                          }
+                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
+  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+  transition-all duration-150 shadow-sm"
+                                          disabled={readOnly}
+                                        />
+                                      </td>
+
+                                      {/* OT Hrs */}
+                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
+                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
+                                          OT Hrs
+                                        </th>
+                                        <input
+                                          min={"0"}
+                                          type="text"
+                                          value={item?.otHrs}
+                                          onFocus={(e) => e.target.select()}
+                                          onChange={(e) =>
+                                            handleInputChange(
+                                              e.target.value,
+                                              index,
+                                              "otHrs"
+                                            )
+                                          }
+                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
+  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+  transition-all duration-150 shadow-sm"
+                                          disabled={readOnly}
+                                        />
+                                      </td>
                                     </tr>
                                   </tbody>
                                 </table>
@@ -839,67 +818,6 @@ const TemplateItems = ({
                         </div>
                       </>
                     )}
-                    {/* Out Next Day */}
-                    <td className="border border-gray-300 text-[11px] py-0.5 item-center">
-                      <select
-                        disabled={readOnly}
-                        className="text-left w-full focus:outline-none rounded py-1 "
-                        value={item.outNxtDay}
-                        onChange={(e) =>
-                          handleInputChange(e.target.value, index, "outNxtDay")
-                        }
-                      >
-                        <option>Select</option>
-                        {commonNew.map((blend) => (
-                          <option value={blend.value} key={blend.value}>
-                            {blend?.show}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    {/* Shift Time Hrs */}
-                    <td className="border border-gray-300 text-[11px] py-0.5 item-center ">
-                      <input
-                        min={"0"}
-                        type="text"
-                        value={item?.shiftTimeHrs}
-                        onFocus={(e) => e.target.select()}
-                        onChange={(e) =>
-                          handleInputChange(
-                            e.target.value,
-                            index,
-                            "shiftTimeHrs"
-                          )
-                        }
-                        className="w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2"
-                        disabled={readOnly}
-                      />
-                    </td>
-                    {/* OT Hrs */}
-                    <td className="border border-gray-300 text-[11px] py-0.5 item-center">
-                      <input
-                        min={"0"}
-                        type="text"
-                        value={item?.otHrs}
-                        onFocus={(e) => e.target.select()}
-                        onChange={(e) =>
-                          handleInputChange(e.target.value, index, "otHrs")
-                        }
-                        className="w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2"
-                        disabled={readOnly}
-                        onContextMenu={(e) => {
-                          if (!readOnly) {
-                            handleRightClick(e, index, "shiftTimeHrs");
-                          }
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            addNewRow();
-                          }
-                        }}
-                      />
-                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -912,7 +830,7 @@ const TemplateItems = ({
             style={{
               position: "absolute",
               top: `${contextMenu.mouseY - 50}px`,
-              left: `${contextMenu.mouseX - 30}px`,
+              left: `${contextMenu.mouseX + 20}px`,
 
               // background: "gray",
               boxShadow: "0px 0px 5px rgba(0,0,0,0.3)",

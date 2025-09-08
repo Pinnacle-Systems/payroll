@@ -173,7 +173,7 @@ export default function LapDip({
           fixed
           style={[
             tw("pr-2  text-sm  pb-2 mt-[50px] absolute bottom-3"),
-            { fontFamily: "Times-Roman" },
+            { fontFamily: "Segoe-UI" },
           ]}
         >
           <View style={tw("")}></View>

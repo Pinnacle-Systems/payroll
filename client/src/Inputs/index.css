@@ -9,3 +9,15 @@ label{
 select{
     font-size:12px;
 }
+
+* {
+  font-family: 'Segoe UI' !important;
+}
+html, body {
+  font-family: "Segoe UI" !important;
+  background-color: #F1F1F0;
+  
+}
+.font-segoe {
+  font-family: 'Segoe UI';
+}

@@ -28,6 +28,7 @@ const EmployeeSubCategory = () => {
   const childRecord = useRef(0);
   const [employeeCategoryId, setEmployeeCategoryId] = useState("");
   const params = getCommonParams();
+     const employeeRef = useRef(null);
 
   const { branchId } = params;
 
@@ -79,7 +80,12 @@ const EmployeeSubCategory = () => {
       return true;
     }
     return false;
-  };
+  }; 
+    useEffect(() => {
+         if (form && !readOnly && employeeRef.current) {
+           employeeRef.current.focus();
+         }
+       }, [form, readOnly]);
 
   const handleSubmitCustom = async (callback, data, text) => {
     try {
@@ -313,6 +319,7 @@ const EmployeeSubCategory = () => {
                               <span className="text-red-500">*</span>{" "}
                             </label>
                             <select
+                              ref={employeeRef}
                               className={`w-full px-2 h-[30px] text-[12px] border border-slate-300 rounded-md 
   focus:border-indigo-300 focus:outline-none transition-all duration-200
   hover:border-slate-400
@@ -336,6 +343,7 @@ const EmployeeSubCategory = () => {
                                   {doc.name}
                                 </option>
                               ))}
+                            
                             </select>
                           </div>
 

@@ -211,7 +211,7 @@ const SidebarComponent = ({ logo, groups, pages, isMainDropdownOpen, setIsMainDr
                                                                     {iconMapping[page?.name] || <span className="text-gray-400">🔘</span>}
 
                                                                 </div>
-                                                                <div className="text-[10px] leading-tight">
+                                                                <div className="text-[11.3px] leading-tight">
                                                                     {page?.name.replace(/\bMASTER\b/g, "").trim().toLowerCase().replace(/\b[a-z]/g, char => char.toUpperCase())}
                                                                 </div>
                                                             </div>

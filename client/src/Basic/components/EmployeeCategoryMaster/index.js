@@ -28,7 +28,7 @@ export default function Form() {
   const [form, setForm] = useState(false);
 
   //  const [openTable,setOpenTable] = useState(false);
-
+   const employeeRef = useRef(null);
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
   const [name, setName] = useState("");
@@ -81,7 +81,11 @@ export default function Form() {
     ),
     id,
   };
-
+  useEffect(() => {
+       if (form && !readOnly && employeeRef.current) {
+         employeeRef.current.focus();
+       }
+     }, [form, readOnly]);
   const validateData = (data) => {
     if (data.name && data.code) {
       return true;
@@ -368,6 +372,7 @@ export default function Form() {
                                 required={true}
                                 readOnly={readOnly}
                                 disabled={childRecord.current > 0}
+                                ref={employeeRef}
                               />
                             </div>
 

@@ -10,15 +10,15 @@ import { Font } from '@react-pdf/renderer'
 import { Toaster } from 'react-hot-toast';
 
 Font.register({
-  family: 'Times-Roman',
-  src: '/fonts/times new roman.ttf',
+  family: 'Segoe-UI',
+  src: '/fonts/SegoeUI.ttf', // Regular
+});
 
-
-})
 Font.register({
-  family: 'Times-Bold',
-  src: '/fonts/times new roman bold.ttf',
-})
+  family: 'Segoe-UI-Bold',
+  src: '/fonts/SegoeUI-Bold.ttf', // Bold
+});
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

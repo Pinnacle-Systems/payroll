@@ -2140,7 +2140,7 @@ export const ReusableTable = ({
     if (totalPages <= 1) return null;
 
     return (
-      <div className="flex flex-col sm:flex-row justify-between items-center p-2 bg-white border-t border-gray-200">
+      <div className="flex flex-col font-segoe sm:flex-row justify-between items-center p-2 bg-white border-t border-gray-200">
         <div className="text-sm text-gray-600 mb-2 sm:mb-0">
           Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, data?.length)} of {data?.length} entries
         </div>

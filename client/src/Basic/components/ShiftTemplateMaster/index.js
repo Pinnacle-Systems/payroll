@@ -28,7 +28,7 @@ import { useGetShiftCommonTemplateQuery } from "../../../redux/services/ShiftCom
 import { useGetshiftMasterQuery } from "../../../redux/services/ShiftMasterService";
 import TemplateItems from "./templateItems";
 import Swal from "sweetalert2";
-import { log } from "util";
+import { useDispatch } from "react-redux";
 
 const ShiftTemplateMaster = () => {
   const [readOnly, setReadOnly] = useState(false);
@@ -44,11 +44,12 @@ const ShiftTemplateMaster = () => {
   const childRecord = useRef(0);
   const [ShiftTemplateItems, setShiftTemplateItems] = useState([]);
   const [categoryId, setCategoryId] = useState("");
-  const[date,setDate] = useState(null)
+  const [date, setDate] = useState(null);
   const params = getCommonParams();
+  const[shiftId,setshiftId] = useState('')
 
   const { branchId } = params;
-
+  const dispatch = useDispatch();
   const { data: company } = useGetCompanyQuery({ params });
   const [companyCode, setCompanyCode] = useState(company?.data[0].code);
 
@@ -97,10 +98,9 @@ const ShiftTemplateMaster = () => {
 
   const syncFormWithDb = useCallback(
     (data) => {
-      
       setName(data?.name || "");
       setDocId(data?.docId);
-   
+
       setDescription(data?.description || "");
       setActive(id ? data?.active ?? false : true);
       setShiftTemplateItems(
@@ -161,6 +161,14 @@ const ShiftTemplateMaster = () => {
         },
       });
       setForm(false);
+      dispatch({
+        type: `shiftMaster/invalidateTags`,
+        payload: ["shiftMaster"],
+      });
+      dispatch({
+        type: `ShiftCommonTemplateMaster/invalidateTags`,
+        payload: ["ShiftCommonTemplate"],
+      });
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -218,7 +226,7 @@ const ShiftTemplateMaster = () => {
     if (!validateData(data)) {
       return;
     }
-   
+
     if (id) {
       handleSubmitCustom(updateData, data, "Updated");
     } else {
@@ -251,6 +259,14 @@ const ShiftTemplateMaster = () => {
           timer: 1000,
         });
         setForm(false);
+        dispatch({
+          type: `shiftMaster/invalidateTags`,
+          payload: ["shiftMaster"],
+        });
+        dispatch({
+          type: `ShiftCommonTemplateMaster/invalidateTags`,
+          payload: ["ShiftCommonTemplate"],
+        });
       } catch (error) {
         Swal.fire({
           icon: "error",
@@ -339,7 +355,7 @@ const ShiftTemplateMaster = () => {
       className: " text-gray-900 text-center uppercase w-36",
     },
   ];
- 
+
   return (
     <div>
       <div onKeyDown={handleKeyDown} className="p-1 ">
@@ -359,6 +375,8 @@ const ShiftTemplateMaster = () => {
             setCompanyCode={setCompanyCode}
             docId={docId}
             setDate={setDate}
+            setshiftId={setshiftId}
+            shiftId={shiftId}
             date={date}
             setDocId={setDocId}
             categoryId={categoryId}
@@ -374,7 +392,7 @@ const ShiftTemplateMaster = () => {
         ) : (
           <>
             <div className="w-full flex bg-white p-1 justify-between  items-center">
-              <h1 className="text-2xl font-bold text-gray-800">
+              <h1 className="text-2xl  font-bold text-gray-800">
                 Shift Template Master
               </h1>
               <div className="flex items-center gap-4">
@@ -383,7 +401,7 @@ const ShiftTemplateMaster = () => {
                     setForm(true);
                     onNew();
                   }}
-                  className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+                  className="bg-white border   border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
                 >
                   + Add Shift Template Master
                 </button>

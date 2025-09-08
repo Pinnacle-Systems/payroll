@@ -43,6 +43,7 @@ export default function Form() {
 
   const childRecord = useRef(0);
   const dispatch = useDispatch();
+   const cityNameRef = useRef(null);
 
   const params = {
     companyId: secureLocalStorage.getItem(
@@ -92,7 +93,11 @@ export default function Form() {
     state,
     id,
   };
-
+  useEffect(() => {
+    if (form && !readOnly && cityNameRef.current) {
+      cityNameRef.current.focus();
+    }
+  }, [form, readOnly]);
   const validateData = (data) => {
     if (data.name && data.state) {
       return true;
@@ -380,6 +385,7 @@ export default function Form() {
                                   disabled={
                                     childRecord.current > 0 ? true : undefined
                                   }
+                                   ref={cityNameRef}
                                 />
                               </div>
                               <div className="mb-3  ml-6">

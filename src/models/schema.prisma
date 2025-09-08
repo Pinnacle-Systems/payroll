@@ -1227,6 +1227,9 @@ model Shift {
   description String?
   docId       String?
   active      Boolean? @default(true)
+  from        String?
+  to          String?
+  shipTemplateItems  ShiftTemplateItems[]
 }
 
 model ShiftCommonTemplate {
@@ -1245,6 +1248,7 @@ model ShiftCommonTemplate {
   employeeCategoryId Int?
   docId              String?
   active             Boolean?          @default(true)
+  shiftCommonTemplate ShiftTemplateItems[]
 }
 
 model ShiftTemplate {
@@ -1279,8 +1283,10 @@ model ShiftTemplateItems {
   updatedBy               User?          @relation("updatedBy", fields: [updatedById], references: [id])
   updatedById             Int?
   active                  Boolean?       @default(true)
-  templateId              Int?
-  shiftId                 Int?
+  shiftCommonTemplate     ShiftCommonTemplate  @relation(fields: [templateId], references: [id])
+  templateId              Int
+  shift                   Shift          @relation(fields: [shiftId], references: [id])
+  shiftId                 Int
   inNextDay               String?
   toleranceInBeforeStart  String?
   startTime               String?

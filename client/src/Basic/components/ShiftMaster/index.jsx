@@ -34,6 +34,7 @@ import {
 } from "../../../redux/services/ShiftMasterService";
 import { getCommonParams } from "../../../Utils/helper";
 import Swal from "sweetalert2";
+import { useDispatch } from "react-redux";
 
 const ShiftMaster = () => {
   const [readOnly, setReadOnly] = useState(false);
@@ -47,10 +48,13 @@ const ShiftMaster = () => {
   const [form, setForm] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
-
+  const shiftRef = useRef(null);
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
   const MODEL = "DESIGNATION";
   console.log(form, "form");
-
+   const dispatch = useDispatch();
+ 
   const params = getCommonParams();
 
   console.log(params, "params");
@@ -77,37 +81,32 @@ const ShiftMaster = () => {
   //     setCompanyCode(company.data[0].code);
   //   }
   // }, [company]);
+  useEffect(() => {
+    if (form && !readOnly && shiftRef.current) {
+      shiftRef.current.focus();
+    }
+  }, [form, readOnly]);
 
   const [addData] = useAddshiftMasterMutation();
   const [updateData] = useUpdateshiftMasterMutation();
   const [removeData] = useDeleteshiftMasterMutation();
-  const getNextDocId = useCallback(() => {
-    if (id) return;
-    if (allData?.nextDocId) {
-      setDocId(allData?.nextDocId);
-    }
-  }, [allData, id]);
-
-  useEffect(getNextDocId, [getNextDocId]);
+  
   const syncFormWithDb = useCallback(
     (data) => {
-      if (!id) {
-        // setReadOnly(false);
-        setName("");
-        setDescription("");
-        setActive(true);
-        setCompanyName(company?.data[0].name);
-        setCompanyCode(company?.data[0].code);
-      } else {
-        // setReadOnly(true);
+    
+      
         setName(data?.name || "");
         setDocId(data?.docId || "");
         setDescription(data?.description || "");
         setActive(id ? data?.active ?? false : true);
-      }
+        setFrom(data?.from || "");
+        setTo(data?.to || "");
+        childRecord.current = data?.childRecord ? data?.childRecord : 0;
+      
     },
     [id, company]
   );
+console.log(docId,'doc');
 
   useEffect(() => {
     syncFormWithDb(singleData?.data);
@@ -117,6 +116,8 @@ const ShiftMaster = () => {
     name,
     description,
     docId,
+    from,
+    to,
     active,
     companyId: secureLocalStorage.getItem(
       sessionStorage.getItem("sessionId") + "userCompanyId"
@@ -126,7 +127,7 @@ const ShiftMaster = () => {
   };
 
   const validateData = (data) => {
-    if (data.name) {
+    if (data?.name && data?.to && data?.from) {
       return true;
     }
     return false;
@@ -165,7 +166,7 @@ const ShiftMaster = () => {
       });
       return;
     }
-   
+
     if (id) {
       handleSubmitCustom(updateData, data, "Updated");
     } else {
@@ -174,37 +175,38 @@ const ShiftMaster = () => {
   };
 
   const deleteData = async (id) => {
-    if (id) {
-      if (!window.confirm("Are you sure to delete...?")) {
-        return;
-      }
-      try {
-        const deldata = await removeData(id).unwrap();
-        if (deldata?.statusCode == 1) {
-          Swal.fire({
-            icon: "error",
-            title: "Submission error",
-            text: deldata.data?.message || "Something went wrong!",
-          });
-          setForm(false);
-          return;
-        }
-        setId("");
-        Swal.fire({
-          title: "Deleted Successfully",
-          icon: "success",
-          timer: 1000,
-        });
-        setForm(false);
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Submission error",
-          text: error.data?.message || "Something went wrong!",
-        });
-      }
-    }
-  };
+     if (id) {
+       if (!window.confirm("Are you sure to delete...?")) {
+         return;
+       }
+       try {
+         let deldata = await removeData(id).unwrap();
+         if (deldata?.statusCode == 1) {
+           Swal.fire({
+             icon: "error",
+             title: "Child record Exists",
+             text: deldata.data?.message || "Data cannot be deleted!",
+           });
+           return;
+         }
+         setId("");
+         Swal.fire({
+           title: "Deleted Successfully",
+           icon: "success",
+           timer: 1000,
+         });
+         setForm(false);
+        
+       } catch (error) {
+         Swal.fire({
+           icon: "error",
+           title: "Submission error",
+           text: error.data?.message || "Something went wrong!",
+         });
+         setForm(false);
+       }
+     }
+   };
 
   const handleKeyDown = (event) => {
     let charCode = String.fromCharCode(event.which).toLowerCase();
@@ -216,10 +218,12 @@ const ShiftMaster = () => {
 
   const onNew = () => {
     setId("");
-    setName('')
+    setName("");
     setReadOnly(false);
     setForm(true);
-    setActive(true)
+    setActive(true);
+    setFrom("");
+    setTo("");
     setSearchValue("");
     setCompanyName(company.data[0].name);
     setCompanyCode(company.data[0].code);
@@ -236,6 +240,14 @@ const ShiftMaster = () => {
     setReadOnly(false);
     console.log("Edit");
   };
+  const getNextDocId = useCallback(() => {
+    if (id) return;
+    if (allData?.nextDocId) {
+      setDocId(allData?.nextDocId);
+    }
+  }, [allData, id]);
+
+  useEffect(getNextDocId, [getNextDocId]);
   const ACTIVE = (
     <div className="bg-gradient-to-r from-green-200 to-green-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-green-500 shadow-lg text-white hover:scale-110 transition-transform duration-300">
       <Power size={10} />
@@ -266,7 +278,6 @@ const ShiftMaster = () => {
       //   cellClass: () => "text-gray-900",
       className: "text-gray-900 text-center uppercase w-16",
     },
-    
   ];
   function onDataClick(id) {
     setId(id);
@@ -305,17 +316,17 @@ const ShiftMaster = () => {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[40%]  h-[45%]"}
+            widthClass={"w-[40%]  h-[65%]"}
             onClose={() => {
               setForm(false);
               setErrors({});
-              setId('')
+              setId("");
             }}
           >
             <div className="h-full flex flex-col bg-gray-100">
               <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
+                  <h2 className="text-lg  py-0.5 font-semibold  text-gray-800">
                     Shift Master
                   </h2>
                 </div>
@@ -373,7 +384,9 @@ const ShiftMaster = () => {
                               // setValue={setDocId}
                               required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              disabled={
+                                childRecord.current > 0 ? true : undefined
+                              }
                             />
                           </div>
 
@@ -384,10 +397,40 @@ const ShiftMaster = () => {
                             setValue={setName}
                             required={true}
                             readOnly={readOnly}
-                            disabled={childRecord.current > 0}
+                            disabled={
+                              childRecord.current > 0 ? true : undefined
+                            }
+                            ref={shiftRef}
                           />
                         </div>
 
+                        <div className="flex gap-x-6">
+                          <div className="w-42">
+                            <TextInput
+                              name="From"
+                              type="text"
+                              value={from}
+                              setValue={setFrom}
+                              required={true}
+                              readOnly={readOnly}
+                              disabled={
+                                childRecord.current > 0 ? true : undefined
+                              }
+                            />
+                          </div>
+
+                          <TextInput
+                            name="To"
+                            type="text"
+                            value={to}
+                            setValue={setTo}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={
+                              childRecord.current > 0 ? true : undefined
+                            }
+                          />
+                        </div>
                         <div className="mt-5">
                           <ToggleButton
                             name="Status"
@@ -398,6 +441,7 @@ const ShiftMaster = () => {
                             readOnly={readOnly}
                           />
                         </div>
+                        {/* <input type="time"/> */}
                       </div>
                     </div>
                   </div>

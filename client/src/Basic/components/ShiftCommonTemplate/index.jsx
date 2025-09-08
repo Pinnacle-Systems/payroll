@@ -77,21 +77,14 @@ const ShiftCommonTemplateMaster = () => {
   useEffect(getNextDocId, [getNextDocId]);
   const syncFormWithDb = useCallback(
     (data) => {
-      if (!id) {
-        // setReadOnly(false);
-
-        setActive(true);
-        setEmployeeCategoryId("");
-        setCompanyName(company?.data[0].name);
-        setCompanyCode(company?.data[0].code);
-      } else {
-        // setReadOnly(true);
+      
 
         setDocId(data?.docId || "");
 
         setEmployeeCategoryId(data?.employeeCategoryId || "");
         setActive(id ? data?.active ?? false : true);
-      }
+        childRecord.current = data?.childRecord ? data?.childRecord : 0;
+      
     },
     [id, company]
   );
@@ -111,6 +104,7 @@ const ShiftCommonTemplateMaster = () => {
     ),
     id,
     branchId,
+    
   };
 
   const validateData = (data) => {
@@ -160,39 +154,39 @@ const ShiftCommonTemplateMaster = () => {
       handleSubmitCustom(addData, data, "Added");
     }
   };
-
-  const deleteData = async (id) => {
-    if (id) {
-      if (!window.confirm("Are you sure to delete...?")) {
-        return;
-      }
-      try {
-        const deldata = await removeData(id).unwrap();
-        if (deldata?.statusCode == 1) {
-          Swal.fire({
-            icon: "error",
-            title: "Submission error",
-            text: deldata.data?.message || "Something went wrong!",
-          });
-          setForm(false);
-          return;
-        }
-        setId("");
-        Swal.fire({
-          title: "Deleted Successfully",
-          icon: "success",
-          timer: 1000,
-        });
-        setForm(false);
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Submission error",
-          text: error.data?.message || "Something went wrong!",
-        });
-      }
-    }
-  };
+const deleteData = async (id) => {
+     if (id) {
+       if (!window.confirm("Are you sure to delete...?")) {
+         return;
+       }
+       try {
+         let deldata = await removeData(id).unwrap();
+         if (deldata?.statusCode == 1) {
+           Swal.fire({
+             icon: "error",
+             title: "Child record Exists",
+             text: deldata.data?.message || "Data cannot be deleted!",
+           });
+           return;
+         }
+         setId("");
+         Swal.fire({
+           title: "Deleted Successfully",
+           icon: "success",
+           timer: 1000,
+         });
+         setForm(false);
+        
+       } catch (error) {
+         Swal.fire({
+           icon: "error",
+           title: "Submission error",
+           text: error.data?.message || "Something went wrong!",
+         });
+         setForm(false);
+       }
+     }
+   };
 
   const handleKeyDown = (event) => {
     let charCode = String.fromCharCode(event.which).toLowerCase();
@@ -351,16 +345,18 @@ const ShiftCommonTemplateMaster = () => {
                               // setValue={setDocId}
                               required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              disabled={
+                                childRecord.current > 0 ? true : undefined
+                              }
                             />
                           </div>
 
                           <div className="w-44">
-                            <label className="block text-xs text-black mb-1">
-                              Choose Template
+                            <label className="block font-semibold text-xs text-black mb-1">
+                              Choose Template <span className="text-red-500">*</span>
                             </label>
                             <select
-                              className={`w-full px-2 h-[23px] text-[12px] border border-slate-300 rounded-md 
+                              className={`w-full px-2 h-[32px] text-[12px] border border-slate-300 rounded-md 
   focus:border-indigo-300 focus:outline-none transition-all duration-200
   hover:border-slate-400
   ${
@@ -372,7 +368,7 @@ const ShiftCommonTemplateMaster = () => {
                               onChange={(e) => {
                                 setEmployeeCategoryId(e.target.value);
                               }}
-                              disabled={readOnly}
+                              disabled={readOnly || childRecord.current > 0 ? true : undefined}
                             >
                               <option value="">Select Category</option>
 

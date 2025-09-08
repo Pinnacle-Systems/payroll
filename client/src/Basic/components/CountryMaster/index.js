@@ -109,14 +109,12 @@ export default function Form() {
     id,
   };
 
-const validateData = (data) => {
-  
-  if (data?.name?.value) {
-    return true;
-  }
-  return false;
-};
-
+  const validateData = (data) => {
+    if (data?.name?.value) {
+      return true;
+    }
+    return false;
+  };
 
   const handleSubmitCustom = async (callback, data, text) => {
     try {
@@ -155,13 +153,11 @@ const validateData = (data) => {
 
     if (id) {
       handleSubmitCustom(updateData, data, "Updated");
-     
     } else {
       handleSubmitCustom(addData, data, "Added");
     }
   };
 
-  
   const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
@@ -210,8 +206,8 @@ const validateData = (data) => {
     setReadOnly(false);
     setForm(true);
     setSearchValue("");
-    setSelectedCountry("")
-    setCountryCode("")
+    setSelectedCountry("");
+    setCountryCode("");
   };
   const handleView = (id) => {
     setId(id);
@@ -239,21 +235,21 @@ const validateData = (data) => {
     {
       header: "S.NO",
       accessor: (item, index) => index + 1,
-      className: " text-gray-900  uppercase  text-center",
+      className: " text-gray-900 font-segoe uppercase  text-center",
     },
 
     {
       header: "COUNTRY NAME",
       accessor: (item) => item?.name,
       //   cellClass: () => "font-medium  text-gray-900",
-      className: " text-gray-900 pl-2 text-left uppercase w-72",
+      className: " text-gray-900 pl-2 font-segoe text-left uppercase w-72",
     },
 
     {
       header: "STATUS",
       accessor: (item) => (item.active ? ACTIVE : INACTIVE),
       //   cellClass: () => "font-medium text-gray-900",
-      className: " text-gray-900 text-center uppercase w-16",
+      className: " text-gray-900 font-segoe text-center uppercase w-16",
     },
     // {
     //   header: "",
@@ -328,14 +324,16 @@ const validateData = (data) => {
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
       <div className="w-full flex bg-white p-1 justify-between  items-center">
-        <h5 className="text-2xl font-bold text-gray-800 ">Country Master</h5>
+        <h5 className="text-2xl font-bold font-segoe text-gray-800 ">
+          Country Master
+        </h5>
         <div className="flex items-center">
           <button
             onClick={() => {
               setForm(true);
               onNew();
             }}
-            className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+            className="bg-white border font-segoe border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
           >
             + Add New Country
           </button>
@@ -369,7 +367,7 @@ const validateData = (data) => {
             <div className="h-full flex flex-col bg-gray-100">
               <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg  py-0.5 font-semibold  text-gray-800">
+                  <h2 className="text-lg   py-0.5 font-semibold  text-gray-800">
                     Country Master
                   </h2>
                 </div>
@@ -381,7 +379,7 @@ const validateData = (data) => {
                         onClick={() => {
                           setReadOnly(false);
                         }}
-                        className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
+                        className="px-3 py-1 font-segoe text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
                       >
                         Edit
                       </button>
@@ -392,7 +390,7 @@ const validateData = (data) => {
                       <button
                         type="button"
                         onClick={saveData}
-                        className="px-3 py-1 hover:bg-green-600 hover:text-white rounded text-green-600 
+                        className="px-3 py-1 font-segoe hover:bg-green-600 hover:text-white rounded text-green-600 
                           border border-green-600 flex items-center gap-1 text-xs"
                       >
                         <Check size={14} />
@@ -404,7 +402,7 @@ const validateData = (data) => {
               </div>
 
               <div className="flex-1  p-3">
-                <div className="grid grid-cols-1  gap-3  h-full">
+                <div className="grid grid-cols-1 font-segoe  gap-3  h-full">
                   <div className="lg:col-span- space-y-3">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
                       <div className="space-y-4 ">
@@ -439,9 +437,9 @@ const validateData = (data) => {
                               />
                             </div>
                           </div> */}
-                          <div className="flex gap-x-3 ">
-                            <div className="w-72 ">
-                              <label className="block text-xs font-bold text-slate-700 mb-1">
+                          <div className="flex gap-x-3 font-segoe">
+                            <div className="w-72 font-segoe">
+                              <label className="block text-xs  font-bold text-slate-700 mb-1">
                                 Select Country{" "}
                                 <span className="text-red-500">*</span>
                               </label>
@@ -456,7 +454,7 @@ const validateData = (data) => {
                                 isSearchable
                                 isClearable={false}
                                 menuShouldScrollIntoView={false}
-  maxMenuHeight={150} // <-- Reduce height here
+                                maxMenuHeight={150} // <-- Reduce height here
                                 onInputChange={(value) => value.toUpperCase()}
                                 className="w-full px-1   text-xs rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
@@ -469,23 +467,46 @@ const validateData = (data) => {
                                     padding: "14px 4px", // Adjust padding inside
                                     fontSize: "12px", // Make text smaller
                                     borderRadius: "8px",
+                                    fontFamily: "'Segoe UI'",
                                   }),
                                   valueContainer: (base) => ({
                                     ...base,
                                     padding: "0 6px", // Space for text
-                                    marginTop:'-8px'
+                                    marginTop: "-8px",
+                                    fontFamily: "'Segoe UI'",
                                   }),
                                   input: (base) => ({
                                     ...base,
                                     margin: 0,
                                     padding: 0,
-
+                                    fontFamily: "'Segoe UI'",
+                                  }),
+                                  singleValue: (base) => ({
+                                    ...base,
+                                    fontFamily:
+                                      "'Segoe UI'",
+                                  }),
+                                  placeholder: (base) => ({
+                                    ...base,
+                                    fontFamily:
+                                      "'Segoe UI'",
+                                  }),
+                                  menu: (base) => ({
+                                    ...base,
+                                    fontFamily:
+                                      "'Segoe UI'",
+                                  }),
+                                  option: (base) => ({
+                                    ...base,
+                                    fontFamily:
+                                      "'Segoe UI'",
+                                    fontSize: "12px",
                                   }),
                                   indicatorsContainer: (base) => ({
                                     ...base,
-                               display: "none" ,
+                                    display: "none",
                                     height: "28px", // Align dropdown arrow
-                                     marginTop: "-12px",
+                                    marginTop: "-12px",
                                   }),
                                 }}
                               />
@@ -497,20 +518,20 @@ const validateData = (data) => {
                               <input
                                 type="text"
                                 value={countryCode}
-                               readOnly={readOnly || childRecord.current > 0}
+                                readOnly={readOnly || childRecord.current > 0}
                                 className={`w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg
   focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
   transition-all duration-150 shadow-sm
   ${
-    readOnly ||  childRecord.current > 0
+    readOnly || childRecord.current > 0
       ? "bg-gray-100 text-gray-500 cursor-not-allowed"
       : "bg-white hover:border-gray-400"
   }`}
-                                 disabled={readOnly || childRecord.current > 0}
-
+                                disabled={readOnly || childRecord.current > 0}
                               />
                             </div>
                           </div>
+
                           <div className=" pt-10">
                             <ToggleButton
                               name="Status"

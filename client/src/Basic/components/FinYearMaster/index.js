@@ -44,7 +44,7 @@ export default function Form() {
   const [code, setCode] = useState("");
   const childRecord = useRef(0);
   const [errors, setErrors] = useState({});
-
+    const designationRef = useRef(null);
   const params = {
     companyId: secureLocalStorage.getItem(
       sessionStorage.getItem("sessionId") + "userCompanyId"
@@ -99,7 +99,11 @@ export default function Form() {
     }
     return false;
   };
-
+     useEffect(() => {
+       if (form && !readOnly && designationRef.current) {
+         designationRef.current.focus();
+       }
+     }, [form, readOnly]);
   const validateOneActiveFinYear = (active) => {
     if (Boolean(active)) {
       return !allData.data.some((finYear) =>
@@ -408,6 +412,7 @@ export default function Form() {
                             required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
+                             ref={designationRef}
                           />
 
                           {errors.name && (

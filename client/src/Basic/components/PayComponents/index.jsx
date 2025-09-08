@@ -36,7 +36,7 @@ const PayComponents = () => {
   const [form, setForm] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
-
+ const payCodeRef = useRef(null);
   const params = {
     companyId: secureLocalStorage.getItem(
       sessionStorage.getItem("sessionId") + "userCompanyId"
@@ -87,7 +87,11 @@ const PayComponents = () => {
     branchId,
     notes,
   };
-
+     useEffect(() => {
+          if (form && !readOnly && payCodeRef.current) {
+            payCodeRef.current.focus();
+          }
+        }, [form, readOnly]);
   const validateData = (data) => {
     if (data?.payCode && data?.payDescription) {
       return true;
@@ -314,6 +318,7 @@ const PayComponents = () => {
                             setValue={setPayDescription}
                             required={true}
                             readOnly={readOnly}
+                              ref={payCodeRef}
                             disabled={childRecord.current > 0}
                           />
                         </div>

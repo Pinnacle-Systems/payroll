@@ -81,7 +81,8 @@ async function getOne(id) {
       id: parseInt(id),
     },
     include: {
-      ShiftTemplateItems: true
+      ShiftTemplateItems: true,
+      
     }
   });
   if (!data) return NoRecordFound("hRCommonTemplate");

@@ -51,7 +51,7 @@ const Designation = () => {
       sessionStorage.getItem("sessionId") + "userCompanyId"
     ),
   };
-
+   const designationRef = useRef(null);
   const { data: company } = useGetCompanyQuery({ params });
   const {
     data: allData,
@@ -107,7 +107,11 @@ const Designation = () => {
     }
     return false;
   };
-
+    useEffect(() => {
+      if (form && !readOnly && designationRef.current) {
+        designationRef.current.focus();
+      }
+    }, [form, readOnly]);
   const handleSubmitCustom = async (callback, data, text) => {
     try {
       let returnData = await callback(data).unwrap();
@@ -395,6 +399,7 @@ const Designation = () => {
                             required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
+                            ref={designationRef}
                           />
                           <div className="mb-3 w-[20%] ml-6">
                             <TextInput

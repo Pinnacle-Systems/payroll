@@ -97,7 +97,7 @@ async function get(req) {
 }
 
 async function getOne(id) {
-  const childRecord = 0;
+  const childRecord = await prisma.shiftTemplateItems.count({ where: { templateId: parseInt(id) } });
   const data = await prisma.shiftCommonTemplate.findUnique({
     where: {
       id: parseInt(id),
@@ -111,7 +111,7 @@ async function getOne(id) {
       },
     },
   });
-  if (!data) return NoRecordFound("hRCommonTemplate");
+  if (!data) return NoRecordFound("ShiftCommonTemplate");
   return { statusCode: 0, data: { ...data, ...{ childRecord } } };
 }
 

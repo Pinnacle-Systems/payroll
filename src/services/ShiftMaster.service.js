@@ -82,13 +82,14 @@ async function get(req) {
 }
 
 async function getOne(id) {
-  const childRecord = 0;
+      const childRecord = await prisma.shiftTemplateItems.count({ where: { shiftId: parseInt(id) } });
+
   const data = await prisma.shift.findUnique({
     where: {
       id: parseInt(id),
     },
   });
-  if (!data) return NoRecordFound("HRTemplate");
+  if (!data) return NoRecordFound("Shift Master");
   return { statusCode: 0, data: { ...data, ...{ childRecord } } };
 }
 
@@ -117,7 +118,7 @@ async function getSearch(req) {
 }
 
 async function create(body) {
-  const { name, branchId, companyId, active, description, docId } = await body;
+  const { name, branchId, companyId, active, description, from,to,docId } = await body;
   const data = await prisma.shift.create({
     data: {
       name,
@@ -125,14 +126,14 @@ async function create(body) {
       active,
       branchId: parseInt(branchId),
       description,
-      docId,
+      docId,from,to,
     },
   });
   return { statusCode: 0, data };
 }
 
 async function update(id, body) {
-  const { name, branchId, companyId, active, description, docId } = await body;
+  const { name, branchId, companyId, active, description, docId,from,to, } = await body;
   const dataFound = await prisma.shift.findUnique({
     where: {
       id: parseInt(id),
@@ -150,6 +151,7 @@ async function update(id, body) {
       branchId: parseInt(branchId),
       description,
       docId,
+      from,to,
     },
   });
   return { statusCode: 0, data };
