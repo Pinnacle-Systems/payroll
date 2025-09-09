@@ -321,6 +321,18 @@ export default function Form() {
       setCountryCode("");
     }
   };
+
+  const [filterData, setFilterData] = useState([]);
+  let val = 3;
+  const filtered = allData?.data.filter((item, index) => index < val);
+
+  // useEffect(() =>{
+
+  //   console.log(filtered,"filtered");
+
+  //   setFilterData(filtered)
+  // },[allData])
+
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
       <div className="w-full flex bg-white p-1 justify-between  items-center">
@@ -483,23 +495,19 @@ export default function Form() {
                                   }),
                                   singleValue: (base) => ({
                                     ...base,
-                                    fontFamily:
-                                      "'Segoe UI'",
+                                    fontFamily: "'Segoe UI'",
                                   }),
                                   placeholder: (base) => ({
                                     ...base,
-                                    fontFamily:
-                                      "'Segoe UI'",
+                                    fontFamily: "'Segoe UI'",
                                   }),
                                   menu: (base) => ({
                                     ...base,
-                                    fontFamily:
-                                      "'Segoe UI'",
+                                    fontFamily: "'Segoe UI'",
                                   }),
                                   option: (base) => ({
                                     ...base,
-                                    fontFamily:
-                                      "'Segoe UI'",
+                                    fontFamily: "'Segoe UI'",
                                     fontSize: "12px",
                                   }),
                                   indicatorsContainer: (base) => ({

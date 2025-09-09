@@ -388,7 +388,7 @@ export default function Form() {
                                    ref={cityNameRef}
                                 />
                               </div>
-                              <div className="mb-3  ml-6">
+                              <div className="mb-3 w-[150px] ml-6">
                                 <TextInput
                                   name="Code"
                                   type="text"

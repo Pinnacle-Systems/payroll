@@ -29,6 +29,7 @@ import {
   payFrequency,
   payFrequencyApi,
   payComponentApi,
+  companyPayCodeApi,
 
 } from "./services"
 import projectPaymentFormApi from "./services/ProjectPaymentService";
@@ -168,8 +169,8 @@ const commonReducers = {
   [ShiftCommonTemplateMasterAPi.reducerPath]: ShiftCommonTemplateMasterAPi.reducer,
   ShiftTemplateMaster: ShiftTemplateMasterApi.reducer,
   [employeeSubCategoryApi.reducerPath]: employeeSubCategoryApi.reducer,
-  [payComponentApi.reducerPath]:payComponentApi.reducer
-
+  [payComponentApi.reducerPath]:payComponentApi.reducer,
+  [companyPayCodeApi.reducerPath]:companyPayCodeApi.reducer,
 
 
 }
@@ -267,7 +268,8 @@ ShiftCommonTemplateMasterAPi.middleware,
 ShiftTemplateMasterApi.middleware,
 employeeSubCategoryApi.middleware,
 payFrequencyApi.middleware,
-payComponentApi.middleware
+payComponentApi.middleware,
+companyPayCodeApi.middleware,
 ];
 
 

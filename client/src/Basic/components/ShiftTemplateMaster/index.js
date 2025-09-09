@@ -337,10 +337,10 @@ const ShiftTemplateMaster = () => {
     },
 
     {
-      header: "DocId",
+      header: "Doc Id",
       accessor: (item) => item?.docId,
       //   cellClass: () => "  text-gray-900",
-      className: " text-gray-900 text-center uppercase w-32",
+      className: " text-gray-900 text-left pl-2 uppercase w-32",
     },
     {
       header: "Category",
@@ -348,12 +348,7 @@ const ShiftTemplateMaster = () => {
       //   cellClass: () => "  text-gray-900",
       className: " text-gray-900 text-center uppercase w-32",
     },
-    {
-      header: "Status",
-      accessor: (item) => (item.active ? ACTIVE : INACTIVE),
-      //   cellClass: () => " text-gray-900",
-      className: " text-gray-900 text-center uppercase w-36",
-    },
+    
   ];
 
   return (

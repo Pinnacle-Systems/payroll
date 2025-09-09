@@ -1213,7 +1213,7 @@ export const TextInput = forwardRef(({
         disabled={disabled}
         tabIndex={tabIndex ?? undefined}
 
-        className={`w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg
+        className={`w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
           ${readOnly || disabled
@@ -1526,7 +1526,7 @@ export const DropdownInput = ({
         defaultValue={defaultValue}
         required={required}
         readOnly={readOnly}
-        className={`w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg
+        className={`w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
           ${isDisabled
@@ -1788,7 +1788,7 @@ export const DateInput = ({
           value={value}
           onChange={(e) => setValue(e.target.value)}
           className={`
-         w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg
+         w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
             ${readOnly ? "bg-gray-100 text-gray-500 cursor-not-allowed" : "bg-white"}

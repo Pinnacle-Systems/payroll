@@ -437,7 +437,7 @@ export default function Form() {
                             Short Code
                             <input
                               name="code"
-                              className={`w-full px-3 font-normal  py-1.5 mt-1 text-xs border border-gray-300 rounded-lg
+                              className={`w-full px-3 font-normal  py-1 mt-1 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm 
            ${

@@ -259,10 +259,7 @@ export const FilterParty = [
     { show: "Customer", value: "Customer" },
     { show: "Supplier", value: "Supplier" },
 ]
-export const common = [
-    { show: "Yes", value: "Yes" },
-    { show: "No", value: "No" },
-]
+
 
 export const married = [
      { show: "Married", value: "Married" },
@@ -278,13 +275,30 @@ export const earningsTypes = [
 
     
 ]
-
+export const common = [
+    { show: "Yes", value: "Yes" },
+    { show: "No", value: "No" },
+]
 export const commonNew = [
     { show: "Both", value: "Both" },
     { show: "Yes", value: "Yes" },
     { show: "No", value: "No" },
 
+
 ]
+
+export const pickFrom = [
+    {show:'ATTN',value:'ATTN'},
+    {show:'IT ADJUST',value:'IT ADJUST'},
+    {show:'ESI',value:'ESI'},
+    {show:'PF',value:'PF'},
+    {show:'SLAB',value:'SLAB'},
+    {show:'ARREAR',value:'ARREAR'},
+    {show:'FORMULA',value:'FORMULA'},
+    {show:'AD',value:'AD'},
+    {show:'STATIC',value:'STATIC'},
+]
+
 export const SalaryMethod = [
     { show: "ByCash", value: "Cash" },
     { show: "ByBank", value: "Bank" },

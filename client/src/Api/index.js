@@ -99,3 +99,4 @@ export const SHIFT_TEMPLATE_API = "ShiftTemplate";
 export const EMPLOYEE_SUB_CATEGORY_API = "employeeSubCategory";
 export const PAY_FREQUENCY_API = "payFrequency"
 export const PAY_COMPONENT_API     = "payComponent"
+export const COMPANY_PAY_CODE_API ='companyPayCode'

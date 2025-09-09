@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { DropdownInput, TextInput } from "../../../Inputs";
+import Modal from "../../../UiComponents/Modal";
 import { getCommonParams } from "../../../Utils/helper";
 import { useGetCompanyQuery } from "../../../redux/services/CompanyMasterService";
 import { useGetShiftCommonTemplateQuery } from "../../../redux/services/ShiftCommonTemplate.service";
@@ -14,7 +15,7 @@ import {
 import { common, commonNew, ShowShiftData } from "../../../Utils/DropdownData";
 import secureLocalStorage from "react-secure-storage";
 import { toast } from "react-toastify";
-import { Eye } from "lucide-react";
+import { Check, Eye } from "lucide-react";
 import { DELETE, PLUS } from "../../../icons";
 import { HiPlus, HiTrash } from "react-icons/hi";
 import { FaFileAlt } from "react-icons/fa";
@@ -50,6 +51,7 @@ const TemplateItems = ({
   const [modal, setModal] = useState(false);
   const [secondModal, setSecondModal] = useState(false);
   const [contextMenu, setContextMenu] = useState(null);
+  const [errors, setErrors] = useState({});
   const handleRightClick = (event, rowIndex, type) => {
     event.preventDefault();
     setContextMenu({
@@ -103,7 +105,7 @@ const TemplateItems = ({
                 onClick={() => {
                   setReadOnly(false);
                 }}
-                className="px-3 py-1 text-indigo-600 hover:bg-indigo-600 hover:text-white border border-indigo-600 text-xs rounded"
+                className="px-3 py-1 text-green-600 hover:bg-green-600 hover:text-white border border-green-600 text-xs rounded"
               >
                 Edit
               </button>
@@ -252,8 +254,10 @@ const TemplateItems = ({
               </thead>
               <tbody>
                 {ShiftTemplateItems?.map((item, index) => (
-                  <tr className=" border border-gray-300 text-[11px] py-0.5 px-1 text-center">
-                    <td className="  w-[4px] text-center px-1">{index + 1}</td>
+                  <tr key={index} className=" w-full table-row ">
+                    <td className="border border-gray-300  w-[4px] text-center px-1">
+                      {index + 1}
+                    </td>
 
                     <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
                       <input
@@ -266,13 +270,14 @@ const TemplateItems = ({
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "date")
                         }
+                        className="bg-transparent"
                       />
                     </td>
                     <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
                       <select
                         // onKeyDown={e => { if (e.key === "Delete") { handleInputChange("", index, "accessoryGroupId") } }}
                         disabled={readOnly}
-                        className="text-left w-full focus:outline-none rounded py-1 "
+                        className="text-left w-full focus:outline-none rounded py-1 bg-transparent"
                         value={item.templateId}
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "templateId")
@@ -295,9 +300,7 @@ const TemplateItems = ({
                     <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
                       <select
                         disabled={readOnly}
-                        
-                        className="text-left focus:outline-none w-full rounded py-1 "
-                       
+                        className="text-left focus:outline-none w-full rounded py-1 bg-transparent"
                         value={item.shiftId}
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "shiftId")
@@ -346,7 +349,7 @@ const TemplateItems = ({
                     <td className="border border-gray-300 text-[11px] py-0.5 item-center">
                       <select
                         disabled={readOnly}
-                        className="text-left w-full focus:outline-none rounded py-1"
+                        className="text-left w-full bg-transparent focus:outline-none rounded py-1"
                         value={item.inNextDay}
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "inNextDay")
@@ -360,9 +363,9 @@ const TemplateItems = ({
                         ))}
                       </select>
                     </td>
-                    <td className="border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className="border border-gray-300  text-center">
                       <button
-                        className="text-blue-600   bg-blue-50 rounded"
+                        className="text-blue-600 text-center   bg-blue-50 rounded"
                         onClick={() => setModal(true)}
                         title="Open"
                       >
@@ -381,9 +384,9 @@ const TemplateItems = ({
                         </svg>
                       </button>
                     </td>
-                    <td>
+                    <td className="text-center border border-gray-300">
                       <button
-                        className="text-blue-600   bg-blue-50 rounded"
+                        className="text-blue-600 text-center   bg-blue-50 rounded"
                         onClick={() => setSecondModal(true)}
                         title="Open"
                       >
@@ -402,45 +405,38 @@ const TemplateItems = ({
                         </svg>
                       </button>
                     </td>
+                    {modal === true && (
+                      <Modal
+                        isOpen={modal}
+                        form={modal}
+                        widthClass={"w-[50%]  h-[45%]"}
+                        onClose={() => {
+                          setModal(false);
+                          setErrors({});
+                        }}
+                      >
+                        <div className="h-full flex flex-col bg-gray-100">
+                          <div className="border-b py-2 px-2 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
+                            <div className="flex items-center">
+                              <h2 className="text-lg  py-0.5 font-semibold  text-gray-800">
+                                Tolerance
+                              </h2>
+                            </div>
+                          </div>
 
-                    {modal && (
-                      <>
-                        <div className="fixed overflow-x-auto h-auto p-4 inset-0 flex  items-center justify-center bg-black bg-opacity-20 z-[9999]">
-                          <div className="bg-white rounded-lg shadow-xl w-[450px] p-4 relative">
-                            {/* Close Button */}
-                            <button
-                              onClick={() => setModal(false)}
-                              className="absolute top-2 right-2 text-white bg-red-600 "
-                            >
-                              <svg
-                                className="h-6 w-6 fill-current"
-                                viewBox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <title>Close</title>
-                                <path
-                                  d="M14.348 5.652a.999.999 0 00-1.414 0L10 8.586l-2.93-2.93a.999.999 0 10-1.414 1.414L8.586 10l-2.93 2.93a.999.999 0 101.414 1.414L10 11.414l2.93 2.93a.999.999 0 101.414-1.414L11.414 10l2.93-2.93a.999.999 0 000-1.414z"
-                                  fillRule="evenodd"
-                                />
-                              </svg>
-                            </button>
-
-                            <h2 className="text-lg text-left pb-2 font-semibold">
-                              Tolerance
-                            </h2>
-                            <div className=" bg-gray-100">
-                              .
-                              <div className="overflow-x-auto mx-4  pb-4 ">
-                                <table className="w-full bg-white border-collapse table-fixed ">
-                                  <tbody>
-                                    <tr className="flex flex-wrap gap-x-3 ml-6 pb-4">
+                          <div className="flex-1 overflow-auto p-3">
+                            <div className="grid grid-cols-1  gap-3  h-full">
+                              <div className="lg:col-span- space-y-3">
+                                <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
+                                  <div className="space-y-4 ">
+                                    <div className="flex gap-y-6  gap-x-6">
                                       {/* Tolerance Before Start */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
+                                      <div className="mb-3">
+                                        <label className="block text-xs font-bold text-slate-700 mb-1">
                                           Tolerance Before Start
-                                        </th>
+                                        </label>
                                         <input
-                                          min={"0"}
+                                          min="0"
                                           type="text"
                                           value={item?.toleranceInBeforeStart}
                                           onFocus={(e) => e.target.select()}
@@ -451,44 +447,20 @@ const TemplateItems = ({
                                               "toleranceInBeforeStart"
                                             )
                                           }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
+                                          className="w-[120px] px-3 py-1 text-xs border border-gray-300 rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
                                           disabled={readOnly}
                                         />
-                                      </td>
-
-                                      {/* Start Time */}
-                                      {/* <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          Start Time
-                                        </th>
-                                        <input
-                                          min={"0"}
-                                          type="text"
-                                          value={item?.startTime}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "startTime"
-                                            )
-                                          }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
-                                        />
-                                      </td> */}
+                                      </div>
 
                                       {/* Tolerance After End */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          Tolerance After End
-                                        </th>
+                                      <div className="mb-3 ">
+                                        <label className="block text-xs  font-bold text-slate-700 mb-1">
+                                          Tolerance After Start
+                                        </label>
                                         <input
-                                          min={"0"}
+                                          min="0"
                                           type="text"
                                           value={item?.toleranceInAfterEnd}
                                           onFocus={(e) => e.target.select()}
@@ -499,26 +471,20 @@ const TemplateItems = ({
                                               "toleranceInAfterEnd"
                                             )
                                           }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
+                                          className="w-[120px] px-3 py-1  text-xs border border-gray-300 rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
                                           disabled={readOnly}
                                         />
-                                      </td>
-
-                                    
-
-                                
-
-                                
+                                      </div>
 
                                       {/* Tolerance Before Start (Out) */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          Tolerance Before Start
-                                        </th>
+                                      <div className="mb-3 ">
+                                        <label className="block text-xs  font-bold text-slate-700 mb-1">
+                                          Tolerance Before End
+                                        </label>
                                         <input
-                                          min={"0"}
+                                          min="0"
                                           type="text"
                                           value={item?.toleranceOutBeforeStart}
                                           onFocus={(e) => e.target.select()}
@@ -529,44 +495,20 @@ const TemplateItems = ({
                                               "toleranceOutBeforeStart"
                                             )
                                           }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
+                                          className="w-[120px] px-3 py-1 text-xs border border-gray-300 rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
                                           disabled={readOnly}
                                         />
-                                      </td>
+                                      </div>
 
-                                      {/* End Time
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          End Time
-                                        </th>
-                                        <input
-                                          min={"0"}
-                                          type="text"
-                                          value={item?.endTime}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "endTime"
-                                            )
-                                          }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
-                                        />
-                                      </td> */}
-
-                                      {/* Tolerance After End */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
+                                      {/* Tolerance After End (Out) */}
+                                      <div className="mb-3">
+                                        <label className="block text-xs  font-bold text-slate-700 mb-1">
                                           Tolerance After End
-                                        </th>
+                                        </label>
                                         <input
-                                          min={"0"}
+                                          min="0"
                                           type="text"
                                           value={item?.toleranceOutAfterEnd}
                                           onFocus={(e) => e.target.select()}
@@ -577,61 +519,56 @@ const TemplateItems = ({
                                               "toleranceOutAfterEnd"
                                             )
                                           }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
+                                          className=" w-[120px] px-3 py-1  text-xs border border-gray-300 rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
                                           disabled={readOnly}
                                         />
-                                      </td>
-
-                                  
-                                    </tr>
-                                  </tbody>
-                                </table>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                          </div>{" "}
+                          </div>
                         </div>
-                      </>
+                      </Modal>
                     )}
-                    {secondModal && (
-                      <>
-                        <div className="fixed overflow-x-auto h-auto p-4 inset-0 flex  items-center justify-center bg-black bg-opacity-20 z-[9999]">
-                          <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full p-4 relative">
-                            {/* Close Button */}
-                            <button
-                              onClick={() => setSecondModal(false)}
-                              className="absolute top-2 right-2 text-white bg-red-600 "
-                            >
-                              <svg
-                                className="h-6 w-6 fill-current"
-                                viewBox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <title>Close</title>
-                                <path
-                                  d="M14.348 5.652a.999.999 0 00-1.414 0L10 8.586l-2.93-2.93a.999.999 0 10-1.414 1.414L8.586 10l-2.93 2.93a.999.999 0 101.414 1.414L10 11.414l2.93 2.93a.999.999 0 101.414-1.414L11.414 10l2.93-2.93a.999.999 0 000-1.414z"
-                                  fillRule="evenodd"
-                                />
-                              </svg>
-                            </button>
 
-                            <h2 className="text-lg text-left pb-2 font-semibold">
-                              Row Details
-                            </h2>
-                            <div className=" bg-gray-100">
-                              .
-                              <div className="overflow-x-auto mx-4  pb-4 ">
-                                <table className="w-full bg-white border-collapse table-fixed ">
-                                  <tbody>
-                                    <tr className="flex flex-wrap gap-x-3 ml-6 pb-4">
-                                      {/* FB OUT */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          First Break out
-                                        </th>
+                    {secondModal && (
+                      <Modal
+                        isOpen={secondModal}
+                        form={secondModal}
+                        widthClass={"w-[50%] h-[55%]"} // Adjust width/height if needed
+                        onClose={() => {
+                          setSecondModal(false);
+                          setErrors({});
+                        }}
+                      >
+                        <div className="h-full flex flex-col bg-gray-100">
+                          {/* Header */}
+                          <div className="border-b py-2 px-2 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
+                            <div className="flex items-center">
+                              <h2 className="text-lg py-0.5 font-semibold text-gray-800">
+                                Break
+                              </h2>
+                            </div>
+                          </div>
+
+                          {/* Body */}
+                          <div className="flex-1 overflow-auto p-3">
+                            <div className="grid grid-cols-1 gap-3 h-full">
+                              <div className="space-y-3">
+                                <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
+                                  <div className="space-y-4">
+                                    <div className="flex flex-wrap gap-y-6 gap-x-10">
+                                      {/* First Break Out */}
+                                      <div className="mb-3 w-24">
+                                        <label className="block text-xs font-bold  text-slate-700 mb-1">
+                                          First Break Out
+                                        </label>
                                         <input
-                                          min={"0"}
+                                          min="0"
                                           type="text"
                                           value={item?.fbOut}
                                           onFocus={(e) => e.target.select()}
@@ -642,20 +579,20 @@ const TemplateItems = ({
                                               "fbOut"
                                             )
                                           }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
+                                          className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
+                      focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                      transition-all duration-150 shadow-sm"
                                           disabled={readOnly}
                                         />
-                                      </td>
+                                      </div>
 
-                                      {/* FB IN */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
+                                      {/* First Break In */}
+                                      <div className="mb-3 w-24">
+                                        <label className="block text-xs font-bold  text-slate-700 mb-1">
                                           First Break In
-                                        </th>
+                                        </label>
                                         <input
-                                          min={"0"}
+                                          min="0"
                                           type="text"
                                           value={item?.fbIn}
                                           onFocus={(e) => e.target.select()}
@@ -666,20 +603,20 @@ const TemplateItems = ({
                                               "fbIn"
                                             )
                                           }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
+                                          className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
+                      focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                      transition-all duration-150 shadow-sm"
                                           disabled={readOnly}
                                         />
-                                      </td>
+                                      </div>
 
                                       {/* Lunch B.ST */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          Lunch B.ST
-                                        </th>
+                                      <div className="mb-3 w-24">
+                                        <label className="block text-xs font-bold  text-slate-700 mb-1">
+                                          Lunch Start
+                                        </label>
                                         <input
-                                          min={"0"}
+                                          min="0"
                                           type="text"
                                           value={item?.lunchBst}
                                           onFocus={(e) => e.target.select()}
@@ -690,24 +627,24 @@ const TemplateItems = ({
                                               "lunchBst"
                                             )
                                           }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
+                                          className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
+                      focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                      transition-all duration-150 shadow-sm"
                                           disabled={readOnly}
                                         />
-                                      </td>
+                                      </div>
 
                                       {/* LB.SNDay */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
+                                      <div className="mb-3 w-24">
+                                        <label className="block text-xs font-bold text-slate-700 mb-1">
                                           LB.SNDay
-                                        </th>
+                                        </label>
                                         <select
                                           disabled={readOnly}
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          value={item.lBSNDay}
+                                          className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
+                      focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                      transition-all duration-150 shadow-sm"
+                                          value={item?.lBSNDay}
                                           onChange={(e) =>
                                             handleInputChange(
                                               e.target.value,
@@ -726,15 +663,15 @@ const TemplateItems = ({
                                             </option>
                                           ))}
                                         </select>
-                                      </td>
+                                      </div>
 
                                       {/* Lunch B.ET */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          Lunch B.ET
-                                        </th>
+                                      <div className="mb-3 w-24">
+                                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                                          Lunch End
+                                        </label>
                                         <input
-                                          min={"0"}
+                                          min="0"
                                           type="text"
                                           value={item?.lunchBET}
                                           onFocus={(e) => e.target.select()}
@@ -745,24 +682,24 @@ const TemplateItems = ({
                                               "lunchBET"
                                             )
                                           }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
+                                          className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
+                      focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                      transition-all duration-150 shadow-sm"
                                           disabled={readOnly}
                                         />
-                                      </td>
+                                      </div>
 
                                       {/* LB.ENDay */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
+                                      <div className="mb-3 w-24">
+                                        <label className="block text-xs font-bold  text-slate-700 mb-1">
                                           LB.ENDay
-                                        </th>
+                                        </label>
                                         <select
                                           disabled={readOnly}
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          value={item.lBEnday}
+                                          className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
+                      focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                      transition-all duration-150 shadow-sm"
+                                          value={item?.lBEnday}
                                           onChange={(e) =>
                                             handleInputChange(
                                               e.target.value,
@@ -781,15 +718,15 @@ const TemplateItems = ({
                                             </option>
                                           ))}
                                         </select>
-                                      </td>
+                                      </div>
 
-                                      {/* SBOut */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
+                                      {/* Second Break Out */}
+                                      <div className="mb-3 w-[100px]">
+                                        <label className="block text-xs font-bold -ml-1 text-slate-700 mb-1">
                                           Second Break Out
-                                        </th>
+                                        </label>
                                         <input
-                                          min={"0"}
+                                          min="0"
                                           type="text"
                                           value={item?.sbOut}
                                           onFocus={(e) => e.target.select()}
@@ -800,20 +737,20 @@ const TemplateItems = ({
                                               "sbOut"
                                             )
                                           }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
+                                          className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
+                      focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                      transition-all duration-150 shadow-sm"
                                           disabled={readOnly}
                                         />
-                                      </td>
+                                      </div>
 
-                                      {/* SBIn */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
+                                      {/* Second Break In */}
+                                      <div className="mb-3 w-24">
+                                        <label className="block text-xs font-bold  text-slate-700 mb-1">
                                           Second Break In
-                                        </th>
+                                        </label>
                                         <input
-                                          min={"0"}
+                                          min="0"
                                           type="text"
                                           value={item?.sbIn}
                                           onFocus={(e) => e.target.select()}
@@ -824,26 +761,27 @@ const TemplateItems = ({
                                               "sbIn"
                                             )
                                           }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
+                                          className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
+                      focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                      transition-all duration-150 shadow-sm"
                                           disabled={readOnly}
                                         />
-                                      </td>
-                                    </tr>
-                                  </tbody>
-                                </table>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                          </div>{" "}
+                          </div>
                         </div>
-                      </>
+                      </Modal>
                     )}
+
                     {/* Out Next Day */}
                     <td className="border border-gray-300 text-[11px] py-0.5 item-center">
                       <select
                         disabled={readOnly}
-                        className="text-left w-full focus:outline-none rounded py-1 "
+                        className="text-left w-full bg-transparent focus:outline-none rounded py-1 "
                         value={item.outNxtDay}
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "outNxtDay")
@@ -904,6 +842,7 @@ const TemplateItems = ({
                 ))}
               </tbody>
             </table>
+            
           </div>
         </div>
 

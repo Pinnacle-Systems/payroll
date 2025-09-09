@@ -36,7 +36,7 @@ const PayComponents = () => {
   const [form, setForm] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
- const payCodeRef = useRef(null);
+  const payCodeRef = useRef(null);
   const params = {
     companyId: secureLocalStorage.getItem(
       sessionStorage.getItem("sessionId") + "userCompanyId"
@@ -67,6 +67,7 @@ const PayComponents = () => {
       setTaxable(data?.taxable);
       setEarningsType(data?.earningsType);
       setNotes(data?.notes);
+      childRecord.current = data?.childRecord ? data?.childRecord : 0;
     },
     [id]
   );
@@ -87,11 +88,11 @@ const PayComponents = () => {
     branchId,
     notes,
   };
-     useEffect(() => {
-          if (form && !readOnly && payCodeRef.current) {
-            payCodeRef.current.focus();
-          }
-        }, [form, readOnly]);
+  useEffect(() => {
+    if (form && !readOnly && payCodeRef.current) {
+      payCodeRef.current.focus();
+    }
+  }, [form, readOnly]);
   const validateData = (data) => {
     if (data?.payCode && data?.payDescription) {
       return true;
@@ -150,10 +151,9 @@ const PayComponents = () => {
         if (deldata?.statusCode == 1) {
           Swal.fire({
             icon: "error",
-            title: "Submission error",
-            text: deldata.data?.message || "Something went wrong!",
+            title: "Child record Exists",
+            text: deldata.data?.message || "Data cannot be deleted!",
           });
-          setForm(false);
           return;
         }
         setId("");
@@ -188,7 +188,7 @@ const PayComponents = () => {
     setSearchValue("");
     setPayCode("");
     setPayDescription("");
-    setEarningsType('')
+    setEarningsType("");
     setTaxable("");
     setNotes("");
   };
@@ -218,14 +218,14 @@ const PayComponents = () => {
     {
       header: "S.No",
       accessor: (item, index) => index + 1,
-      className: " text-gray-900 w-12  text-center",
+      className: " text-gray-900 w-12 text-center",
     },
 
     {
       header: "Pay Code",
       accessor: (item) => item?.payCode,
       //   cellClass: () => "  text-gray-900",
-      className: " text-gray-900 text-center uppercase w-44",
+      className: " text-gray-900  text-left pl-2 uppercase w-44",
     },
   ];
 
@@ -318,7 +318,7 @@ const PayComponents = () => {
                             setValue={setPayDescription}
                             required={true}
                             readOnly={readOnly}
-                              ref={payCodeRef}
+                            ref={payCodeRef}
                             disabled={childRecord.current > 0}
                           />
                         </div>

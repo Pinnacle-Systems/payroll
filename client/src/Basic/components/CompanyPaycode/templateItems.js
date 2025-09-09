@@ -11,7 +11,7 @@ import {
   useGetShiftTemplateMasterQuery,
   useUpdateShiftTemplateMasterMutation,
 } from "../../../redux/services/ShiftTemplateMaster";
-import { common, commonNew, ShowShiftData } from "../../../Utils/DropdownData";
+import { common, commonNew, pickFrom, ShowShiftData } from "../../../Utils/DropdownData";
 import secureLocalStorage from "react-secure-storage";
 import { toast } from "react-toastify";
 import { Eye } from "lucide-react";
@@ -26,8 +26,8 @@ const TemplateItems = ({
   ShitCommonData,
   shiftData,
   readOnly,
-  ShiftTemplateItems,
-  setShiftTemplateItems,
+  payDetails,
+  setPayDetails,
   id,
   setDate,
   date,
@@ -65,19 +65,19 @@ const TemplateItems = ({
   };
 
   const handleInputChange = (value, index, field) => {
-    const newBlend = structuredClone(ShiftTemplateItems);
+    const newBlend = structuredClone(payDetails);
     newBlend[index][field] = value;
 
-    setShiftTemplateItems(newBlend);
+    setPayDetails(newBlend);
   };
 
   const addNewRow = () => {
     const newRow = { templateId: "" };
-    setShiftTemplateItems([...ShiftTemplateItems, newRow]);
+    setPayDetails([...payDetails, newRow]);
   };
   const selectRef = useRef(null);
   const handleDeleteRow = (id) => {
-    setShiftTemplateItems((yarnBlend) => {
+    setPayDetails((yarnBlend) => {
       if (yarnBlend.length <= 1) {
         return yarnBlend;
       }
@@ -85,11 +85,12 @@ const TemplateItems = ({
     });
   };
   const handleDeleteAllRows = () => {
-    setShiftTemplateItems((prevRows) => {
+    setPayDetails((prevRows) => {
       if (prevRows.length <= 1) return prevRows;
       return [prevRows[0]];
     });
   };
+  console.log(payComponent, "payComponent");
 
   return (
     <>
@@ -103,7 +104,7 @@ const TemplateItems = ({
                 onClick={() => {
                   setReadOnly(false);
                 }}
-                className="px-3 py-1 text-indigo-600 hover:bg-indigo-600 hover:text-white border border-indigo-600 text-xs rounded"
+                className="px-3 py-1 text-green-600 hover:bg-green-600 hover:text-white border border-green-600 text-xs rounded"
               >
                 Edit
               </button>
@@ -156,10 +157,10 @@ const TemplateItems = ({
                   />
                 </div>
 
-                <div className="">
+                <div className="w-[120px]">
                   <DateInput
                     name="Date"
-                    value={date.toISOString().substring(0, 10)}
+                    value={date}
                     setValue={setDate}
                     required={true}
                     readOnly={readOnly}
@@ -183,88 +184,172 @@ const TemplateItems = ({
               <thead className="bg-gray-200 text-gray-800">
                 <tr>
                   <th
-                    className={`w-[8px] px-4 py-2 text-center font-medium text-[13px] `}
+                    className={`w-[8px] px-2 text-center font-medium text-[13px] `}
                   >
                     S.No
                   </th>
                   <th
                     className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
                   >
-                    Applied On
+                    Pay Code
                   </th>
                   <th
-                    className={`w-32 px-4 py-2 text-center font-medium text-[13px] `}
+                    className={`w-24 px-4 py-2 text-center font-medium text-[13px] `}
                   >
-                    Shift Common Template
+                    Pay Description
                   </th>
                   <th
-                    className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
+                    className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
                   >
-                    Shift
+                    PayCode Type
                   </th>
 
-                  <th className={`w-12  item-center font-medium text-[13px] `}>
-                    Other Data
+                  <th className={`w-8  item-center font-medium text-[13px] `}>
+                    Apply LOP
                   </th>
-                  <th
-                    className={`w-72  item-center font-medium text-[13px] `}
-                  ></th>
+                  <th className={`w-8 item-center font-medium text-[13px] `}>
+                    PF Applicable
+                  </th>
+                  <th className={`w-8 item-center font-medium text-[13px] `}>
+                    ESI Applicable
+                  </th>
+                  <th className={`w-8 item-center font-medium text-[13px] `}>
+                    Pick From
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {ShiftTemplateItems?.map((item, index) => (
-                  <tr className=" border border-gray-300 text-[11px] py-0.5 px-1 text-center">
-                    <td className="  w-2 text-center px-1">{index + 1}</td>
+                {payDetails?.map((item, index) => (
+                  <tr className=" w-full table-row">
+                    <td className="border border-gray-300  text-center px-1">
+                      {index + 1}
+                    </td>
 
                     <td className=" border border-gray-300 text-[11px] py-0.5 px-1 item-center">
-                      <DropdownInput
-                       
-                        name="Select payCode"
-                        value={payComponentId}
-                        setValue={setPayComponentId}
-                        // options={dropDownListObject(
-                        //   payComponent?.data,
-                        //   "name",
-                        //   "id"
-                        // )}
-                        // required={true}
-                        readOnly={readOnly}
-                        disabled={childRecord.current > 0}
-                        // onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                      />
-                    </td>
-                    <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
                       <select
                         // onKeyDown={e => { if (e.key === "Delete") { handleInputChange("", index, "accessoryGroupId") } }}
                         disabled={readOnly}
                         className="text-left w-full focus:outline-none rounded py-1 "
-                        value={item.templateId}
+                        value={item?.payComponentId}
                         onChange={(e) =>
-                          handleInputChange(e.target.value, index, "templateId")
+                          handleInputChange(
+                            e.target.value,
+                            index,
+                            "payComponentId"
+                          )
                         }
                       >
-                        <option>Select Shift Common Template</option>
-                        {(id
-                          ? ShitCommonData?.data || []
-                          : ShitCommonData?.data.filter(
-                              (item) => item.active
-                            ) || []
-                        ).map((blend) => (
+                        <option>Select Pay Code</option>
+                        {(payComponent?.data || []).map((blend) => (
                           <option value={blend.id} key={blend.id}>
-                            {blend.employeeCategory?.name}
+                            {blend?.payCode}
                           </option>
                         ))}
                       </select>
                     </td>
 
+                    <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+                      <input
+                        type="text"
+                        value={
+                          payComponent?.data?.find(
+                            (i) => i.id == item?.payComponentId
+                          )?.payDescription
+                        }
+                        onChange={(e) =>
+                          handleInputChange(
+                            e.target.value,
+                            index,
+                            "payDescription"
+                          )
+                        }
+                        className="w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent"
+                        disabled={true}
+                      />
+                    </td>
+
+                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                      <input
+                        type="text"
+                        value={
+                          payComponent?.data?.find(
+                            (i) => i.id == item?.payComponentId
+                          )?.earningsType
+                        }
+                        onChange={(e) =>
+                          handleInputChange(
+                            e.target.value,
+                            index,
+                            "earningsType"
+                          )
+                        }
+                        className="w-full bg-transparent  text-left pl-2  focus:outline-none focus:border-transparent"
+                        disabled={true}
+                      />
+                    </td>
                     <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
                       <select
                         disabled={readOnly}
-                        ref={selectRef}
-                        className="text-left focus:outline-none w-full rounded py-1 "
-                        onClick={() => {
-                          // Refocus select after left click to ensure Enter works
-                          selectRef.current?.focus();
+                        className="text-left w-full bg-transparent focus:outline-none rounded py-1"
+                        value={item?.lop}
+                        onChange={(e) =>
+                          handleInputChange(e.target.value, index, "lop")
+                        }
+                      >
+                        <option>Select</option>
+                        {common.map((blend) => (
+                          <option value={blend.value} key={blend.value}>
+                            {blend?.show}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                      <select
+                        disabled={readOnly}
+                        className="text-left w-full bg-transparent focus:outline-none rounded py-1"
+                        value={item?.pf}
+                        onChange={(e) =>
+                          handleInputChange(e.target.value, index, "pf")
+                        }
+                      >
+                        <option>Select</option>
+                        {common.map((blend) => (
+                          <option value={blend.value} key={blend.value}>
+                            {blend?.show}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                      <select
+                        disabled={readOnly}
+                        className="text-left w-full bg-transparent focus:outline-none rounded py-1"
+                        value={item?.esi}
+                        onChange={(e) =>
+                          handleInputChange(e.target.value, index, "esi")
+                        }
+                      >
+                        <option>Select</option>
+                        {common.map((blend) => (
+                          <option value={blend.value} key={blend.value}>
+                            {blend?.show}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                     <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                      <select
+                        disabled={readOnly}
+                        className="text-left w-full bg-transparent focus:outline-none rounded py-1"
+                        value={item?.pickFrom}
+                        onChange={(e) =>
+                          handleInputChange(e.target.value, index, "pickFrom")
+                        }
+                          onContextMenu={(e) => {
+                          if (!readOnly) {
+                            handleRightClick(e, index, "pickFrom");
+                          }
                         }}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
@@ -272,552 +357,16 @@ const TemplateItems = ({
                             addNewRow();
                           }
                         }}
-                        value={item.shiftId}
-                        onChange={(e) => {
-                          handleInputChange(e.target.value, index, "shiftId");
-                        }}
+                        
                       >
-                        <option>Select Shift</option>
-                        {(id
-                          ? shiftData?.data || []
-                          : shiftData?.data.filter((item) => item.active) || []
-                        ).map((blend) => (
-                          <option value={blend.id} key={blend.id}>
-                            {blend?.name}
+                        <option>Select</option>
+                        {pickFrom.map((blend) => (
+                          <option value={blend.value} key={blend.value}>
+                            {blend?.show}
                           </option>
                         ))}
                       </select>
                     </td>
-                    <td>
-                      <button
-                        className="text-blue-600   bg-blue-50 rounded"
-                        onClick={() => setModal(true)}
-                        title="Open"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                          <path
-                            fillRule="evenodd"
-                            d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
-                    </td>
-                    <td
-                      className="  border border-gray-300 text-[11px] py-0.5 item-center"
-                      onContextMenu={(e) => {
-                        if (!readOnly) {
-                          handleRightClick(e, index, "notes");
-                        }
-                      }}
-                    >
-                      {" "}
-                    </td>
-                    {modal && (
-                      <>
-                        <div className="fixed overflow-x-auto h-auto p-4 inset-0 flex  items-center justify-center bg-black bg-opacity-20 z-[9999]">
-                          <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full p-4 relative">
-                            {/* Close Button */}
-                            <button
-                              onClick={() => setModal(false)}
-                              className="absolute top-2 right-2 text-white bg-red-600 "
-                            >
-                              <svg
-                                className="h-6 w-6 fill-current"
-                                viewBox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <title>Close</title>
-                                <path
-                                  d="M14.348 5.652a.999.999 0 00-1.414 0L10 8.586l-2.93-2.93a.999.999 0 10-1.414 1.414L8.586 10l-2.93 2.93a.999.999 0 101.414 1.414L10 11.414l2.93 2.93a.999.999 0 101.414-1.414L11.414 10l2.93-2.93a.999.999 0 000-1.414z"
-                                  fillRule="evenodd"
-                                />
-                              </svg>
-                            </button>
-
-                            <h2 className="text-lg text-left pb-2 font-semibold">
-                              Row Details
-                            </h2>
-                            <div className=" bg-gray-100">
-                              .
-                              <div className="overflow-x-auto mx-4  pb-4 ">
-                                <table className="w-full bg-white border-collapse table-fixed ">
-                                  <tbody>
-                                    <tr className="flex flex-wrap gap-x-3 ml-6 pb-4">
-                                      {/* In Next Day */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          In Next Day
-                                        </th>
-                                        <select
-                                          disabled={readOnly}
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          value={item.inNextDay}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "inNextDay"
-                                            )
-                                          }
-                                        >
-                                          <option>Select</option>
-                                          {commonNew.map((blend) => (
-                                            <option
-                                              value={blend.value}
-                                              key={blend.value}
-                                            >
-                                              {blend?.show}
-                                            </option>
-                                          ))}
-                                        </select>
-                                      </td>
-
-                                      {/* Tolerance Before Start */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          Tolerance Before Start
-                                        </th>
-                                        <input
-                                          min={"0"}
-                                          type="text"
-                                          value={item?.toleranceInBeforeStart}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "toleranceInBeforeStart"
-                                            )
-                                          }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
-                                        />
-                                      </td>
-
-                                      {/* Start Time */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          Start Time
-                                        </th>
-                                        <input
-                                          min={"0"}
-                                          type="text"
-                                          value={item?.startTime}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "startTime"
-                                            )
-                                          }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
-                                        />
-                                      </td>
-
-                                      {/* Tolerance After End */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          Tolerance After End
-                                        </th>
-                                        <input
-                                          min={"0"}
-                                          type="text"
-                                          value={item?.toleranceInAfterEnd}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "toleranceInAfterEnd"
-                                            )
-                                          }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
-                                        />
-                                      </td>
-
-                                      {/* FB OUT */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          First Break out
-                                        </th>
-                                        <input
-                                          min={"0"}
-                                          type="text"
-                                          value={item?.fbOut}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "fbOut"
-                                            )
-                                          }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
-                                        />
-                                      </td>
-
-                                      {/* FB IN */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          First Break In
-                                        </th>
-                                        <input
-                                          min={"0"}
-                                          type="text"
-                                          value={item?.fbIn}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "fbIn"
-                                            )
-                                          }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
-                                        />
-                                      </td>
-
-                                      {/* Lunch B.ST */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          Lunch B.ST
-                                        </th>
-                                        <input
-                                          min={"0"}
-                                          type="text"
-                                          value={item?.lunchBst}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "lunchBst"
-                                            )
-                                          }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
-                                        />
-                                      </td>
-
-                                      {/* LB.SNDay */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          LB.SNDay
-                                        </th>
-                                        <select
-                                          disabled={readOnly}
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          value={item.lBSNDay}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "lBSNDay"
-                                            )
-                                          }
-                                        >
-                                          <option>Select</option>
-                                          {commonNew.map((blend) => (
-                                            <option
-                                              value={blend.value}
-                                              key={blend.value}
-                                            >
-                                              {blend?.show}
-                                            </option>
-                                          ))}
-                                        </select>
-                                      </td>
-
-                                      {/* Lunch B.ET */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          Lunch B.ET
-                                        </th>
-                                        <input
-                                          min={"0"}
-                                          type="text"
-                                          value={item?.lunchBET}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "lunchBET"
-                                            )
-                                          }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
-                                        />
-                                      </td>
-
-                                      {/* LB.ENDay */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          LB.ENDay
-                                        </th>
-                                        <select
-                                          disabled={readOnly}
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          value={item.lBEnday}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "lBEnday"
-                                            )
-                                          }
-                                        >
-                                          <option>Select</option>
-                                          {commonNew.map((blend) => (
-                                            <option
-                                              value={blend.value}
-                                              key={blend.value}
-                                            >
-                                              {blend?.show}
-                                            </option>
-                                          ))}
-                                        </select>
-                                      </td>
-
-                                      {/* SBOut */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          Second Break Out
-                                        </th>
-                                        <input
-                                          min={"0"}
-                                          type="text"
-                                          value={item?.sbOut}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "sbOut"
-                                            )
-                                          }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
-                                        />
-                                      </td>
-
-                                      {/* SBIn */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          Second Break In
-                                        </th>
-                                        <input
-                                          min={"0"}
-                                          type="text"
-                                          value={item?.sbIn}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "sbIn"
-                                            )
-                                          }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
-                                        />
-                                      </td>
-
-                                      {/* Tolerance Before Start (Out) */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          Tolerance Before Start
-                                        </th>
-                                        <input
-                                          min={"0"}
-                                          type="text"
-                                          value={item?.toleranceOutBeforeStart}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "toleranceOutBeforeStart"
-                                            )
-                                          }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
-                                        />
-                                      </td>
-
-                                      {/* End Time */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          End Time
-                                        </th>
-                                        <input
-                                          min={"0"}
-                                          type="text"
-                                          value={item?.endTime}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "endTime"
-                                            )
-                                          }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
-                                        />
-                                      </td>
-
-                                      {/* Tolerance After End */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          Tolerance After End
-                                        </th>
-                                        <input
-                                          min={"0"}
-                                          type="text"
-                                          value={item?.toleranceOutAfterEnd}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "toleranceOutAfterEnd"
-                                            )
-                                          }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
-                                        />
-                                      </td>
-
-                                      {/* Out Next Day */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          Out Next Day
-                                        </th>
-                                        <select
-                                          disabled={readOnly}
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          value={item.outNxtDay}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "outNxtDay"
-                                            )
-                                          }
-                                        >
-                                          <option>Select</option>
-                                          {commonNew.map((blend) => (
-                                            <option
-                                              value={blend.value}
-                                              key={blend.value}
-                                            >
-                                              {blend?.show}
-                                            </option>
-                                          ))}
-                                        </select>
-                                      </td>
-
-                                      {/* Shift Time Hrs */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          Shift Time Hrs
-                                        </th>
-                                        <input
-                                          min={"0"}
-                                          type="text"
-                                          value={item?.shiftTimeHrs}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "shiftTimeHrs"
-                                            )
-                                          }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
-                                        />
-                                      </td>
-
-                                      {/* OT Hrs */}
-                                      <td className="flex flex-col w-40 text-[11px] py-0.5 ">
-                                        <th className=" py-2 text-left block text-xs font-bold text-slate-700">
-                                          OT Hrs
-                                        </th>
-                                        <input
-                                          min={"0"}
-                                          type="text"
-                                          value={item?.otHrs}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "otHrs"
-                                            )
-                                          }
-                                          className="w-24 px-1 py-0.5 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
-                                        />
-                                      </td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </div>
-                            </div>
-                          </div>{" "}
-                        </div>
-                      </>
-                    )}
                   </tr>
                 ))}
               </tbody>

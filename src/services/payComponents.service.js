@@ -14,13 +14,14 @@ async function get(req) {
 }
 
 async function getOne(id) {
+   const childRecord = await prisma.payDetails.count({ where: { payComponentId: parseInt(id) } });
   const data = await prisma.payComponents.findUnique({
     where: {
       id: parseInt(id),
     },
   });
   if (!data) return NoRecordFound("payComponents");
-  return { statusCode: 0, data };
+  return { statusCode: 0, data: { ...data, ...{ childRecord } } };
 }
 
 async function getSearch(req) {

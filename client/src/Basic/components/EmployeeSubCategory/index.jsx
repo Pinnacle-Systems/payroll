@@ -320,7 +320,7 @@ const EmployeeSubCategory = () => {
                             </label>
                             <select
                               ref={employeeRef}
-                              className={`w-full px-2 h-[30px] text-[12px] border border-slate-300 rounded-md 
+                              className={`w-full px-2 h-[27px] text-[12px] border border-slate-300 rounded-md 
   focus:border-indigo-300 focus:outline-none transition-all duration-200
   hover:border-slate-400
   ${

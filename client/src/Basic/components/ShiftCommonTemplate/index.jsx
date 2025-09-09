@@ -67,14 +67,7 @@ const ShiftCommonTemplateMaster = () => {
   const [addData] = useAddShiftCommonTemplateMutation();
   const [updateData] = useUpdateShiftCommonTemplateMutation();
   const [removeData] = useDeleteShiftCommonTemplateMutation();
-  const getNextDocId = useCallback(() => {
-    if (id) return;
-    if (allData?.nextDocId) {
-      setDocId(allData?.nextDocId);
-    }
-  }, [allData, id]);
-
-  useEffect(getNextDocId, [getNextDocId]);
+  
   const syncFormWithDb = useCallback(
     (data) => {
       
@@ -187,7 +180,14 @@ const deleteData = async (id) => {
        }
      }
    };
+const getNextDocId = useCallback(() => {
+    if (id) return;
+    if (allData?.nextDocId) {
+      setDocId(allData?.nextDocId);
+    }
+  }, [allData, id]);
 
+  useEffect(getNextDocId, [getNextDocId]);
   const handleKeyDown = (event) => {
     let charCode = String.fromCharCode(event.which).toLowerCase();
     if ((event.ctrlKey || event.metaKey) && charCode === "s") {
@@ -292,6 +292,7 @@ const deleteData = async (id) => {
               setForm(false);
               setErrors({});
               setId("");
+              setEmployeeCategoryId('')
             }}
           >
             <div className="h-full flex flex-col bg-gray-100">
@@ -356,11 +357,11 @@ const deleteData = async (id) => {
                               Choose Template <span className="text-red-500">*</span>
                             </label>
                             <select
-                              className={`w-full px-2 h-[32px] text-[12px] border border-slate-300 rounded-md 
+                              className={`w-full px-2 h-[28px] text-[12px] border border-slate-300 rounded-md 
   focus:border-indigo-300 focus:outline-none transition-all duration-200
   hover:border-slate-400
   ${
-    readOnly
+    readOnly || childRecord.current > 0
       ? "bg-gray-100 text-gray-500 cursor-not-allowed"
       : "bg-white hover:border-gray-400"
   }`}
@@ -372,7 +373,6 @@ const deleteData = async (id) => {
                             >
                               <option value="">Select Category</option>
 
-                              {console.log(employeeCategory?.data, "dropdown")}
 
                               {employeeCategory?.data?.map((doc) => (
                                 <option value={doc?.id} key={doc.id}>
