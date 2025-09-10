@@ -62,6 +62,7 @@ import { useGetStateQuery } from "../../../redux/services/StateMasterService";
 import { useGetCountriesQuery } from "../../../redux/services/CountryMasterService";
 import { log } from "util";
 import Swal from "sweetalert2";
+import { faL } from "@fortawesome/free-solid-svg-icons";
 
 const MODEL = "Employee Master";
 export default function Form() {
@@ -224,7 +225,7 @@ export default function Form() {
     }
   }, [allData, isLoading, isFetching, id]);
 
-  useEffect(getRegNo, id[(getRegNo, id)]);
+  // useEffect(getRegNo, id[(getRegNo, id)]);
 
   const syncFormWithDb = useCallback(
     (data) => {
@@ -474,7 +475,7 @@ export default function Form() {
           value = data[key];
         }
 
-        console.log("Appending:", key, "=>", value); 
+        console.log("Appending:", key, "=>", value);
         formData.append(key, value);
       }
 
@@ -488,10 +489,10 @@ export default function Form() {
       } else {
         returnData = await callback(formData).unwrap();
       }
-      setId(returnData.data.id);
-
+      setId(returnData?.data?.id);
+      
       setSearchValue("");
-      setStep(1);
+      // setStep(1);
       dispatch({
         type: `EmployeeCategoryMaster/invalidateTags`,
         payload: ["Employee Category"],
@@ -511,6 +512,7 @@ export default function Form() {
         showConfirmButton: false,
         timer: 2000,
       });
+      return returnData;
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -530,30 +532,51 @@ export default function Form() {
       data?.desiginationId &&
       data?.dob &&
       data?.joiningDate &&
-      data?.shiftTemplateId
+      data?.shiftTemplateId &&
+      data?.email
     ) {
       return true;
     }
+
     return false;
   };
-  const saveData = () => {
-    if (!validateData(data)) {
-      Swal.fire({
-        icon: "error",
-        title: "Submission error",
-        text: "Please fill all required fields...!",
-      });
-      return;
-    }
 
-    if (id) {
-      handleSubmitCustom(updateData, data, "Updated");
-    } else {
-      handleSubmitCustom(addData, data, "Added");
-    }
-    setId("");
-    setForm(true);
-  };
+ const saveData = async () => {
+  // Front-end validation
+  if (!validateData(data)) {
+    Swal.fire({
+      icon: "error",
+      title: "Submission error",
+      text: "Please fill all required fields...!",
+    });
+    return;
+  }
+
+  let response;
+  if (id) {
+    response = await handleSubmitCustom(updateData, data, "Updated");
+  } else {
+    response = await handleSubmitCustom(addData, data, "Added");
+  }
+
+  // Handle backend errors like email already exists
+  if (response?.statusCode === 1 && response?.message === "EMAIL Already exists") {
+    Swal.fire({
+      icon: "error",
+      title: "Submission error",
+      text: "Email already exists. Please use a different email.",
+    });
+    setForm(true)
+    return; // Form stays open
+  }
+
+  setId("");
+  setForm(false);
+  setSearchValue("");
+  // setStep(1);
+};
+
+
   const saveDataandExit = async (exitAfterSave = false) => {
     if (!validateData(data)) {
       Swal.fire({
@@ -684,29 +707,25 @@ export default function Form() {
     setPermAddress("");
     setPermCity("");
     setPermPincode("");
-    setPresentAddress(
-      {
-        address: "",
-        cityId: "",
-        village: "",
-        stateId: "",
-        countryId: "",
-        pincode: "",
-        mobile: "",
-      },
-    );
+    setPresentAddress({
+      address: "",
+      cityId: "",
+      village: "",
+      stateId: "",
+      countryId: "",
+      pincode: "",
+      mobile: "",
+    });
     setSameAsPresent(false);
-    setPermanentAddress(
-      {
-        address: "",
-        cityId: "",
-        village: "",
-        stateId: "",
-        countryId: "",
-        pincode: "",
-        mobile: "",
-      },
-    );
+    setPermanentAddress({
+      address: "",
+      cityId: "",
+      village: "",
+      stateId: "",
+      countryId: "",
+      pincode: "",
+      mobile: "",
+    });
 
     // Personal Info
     setAadharNo("");
