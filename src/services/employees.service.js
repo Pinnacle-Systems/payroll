@@ -272,6 +272,7 @@ async function getSearch(req) {
 }
 
 async function create(req) {
+  const image = req.file;
   const {
     branchId,
     employeeType,
@@ -288,10 +289,12 @@ async function create(req) {
     height,
     weight,
     maritalStatus,
+    bloodGroupId,
 
     joiningDate,
     departmentId,
     employeeCategoryId,
+    employeeSubCategoryId,
     payCategory,
     idNumber,
     desiginationId,
@@ -315,7 +318,7 @@ async function create(req) {
     educationDetails,
     familyDetails,
   } = await req.body;
- const presentAddressObj = presentAddress ? JSON.parse(presentAddress) : {};
+  const presentAddressObj = presentAddress ? JSON.parse(presentAddress) : {};
   const permanentAddressObj = permanentAddress
     ? JSON.parse(permanentAddress)
     : {};
@@ -352,7 +355,8 @@ async function create(req) {
       pfNo: pfNo ? pfNo : "",
       email: email ? email : "",
       uanNo: uanNo ? uanNo : "",
-
+      image: image ? image.buffer : null,
+    
       presentAddress: presentAddressObj.address
         ? presentAddressObj.address
         : undefined,
@@ -381,6 +385,7 @@ async function create(req) {
 
       Branch: branchId ? { connect: { id: parseInt(branchId) } } : undefined,
       // shiftTemplateId: shiftTemplateId ? parseInt(shiftTemplateId) : null,
+        BloodGroup: bloodGroupId ? {connect :{id :parseInt(bloodGroupId) }} : undefined,
       shiftTemplate: shiftTemplateId
         ? { connect: { id: parseInt(shiftTemplateId) } }
         : undefined,
@@ -392,6 +397,9 @@ async function create(req) {
         : undefined,
       EmployeeCategory: employeeCategoryId
         ? { connect: { id: parseInt(employeeCategoryId) } }
+        : undefined,
+      EmployeeSubCategory: employeeSubCategoryId
+        ? { connect: { id: parseInt(employeeSubCategoryId) } }
         : undefined,
 
       presentCity: presentAddressObj.cityId
@@ -457,6 +465,7 @@ async function create(req) {
 }
 
 async function update(id, req) {
+  const image = req.file;
   const {
     branchId,
     employeeType,
@@ -473,6 +482,7 @@ async function update(id, req) {
     height,
     weight,
     maritalStatus,
+    bloodGroupId,
 
     joiningDate,
     departmentId,
@@ -493,12 +503,13 @@ async function update(id, req) {
     pfNo,
     uanNo,
     email,
-
+    isDeleteImage,
     presentAddress,
     permanentAddress,
     bankDetails,
     educationDetails,
     familyDetails,
+    employeeSubCategoryId
   } = await req.body;
 
   const presentAddressObj = presentAddress ? JSON.parse(presentAddress) : {};
@@ -513,6 +524,7 @@ async function update(id, req) {
       id: parseInt(id),
     },
   });
+  let removeImage = isDeleteImage ? JSON.parse(isDeleteImage) : false;
   if (!dataFound) return NoRecordFound("Employee");
   const data = await prisma.employee.update({
     where: {
@@ -547,7 +559,8 @@ async function update(id, req) {
       pfNo: pfNo ? pfNo : "",
       email: email ? email : "",
       uanNo: uanNo ? uanNo : "",
-
+      image: image ? image.buffer : removeImage ? null : undefined,
+      BloodGroup: bloodGroupId ? {connect :{id :parseInt(bloodGroupId) }} : undefined,
       presentAddress: presentAddressObj.address
         ? presentAddressObj.address
         : undefined,
@@ -587,6 +600,9 @@ async function update(id, req) {
         : undefined,
       EmployeeCategory: employeeCategoryId
         ? { connect: { id: parseInt(employeeCategoryId) } }
+        : undefined,
+          EmployeeSubCategory: employeeSubCategoryId
+        ? { connect: { id: parseInt(employeeSubCategoryId) } }
         : undefined,
 
       presentCity: presentAddressObj.cityId

@@ -23,6 +23,7 @@ async function get(req) {
 }
 
 async function getOne(id) {
+     const childRecord = await prisma.employee.count({ where: { employeeSubCategoryId: parseInt(id) } });
   const data = await prisma.employeSubCategory.findUnique({
     where: {
       id: parseInt(id),
@@ -36,7 +37,7 @@ async function getOne(id) {
     },
   });
   if (!data) return NoRecordFound("Employee Sub Category");
-  return { statusCode: 0, data };
+   return { statusCode: 0, data: {...data, ...{childRecord}} };
 }
 
 async function getSearch(req) {

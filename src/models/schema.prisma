@@ -65,6 +65,7 @@ model Company {
   EmployeSubCategory  EmployeSubCategory[]
   PayComponents       PayComponents[]
   CompanyPaycode      CompanyPaycode[]
+  BloodGroupMaster    BloodGroupMaster[]
 }
 
 model Subscription {
@@ -111,6 +112,7 @@ model Branch {
   EmployeSubCategory  EmployeSubCategory[]
   PayComponents       PayComponents[]
   CompanyPaycode      CompanyPaycode[]
+  BloodGroupMaster    BloodGroupMaster[]
 }
 
 model UserOnBranch {
@@ -209,6 +211,8 @@ model User {
   PayComponentsupdatedBy       PayComponents[]       @relation(name: "updatedBy")
   CompanyPaycodeCreatedBy      CompanyPaycode[]      @relation(name: "createdBy")
   CompanyPaycodeupdatedBy      CompanyPaycode[]      @relation(name: "updatedBy")
+  BloodGroupMasterCreatedBy    BloodGroupMaster[]    @relation(name: "createdBy")
+  BloodGroupMasterupdatedBy    BloodGroupMaster[]    @relation(name: "updatedBy")
 }
 
 model Employee {
@@ -252,29 +256,29 @@ model Employee {
   presentPincode String?
   presentMobile  String?
 
-  shiftTemplate      ShiftTemplate? @relation(fields: [shiftTemplateId], references: [id])
-  shiftTemplateId    Int?
-  department         Department?    @relation(fields: [departmentId], references: [id])
-  departmentId       Int?
-  designation        Designation?   @relation(fields: [designationId], references: [id])
-  designationId      Int?
-  permanentCity      City?          @relation("permanentCityId", fields: [permanentCityId], references: [id])
-  permanentCityId    Int?
-  presentCity        City?          @relation("presentCityId", fields: [presentCityId], references: [id])
-  presentCityId      Int?
-  presentCountry     Country?       @relation("PresentCountryId", fields: [presentCountryId], references: [id])
-  presentCountryId   Int?
-  permanentCountry   Country?       @relation("PermanentCountryId", fields: [permanentCountryId], references: [id])
-  permanentCountryId Int?
-  presentState       State?         @relation("PresentStateId", fields: [presentStateId], references: [id])
-  presentStateId     Int?
-  permanentState     State?         @relation("PermanentStateId", fields: [permanentStateId], references: [id])
-  permanentStateId   Int?
+  shiftTemplate      ShiftTemplate @relation(fields: [shiftTemplateId], references: [id])
+  shiftTemplateId    Int
+  department         Department    @relation(fields: [departmentId], references: [id])
+  departmentId       Int
+  designation        Designation   @relation(fields: [designationId], references: [id])
+  designationId      Int
+  permanentCity      City          @relation("permanentCityId", fields: [permanentCityId], references: [id])
+  permanentCityId    Int
+  presentCity        City          @relation("presentCityId", fields: [presentCityId], references: [id])
+  presentCityId      Int
+  presentCountry     Country       @relation("PresentCountryId", fields: [presentCountryId], references: [id])
+  presentCountryId   Int
+  permanentCountry   Country       @relation("PermanentCountryId", fields: [permanentCountryId], references: [id])
+  permanentCountryId Int
+  presentState       State         @relation("PresentStateId", fields: [presentStateId], references: [id])
+  presentStateId     Int
+  permanentState     State         @relation("PermanentStateId", fields: [permanentStateId], references: [id])
+  permanentStateId   Int
 
   Branch                   Branch?                    @relation(fields: [branchId], references: [id])
   branchId                 Int?
-  EmployeeCategory         EmployeeCategory?          @relation(fields: [employeeCategoryId], references: [id])
-  employeeCategoryId       Int?
+  EmployeeCategory         EmployeeCategory           @relation(fields: [employeeCategoryId], references: [id])
+  employeeCategoryId       Int
   createdBy                User?                      @relation("createdBy", fields: [createdById], references: [id])
   createdById              Int?
   updatedBy                User?                      @relation("updatedBy", fields: [updatedById], references: [id])
@@ -283,6 +287,12 @@ model Employee {
   EmployeeBankDetails      EmployeeBankDetails[]
   EmployeeEducationdetails EmployeeEducationDetails[]
   EmployeeFamilyDetails    EmployeeFamilyDetails[]
+
+  BloodGroup            BloodGroupMaster   @relation(fields: [bloodGroupId], references: [id])
+  bloodGroupId          Int
+  EmployeeSubCategory   EmployeSubCategory @relation(fields: [employeeSubCategoryId], references: [id])
+  employeeSubCategoryId Int
+  image                 Bytes?             @db.LongBlob
 }
 
 model EmployeeBankDetails {
@@ -1351,6 +1361,7 @@ model EmployeSubCategory {
   employeeCategoryId Int?
   gradeName          String?
   active             Boolean?          @default(true)
+  employee           Employee[]
 }
 
 model PayFrequencyItems {
@@ -1402,7 +1413,7 @@ model CompanyPaycode {
 
 model PayDetails {
   id               Int            @id @default(autoincrement())
-  companyPaycode   CompanyPaycode @relation(fields: [companyPayCodeId], references: [id] , onDelete: Cascade)
+  companyPaycode   CompanyPaycode @relation(fields: [companyPayCodeId], references: [id], onDelete: Cascade)
   companyPayCodeId Int
   payComponent     PayComponents  @relation(fields: [payComponentId], references: [id])
   payComponentId   Int
@@ -1410,4 +1421,23 @@ model PayDetails {
   pf               String?
   esi              String?
   pickFrom         String?
+}
+
+model BloodGroupMaster {
+  id             Int        @id @default(autoincrement())
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  createdBy      User?      @relation("createdBy", fields: [createdById], references: [id])
+  createdById    Int?
+  updatedBy      User?      @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById    Int?
+  companyId      Int?
+  company        Company?   @relation(fields: [companyId], references: [id])
+  branch         Branch?    @relation(fields: [branchId], references: [id])
+  branchId       Int?
+  bloodGroupName String?
+  postive        String?
+  bgFamily       String?
+  active         Boolean?   @default(true)
+  employee       Employee[]
 }

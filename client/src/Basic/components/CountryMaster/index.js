@@ -308,6 +308,8 @@ export default function Form() {
           .sort((a, b) => a.label.localeCompare(b.label));
 
         setCountries(formatted);
+        console.log(data,"data---");
+        
       })
       .catch(console.error);
   }, []);

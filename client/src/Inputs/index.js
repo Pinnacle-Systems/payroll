@@ -1213,7 +1213,7 @@ export const TextInput = forwardRef(({
         disabled={disabled}
         tabIndex={tabIndex ?? undefined}
 
-        className={`w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
+        className={`w-full px-2 py-1 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
           ${readOnly || disabled
@@ -1526,7 +1526,7 @@ export const DropdownInput = ({
         defaultValue={defaultValue}
         required={required}
         readOnly={readOnly}
-        className={`w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
+        className={`w-full px-2 py-1 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
           ${isDisabled
@@ -1771,10 +1771,15 @@ export const DateInput = ({
 }) => {
   return (
     <div className="flex flex-col gap-1 w-full">
-      <label className="block text-xs font-bold text-slate-700 ">
-
-        {inputHead ?? name}
-      </label>
+        {name && (
+        <label className="block text-xs font-bold text-slate-700">
+          {required ? (
+            <RequiredLabel name={inputHead ?? name} />
+          ) : (
+            inputHead ?? name
+          )}
+        </label>
+      )}
 
       <div className="relative">
         <input

@@ -1,69 +1,63 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import secureLocalStorage from "react-secure-storage";
 import {
-  useGetDepartmentQuery,
-  useGetDepartmentByIdQuery,
-  useAddDepartmentMutation,
-  useUpdateDepartmentMutation,
-  useDeleteDepartmentMutation,
-} from "../../../redux/services/DepartmentMasterService";
-import FormHeader from "../FormHeader";
-import FormReport from "../FormReportTemplate";
-import { toast } from "react-toastify";
+useGetBloodGroupQuery,
+  useGetBloodGroupByIdQuery,
+  useAddBloodGroupMutation,
+  useUpdateBloodGroupMutation,
+  useDeleteBloodGroupMutation,
+} from "../../../redux/services/BloodGroupService";
+
 import {
   TextInput,
-  CheckBox,
   ToggleButton,
   ReusableTable,
+  DropdownInput,
 } from "../../../Inputs";
-import ReportTemplate from "../ReportTemplate";
-import Mastertable from "../MasterTable/Mastertable";
-import MastersForm from "../MastersForm/MastersForm";
-import { statusDropdown } from "../../../Utils/DropdownData";
-import { useGetdesignationByIdQuery } from "../../../redux/services/DesignationMasterService";
+
+import { bloodGrouptype, statusDropdown } from "../../../Utils/DropdownData";
+
 import { Check, Power } from "lucide-react";
 import Modal from "../../../UiComponents/Modal";
 import Swal from "sweetalert2";
-const MODEL = "Department Master";
+import { getCommonParams } from "../../../Utils/helper";
 
 export default function Form() {
-  // const [openTable, setOpenTable] = useState(false);
-
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
-  const [name, setName] = useState("");
-  const [code, setCode] = useState("");
+  const [bloodGroupName, setBloodGroupName] = useState("");
+  const [postive, setPositive] = useState("");
+  const [bgFamily, setBgFamily] = useState("");
   const [active, setActive] = useState(true);
   const [errors, setErrors] = useState({});
+
   const [form, setForm] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
- const departmentNameref = useRef(null);
-  console.log(form, "form");
-  const params = {
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
-  };
-  const { data: allData } = useGetDepartmentQuery({
+  const bloodGroupNameref = useRef(null);
+
+  const params = getCommonParams();
+  const { data: allData } = useGetBloodGroupQuery({
     params,
     searchParams: searchValue,
   });
+  const { branchId } = params;
   const {
     data: singleData,
     isFetching: isSingleFetching,
     isLoading: isSingleLoading,
-  } = useGetDepartmentByIdQuery(id, { skip: !id });
+  } = useGetBloodGroupByIdQuery(id, { skip: !id });
 
-  const [addData] = useAddDepartmentMutation();
-  const [updateData] = useUpdateDepartmentMutation();
-  const [removeData] = useDeleteDepartmentMutation();
+  const [addData] = useAddBloodGroupMutation();
+  const [updateData] = useUpdateBloodGroupMutation();
+  const [removeData] = useDeleteBloodGroupMutation();
 
   const syncFormWithDb = useCallback(
     (data) => {
       // setReadOnly(true);
-      setName(data?.name || "");
-      setCode(data?.code || "");
+      setBloodGroupName(data?.bloodGroupName || "");
+      setPositive(data?.postive || "");
+      setBgFamily(data?.bgFamily || "");
       setActive(id ? data?.active ?? false : true);
       childRecord.current = data?.childRecord ? data?.childRecord : 0;
     },
@@ -74,29 +68,29 @@ export default function Form() {
     syncFormWithDb(singleData?.data);
   }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
 
-  console.log(singleData?.data, "singleData?.data");
-
   const data = {
-    name,
-    code,
+    bloodGroupName,
+    postive,
+    bgFamily,
     active,
     companyId: secureLocalStorage.getItem(
       sessionStorage.getItem("sessionId") + "userCompanyId"
     ),
     id,
+    branchId,
   };
 
   const validateData = (data) => {
-    if (data.name) {
+    if (data?.bloodGroupName && data?.postive) {
       return true;
     }
     return false;
   };
-   useEffect(() => {
-     if (form && !readOnly && departmentNameref.current) {
-       departmentNameref.current.focus();
-     }
-   }, [form, readOnly]);
+  useEffect(() => {
+    if (form && !readOnly && bloodGroupNameref.current) {
+      bloodGroupNameref.current.focus();
+    }
+  }, [form, readOnly]);
   const handleSubmitCustom = async (callback, data, text) => {
     try {
       let returnData = await callback(data).unwrap();
@@ -138,13 +132,13 @@ export default function Form() {
     }
   };
 
- const deleteData = async (id) => {
+  const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
         return;
       }
       try {
-        let deldata = await removeData(id).unwrap();
+        const deldata = await removeData(id).unwrap();
         if (deldata?.statusCode == 1) {
           Swal.fire({
             icon: "error",
@@ -166,7 +160,6 @@ export default function Form() {
           title: "Submission error",
           text: error.data?.message || "Something went wrong!",
         });
-        setForm(false);
       }
     }
   };
@@ -181,53 +174,23 @@ export default function Form() {
 
   const onNew = () => {
     setId("");
-    setName("");
-    setCode("");
+    setBloodGroupName("");
+    setPositive("");
+    setBgFamily('')
     setActive(true);
     setReadOnly(false);
     setForm(true);
     setSearchValue("");
   };
 
-  function onDataClick(id) {
-    setId(id);
-    setForm(true);
-  }
+  useEffect(() => {
+    if (bloodGroupName && postive) {
+      setBgFamily(`${bloodGroupName} ${postive}`);
+    } else {
+      setBgFamily("");
+    }
+  }, [bloodGroupName, postive]);
 
-  const tableHeaders = [
-    "S.NO",
-    "Code",
-    "Name",
-    "Status",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-  ];
-  const tableDataNames = [
-    "index+1",
-    "dataObj.code",
-    "dataObj.name",
-    "dataObj.active ? ACTIVE : INACTIVE",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-  ];
   const ACTIVE = (
     <div className="bg-gradient-to-r from-green-200 to-green-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-green-500 shadow-lg text-white hover:scale-110 transition-transform duration-300">
       <Power size={10} />
@@ -246,10 +209,10 @@ export default function Form() {
     },
 
     {
-      header: "Department Name",
-      accessor: (item) => item?.name,
+      header: "Blood Group",
+      accessor: (item) => item?.bgFamily,
       //   cellClass: () => "font-medium  text-gray-900",
-      className: " text-gray-900 text-left pl-2 uppercase w-72",
+      className: " text-gray-900 text-left pl-2  w-30",
     },
 
     {
@@ -274,7 +237,7 @@ export default function Form() {
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
       <div className="w-full flex bg-white p-1 justify-between  items-center">
-        <h1 className="text-2xl font-bold text-gray-800">Department Master</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Blood Group Master</h1>
         <div className="flex items-center">
           <button
             onClick={() => {
@@ -283,23 +246,11 @@ export default function Form() {
             }}
             className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
           >
-            + Add New Department
+            + Add New Blood Group
           </button>
         </div>
       </div>
-      {/* <div className="w-full flex items-start">
-        <Mastertable
-          header={"Department list"}
-          searchValue={searchValue}
-          setSearchValue={setSearchValue}
-          onDataClick={onDataClick}
-          // setOpenTable={setOpenTable}
-          tableHeaders={tableHeaders}
-          tableDataNames={tableDataNames}
-          data={allData?.data}
-          loading={isLoading || isFetching}
-        />
-      </div> */}
+
       <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-3">
         <ReusableTable
           columns={columns}
@@ -325,7 +276,7 @@ export default function Form() {
             <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
               <div className="flex items-center gap-2">
                 <h2 className="text-lg  py-0.5 font-semibold  text-gray-800">
-                  Department Master
+                  Blood Group Master
                 </h2>
               </div>
               <div className="flex gap-2">
@@ -364,28 +315,38 @@ export default function Form() {
                   <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
                     <div className="space-y-4 ">
                       <div className="flex flex-wrap">
-                        <div className="mb-3 w-72">
+                        <div className="mb-3 w-32">
                           <TextInput
-                            name="Department Name"
+                            name="Blood Group Name"
                             type="text"
-                            value={name}
-                            setValue={setName}
+                            value={bloodGroupName}
+                            setValue={setBloodGroupName}
                             required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
-                             ref={departmentNameref}
+                            ref={bloodGroupNameref}
                           />
                         </div>
-                        <div className="mb-3 w-[20%] ml-6">
-                          <TextInput
-                            name="Code"
-                            type="text"
-                            value={code}
-                            setValue={setCode}
-                            // required={true}
+                        <div className="mb-3 w-28 ml-6">
+                          <DropdownInput
+                            name="Type"
+                            value={postive}
+                            setValue={setPositive}
+                            options={bloodGrouptype}
                             readOnly={readOnly}
+                            required={true}
                             disabled={childRecord.current > 0}
-                            
+                          />
+                        </div>
+                        <div className="mb-3 w-32 ml-6">
+                          <TextInput
+                            name="Blood Group Family"
+                            type="text"
+                            value={bgFamily}
+                            setValue={setBgFamily}
+                            required={true}
+                            readOnly={true}
+                            disabled={childRecord.current > 0}
                           />
                         </div>
                       </div>

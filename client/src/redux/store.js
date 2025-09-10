@@ -30,6 +30,7 @@ import {
   payFrequencyApi,
   payComponentApi,
   companyPayCodeApi,
+  bloodGroupApi,
 
 } from "./services"
 import projectPaymentFormApi from "./services/ProjectPaymentService";
@@ -171,6 +172,7 @@ const commonReducers = {
   [employeeSubCategoryApi.reducerPath]: employeeSubCategoryApi.reducer,
   [payComponentApi.reducerPath]:payComponentApi.reducer,
   [companyPayCodeApi.reducerPath]:companyPayCodeApi.reducer,
+  [bloodGroupApi.reducerPath]:bloodGroupApi.reducer,
 
 
 }
@@ -270,6 +272,7 @@ employeeSubCategoryApi.middleware,
 payFrequencyApi.middleware,
 payComponentApi.middleware,
 companyPayCodeApi.middleware,
+bloodGroupApi.middleware,
 ];
 
 

@@ -236,7 +236,7 @@ const getNextDocId = useCallback(() => {
 
     {
       header: "Common Template Name",
-      accessor: (item) => item?.employeeCategory.name,
+      accessor: (item) => item?.employeeCategory?.name,
       //   cellClass: () => "  text-gray-900",
       className: " text-gray-900 text-center uppercase w-72",
     },

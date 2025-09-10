@@ -53,6 +53,7 @@ import {
   Table,
   X,
 } from "lucide-react";
+import { useGetBloodGroupQuery } from "../../../redux/services/BloodGroupService";
 import Mastertable from "../MasterTable/Mastertable";
 import imageDefault from "../../../assets/default-dp.png";
 import { HiPlus } from "react-icons/hi";
@@ -63,7 +64,9 @@ import { useGetCountriesQuery } from "../../../redux/services/CountryMasterServi
 import { log } from "util";
 import Swal from "sweetalert2";
 import { faL } from "@fortawesome/free-solid-svg-icons";
-
+import { FaQuestionCircle, FaUpload } from "react-icons/fa";
+import { getImageUrlPath } from "../../../Constants";
+import { useGetemployeeSubCategoryQuery } from "../../../redux/services/EmployeeSubCategoryservice";
 const MODEL = "Employee Master";
 export default function Form() {
   const [view, setView] = useState("table");
@@ -97,6 +100,7 @@ export default function Form() {
   const [ifscNo, setIfscNo] = useState("");
   const [branchName, setBranchName] = useState("");
   const [bloodGroup, setBloodGroup] = useState("");
+  const [bloodGroupId, setBloodGroupId] = useState("");
   // const [department, setDepartment] = useState("");
   const [employeeCategoryId, setEmployeeCategoryId] = useState("");
   const [permanent, setPermanent] = useState("");
@@ -138,7 +142,17 @@ export default function Form() {
   const [bankDetails, setBankDetails] = useState([]);
   const [educationDetails, setEducationDetails] = useState([]);
   const [familyDetails, setFamilyDetails] = useState([]);
-
+  const [employeeSubCategoryId,setEmployeeSubCategoryId] = useState('')
+  const [open, setOpen] = useState(false);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [imageRemoved, setImageRemoved] = useState(false);
+  // const [readOnly, setReadOnly] = useState(false)
+  // const [id, setId] = useState("");
+  const [showImageTooltip, setShowImageTooltip] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  // const [mode, setMode] = useState('view')
+  const fileInputRef = useRef(null);
   const [presentAddress, setPresentAddress] = useState({
     address: "",
     cityId: "",
@@ -189,8 +203,10 @@ export default function Form() {
   const { data: employeeCategoryList } = useGetEmployeeCategoryQuery({
     params: companyId,
   });
-
+ const { data : employeeSubCategoryList} = useGetemployeeSubCategoryQuery({params})
   const { data: desigination } = useGetdesignationQuery({ params });
+
+  const { data: bloodGroupList } = useGetBloodGroupQuery({ params });
 
   const { data: department } = useGetDepartmentQuery({ params });
   const {
@@ -243,7 +259,7 @@ export default function Form() {
       setDisability(data?.disability || "");
       setHeight(data?.height || "");
       setWeight(data?.weight || "");
-      setBloodGroup(data?.bloodGroup);
+      setBloodGroupId(data?.bloodGroupId);
 
       // IDs & Numbers
       setPanNo(data?.panNo || "");
@@ -260,6 +276,7 @@ export default function Form() {
       // Employment Info
       setDepartmentId(data?.departmentId || "");
       setShiftTemplateId(data?.shiftTemplateId || "");
+      setEmployeeSubCategoryId(data?.employeeSubCategoryId || "")
       setEmployeeCategoryId(data?.employeeCategoryId || "");
       setPayCategory(data?.payCategory || "");
       setSalary(data?.salary || "");
@@ -355,33 +372,33 @@ export default function Form() {
     [id]
   );
 
-  const cleanData = (obj) => {
-    if (Array.isArray(obj)) {
-      return obj.map(cleanData); // process each item
-    }
-    if (!obj || typeof obj !== "object") return obj;
+  // const cleanData = (obj) => {
+  //   if (Array.isArray(obj)) {
+  //     return obj.map(cleanData); // process each item
+  //   }
+  //   if (!obj || typeof obj !== "object") return obj;
 
-    return Object.fromEntries(
-      Object.entries(obj).map(([key, value]) => {
-        if (typeof value === "string") {
-          // Remove surrounding quotes and any extra quotes inside
-          let cleaned = value.replace(/^"+|"+$/g, ""); // remove leading/trailing quotes
-          cleaned = cleaned.replace(/"+/g, ""); // remove remaining quotes inside
-          return [key, cleaned];
-        } else if (typeof value === "object" && value !== null) {
-          return [key, cleanData(value)]; // recurse
-        }
-        return [key, value];
-      })
-    );
-  };
+  //   return Object.fromEntries(
+  //     Object.entries(obj).map(([key, value]) => {
+  //       if (typeof value === "string") {
+  //         // Remove surrounding quotes and any extra quotes inside
+  //         let cleaned = value.replace(/^"+|"+$/g, ""); // remove leading/trailing quotes
+  //         cleaned = cleaned.replace(/"+/g, ""); // remove remaining quotes inside
+  //         return [key, cleaned];
+  //       } else if (typeof value === "object" && value !== null) {
+  //         return [key, cleanData(value)]; // recurse
+  //       }
+  //       return [key, value];
+  //     })
+  //   );
+  // };
 
   useEffect(() => {
     if (singleData?.data) {
-      const cleanedData = cleanData(singleData?.data);
-      console.log(cleanedData, "cleanedData");
-
-      syncFormWithDb(cleanedData);
+      // const cleanedData = cleanData(singleData?.data);
+      // console.log(cleanedData, "cleanedData");
+      syncFormWithDb(singleData?.data);
+      // syncFormWithDb(cleanedData);
     }
   }, [singleData, syncFormWithDb]);
 
@@ -402,7 +419,7 @@ export default function Form() {
     disability,
     identificationMark,
 
-    bloodGroup,
+    bloodGroupId,
     maritalStatus,
     height,
     weight,
@@ -410,6 +427,7 @@ export default function Form() {
     joiningDate,
     departmentId,
     employeeCategoryId,
+    employeeSubCategoryId,
     payCategory,
     idNumber,
     desiginationId,
@@ -429,7 +447,7 @@ export default function Form() {
 
     presentAddress,
     permanentAddress: sameAsPresent ? presentAddress : permanentAddress,
-
+    image,
     // chamberNo,
     // localAddress,
     // localCity,
@@ -490,7 +508,7 @@ export default function Form() {
         returnData = await callback(formData).unwrap();
       }
       setId(returnData?.data?.id);
-      
+
       setSearchValue("");
       // setStep(1);
       dispatch({
@@ -527,55 +545,70 @@ export default function Form() {
     console.log(data, "data--");
 
     if (
+      data?.employeeType &&
       data?.firstName &&
-      data?.departmentId &&
-      data?.desiginationId &&
       data?.dob &&
+      data?.gender &&
+      data?.disability &&
+      data?.bloodGroupId &&
       data?.joiningDate &&
+      data?.departmentId &&
+      data?.employeeCategoryId &&
+      data?.desiginationId &&
       data?.shiftTemplateId &&
-      data?.email
+      data?.email &&
+      data?.presentAddress.cityId &&
+      data?.permanentAddress.cityId &&
+      data?.presentAddress.stateId &&
+      data?.permanentAddress.stateId &&
+      data?.presentAddress.countryId &&
+      data?.permanentAddress.countryId &&
+      data?.employeeSubCategoryId
     ) {
       return true;
     }
 
     return false;
   };
+  console.log(image, "setted");
 
- const saveData = async () => {
-  // Front-end validation
-  if (!validateData(data)) {
-    Swal.fire({
-      icon: "error",
-      title: "Submission error",
-      text: "Please fill all required fields...!",
-    });
-    return;
-  }
+  const saveData = async () => {
+    // Front-end validation
+    if (!validateData(data)) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Please fill all required fields...!",
+      });
+      return;
+    }
 
-  let response;
-  if (id) {
-    response = await handleSubmitCustom(updateData, data, "Updated");
-  } else {
-    response = await handleSubmitCustom(addData, data, "Added");
-  }
+    let response;
+    if (id) {
+      response = await handleSubmitCustom(updateData, data, "Updated");
+    } else {
+      response = await handleSubmitCustom(addData, data, "Added");
+    }
 
-  // Handle backend errors like email already exists
-  if (response?.statusCode === 1 && response?.message === "EMAIL Already exists") {
-    Swal.fire({
-      icon: "error",
-      title: "Submission error",
-      text: "Email already exists. Please use a different email.",
-    });
-    setForm(true)
-    return; // Form stays open
-  }
+    // Handle backend errors like email already exists
+    if (
+      response?.statusCode === 1 &&
+      response?.message === "EMAIL Already exists"
+    ) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Email already exists. Please use a different email.",
+      });
+      setForm(true);
+      return; // Form stays open
+    }
 
-  setId("");
-  setForm(false);
-  setSearchValue("");
-  // setStep(1);
-};
-
+    setId("");
+    setForm(false);
+    setSearchValue("");
+    // setStep(1);
+  };
 
   const saveDataandExit = async (exitAfterSave = false) => {
     if (!validateData(data)) {
@@ -675,10 +708,11 @@ export default function Form() {
 
     setMaritalStatus("");
     setRegNo("");
-    setBloodGroup("");
-
+    setBloodGroupId("");
+    setImage(null);
     // Employment Info
     setShiftTemplateId("");
+    setEmployeeSubCategoryId('')
     setPf("");
     setEsi("");
     setSalary("");
@@ -970,6 +1004,27 @@ export default function Form() {
     console.log("Edit");
     setStep("Basic Details");
   };
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    setImageRemoved(true);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    console.log(imageFile, "Image file");
+  };
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size <= 5 * 1024 * 1024) {
+      setImageFile(file);
+      console.log(imageFile, "Imageset");
+      setImageRemoved(false);
+
+      const reader = new FileReader();
+      reader.onloadend = () => setImagePreview(reader.result);
+      reader.readAsDataURL(file);
+    } else {
+      alert("Please select an image under 5MB.");
+    }
+  };
   const columns = [
     {
       header: "S.No",
@@ -1232,8 +1287,18 @@ export default function Form() {
               <div className="grid grid-cols-1 gap-2 h-[90%] mt-2 overflow-y-auto">
                 {step === "Basic Details" && (
                   <div className=" bg-white p-3 rounded-md border border-gray-200 overflow-y-auto">
-                    {/* <h1 className=" text-gray-800 mb-2 ">Basic Details</h1> */}
-                    <div className="grid grid-cols-6 gap-4 ">
+                    <div className="flex gap-x-8">
+                          <SingleImageFileUploadComponent
+                        setWebCam={setCameraOpen}
+                        disabled={readOnly}
+                        image={image}
+                        setImage={setImage}
+                        className="mb-3"
+                      />
+                    
+                    
+                    <div className=" ml-3 grid grid-cols-5 gap-4 ">
+                       
                       <div className="col-span-1">
                         <DropdownInput
                           ref={input1Ref}
@@ -1246,11 +1311,6 @@ export default function Form() {
                           disabled={childRecord.current > 0}
                           onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                         />
-                        {errors.name && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.name}
-                          </span>
-                        )}
                       </div>
                       <div className="col-span-1">
                         <TextInput
@@ -1263,11 +1323,6 @@ export default function Form() {
                           disabled={childRecord.current > 0}
                           onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                         />
-                        {errors.name && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.name}
-                          </span>
-                        )}
                       </div>{" "}
                       <div className="col-span-1">
                         <TextInput
@@ -1280,11 +1335,6 @@ export default function Form() {
                           disabled={childRecord.current > 0}
                           onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                         />
-                        {errors.name && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.name}
-                          </span>
-                        )}
                       </div>{" "}
                       <div className="col-span-1">
                         <TextInput
@@ -1297,11 +1347,6 @@ export default function Form() {
                           disabled={childRecord.current > 0}
                           onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                         />
-                        {errors.name && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.name}
-                          </span>
-                        )}
                       </div>
                       <div className="col-span-1">
                         <TextInput
@@ -1314,11 +1359,6 @@ export default function Form() {
                           disabled={childRecord.current > 0}
                           onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                         />
-                        {errors.name && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.name}
-                          </span>
-                        )}
                       </div>{" "}
                       <div className="col-span-1">
                         <TextInput
@@ -1331,11 +1371,6 @@ export default function Form() {
                           disabled={childRecord.current > 0}
                           onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                         />
-                        {errors.name && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.name}
-                          </span>
-                        )}
                       </div>{" "}
                       <div className="col-span-1">
                         <DateInput
@@ -1348,11 +1383,6 @@ export default function Form() {
                           disabled={childRecord.current > 0}
                           onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                         />
-                        {errors.name && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.name}
-                          </span>
-                        )}
                       </div>{" "}
                       <div className="col-span-1">
                         <DropdownInput
@@ -1366,11 +1396,6 @@ export default function Form() {
                           disabled={childRecord.current > 0}
                           onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                         />
-                        {errors.name && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.name}
-                          </span>
-                        )}
                       </div>{" "}
                       <div className="col-span-1">
                         <DropdownInput
@@ -1384,11 +1409,6 @@ export default function Form() {
                           disabled={childRecord.current > 0}
                           onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                         />
-                        {errors.name && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.name}
-                          </span>
-                        )}
                       </div>{" "}
                       <div className="col-span-1">
                         <TextInput
@@ -1401,29 +1421,23 @@ export default function Form() {
                           disabled={childRecord.current > 0}
                           onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                         />
-                        {errors.name && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.name}
-                          </span>
-                        )}
                       </div>{" "}
                       <div className="col-span-1">
                         <DropdownInput
                           ref={input1Ref}
-                          name="Blood Group"
-                          value={bloodGroup}
-                          setValue={setBloodGroup}
-                          options={bloodList}
-                          // required={true}
+                          name=" Blood Group"
+                          value={bloodGroupId}
+                          setValue={setBloodGroupId}
+                          options={dropDownListObject(
+                            bloodGroupList?.data,
+                            "bgFamily",
+                            "id"
+                          )}
+                          required={true}
                           readOnly={readOnly}
                           disabled={childRecord.current > 0}
                           onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                         />
-                        {errors.name && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.name}
-                          </span>
-                        )}
                       </div>{" "}
                       <div className="col-span-1">
                         <DropdownInput
@@ -1437,11 +1451,6 @@ export default function Form() {
                           disabled={childRecord.current > 0}
                           onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                         />
-                        {errors.name && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.name}
-                          </span>
-                        )}
                       </div>
                       <div className="col-span-1">
                         <TextInput
@@ -1454,11 +1463,6 @@ export default function Form() {
                           disabled={childRecord.current > 0}
                           onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                         />
-                        {errors.name && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.name}
-                          </span>
-                        )}
                       </div>{" "}
                       <div className="col-span-1">
                         <TextInput
@@ -1471,12 +1475,19 @@ export default function Form() {
                           disabled={childRecord.current > 0}
                           onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                         />
-                        {errors.name && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.name}
-                          </span>
-                        )}
-                      </div>{" "}
+                      </div>
+                      
+                      <Modal
+                        isOpen={cameraOpen}
+                        onClose={() => setCameraOpen(false)}
+                      >
+                        <LiveWebCam
+                          picture={image}
+                          setPicture={setImage}
+                          onClose={() => setCameraOpen(false)}
+                        />
+                      </Modal>
+                    </div>
                     </div>
                   </div>
                 )}
@@ -1496,11 +1507,6 @@ export default function Form() {
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
                           />
-                          {errors.joiningDate && (
-                            <span className="text-red-500 text-xs ml-1">
-                              {errors.joiningDate}
-                            </span>
-                          )}
                         </div>
                         <div className="col-span-1">
                           <DropdownInput
@@ -1513,16 +1519,11 @@ export default function Form() {
                               "name",
                               "id"
                             )}
-                            // required={true}
+                            required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
-                          {errors.name && (
-                            <span className="text-red-500 text-xs ml-1">
-                              {errors.name}
-                            </span>
-                          )}
                         </div>
 
                         <div className="col-span-1">
@@ -1536,16 +1537,28 @@ export default function Form() {
                               "name",
                               "id"
                             )}
-                            // required={true}
+                            required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
-                          {errors.name && (
-                            <span className="text-red-500 text-xs ml-1">
-                              {errors.name}
-                            </span>
-                          )}
+                        </div>
+                        <div className="col-span-1">
+                          <DropdownInput
+                            ref={input1Ref}
+                            name="Employee Sub Category"
+                            value={employeeSubCategoryId}
+                            setValue={setEmployeeSubCategoryId}
+                            options={dropDownListObject(
+                              employeeSubCategoryList?.data,
+                              "gradeName",
+                              "id"
+                            )}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
                         </div>
                         <div className="col-span-1">
                           <TextInput
@@ -1553,16 +1566,11 @@ export default function Form() {
                             name="Pay Category"
                             value={payCategory}
                             setValue={setPayCategory}
-                            required={true}
+                            // required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
-                          {errors.name && (
-                            <span className="text-red-500 text-xs ml-1">
-                              {errors.name}
-                            </span>
-                          )}
                         </div>
                         <div className="col-span-1">
                           <TextInput
@@ -1570,16 +1578,11 @@ export default function Form() {
                             name="Id Card Number"
                             value={idNumber}
                             setValue={setIdNumber}
-                            required={true}
+                            // required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
-                          {errors.name && (
-                            <span className="text-red-500 text-xs ml-1">
-                              {errors.name}
-                            </span>
-                          )}
                         </div>
 
                         <div className="col-span-1">
@@ -1593,16 +1596,11 @@ export default function Form() {
                               "name",
                               "id"
                             )}
-                            // required={true}
+                            required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
-                          {errors.name && (
-                            <span className="text-red-500 text-xs ml-1">
-                              {errors.name}
-                            </span>
-                          )}
                         </div>
 
                         <div className="col-span-1">
@@ -1616,16 +1614,11 @@ export default function Form() {
                               "docId",
                               "id"
                             )}
-                            // required={true}
+                            required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
-                          {errors.name && (
-                            <span className="text-red-500 text-xs ml-1">
-                              {errors.name}
-                            </span>
-                          )}
                         </div>
                         <div className="col-span-1">
                           <DropdownInput
@@ -1633,17 +1626,12 @@ export default function Form() {
                             name="PF (Y/N)"
                             value={pf}
                             setValue={setPf}
-                            required={true}
+                            // required={true}
                             options={common}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
-                          {errors.name && (
-                            <span className="text-red-500 text-xs ml-1">
-                              {errors.name}
-                            </span>
-                          )}
                         </div>
 
                         <div className="col-span-1">
@@ -1652,17 +1640,12 @@ export default function Form() {
                             name="ESI (Y/N)"
                             value={esi}
                             setValue={setEsi}
-                            required={true}
+                            // required={true}
                             options={common}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
-                          {errors.name && (
-                            <span className="text-red-500 text-xs ml-1">
-                              {errors.name}
-                            </span>
-                          )}
                         </div>
 
                         <div className="col-span-1">
@@ -1671,16 +1654,11 @@ export default function Form() {
                             name="Salary"
                             value={salary}
                             setValue={setSalary}
-                            required={true}
+                            // required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
-                          {errors.name && (
-                            <span className="text-red-500 text-xs ml-1">
-                              {errors.name}
-                            </span>
-                          )}
                         </div>
                         <div className="col-span-1">
                           <DropdownInput
@@ -1689,16 +1667,11 @@ export default function Form() {
                             value={salaryMethod}
                             setValue={setSalaryMethod}
                             options={SalaryMethod}
-                            required={true}
+                            // required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
-                          {errors.name && (
-                            <span className="text-red-500 text-xs ml-1">
-                              {errors.name}
-                            </span>
-                          )}
                         </div>
                       </div>
                     </div>
@@ -1715,15 +1688,9 @@ export default function Form() {
                           name="Religion"
                           value={religion}
                           setValue={setReligion}
-                          required
                           readOnly={readOnly}
                           disabled={childRecord.current > 0}
                         />
-                        {errors.fatherName && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.fatherName}
-                          </span>
-                        )}
                       </div>
                       <div className="col-span-1">
                         <TextInput
@@ -1731,7 +1698,6 @@ export default function Form() {
                           name="Adhaar No"
                           value={aadharNo}
                           setValue={setAadharNo}
-                          required={true}
                           readOnly={readOnly}
                           disabled={childRecord.current > 0}
                           onKeyDown={(e) => handleKeyNext(e, input2Ref)}
@@ -1747,75 +1713,53 @@ export default function Form() {
                           name="Pan No"
                           value={panNo}
                           setValue={setPanNo}
-                          required
                           readOnly={readOnly}
                           disabled={childRecord.current > 0}
                         />
-                        {errors.fatherName && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.fatherName}
-                          </span>
-                        )}
                       </div>
                       <div>
                         <TextInput
                           name="ESI No"
                           value={esiNo}
                           setValue={setEsiNo}
-                          required
                           readOnly={readOnly}
                           disabled={childRecord.current > 0}
                         />
-                        {errors.fatherName && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.fatherName}
-                          </span>
-                        )}
                       </div>
                       <div>
                         <TextInput
                           name="PF No"
                           value={pfNo}
                           setValue={setPfNo}
-                          required
                           readOnly={readOnly}
                           disabled={childRecord.current > 0}
                         />
-                        {errors.fatherName && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.fatherName}
-                          </span>
-                        )}
                       </div>
                       <div>
                         <TextInput
                           name="UAN No (PF)"
                           value={uanNo}
                           setValue={setUanNo}
-                          required
                           readOnly={readOnly}
                           disabled={childRecord.current > 0}
                         />
-                        {errors.fatherName && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.fatherName}
-                          </span>
-                        )}
                       </div>
                       <div>
-                        <TextInput
-                          name="Email"
+                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                          Email <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          name="email"
                           value={email}
-                          setValue={setEmail}
-                          required
+                          onChange={(e) => {
+                            setEmail(e.target.value);
+                          }}
                           readOnly={readOnly}
+                          className={`w-full px-2 py-1 text-xs border border-gray-300 rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm`}
                           disabled={childRecord.current > 0}
                         />
-                        {errors.fatherName && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.fatherName}
-                          </span>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -1836,7 +1780,6 @@ export default function Form() {
                               setValue={(val) =>
                                 handlePresentChange("address", val)
                               }
-                              required
                               readOnly={readOnly}
                               disabled={childRecord.current > 0}
                             />
@@ -1853,7 +1796,6 @@ export default function Form() {
                               setValue={(val) =>
                                 handlePresentChange("village", val)
                               }
-                              required
                               readOnly={readOnly}
                               disabled={childRecord.current > 0}
                             />
@@ -1940,7 +1882,6 @@ export default function Form() {
                               setValue={(val) =>
                                 handlePresentChange("pincode", val)
                               }
-                              required
                               readOnly={readOnly}
                               disabled={childRecord.current > 0}
                             />
@@ -1952,7 +1893,6 @@ export default function Form() {
                               setValue={(val) =>
                                 handlePresentChange("mobile", val)
                               }
-                              required
                               readOnly={readOnly}
                               disabled={childRecord.current > 0}
                             />
@@ -1984,7 +1924,6 @@ export default function Form() {
                               setValue={(val) =>
                                 handlePermanentChange("address", val)
                               }
-                              required
                               readOnly={readOnly}
                               disabled={
                                 childRecord.current > 0 || sameAsPresent
@@ -1998,7 +1937,6 @@ export default function Form() {
                               setValue={(val) =>
                                 handlePermanentChange("village", val)
                               }
-                              required
                               readOnly={readOnly}
                               disabled={
                                 childRecord.current > 0 || sameAsPresent
@@ -2067,7 +2005,6 @@ export default function Form() {
                               setValue={(val) =>
                                 handlePermanentChange("pincode", val)
                               }
-                              required
                               readOnly={readOnly}
                               disabled={
                                 childRecord.current > 0 || sameAsPresent
@@ -2081,7 +2018,6 @@ export default function Form() {
                               setValue={(val) =>
                                 handlePermanentChange("mobile", val)
                               }
-                              required
                               readOnly={readOnly}
                               disabled={
                                 childRecord.current > 0 || sameAsPresent
@@ -2605,14 +2541,6 @@ export default function Form() {
               </div>
             </div>
           </div>
-
-          <Modal isOpen={cameraOpen} onClose={() => setCameraOpen(false)}>
-            <LiveWebCam
-              picture={image}
-              setPicture={setImage}
-              onClose={() => setCameraOpen(false)}
-            />
-          </Modal>
 
           <Modal isOpen={leavingForm} onClose={() => setLeavingForm(false)}>
             <EmployeeLeavingForm

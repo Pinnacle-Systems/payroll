@@ -29,6 +29,7 @@ import {
   EmployeeSubCategory,
   PayComponents,
   CompanyPaycode,
+  BloodGroup,
 
  
   
@@ -110,7 +111,8 @@ const ActiveTabList = () => {
     "SHIFT TEMPLATE MASTER" : <ShiftTemplateMaster/>,
     "EMPLOYEE SUB CATEGORY":<EmployeeSubCategory/>,
     "PAYCOMPONENTS" :<PayComponents/>,
-    "COMPANY PAYCODE":<CompanyPaycode/>
+    "COMPANY PAYCODE":<CompanyPaycode/>,
+    "BLOOD GROUP" : <BloodGroup/>
 
 
 

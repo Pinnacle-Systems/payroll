@@ -315,3 +315,8 @@ export const payCategory = [
     { show: "Monthly Pay Frequency", value: "Monthly Pay Frequency" },
     { show: "Weekly Pay Frequency", value: "Weekly Pay Frequency" },
 ]
+
+export const bloodGrouptype = [
+       { show: "+ve", value: "+ve" },
+    { show: "-ve", value: "-ve" },
+]
