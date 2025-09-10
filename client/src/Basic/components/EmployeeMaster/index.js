@@ -466,12 +466,16 @@ export default function Form() {
       let returnData;
       const formData = new FormData();
       for (let key in data) {
-        formData.append(
-          key,
-          typeof data[key] === "object" && data[key] !== null
-            ? JSON.stringify(data[key])
-            : data[key]
-        );
+        let value;
+
+        if (typeof data[key] === "object" && data[key] !== null) {
+          value = JSON.stringify(data[key]);
+        } else {
+          value = data[key];
+        }
+
+        console.log("Appending:", key, "=>", value); 
+        formData.append(key, value);
       }
 
       if (image instanceof File) {
@@ -548,9 +552,7 @@ export default function Form() {
       handleSubmitCustom(addData, data, "Added");
     }
     setId("");
-    setForm(true)
-    
-    
+    setForm(true);
   };
   const saveDataandExit = async (exitAfterSave = false) => {
     if (!validateData(data)) {
@@ -561,15 +563,14 @@ export default function Form() {
       });
       return;
     }
-   
-      if (id) {
-        await handleSubmitCustom(updateData, data, "Updated");
-      } else {
-        await handleSubmitCustom(addData, data, "Added");
-      }
-      setId('')
-     setForm(false)
-   
+
+    if (id) {
+      await handleSubmitCustom(updateData, data, "Updated");
+    } else {
+      await handleSubmitCustom(addData, data, "Added");
+    }
+    setId("");
+    setForm(false);
   };
 
   const deleteData = async (id) => {
@@ -683,7 +684,7 @@ export default function Form() {
     setPermAddress("");
     setPermCity("");
     setPermPincode("");
-    setPresentAddress([
+    setPresentAddress(
       {
         address: "",
         cityId: "",
@@ -693,9 +694,9 @@ export default function Form() {
         pincode: "",
         mobile: "",
       },
-    ]);
+    );
     setSameAsPresent(false);
-    setPermanentAddress([
+    setPermanentAddress(
       {
         address: "",
         cityId: "",
@@ -705,7 +706,7 @@ export default function Form() {
         pincode: "",
         mobile: "",
       },
-    ]);
+    );
 
     // Personal Info
     setAadharNo("");
