@@ -315,8 +315,10 @@ async function create(req) {
     educationDetails,
     familyDetails,
   } = await req.body;
-  const presentAddressObj = presentAddress ? presentAddress : {};
-  const permanentAddressObj = permanentAddress ? permanentAddress : {};
+ const presentAddressObj = presentAddress ? JSON.parse(presentAddress) : {};
+  const permanentAddressObj = permanentAddress
+    ? JSON.parse(permanentAddress)
+    : {};
 
   console.log(req.body, "form");
 

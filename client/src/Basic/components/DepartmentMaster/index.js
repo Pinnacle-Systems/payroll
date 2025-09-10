@@ -359,7 +359,7 @@ export default function Form() {
                   <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
                     <div className="space-y-4 ">
                       <div className="flex flex-wrap">
-                        <div className="mb-3 w-[48%]">
+                        <div className="mb-3 w-72">
                           <TextInput
                             name="Department Name"
                             type="text"

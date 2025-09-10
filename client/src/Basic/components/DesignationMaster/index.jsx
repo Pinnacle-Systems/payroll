@@ -391,6 +391,7 @@ const Designation = () => {
                           required={true}
                           disabled={true}
                         /> */}
+                           <div className="mb-3 w-72">
                           <TextInput
                             name="Designation Name"
                             type="text"
@@ -400,7 +401,7 @@ const Designation = () => {
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
                             ref={designationRef}
-                          />
+                          /></div>
                           <div className="mb-3 w-[20%] ml-6">
                             <TextInput
                               name="Code"
