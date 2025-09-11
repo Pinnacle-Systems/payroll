@@ -52,7 +52,25 @@ async function get(req) {
         : undefined,
     },
     include: {
-      PayDetails: true,
+      PayDetails: {
+        select:{
+        payComponent:{
+          
+          select:{
+          id:true,
+          payCode:true,
+          payDescription:true
+        
+        },
+        },
+        id:true,
+        payComponentId:true,
+        pf:true,
+        lop:true,
+        esi:true,
+        pickFrom:true,
+      }
+      },
     },
     orderBy: { id: "desc" },
   });
@@ -84,7 +102,24 @@ async function getOne(id) {
       id: parseInt(id),
     },
     include: {
-      PayDetails: true,
+      PayDetails: {
+        select:{
+         
+        payComponent:{
+          select:{
+          id:true,
+          payCode:true,
+          payDescription:true
+        },
+        },
+         id:true,
+         payComponentId:true,
+        pf:true,
+        lop:true,
+        esi:true,
+        pickFrom:true,
+      }
+      },
     },
   });
   if (!data) return NoRecordFound("Company Pay Code");

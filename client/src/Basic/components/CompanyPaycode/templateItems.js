@@ -1,24 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import { DateInput, DropdownInput, TextInput } from "../../../Inputs";
-import { getCommonParams } from "../../../Utils/helper";
-import { useGetCompanyQuery } from "../../../redux/services/CompanyMasterService";
-import { useGetShiftCommonTemplateQuery } from "../../../redux/services/ShiftCommonTemplate.service";
-import { useGetshiftMasterQuery } from "../../../redux/services/ShiftMasterService";
-import {
-  useAddShiftTemplateMasterMutation,
-  useDeleteShiftTemplateMasterMutation,
-  useGetShiftTemplateMasterByIdQuery,
-  useGetShiftTemplateMasterQuery,
-  useUpdateShiftTemplateMasterMutation,
-} from "../../../redux/services/ShiftTemplateMaster";
-import { common, commonNew, pickFrom, ShowShiftData } from "../../../Utils/DropdownData";
-import secureLocalStorage from "react-secure-storage";
-import { toast } from "react-toastify";
-import { Eye } from "lucide-react";
-import { DELETE, PLUS } from "../../../icons";
-import { HiPlus, HiTrash } from "react-icons/hi";
-import { FaFileAlt } from "react-icons/fa";
-import { FiSave } from "react-icons/fi";
+import { useRef, useState } from "react";
+import { DateInput, TextInput } from "../../../Inputs";
+import { common, pickFrom } from "../../../Utils/DropdownData";
+import Select from "react-select";
 
 const TemplateItems = ({
   saveData,
@@ -47,8 +30,6 @@ const TemplateItems = ({
   setId,
   refetch,
 }) => {
-  const [modal, setModal] = useState(false);
-  const [errors, setErrors] = useState({});
   const [contextMenu, setContextMenu] = useState(null);
   const handleRightClick = (event, rowIndex, type) => {
     event.preventDefault();
@@ -75,7 +56,7 @@ const TemplateItems = ({
     const newRow = { templateId: "" };
     setPayDetails([...payDetails, newRow]);
   };
-  const selectRef = useRef(null);
+
   const handleDeleteRow = (id) => {
     setPayDetails((yarnBlend) => {
       if (yarnBlend.length <= 1) {
@@ -94,7 +75,7 @@ const TemplateItems = ({
 
   return (
     <>
-      <div className="w-full bg-gray-100 mx-auto rounded-md shadow-md px-2 py-1">
+      <div className="w-full bg-gray-100 mx-auto rounded-md shadow-md px-2 overflow-auto py-1 ">
         <div className="flex justify-between items-center mb-1">
           <h1 className="text-2xl font-bold text-gray-800">Company Paycode </h1>
           <div className="flex gap-2">
@@ -131,7 +112,7 @@ const TemplateItems = ({
             )}
           </div>
         </div>
-        <div className="space-y-3  h-[580px] ">
+        <div className="space-y-3 overflow-auto">
           <div className="grid grid-cols-1 md:grid-cols-1 gap-2">
             <div className="border border-slate-200 p-2 bg-white rounded-md shadow-sm col-span-1">
               <h2 className="font-medium text-slate-700 mb-2">Basic Details</h2>
@@ -170,18 +151,9 @@ const TemplateItems = ({
               </div>
             </div>
           </div>
-          <div
-            className={`w-full   p-2 overflow-x-auto bg-white`}
-            // tabIndex={0} // Make it focusable
-            // onKeyDown={(e) => {
-            //   if (e.key === "Enter") {
-            //     e.preventDefault(); // Prevent default Enter behavior
-            //     addNewRow();
-            //   }
-            // }}
-          >
+          <div className={`w-full   p-2 overflow-auto bg-white max-h-[370px]`}>
             <table className="w-full border-collapse table-fixed ">
-              <thead className="bg-gray-200 text-gray-800">
+              <thead className="bg-gray-200 text-gray-800 ">
                 <tr>
                   <th
                     className={`w-[8px] px-2 text-center font-medium text-[13px] `}
@@ -225,11 +197,10 @@ const TemplateItems = ({
                       {index + 1}
                     </td>
 
-                    <td className=" border border-gray-300 text-[11px] py-0.5 px-1 item-center">
-                      <select
-                        // onKeyDown={e => { if (e.key === "Delete") { handleInputChange("", index, "accessoryGroupId") } }}
+                    <td className=" border border-gray-300 text-[11px] py-0.5 px-1 item-center ">
+                      {/* <select
                         disabled={readOnly}
-                        className="text-left w-full focus:outline-none rounded py-1 "
+                        className="text-left w-full focus:outline-none  bg-transparent rounded py-1 "
                         value={item?.payComponentId}
                         onChange={(e) =>
                           handleInputChange(
@@ -239,13 +210,87 @@ const TemplateItems = ({
                           )
                         }
                       >
-                        <option>Select Pay Code</option>
+                        <option className=" ">Select Pay Code</option>
                         {(payComponent?.data || []).map((blend) => (
                           <option value={blend.id} key={blend.id}>
                             {blend?.payCode}
                           </option>
                         ))}
-                      </select>
+                      </select> */}
+                      <Select
+                        options={(payComponent?.data || []).map((blend) => ({
+                          value: blend.id,
+                          label: blend.payCode,
+                        }))}
+                        isDisabled={readOnly}
+                        onChange={(selected) =>
+                          handleInputChange(
+                            selected.value,
+                            index,
+                            "payComponentId"
+                          )
+                        }
+                        placeholder="Select Pay Code"
+                        value={(payComponent?.data || [])
+                          .map((blend) => ({
+                            value: blend.id,
+                            label: blend.payCode,
+                          }))
+                          .find((opt) => opt.value === item?.payComponentId)}
+                        menuPlacement="auto"
+                        menuPosition="fixed"
+                        styles={{
+                          control: (base) => ({
+                            ...base,
+                            border: "none", // remove border
+                            boxShadow: "none", // remove focus ring
+                            backgroundColor: "transparent",
+                            minHeight: "unset",
+                            height: "20px", // match table row height
+                            color: "black",
+                          }),
+                          placeholder: (base) => ({
+                            ...base,
+                            color: "black", // gray placeholder like Tailwind `text-gray-400`
+                          }),
+                          singleValue: (base) => ({
+                            ...base,
+                            color: readOnly ? "gray" : "black", 
+                            fontSize: "12px", // optional: adjust font size
+                          }),
+
+                          dropdownIndicator: (base) => ({
+                            ...base,
+                            padding: 2, // smaller padding
+                            svg: {
+                              width: 14, // icon width
+                              height: 14, // icon height
+                            },
+                            color: "black",
+                          }),
+
+                          indicatorSeparator: () => ({ display: "none" }), // remove line
+                          valueContainer: (base) => ({
+                            ...base,
+                            padding: "0 2px", // tighten padding
+                            color: "black",
+                          }),
+                          input: (base) => ({
+                            ...base,
+                            margin: 0,
+                            padding: 0,
+                            color: "black",
+                          }),
+                          menu: (base) => ({
+                            ...base,
+                            zIndex: 9999, // keep menu on top
+                          }),
+                        }}
+                        components={{
+                          // DropdownIndicator: () => null,
+                          IndicatorSeparator: () => null, // remove separator
+                        }}
+                      />
                     </td>
 
                     <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
@@ -263,7 +308,9 @@ const TemplateItems = ({
                             "payDescription"
                           )
                         }
-                        className="w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent"
+                            className={`w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent ${
+      readOnly ? "text-gray-600" : "text-black"
+    }`}
                         disabled={true}
                       />
                     </td>
@@ -283,7 +330,9 @@ const TemplateItems = ({
                             "earningsType"
                           )
                         }
-                        className="w-full bg-transparent  text-left pl-2  focus:outline-none focus:border-transparent"
+                           className={`w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent ${
+      readOnly ? "text-gray-600" : "text-black"
+    }`}
                         disabled={true}
                       />
                     </td>
@@ -338,15 +387,15 @@ const TemplateItems = ({
                         ))}
                       </select>
                     </td>
-                     <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
                       <select
                         disabled={readOnly}
-                        className="text-left w-full bg-transparent focus:outline-none rounded py-1"
+                        className="text-left w-full text-[11px] bg-transparent focus:outline-none rounded py-1"
                         value={item?.pickFrom}
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "pickFrom")
                         }
-                          onContextMenu={(e) => {
+                        onContextMenu={(e) => {
                           if (!readOnly) {
                             handleRightClick(e, index, "pickFrom");
                           }
@@ -357,7 +406,6 @@ const TemplateItems = ({
                             addNewRow();
                           }
                         }}
-                        
                       >
                         <option>Select</option>
                         {pickFrom.map((blend) => (

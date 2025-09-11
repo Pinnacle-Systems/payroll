@@ -30,6 +30,7 @@ import {
   PayComponents,
   CompanyPaycode,
   BloodGroup,
+  PayStructure,
 
  
   
@@ -112,7 +113,8 @@ const ActiveTabList = () => {
     "EMPLOYEE SUB CATEGORY":<EmployeeSubCategory/>,
     "PAYCOMPONENTS" :<PayComponents/>,
     "COMPANY PAYCODE":<CompanyPaycode/>,
-    "BLOOD GROUP" : <BloodGroup/>
+    "BLOOD GROUP" : <BloodGroup/>,
+    "PAY STRUCTURE" : <PayStructure/>,
 
 
 

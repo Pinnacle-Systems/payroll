@@ -64,6 +64,7 @@ export default function Form() {
       setName(data?.name || "");
       setCode(data?.code || "");
       setActive(id ? data?.active ?? false : true);
+       childRecord.current = data?.childRecord ? data?.childRecord : 0;
     },
     [id]
   );
@@ -80,6 +81,7 @@ export default function Form() {
       sessionStorage.getItem("sessionId") + "userCompanyId"
     ),
     id,
+
   };
   useEffect(() => {
        if (form && !readOnly && employeeRef.current) {
@@ -135,38 +137,38 @@ export default function Form() {
     }
   };
 
-  const deleteData = async (id) => {
-    if (id) {
-      if (!window.confirm("Are you sure to delete...?")) {
-        return;
-      }
-      try {
-        const deldata = await removeData(id).unwrap();
-        if (deldata?.statusCode == 1) {
+   const deleteData = async (id) => {
+      if (id) {
+        if (!window.confirm("Are you sure to delete...?")) {
+          return;
+        }
+        try {
+          let deldata = await removeData(id).unwrap();
+          if (deldata?.statusCode == 1) {
+            Swal.fire({
+              icon: "error",
+              title: "Child record Exists",
+              text: deldata.data?.message || "Data cannot be deleted!",
+            });
+            return;
+          }
+          setId("");
+          Swal.fire({
+            title: "Deleted Successfully",
+            icon: "success",
+            timer: 1000,
+          });
+          setForm(false);
+        } catch (error) {
           Swal.fire({
             icon: "error",
             title: "Submission error",
-            text: deldata.data?.message || "Something went wrong!",
+            text: error.data?.message || "Something went wrong!",
           });
           setForm(false);
-          return;
         }
-        setId("");
-        Swal.fire({
-          title: "Deleted Successfully",
-          icon: "success",
-          timer: 1000,
-        });
-        setForm(false);
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Submission error",
-          text: error.data?.message || "Something went wrong!",
-        });
       }
-    }
-  };
+    };
 
   const handleKeyDown = (event) => {
     let charCode = String.fromCharCode(event.which).toLowerCase();

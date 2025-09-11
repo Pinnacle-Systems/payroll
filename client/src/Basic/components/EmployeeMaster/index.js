@@ -639,7 +639,7 @@ export default function Form() {
         setId("");
         dispatch({
           type: `EmployeeCategoryMaster/invalidateTags`,
-          payload: ["Employee Category"],
+          payload: ["EmployeeCategory"],
         });
         dispatch({
           type: `DepartmentMaster/invalidateTags`,
@@ -651,7 +651,7 @@ export default function Form() {
         });
 
         setForm(false);
-        Swal.fire({
+        Swal.fire({ 
           icon: "success",
           title: "Deleted successfully",
           timer: 1500,

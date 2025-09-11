@@ -146,35 +146,39 @@ export default function Form() {
     }
   };
 
-  const deleteData = async (id) => {
+   const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
         return;
       }
       try {
-        const deldata = await removeData(id).unwrap();
+        let deldata = await removeData(id).unwrap();
         if (deldata?.statusCode == 1) {
-          // toast.error(deldata?.message);
-          setForm(false);
+          Swal.fire({
+            icon: "error",
+            title: "Child record Exists",
+            text: deldata.data?.message || "Data cannot be deleted!",
+          });
           return;
         }
         setId("");
-        dispatch({
-          type: `StateMaster/invalidateTags`,
-          payload: ["State"],
-        });
         Swal.fire({
           title: "Deleted Successfully",
           icon: "success",
           timer: 1000,
         });
         setForm(false);
+         dispatch({
+        type: `StateMaster/invalidateTags`,
+        payload: ["State"],
+      });
       } catch (error) {
         Swal.fire({
-          title: "Deleted Successfully",
-          icon: "success",
-          timer: 1000,
+          icon: "error",
+          title: "Submission error",
+          text: error.data?.message || "Something went wrong!",
         });
+        setForm(false);
       }
     }
   };

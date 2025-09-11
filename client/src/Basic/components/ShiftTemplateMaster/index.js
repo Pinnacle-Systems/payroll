@@ -107,6 +107,7 @@ const ShiftTemplateMaster = () => {
         data?.ShiftTemplateItems ? data?.ShiftTemplateItems : []
       );
       setCategoryId(data?.category ? data?.category : "");
+      childRecord.current = data?.childRecord ? data?.childRecord : 0;
     },
     [id]
   );
@@ -236,20 +237,19 @@ const ShiftTemplateMaster = () => {
 
   console.log(id, "id");
 
-  const deleteData = async (id) => {
+   const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
         return;
       }
       try {
-        const deldata = await removeData(id).unwrap();
+        let deldata = await removeData(id).unwrap();
         if (deldata?.statusCode == 1) {
           Swal.fire({
             icon: "error",
-            title: "Submission error",
-            text: deldata?.data?.message || "Something went wrong!",
+            title: "Child record Exists",
+            text: deldata.data?.message || "Data cannot be deleted!",
           });
-          setForm(false);
           return;
         }
         setId("");
@@ -259,23 +259,16 @@ const ShiftTemplateMaster = () => {
           timer: 1000,
         });
         setForm(false);
-        dispatch({
-          type: `shiftMaster/invalidateTags`,
-          payload: ["shiftMaster"],
-        });
-        dispatch({
-          type: `ShiftCommonTemplateMaster/invalidateTags`,
-          payload: ["ShiftCommonTemplate"],
-        });
       } catch (error) {
         Swal.fire({
           icon: "error",
           title: "Submission error",
           text: error.data?.message || "Something went wrong!",
         });
+        setForm(false);
       }
     }
-  };
+  };;
 
   const handleKeyDown = (event) => {
     let charCode = String.fromCharCode(event.which).toLowerCase();

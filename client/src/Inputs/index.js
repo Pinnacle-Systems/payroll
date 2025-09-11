@@ -2142,7 +2142,7 @@ export const ReusableTable = ({
   };
 
   const Pagination = () => {
-    if (totalPages <= 1) return null;
+    // if (totalPages <= 1) return null;
 
     return (
       <div className="flex flex-col font-segoe sm:flex-row justify-between items-center p-2 bg-white border-t border-gray-200">
@@ -2219,7 +2219,8 @@ export const ReusableTable = ({
   };
 
   return (
-    <div className="bg-[#F1F1F0] shadow-sm overflow-hidden">
+    <>
+    <div className="bg-[#F1F1F0] h-[70%]  shadow-sm overflow-hidden ">
       <table className=" border-collapse">
         <thead className="bg-gray-200 text-gray-800">
           <tr>
@@ -2306,10 +2307,15 @@ export const ReusableTable = ({
           )}
         </tbody>
       </table>
-      <Pagination />
+ 
+     
+    
     </div>
-
-
+    <div className=" h-[8%]">
+<Pagination />
+    </div>
+ 
+        </>  
   );
 };
 

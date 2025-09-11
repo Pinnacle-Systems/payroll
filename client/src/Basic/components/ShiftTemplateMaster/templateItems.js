@@ -31,6 +31,7 @@ const TemplateItems = ({
   ShiftTemplateItems,
   setShiftTemplateItems,
   id,
+
   shiftId,
   setShiftId,
   setDate,
@@ -271,12 +272,15 @@ const TemplateItems = ({
                           handleInputChange(e.target.value, index, "date")
                         }
                         className="bg-transparent"
+                        disabled={childRecord.current > 0}
+                        readOnly={readOnly}
                       />
                     </td>
                     <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
                       <select
                         // onKeyDown={e => { if (e.key === "Delete") { handleInputChange("", index, "accessoryGroupId") } }}
-                        disabled={readOnly}
+                       disabled={childRecord.current > 0}
+                        readOnly={readOnly}
                         className="text-left w-full focus:outline-none rounded py-1 bg-transparent"
                         value={item.templateId}
                         onChange={(e) =>
@@ -299,7 +303,8 @@ const TemplateItems = ({
 
                     <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
                       <select
-                        disabled={readOnly}
+                        disabled={childRecord.current > 0}
+                        readOnly={readOnly}
                         className="text-left focus:outline-none w-full rounded py-1 bg-transparent"
                         value={item.shiftId}
                         onChange={(e) =>
@@ -348,7 +353,8 @@ const TemplateItems = ({
                     {/* In Next Day */}
                     <td className="border border-gray-300 text-[11px] py-0.5 item-center">
                       <select
-                        disabled={readOnly}
+                        disabled={childRecord.current > 0}
+                        readOnly={readOnly}
                         className="text-left w-full bg-transparent focus:outline-none rounded py-1"
                         value={item.inNextDay}
                         onChange={(e) =>
@@ -450,7 +456,8 @@ const TemplateItems = ({
                                           className="w-[120px] px-3 py-1 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
+                                          disabled={childRecord.current > 0}
+                        readOnly={readOnly}
                                         />
                                       </div>
 
@@ -474,7 +481,8 @@ const TemplateItems = ({
                                           className="w-[120px] px-3 py-1  text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
+                                         disabled={childRecord.current > 0}
+                        readOnly={readOnly}
                                         />
                                       </div>
 
@@ -498,7 +506,8 @@ const TemplateItems = ({
                                           className="w-[120px] px-3 py-1 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
+                                          disabled={childRecord.current > 0}
+                        readOnly={readOnly}
                                         />
                                       </div>
 
@@ -522,7 +531,8 @@ const TemplateItems = ({
                                           className=" w-[120px] px-3 py-1  text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
+                                          disabled={childRecord.current > 0}
+                        readOnly={readOnly}
                                         />
                                       </div>
                                     </div>
@@ -582,7 +592,8 @@ const TemplateItems = ({
                                           className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
                       focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                       transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
+                                          disabled={childRecord.current > 0}
+                        readOnly={readOnly}
                                         />
                                       </div>
 
@@ -606,7 +617,8 @@ const TemplateItems = ({
                                           className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
                       focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                       transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
+                                         disabled={childRecord.current > 0}
+                        readOnly={readOnly}
                                         />
                                       </div>
 
@@ -630,7 +642,8 @@ const TemplateItems = ({
                                           className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
                       focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                       transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
+                                         disabled={childRecord.current > 0}
+                        readOnly={readOnly}
                                         />
                                       </div>
 
@@ -640,7 +653,8 @@ const TemplateItems = ({
                                           LB.SNDay
                                         </label>
                                         <select
-                                          disabled={readOnly}
+                                         disabled={childRecord.current > 0}
+                        readOnly={readOnly}
                                           className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
                       focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                       transition-all duration-150 shadow-sm"
@@ -685,7 +699,8 @@ const TemplateItems = ({
                                           className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
                       focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                       transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
+                                         disabled={childRecord.current > 0}
+                        readOnly={readOnly}
                                         />
                                       </div>
 
@@ -695,7 +710,8 @@ const TemplateItems = ({
                                           LB.ENDay
                                         </label>
                                         <select
-                                          disabled={readOnly}
+                                         disabled={childRecord.current > 0}
+                        readOnly={readOnly}
                                           className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
                       focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                       transition-all duration-150 shadow-sm"
@@ -740,7 +756,8 @@ const TemplateItems = ({
                                           className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
                       focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                       transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
+                                         disabled={childRecord.current > 0}
+                        readOnly={readOnly}
                                         />
                                       </div>
 
@@ -764,7 +781,8 @@ const TemplateItems = ({
                                           className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
                       focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                       transition-all duration-150 shadow-sm"
-                                          disabled={readOnly}
+                                         disabled={childRecord.current > 0}
+                        readOnly={readOnly}
                                         />
                                       </div>
                                     </div>
@@ -780,7 +798,8 @@ const TemplateItems = ({
                     {/* Out Next Day */}
                     <td className="border border-gray-300 text-[11px] py-0.5 item-center">
                       <select
-                        disabled={readOnly}
+                       disabled={childRecord.current > 0}
+                        readOnly={readOnly}
                         className="text-left w-full bg-transparent focus:outline-none rounded py-1 "
                         value={item.outNxtDay}
                         onChange={(e) =>
@@ -810,7 +829,8 @@ const TemplateItems = ({
                           )
                         }
                         className="w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2"
-                        disabled={readOnly}
+                        disabled={childRecord.current > 0}
+                        readOnly={readOnly}
                       />
                     </td>
                     {/* OT Hrs */}
@@ -824,7 +844,8 @@ const TemplateItems = ({
                           handleInputChange(e.target.value, index, "otHrs")
                         }
                         className="w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2"
-                        disabled={readOnly}
+                        disabled={childRecord.current > 0}
+                        readOnly={readOnly}
                         onContextMenu={(e) => {
                           if (!readOnly) {
                             handleRightClick(e, index, "shiftTimeHrs");

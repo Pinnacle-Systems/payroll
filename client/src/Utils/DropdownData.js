@@ -288,7 +288,9 @@ export const commonNew = [
 ]
 
 export const pickFrom = [
+    {show:'NONE',value:"NONE"},
     {show:'ATTN',value:'ATTN'},
+    {show:'BATTN',value:'BATTN'},
     {show:'IT ADJUST',value:'IT ADJUST'},
     {show:'ESI',value:'ESI'},
     {show:'PF',value:'PF'},
