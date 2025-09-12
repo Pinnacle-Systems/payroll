@@ -101,3 +101,4 @@ export const PAY_FREQUENCY_API = "payFrequency"
 export const PAY_COMPONENT_API     = "payComponent"
 export const COMPANY_PAY_CODE_API ='companyPayCode'
 export const BLOOD_GROUP_API    = 'bloodGroup'
+export const PAY_STRUCTURE_API = 'payStructure'

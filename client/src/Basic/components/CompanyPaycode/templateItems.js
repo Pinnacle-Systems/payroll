@@ -256,7 +256,7 @@ const TemplateItems = ({
                           singleValue: (base) => ({
                             ...base,
                             color: readOnly ? "gray" : "black", 
-                            fontSize: "12px", // optional: adjust font size
+                            fontSize: "11px", // optional: adjust font size
                           }),
 
                           dropdownIndicator: (base) => ({

@@ -21,26 +21,36 @@ import {
   useGetCompanyPayCodeQuery,
   useUpdateCompanyPayCodeMutation,
 } from "../../../redux/services/CompanyPayCodeService";
+import {
+  useAddPayStructureMutation,
+  useDeletePayStructureMutation,
+  useGetPayStructureByIdQuery,
+useGetPayStructureQuery,
+useUpdatePayStructureMutation,
+
+} from "../../../redux/services/PayStructureService";
 
 import TemplateItems from "./TemplateItems";
 import Swal from "sweetalert2";
 import { useGetPayComponentQuery } from "../../../redux/services/PayComponentsService";
 import moment from "moment";
 import { useDispatch } from "react-redux";
+import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCategoryMasterService";
 
 const PayStructure = () => {
   const today = new Date();
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
-  const [companyPayCodeId, setcompanyPayCodeId] = useState("");
+  const [payDetailsId, setPayDetailsId] = useState("");
 
   const [docId, setDocId] = useState("");
 
   const [form, setForm] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
-  const [payDetails, setPayDetails] = useState([]);
-  const [categoryId, setCategoryId] = useState("");
+  const [payStructure, setPayStructure] = useState([]);
+  const[category,setCategory] = useState('')
+  const [employeeCategoryId, setEmployeeCategoryId] = useState("");
   const [date, setDate] = useState(moment.utc(today).format("YYYY-MM-DD"));
   const dispatch = useDispatch();
   console.log(date, "date");
@@ -52,10 +62,13 @@ const PayStructure = () => {
   const { data: company } = useGetCompanyQuery({ params });
   const [companyCode, setCompanyCode] = useState(company?.data[0].code);
 
-  const { data: allData, refetch } = useGetCompanyPayCodeQuery({
+  const { data: allData, refetch } = useGetPayStructureQuery({
     params,
     searchParams: searchValue,
   });
+    const { data: employeeCategoryList } = useGetEmployeeCategoryQuery({
+      params
+    });
 
   const { data: companyPayCode } = useGetCompanyPayCodeQuery({
     params,
@@ -65,11 +78,11 @@ const PayStructure = () => {
     data: singleData,
     isFetching: isSingleFetching,
     isLoading: isSingleLoading,
-  } = useGetCompanyPayCodeByIdQuery(id, { skip: !id });
+  } = useGetPayStructureByIdQuery(id, { skip: !id });
 
-  const [addData] = useAddCompanyPayCodeMutation();
-  const [updateData] = useUpdateCompanyPayCodeMutation();
-  const [removeData] = useDeleteCompanyPayCodeMutation();
+  const [addData] = useAddPayStructureMutation();
+  const [updateData] = useUpdatePayStructureMutation();
+  const [removeData] = useDeletePayStructureMutation();
 
   
 
@@ -81,30 +94,41 @@ const PayStructure = () => {
   // }, [company]);
 
   useEffect(() => {
-    if (payDetails?.length >= 1) return;
-    setPayDetails((prev) => {
+    if (payStructure?.length >= 1) return;
+    setPayStructure((prev) => {
       let newArray = Array?.from({ length: 1 - prev?.length }, () => {
         return {
-           payComponentId:''
+          payDetailsId:''
         };
       });
       return [...prev, ...newArray];
     });
-  }, [setPayDetails, payDetails]);
+  }, [payStructure,setPayStructure ]);
 
-  const syncFormWithDb = useCallback(
-    (data) => {
-      setDocId(data?.docId);
-      setDate(
-        data?.date
-          ? moment.utc(data.date).format("YYYY-MM-DD")
-          : moment.utc(today).format("YYYY-MM-DD")
-      );
+const syncFormWithDb = useCallback(
+  (data) => {
+    setDocId(data?.docId);
+    setDate(
+      data?.date
+        ? moment.utc(data.date).format("YYYY-MM-DD")
+        : moment.utc(today).format("YYYY-MM-DD")
+    );
+    setEmployeeCategoryId(data?.employeeCategoryId);
+    setCategory(data?.category || "");
 
-      setPayDetails(data?.PayDetails ? data?.PayDetails : []);
-    },
-    [id]
-  );
+    // Map PayStructure to include payDescription and pickFrom
+    const enrichedPayStructure = data?.PayStructure?.map((ps) => ({
+      ...ps,
+      
+      payDescription: ps?.PayDetails?.payComponent?.payDescription || "",
+      pickFrom: ps?.PayDetails?.pickFrom || "",
+    })) || [];
+
+    setPayStructure(enrichedPayStructure);
+  },
+  [id]
+);
+
 
   useEffect(() => {
     syncFormWithDb(singleData?.data);
@@ -112,32 +136,41 @@ const PayStructure = () => {
 
   const data = {
     date,
-
     docId,
-
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
+    category,
+    employeeCategoryId,
+   
     id,
     branchId,
-    payDetails,
+    payStructure,
+     companyId: secureLocalStorage.getItem(
+      sessionStorage.getItem("sessionId") + "userCompanyId"
+    ),
   };
 
   
-  const validateData = (data) => {
-    
-   
-    if (payDetails?.some((i) => !i.payComponentId || i.payComponentId === "")) {
-      Swal.fire({
-        icon: "error",
-        title: "Submission error",
-        text: "Pay Code is Missing",
-      });
-      return;
-    }
-  
-    return true;
-  };
+const validateData = (data) => {
+  if (!data?.employeeCategoryId || !data?.category) {
+    Swal.fire({
+      icon: "error",
+      title: "Submission error",
+      text: "Employee Category and category are required",
+    });
+    return false;
+  }
+
+  if (payStructure?.some((i) => !i.payDetailsId || i.payDetailsId === "")) {
+    Swal.fire({
+      icon: "error",
+      title: "Submission error",
+      text: "Pay Details is missing in one or more rows",
+    });
+    return false;
+  }
+
+  return true;
+};
+
 
   const handleSubmitCustom = async (callback, data, text) => {
     try {
@@ -243,11 +276,13 @@ const PayStructure = () => {
   const onNew = () => {
    
     setId("");
-
+    setEmployeeCategoryId('')
+    setCategory('')
     setReadOnly(false);
     setSearchValue("");
     // setCompanyCode(company?.data[0]?.code);
-    setPayDetails([]);
+    setPayStructure([]);
+      setDate(moment.utc(new Date(today)).format("YYYY-MM-DD"));
     
     refetch();
   };
@@ -295,11 +330,12 @@ const PayStructure = () => {
               setForm={setForm}
               setReadOnly={setReadOnly}
               setId={setId}
-           
+              setCategory={setCategory}
+              category={category}
               
               readOnly={readOnly}
-              payDetails={payDetails}
-              setPayDetails={setPayDetails}
+              payStructure={payStructure}
+              setPayStructure={setPayStructure}
               id={id}
               companyCode={companyCode}
               setCompanyCode={setCompanyCode}
@@ -307,18 +343,19 @@ const PayStructure = () => {
               setDate={setDate}
               date={date}
               setDocId={setDocId}
-              categoryId={categoryId}
-              setCategoryId={setCategoryId}
+              employeeCategoryId={employeeCategoryId}
+              setEmployeeCategoryId={setEmployeeCategoryId}
               childRecord={childRecord}
               companyPayCode = {companyPayCode}
-              setcompanyPayCodeId={setcompanyPayCodeId}
-              companyPayCodeId={companyPayCodeId}
+              setPayDetailsId={setPayDetailsId}
+              payDetailsId={payDetailsId}
               onClose={() => {
                 setForm(false);
                 onNew();
               }}
               onNew={onNew}
               refetch={refetch}
+              employeeCategoryList={employeeCategoryList}
             />
           ) : (
             <>

@@ -53,6 +53,7 @@ import {
   payComponents,
   companyPaycode,
   bloodGroup,
+  payStructure,
 } from "./src/routes/index.js";
 
 import { socketMain } from "./src/sockets/socket.js";
@@ -139,6 +140,10 @@ app.use("/payFrequency", payfrequency);
 app.use("/payComponent", payComponents);
 app.use("/companyPayCode", companyPaycode);
 app.use('/bloodGroup',bloodGroup)
+app.use('/payStructure',payStructure)
+
+
+
 app.get("/retreiveFile/:fileName", (req, res) => {
   const { fileName } = req.params;
   res.sendFile(__dirname + "/uploads/" + fileName);

@@ -51,3 +51,4 @@ export { default as payFrequencyApi } from "./PayFrequencyService";
 export { default as payComponentApi } from "./PayComponentsService";
 export { default as companyPayCodeApi } from "./CompanyPayCodeService";
 export { default as bloodGroupApi} from './BloodGroupService'
+export { default as payStructureApi}  from './PayStructureService'

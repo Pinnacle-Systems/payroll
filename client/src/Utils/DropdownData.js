@@ -307,6 +307,7 @@ export const SalaryMethod = [
 ]
 
 export const ShowShiftData = [
+    {show:"Both",value:"Both"},
     { show: "Actual", value: "Actual" },
     { show: "Buyer", value: "Buyer" },
 ]

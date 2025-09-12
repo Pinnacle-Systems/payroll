@@ -66,6 +66,7 @@ model Company {
   PayComponents       PayComponents[]
   CompanyPaycode      CompanyPaycode[]
   BloodGroupMaster    BloodGroupMaster[]
+  CompanyPayStructure CompanyPayStructure[]
 }
 
 model Subscription {
@@ -113,6 +114,7 @@ model Branch {
   PayComponents       PayComponents[]
   CompanyPaycode      CompanyPaycode[]
   BloodGroupMaster    BloodGroupMaster[]
+  CompanyPayStructure CompanyPayStructure[]
 }
 
 model UserOnBranch {
@@ -213,6 +215,8 @@ model User {
   CompanyPaycodeupdatedBy      CompanyPaycode[]      @relation(name: "updatedBy")
   BloodGroupMasterCreatedBy    BloodGroupMaster[]    @relation(name: "createdBy")
   BloodGroupMasterupdatedBy    BloodGroupMaster[]    @relation(name: "updatedBy")
+  CompanyPayStructureCreatedBy CompanyPayStructure[] @relation(name: "createdBy")
+  CompanyPayStructureupdatedBy CompanyPayStructure[] @relation(name: "updatedBy")
 }
 
 model Employee {
@@ -349,6 +353,7 @@ model EmployeeCategory {
   Employee            Employee[]
   ShiftCommonTemplate ShiftCommonTemplate[]
   EmployeSubCategory  EmployeSubCategory[]
+  CompanyPayStructure CompanyPayStructure[]
 }
 
 model Country {
@@ -1421,6 +1426,7 @@ model PayDetails {
   pf               String?
   esi              String?
   pickFrom         String?
+  PayStructure     PayStructure[]
 }
 
 model BloodGroupMaster {
@@ -1440,4 +1446,36 @@ model BloodGroupMaster {
   bgFamily       String?
   active         Boolean?   @default(true)
   employee       Employee[]
+}
+
+model CompanyPayStructure {
+  id                 Int              @id @default(autoincrement())
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  createdBy          User?            @relation("createdBy", fields: [createdById], references: [id])
+  createdById        Int?
+  updatedBy          User?            @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById        Int?
+  companyId          Int?
+  company            Company?         @relation(fields: [companyId], references: [id])
+  branch             Branch?          @relation(fields: [branchId], references: [id])
+  branchId           Int?
+  docId              String?
+  date               DateTime?
+  EmployeeCategory   EmployeeCategory @relation(fields: [employeeCategoryId], references: [id])
+  employeeCategoryId Int
+  category           String?
+  PayStructure       PayStructure[]
+}
+
+model PayStructure {
+  id                    Int                  @id @default(autoincrement())
+  CompanyPayStructure   CompanyPayStructure? @relation(fields: [companyPayStructureId], references: [id], onDelete: Cascade)
+  companyPayStructureId Int?
+  PayDetails            PayDetails? @relation(fields: [payDetailsId], references: [id])
+  payDetailsId          Int?
+  salaryPercentage     Float?
+  mark                  Boolean?   @default(false)
+  formula               String?
+  notes                 String?
 }

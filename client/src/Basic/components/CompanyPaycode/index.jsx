@@ -98,7 +98,7 @@ const CompanyPaycode = () => {
     setPayDetails((prev) => {
       let newArray = Array?.from({ length: 1 - prev?.length }, () => {
         return {
-           payComponentId:''
+          payComponentId: "",
         };
       });
       return [...prev, ...newArray];
@@ -136,10 +136,7 @@ const CompanyPaycode = () => {
     payDetails,
   };
 
-  
   const validateData = (data) => {
-    
-   
     if (payDetails?.some((i) => !i.payComponentId || i.payComponentId === "")) {
       Swal.fire({
         icon: "error",
@@ -148,7 +145,7 @@ const CompanyPaycode = () => {
       });
       return;
     }
-  
+
     return true;
   };
 
@@ -182,10 +179,7 @@ const CompanyPaycode = () => {
     }
   };
 
- 
-
   const saveData = () => {
-   
     if (!validateData(data)) {
       return;
     }
@@ -220,10 +214,10 @@ const CompanyPaycode = () => {
           timer: 1000,
         });
         setForm(false);
-         dispatch({
-        type: `payComponent/invalidateTags`,
-        payload: ["payComponent"],
-      });
+        dispatch({
+          type: `payComponent/invalidateTags`,
+          payload: ["payComponent"],
+        });
       } catch (error) {
         Swal.fire({
           icon: "error",
@@ -254,14 +248,14 @@ const CompanyPaycode = () => {
   useEffect(getNextDocId, [getNextDocId]);
   console.log(allData, "alldata");
   const onNew = () => {
-   
     setId("");
+    setDate(moment.utc(new Date(today)).format("YYYY-MM-DD"));
 
     setReadOnly(false);
     setSearchValue("");
     // setCompanyCode(company?.data[0]?.code);
     setPayDetails([]);
-    
+
     refetch();
   };
   const handleView = (id) => {
