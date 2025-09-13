@@ -31,6 +31,8 @@ import {
   CompanyPaycode,
   BloodGroup,
   PayStructure,
+  LevelType,
+  PFAndESIEditor,
 
  
   
@@ -115,6 +117,8 @@ const ActiveTabList = () => {
     "COMPANY PAYCODE":<CompanyPaycode/>,
     "BLOOD GROUP" : <BloodGroup/>,
     "PAY STRUCTURE" : <PayStructure/>,
+    "LEVEL TYPE" : <LevelType/>,
+    "PF AND ESI EDITOR":<PFAndESIEditor/>,
 
 
 

@@ -335,6 +335,7 @@ const PayComponents = () => {
                         </div>
                       </div>
                       <div className="flex gap-x-6">
+                        <div className="w-[198px]">
                         <DropdownInput
                           name="Earnings / Deductions"
                           value={earningsType}
@@ -344,12 +345,13 @@ const PayComponents = () => {
                           readOnly={readOnly}
                           disabled={childRecord.current > 0}
                           // onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                        />
+                        /></div>
                         {errors.name && (
                           <span className="text-red-500 text-xs ml-1">
                             {errors.name}
                           </span>
                         )}
+                         <div className="w-[120px]">
                         <DropdownInput
                           name="Taxable"
                           value={taxable}
@@ -359,7 +361,7 @@ const PayComponents = () => {
                           readOnly={readOnly}
                           disabled={childRecord.current > 0}
                           // onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                        />
+                        /></div>
                         {errors.name && (
                           <span className="text-red-500 text-xs ml-1">
                             {errors.name}

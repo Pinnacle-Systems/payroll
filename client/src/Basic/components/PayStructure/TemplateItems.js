@@ -6,7 +6,6 @@ import { ShowShiftData } from "../../../Utils/DropdownData";
 import { dropDownListObject } from "../../../Utils/contructObject";
 import Modal from "../../../UiComponents/Modal";
 
-
 const TemplateItems = ({
   saveData,
   setForm,
@@ -233,20 +232,20 @@ const TemplateItems = ({
                   >
                     S.No
                   </th>
-                  <th
+                  {/* <th
                     className={`w-[6px] px-1.5 text-center font-medium text-[13px] `}
                   >
                     Mark
-                  </th>
+                  </th> */}
                   <th
                     className={`w-8 px-4 py-2 text-center font-medium text-[13px] `}
                   >
                     Pay Code
                   </th>
                   <th
-                    className={`w-8  py-2 item-center font-medium text-[13px] `}
+                    className={`w-4  py-2 item-center font-medium text-[13px] `}
                   >
-                    Salary Percenteage
+                    Salary %
                   </th>
                   <th
                     className={`w-8 py-2 item-center font-medium text-[13px] `}
@@ -269,7 +268,7 @@ const TemplateItems = ({
                     Add Formula
                   </th>
                   <th
-                    className={`w-12 py-2  item-center font-medium text-[13px] `}
+                    className={`w-16 py-2  item-center font-medium text-[13px] `}
                   >
                     Formula
                   </th>
@@ -291,7 +290,7 @@ const TemplateItems = ({
                     <td className="border border-gray-300 py-1.5  text-center px-1">
                       {index + 1}
                     </td>
-                    <td className="border border-gray-300 py-1.5  text-center px-1">
+                    {/* <td className="border border-gray-300 py-1.5  text-center px-1">
                       <input
                         type="checkBox"
                         checked={item?.mark || false}
@@ -300,7 +299,7 @@ const TemplateItems = ({
                         }
                         disabled={readOnly}
                       />
-                    </td>
+                    </td> */}
 
                     <td className=" border border-gray-300 text-[11px] py-0.5 px-1 item-center ">
                       {/* <select
@@ -347,7 +346,7 @@ const TemplateItems = ({
                             "payDetailsId"
                           )
                         }
-                         isDisabled={readOnly} 
+                        isDisabled={readOnly}
                         placeholder="Select Pay Code"
                         menuPlacement="auto"
                         menuPosition="fixed"
@@ -442,8 +441,8 @@ const TemplateItems = ({
                           );
                         }}
                         className={`w-full bg-transparent text-right pr-2 focus:outline-none focus:border-transparent ${
-      readOnly ? "text-gray-600" : "text-black"
-    }`}
+                          readOnly ? "text-gray-600" : "text-black"
+                        }`}
                         disabled={readOnly}
                       />
                     </td>
@@ -469,9 +468,7 @@ const TemplateItems = ({
                         type="text"
                         value={item?.payDescription || ""}
                         className={`w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent
-                          ${
-      readOnly ? "text-gray-600" : "text-black"
-    }
+                          ${readOnly ? "text-gray-600" : "text-black"}
                           `}
                         disabled
                       />
@@ -480,9 +477,9 @@ const TemplateItems = ({
                       <input
                         type="text"
                         value={item?.pickFrom || ""}
-                        className={ `w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent ${
-      readOnly ? "text-gray-600" : "text-black"
-    } `}
+                        className={`w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent ${
+                          readOnly ? "text-gray-600" : "text-black"
+                        } `}
                         disabled
                       />
                     </td>
@@ -490,13 +487,24 @@ const TemplateItems = ({
                       <button
                         type="button"
                         onClick={() => {
-                          setActiveFormulaRow(index);
-                          setModalFormulaValue(item?.formula || ""); // prefill modal input
-                          setModal(true);
+                          if (item?.pickFrom?.toLowerCase() === "formula") {
+                            setActiveFormulaRow(index);
+                            setModalFormulaValue(item?.formula || ""); // prefill modal input
+                            setModal(true);
+                          }
                         }}
-                        className="flex items-center justify-center w-6 h-6  rounded mx-auto"
-                        title="Add Formula"
-                        disabled={!item?.mark} // optional
+                        className={`flex items-center justify-center w-6 h-6 rounded mx-auto 
+    ${
+      item?.pickFrom?.toLowerCase() === "formula"
+        ? "cursor-pointer"
+        : "cursor-not-allowed opacity-50"
+    }`}
+                        title={
+                          item?.pickFrom?.toLowerCase() === "formula"
+                            ? "Add Formula"
+                            : "Not allowed"
+                        }
+                        disabled={item?.pickFrom?.toLowerCase() !== "formula"}
                       >
                         <Plus size={14} className="text-green-500" />
                       </button>
@@ -507,9 +515,7 @@ const TemplateItems = ({
                         type="text"
                         value={item?.formula || ""}
                         className={`w-full bg-transparent pl-2 h-4 text-left focus:outline-none
-                          ${
-      readOnly ? "text-gray-600" : "text-black"
-    }
+                          ${readOnly ? "text-gray-600" : "text-black"}
                           
                           `}
                         readOnly
@@ -535,8 +541,8 @@ const TemplateItems = ({
                         type="text"
                         value={item?.notes || ""}
                         className={`w-full bg-transparent pl-2 focus:outline-none ${
-      readOnly ? "text-gray-600" : "text-black"
-    }`}
+                          readOnly ? "text-gray-600" : "text-black"
+                        }`}
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "notes")
                         }
@@ -578,7 +584,7 @@ const TemplateItems = ({
                 </div>
               </div>
 
-              <div className="flex-1 overflow-auto p-3">
+              <div className="flex-1  p-3">
                 <div className="grid grid-cols-1  gap-3  h-full">
                   <div className="lg:col-span- space-y-3">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
@@ -655,6 +661,13 @@ const TemplateItems = ({
                                   ...base,
                                   zIndex: 9999, // keep menu on top
                                 }),
+                                menuList: (base) => ({
+                                  ...base,
+                                  maxHeight: 150, // limit menu height (px)
+                                  overflowY: "auto", // enable vertical scroll
+                                  padding: 0,
+                                }),
+
                                 option: (base, state) => ({
                                   ...base,
                                   // color: state.isSelected ? "white" : "black",
@@ -687,8 +700,8 @@ const TemplateItems = ({
                                 setModalFormulaValue(e.target.value)
                               }
                               className={`border border-gray-300 h-24 px-2 py-1 w-full text-[11px]  rounded focus:outline-none focus:ring-1 focus:ring-blue-400 ${
-      readOnly ? "text-gray-600" : "text-black"
-    }`}
+                                readOnly ? "text-gray-600" : "text-black"
+                              }`}
                               placeholder="Type or select Pay Code"
                               disabled={readOnly}
                             />
@@ -696,10 +709,11 @@ const TemplateItems = ({
                         </div>
                         <div className="flex justify-end gap-2 mt-2">
                           <button
-                             className={`px-3 py-1 text-red-600 border border-red-600 text-xs rounded 
-    ${readOnly 
-      ? "bg-gray-100 text-gray-400 cursor-not-allowed hover:bg-gray-100 hover:text-gray-400" 
-      : "hover:bg-red-600 hover:text-white"
+                            className={`px-3 py-1 text-red-600 border border-red-600 text-xs rounded 
+    ${
+      readOnly
+        ? "bg-gray-100 text-gray-400 cursor-not-allowed hover:bg-gray-100 hover:text-gray-400"
+        : "hover:bg-red-600 hover:text-white"
     }`}
                             onClick={() => {
                               setModalFormulaValue(""); // clear modal input
@@ -709,10 +723,11 @@ const TemplateItems = ({
                             Clear
                           </button>
                           <button
-                          className={`px-4 py-1 text-green-600 border border-green-600 text-xs rounded 
-    ${readOnly 
-      ? "bg-gray-100 text-gray-400 cursor-not-allowed hover:bg-gray-100 hover:text-gray-400" 
-      : "hover:bg-green-600 hover:text-white"
+                            className={`px-4 py-1 text-green-600 border border-green-600 text-xs rounded 
+    ${
+      readOnly
+        ? "bg-gray-100 text-gray-400 cursor-not-allowed hover:bg-gray-100 hover:text-gray-400"
+        : "hover:bg-green-600 hover:text-white"
     }`}
                             onClick={() => {
                               // Update the formula in the correct row
@@ -723,10 +738,9 @@ const TemplateItems = ({
                               );
                               setModal(false);
                             }}
-                          disabled={readOnly}
-
+                            disabled={readOnly}
                           >
-                            Fill 
+                            Fill
                           </button>
                         </div>
                       </div>

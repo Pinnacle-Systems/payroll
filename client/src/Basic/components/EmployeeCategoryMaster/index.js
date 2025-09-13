@@ -365,7 +365,7 @@ export default function Form() {
                       <div className="space-y-4 ">
                         <div className="">
                           <div className="flex flex-wrap">
-                            <div className="mb-3 w-[48%]">
+                            <div className="mb-3 w-72">
                               <TextInput
                                 name="Category Name"
                                 type="text"
@@ -378,7 +378,7 @@ export default function Form() {
                               />
                             </div>
 
-                            <div className="mb-3 w-[20%] ml-6">
+                            <div className="mb-3 w-20 ml-6">
                               <TextInput
                                 name="Code"
                                 type="text"

@@ -54,6 +54,8 @@ import {
   companyPaycode,
   bloodGroup,
   payStructure,
+  LevelType,
+  pFEsiEditor,
 } from "./src/routes/index.js";
 
 import { socketMain } from "./src/sockets/socket.js";
@@ -141,7 +143,8 @@ app.use("/payComponent", payComponents);
 app.use("/companyPayCode", companyPaycode);
 app.use('/bloodGroup',bloodGroup)
 app.use('/payStructure',payStructure)
-
+app.use('/leveltype',LevelType)
+app.use('/pFEsiEditor',pFEsiEditor)
 
 
 app.get("/retreiveFile/:fileName", (req, res) => {

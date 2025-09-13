@@ -392,7 +392,7 @@ export default function Form() {
                                    ref={cityNameRef}
                                 />
                               </div>
-                              <div className="mb-3 w-[150px] ml-6">
+                              <div className="mb-3 w-[90px] ml-6">
                                 <TextInput
                                   name="Code"
                                   type="text"
@@ -406,8 +406,8 @@ export default function Form() {
                                 />
                               </div>
                             </div>
-                            <div className="flex flex-wrap w-full justify-between">
-                              <div className="mb-3 w-[48%]">
+                            <div className="flex flex-wrap w-full gap-x-6">
+                              <div className="mb-3 w-60">
                                 <DropdownInput
                                   name="State"
                                   options={dropDownListObject(
@@ -429,7 +429,7 @@ export default function Form() {
                                   // disabled={true}
                                 />
                               </div>
-                              <div className="w-[48%]">
+                              <div className="w-16">
                                 <TextInput
                                   name="Country"
                                   width={"w-[150px]"}

@@ -199,7 +199,7 @@ useEffect(() => {
                 onClick={() => {
                   setReadOnly(false);
                 }}
-                className="px-3 py-1 text-indigo-600 hover:bg-indigo-600 hover:text-white border border-indigo-600 text-xs rounded"
+                className="px-3 py-1 text-green-600 hover:bg-green-600 hover:text-white border border-green-600 text-xs rounded"
               >
                 Edit
               </button>
@@ -245,6 +245,7 @@ useEffect(() => {
                 readOnly={readOnly}
                 disabled={childRecord.current > 0}
               />
+              <div className="w-24">
               <TextInput
                 name="Start Date"
                 type="text"
@@ -260,7 +261,8 @@ useEffect(() => {
                 setValue={() => {}}
                 required={true}
                 disabled={true}
-              />
+              /></div>
+                <div className="w-24">
               <TextInput
                 name="End Date"
                 type="text"
@@ -274,7 +276,7 @@ useEffect(() => {
                 setValue={() => {}}
                 required={true}
                 disabled={true}
-              />
+              /></div>
             </div>
           </div>
           <div className="bg-white   rounded-md border mt-1 border-gray-200 h-full w-full p-3">
@@ -308,25 +310,25 @@ useEffect(() => {
                   //   }
                   // }}
                 >
-                  <table className="w-full border-collapse table-fixed">
+                  <table className="w-80 border-collapse table-fixed">
                     <thead className="bg-gray-200 text-gray-800">
                       <tr>
                         <th className="w-12 px-4 py-2 text-center font-medium text-[13px]">S.No</th>
-                        <th className="w-36 px-4 py-2 text-center font-medium text-[13px]">
+                        <th className="w-28 px-2 py-2 text-center font-medium text-[13px]">
                           Start Date
                         </th>
-                        <th className="w-36 px-4 py-2 text-center font-medium text-[13px]">End Date</th>
-                        <th className="w-36 px-4 py-2 text-center font-medium text-[13px]">
+                        <th className="w-28  px-2  py-2 text-center font-medium text-[13px]">End Date</th>
+                        <th className="w-28  px-2  py-2 text-center font-medium text-[13px]">
                           Salary Date
                         </th>
                         <th className="w-44 px-4 py-2 text-center font-medium text-[13px]">
                           Pay Month
                         </th>
-                        <th className="w-36 px-4 py-2 text-center font-medium text-[13px]">
+                        <th className="w-28 py-2 text-center font-medium text-[13px]">
                           Pay Period Days
                         </th>
-                        <th className="w-32 px-4 py-2 text-center font-medium text-[13px]">Holidays</th>
-                        <th className="w-[310px] px-4 py-2 text-center font-medium text-[13px]">
+                        <th className="w-24 px-4 py-2 text-center font-medium text-[13px]">Holidays</th>
+                        <th className="w-44 px-4 py-2 text-center font-medium text-[13px]">
                           Notes
                         </th>
 

@@ -476,9 +476,9 @@ export default function Form() {
                                 styles={{
                                   control: (base) => ({
                                     ...base,
-                                    minHeight: "22px", // Reduce overall height
-                                    height: "22px", // Force height
-                                    padding: "14px 4px", // Adjust padding inside
+                                    minHeight: "16px", // Reduce overall height
+                                    height: "16px", // Force height
+                                    padding: "13px 4px", // Adjust padding inside
                                     fontSize: "12px", // Make text smaller
                                     borderRadius: "8px",
                                     fontFamily: "'Segoe UI'",
@@ -529,7 +529,7 @@ export default function Form() {
                                 type="text"
                                 value={countryCode}
                                 readOnly={readOnly || childRecord.current > 0}
-                                className={`w-full px-3 py-1.5 text-xs border border-gray-300 rounded-lg
+                                className={`w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
   focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
   transition-all duration-150 shadow-sm
   ${
@@ -538,6 +538,7 @@ export default function Form() {
       : "bg-white hover:border-gray-400"
   }`}
                                 disabled={readOnly || childRecord.current > 0}
+                                placeholder="Code"
                               />
                             </div>
                           </div>

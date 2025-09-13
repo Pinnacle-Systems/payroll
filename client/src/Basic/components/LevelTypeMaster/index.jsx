@@ -1,79 +1,62 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import secureLocalStorage from "react-secure-storage";
 import {
-  useGetFinYearQuery,
-  useGetFinYearByIdQuery,
-  useAddFinYearMutation,
-  useUpdateFinYearMutation,
-  useDeleteFinYearMutation,
-} from "../../../redux/services/FinYearMasterService";
-import FormHeader from "../FormHeader";
-import FormReport from "../FormReportTemplate";
-import { toast } from "react-toastify";
-import {
-  DateInput,
-  CheckBox,
-  DisabledInput,
-  ToggleButton,
-  ReusableTable,
-  TextInput,
-} from "../../../Inputs";
-import ReportTemplate from "../ReportTemplate";
-import { getYearShortCode } from "../../../Utils/helper";
+  useGetLevelTypeQuery,
+  useGetLevelTypeByIdQuery,
+  useAddLevelTypeMutation,
+  useUpdateLevelTypeMutation,
+  useDeleteLevelTypeMutation,
+} from "../../../redux/services/LevelType.service";
 
-import Mastertable from "../MasterTable/Mastertable";
-import MastersForm from "../MastersForm/MastersForm";
+import { TextInput, ToggleButton, ReusableTable } from "../../../Inputs";
+
 import { statusDropdown } from "../../../Utils/DropdownData";
-import moment from "moment";
 
 import { Check, Power } from "lucide-react";
 import Modal from "../../../UiComponents/Modal";
-import { ReusableInput } from "../../../Uniform/Components/styleesheet/CommonInput";
 import Swal from "sweetalert2";
-
-const MODEL = "Fin Year Master";
+import { getCommonParams } from "../../../Utils/helper";
 
 export default function Form() {
-  const [form, setForm] = useState(false);
+  // const [openTable, setOpenTable] = useState(false);
+
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState("");
+  const [name, setName] = useState("");
+
   const [active, setActive] = useState(true);
-  const [searchValue, setSearchValue] = useState("");
-  const [code, setCode] = useState("");
-  const childRecord = useRef(0);
   const [errors, setErrors] = useState({});
-    const designationRef = useRef(null);
-  const params = {
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
-  };
-  const {
-    data: allData,
-    isLoading,
-    isFetching,
-  } = useGetFinYearQuery({ params, searchParams: searchValue });
+  const [form, setForm] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+  const childRecord = useRef(0);
+  const levelNameref = useRef(null);
+  console.log(form, "form");
+
+  const params = getCommonParams();
+
+  const { branchId } = params;
+
+  const { data: allData } = useGetLevelTypeQuery({
+    params,
+    searchParams: searchValue,
+  });
   const {
     data: singleData,
     isFetching: isSingleFetching,
     isLoading: isSingleLoading,
-  } = useGetFinYearByIdQuery(id, { skip: !id });
+  } = useGetLevelTypeByIdQuery(id, { skip: !id });
 
-  const [addData] = useAddFinYearMutation();
-  const [updateData] = useUpdateFinYearMutation();
-  const [removeData] = useDeleteFinYearMutation();
+  const [addData] = useAddLevelTypeMutation();
+  const [updateData] = useUpdateLevelTypeMutation();
+  const [removeData] = useDeleteLevelTypeMutation();
 
   const syncFormWithDb = useCallback(
     (data) => {
-      if (id) {
-        // setReadOnly(true);
-        setTo(data?.to ? moment.utc(data.to).format("YYYY-MM-DD") : "");
-        setFrom(data?.from ? moment.utc(data.from).format("YYYY-MM-DD") : "");
-        setActive(data?.active);
-        setCode(data?.code);
-      }
+      // setReadOnly(true);
+      setName(data?.name || "");
+
+      setActive(id ? data?.active ?? false : true);
+      childRecord.current = data?.childRecord ? data?.childRecord : 0;
     },
     [id]
   );
@@ -82,42 +65,34 @@ export default function Form() {
     syncFormWithDb(singleData?.data);
   }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
 
+  console.log(singleData?.data, "singleData?.data");
+
   const data = {
-    from,
-    to,
+    name,
+
     active,
     companyId: secureLocalStorage.getItem(
       sessionStorage.getItem("sessionId") + "userCompanyId"
     ),
     id,
-    code,
+    branchId,
   };
 
   const validateData = (data) => {
-    if (data.from && data.to) {
+    if (data?.name) {
       return true;
     }
     return false;
   };
-     useEffect(() => {
-       if (form && !readOnly && designationRef.current) {
-         designationRef.current.focus();
-       }
-     }, [form, readOnly]);
-  const validateOneActiveFinYear = (active) => {
-    if (Boolean(active)) {
-      return !allData.data.some((finYear) =>
-        id === finYear.id ? false : Boolean(finYear.active)
-      );
+  useEffect(() => {
+    if (form && !readOnly && levelNameref.current) {
+      levelNameref.current.focus();
     }
-    return true;
-  };
-
+  }, [form, readOnly]);
   const handleSubmitCustom = async (callback, data, text) => {
     try {
       let returnData = await callback(data).unwrap();
       setId(returnData.data.id);
-      syncFormWithDb(undefined);
       Swal.fire({
         title: text + "  " + "Successfully",
         icon: "success",
@@ -139,23 +114,15 @@ export default function Form() {
   };
 
   const saveData = () => {
-    if (!validateOneActiveFinYear(data.active)) {
+    if (!validateData(data)) {
       Swal.fire({
         icon: "error",
         title: "Submission error",
-        text: "Only one Fin year can be active",
+        text: "Please fill all required fields...!",
       });
       return;
     }
-    if (!validateData(data)) {
-         Swal.fire({
-           icon: "error",
-           title: "Submission error",
-           text: "Please fill all required fields...!",
-         });
-         return;
-       }
-    
+
     if (id) {
       handleSubmitCustom(updateData, data, "Updated");
     } else {
@@ -173,8 +140,8 @@ export default function Form() {
         if (deldata?.statusCode == 1) {
           Swal.fire({
             icon: "error",
-            title: "Submission error",
-            text: deldata.data?.message || "Something went wrong!",
+            title: "Child record Exists",
+            text: deldata.data?.message || "Data cannot be deleted!",
           });
           return;
         }
@@ -191,6 +158,7 @@ export default function Form() {
           title: "Submission error",
           text: error.data?.message || "Something went wrong!",
         });
+        setForm(false);
       }
     }
   };
@@ -205,64 +173,12 @@ export default function Form() {
 
   const onNew = () => {
     setId("");
+    setName("");
+
+    setActive(true);
     setReadOnly(false);
     setForm(true);
     setSearchValue("");
-    setTo("");
-    setFrom("");
-    setCode("");
-    setActive(true)
-  };
-
-  function onDataClick(id) {
-    setId(id);
-    setForm(true);
-  }
-  const tableHeaders = [
-    "S.NO",
-    "From",
-    "To",
-    "Status",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-  ];
-  const tableDataNames = [
-    "index+1",
-    "dataObj.from",
-    "dataObj.to",
-    "dataObj.active ? ACTIVE : INACTIVE",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-  ];
-  const handleView = (id) => {
-    setId(id);
-    setForm(true);
-    setReadOnly(true);
-    console.log("view");
-  };
-  const handleEdit = (id) => {
-    setId(id);
-    setForm(true);
-    setReadOnly(false);
-    console.log("Edit");
   };
 
   const ACTIVE = (
@@ -283,62 +199,48 @@ export default function Form() {
     },
 
     {
-      header: "From",
-      accessor: (item) =>
-        item.from ? new Date(item.from).toISOString().split("T")[0] : "",
+      header: "Level Name",
+      accessor: (item) => item?.name,
       //   cellClass: () => "font-medium  text-gray-900",
-      className: " text-gray-900 text-center uppercase w-28",
+      className: " text-gray-900 text-left pl-2 uppercase w-72",
     },
-    {
-      header: "To",
-      accessor: (item) =>
-        item.to ? new Date(item.to).toISOString().split("T")[0] : "",
-      //   cellClass: () => "font-medium text-gray-900",
-      className: " text-gray-900 text-center uppercase w-28",
-    },
-    {
-      header: "Code",
-      accessor: (item) => item.code,
-      //   cellClass: () => "font-medium text-gray-900",
-      className: " text-gray-900 text-center uppercase w-28",
-    },
+
     {
       header: "Status",
       accessor: (item) => (item.active ? ACTIVE : INACTIVE),
       //   cellClass: () => "font-medium text-gray-900",
-      className: " text-gray-900 text-center uppercase w-28",
+      className: " text-gray-900 text-center uppercase w-16",
     },
   ];
+  const handleView = (id) => {
+    setId(id);
+    setForm(true);
+    setReadOnly(true);
+    console.log("view");
+  };
+  const handleEdit = (id) => {
+    setId(id);
+    setForm(true);
+    setReadOnly(false);
+    console.log("Edit");
+  };
   return (
-    <div onKeyDown={handleKeyDown} className="p-1 ">
+    <div onKeyDown={handleKeyDown} className="p-1">
       <div className="w-full flex bg-white p-1 justify-between  items-center">
-        <h1 className="text-2xl font-bold text-gray-800">Fin Year Master</h1>
-        <div className="flex items-center gap-4">
+        <h1 className="text-2xl font-bold text-gray-800">Level Type Master</h1>
+        <div className="flex items-center">
           <button
             onClick={() => {
               setForm(true);
               onNew();
-              setId("");
             }}
             className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
           >
-            + Add New Fin Year
+            + Add New Level Type
           </button>
         </div>
       </div>
-      {/* <div className="w-full flex items-start">
-        <Mastertable
-          header={"Fin Year list"}
-          searchValue={searchValue}
-          setSearchValue={setSearchValue}
-          onDataClick={onDataClick}
-          // setOpenTable={setOpenTable}
-          tableHeaders={tableHeaders}
-          tableDataNames={tableDataNames}
-          data={allData?.data}
-          loading={isLoading || isFetching}
-        />
-      </div> */}
+
       <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-3">
         <ReusableTable
           columns={columns}
@@ -349,12 +251,11 @@ export default function Form() {
           itemsPerPage={10}
         />
       </div>
-      {console.log(readOnly, "con")}
       {form === true && (
         <Modal
           isOpen={form}
           form={form}
-          widthClass={"w-[40%] h-[50%]"}
+          widthClass={"w-[40%]  h-[45%]"}
           onClose={() => {
             setForm(false);
             setErrors({});
@@ -365,7 +266,7 @@ export default function Form() {
             <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
               <div className="flex items-center gap-2">
                 <h2 className="text-lg  py-0.5 font-semibold  text-gray-800">
-                  Fin year Master
+                  Level Type Master
                 </h2>
               </div>
               <div className="flex gap-2">
@@ -388,7 +289,7 @@ export default function Form() {
                       type="button"
                       onClick={saveData}
                       className="px-3 py-1 hover:bg-green-600 hover:text-white rounded text-green-600 
-                  border border-green-600 flex items-center gap-1 text-xs"
+                     border border-green-600 flex items-center gap-1 text-xs"
                     >
                       <Check size={14} />
                       {id ? "Update" : "Save"}
@@ -402,61 +303,22 @@ export default function Form() {
               <div className="grid grid-cols-1  gap-3  h-full">
                 <div className="lg:col-span- space-y-3">
                   <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
-                    <div className="space-y-2">
-                      <div className="flex gap-x-6">
-                        <div className="w-30">
-                          <DateInput
-                            name="From"
-                            value={from}
-                            setValue={setFrom}
+                    <div className="space-y-4 ">
+                      <div className="flex flex-wrap">
+                        <div className="mb-3 w-72">
+                          <TextInput
+                            name="Level Name"
+                            type="text"
+                            value={name}
+                            setValue={setName}
                             required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
-                             ref={designationRef}
+                            ref={levelNameref}
                           />
-
-                          {errors.name && (
-                            <span className="text-red-500 text-xs ml-1">
-                              {errors.name}
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="w-30">
-                          <DateInput
-                            name="To"
-                            value={to}
-                            setValue={setTo}
-                            required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                          />
-                        </div>
-                        <div className="w-16">
-                          <label className="block text-xs font-bold text-slate-700 ">
-                            Short Code
-                            <input
-                              name="code"
-                              className={`w-full px-3 font-normal  py-1 mt-1 text-xs border border-gray-300 rounded-lg
-          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-          transition-all duration-150 shadow-sm 
-           ${
-             readOnly || childRecord.current > 0
-               ? "bg-gray-100 text-gray-500 cursor-not-allowed"
-               : "bg-white hover:border-gray-400"
-           }
-          
-          `}
-                              value={code}
-                              onChange={(e) => setCode(e.target.value)}
-                              readOnly={readOnly || childRecord.current > 0}
-                              disabled={childRecord.current > 0}
-                            />
-                          </label>
                         </div>
                       </div>
-
-                      <div className=" pt-5">
+                      <div className="mb-3">
                         <ToggleButton
                           name="Status"
                           options={statusDropdown}
@@ -464,7 +326,6 @@ export default function Form() {
                           setActive={setActive}
                           required={true}
                           readOnly={readOnly}
-                          disabled={childRecord.current > 0}
                         />
                       </div>
                     </div>
@@ -473,8 +334,6 @@ export default function Form() {
               </div>
             </div>
           </div>
-
-          {/* </MastersForm> */}
         </Modal>
       )}
     </div>

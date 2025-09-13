@@ -6,37 +6,33 @@ import {
   useAddStateMutation,
   useUpdateStateMutation,
   useDeleteStateMutation,
-  useLazyGetStateByIdQuery,
+ 
 } from "../../../redux/services/StateMasterService";
 import { useGetCountriesQuery } from "../../../redux/services/CountryMasterService";
 
-import FormHeader from "../FormHeader";
-import FormReport from "../FormReportTemplate";
-import { toast } from "react-toastify";
+
 import {
   TextInput,
-  CheckBox,
+  
   DropdownInput,
   ToggleButton,
   ReusableTable,
 } from "../../../Inputs";
-import ReportTemplate from "../ReportTemplate";
+
 import { dropDownListObject } from "../../../Utils/contructObject";
 import { useDispatch } from "react-redux";
-import Mastertable from "../MasterTable/Mastertable";
-import MastersForm from "../MastersForm/MastersForm";
+
 import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
 import Swal from "sweetalert2";
-import Select from "react-dropdown-select";
 
-const MODEL = "State Master";
+
 
 export default function Form() {
   const [form, setForm] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const [openTable, setOpenTable] = useState(false);
+  
 
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
@@ -61,8 +57,7 @@ export default function Form() {
 
   const {
     data: allData,
-    isLoading,
-    isFetching,
+   
   } = useGetStateQuery({ params, searchParams: searchValue });
 
   const {
@@ -430,9 +425,9 @@ export default function Form() {
                 <div className="grid grid-cols-1  gap-3  h-full">
                   <div className="lg:col-span- space-y-3">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
-                      <div className="space-y-4 ">
+                      <div className="space-y-2 ">
                         <div className="flex">
-                          <div className="mb-3 w-[200px]">
+                          <div className="mb-3 w-72">
                             <TextInput
                               name="State Name"
                               type="text"
@@ -446,7 +441,7 @@ export default function Form() {
                               ref={stateNameRef}
                             />
                           </div>
-                          <div className="mb-3 ms-3">
+                          <div className="mb-3 ms-3 w-20">
                             <TextInput
                               name="Code"
                               type="text"
@@ -460,7 +455,7 @@ export default function Form() {
                         </div>
 
                         <div className="flex">
-                          <div className="w-[200px] mb-3 ">
+                          <div className="w-72 mb-3 ">
                             <DropdownInput
                               name="Country"
                               options={dropDownListObject(
@@ -472,7 +467,7 @@ export default function Form() {
                                 "name",
                                 "id"
                               )}
-                              className={`w-[150px]`}
+                              className={`w-[200px]`}
                               value={country}
                               setValue={setCountry}
                               required={true}

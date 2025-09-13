@@ -67,6 +67,8 @@ model Company {
   CompanyPaycode      CompanyPaycode[]
   BloodGroupMaster    BloodGroupMaster[]
   CompanyPayStructure CompanyPayStructure[]
+  LevelType           LevelType[]
+  PFESIEditor         PFESIEditor[]
 }
 
 model Subscription {
@@ -115,6 +117,8 @@ model Branch {
   CompanyPaycode      CompanyPaycode[]
   BloodGroupMaster    BloodGroupMaster[]
   CompanyPayStructure CompanyPayStructure[]
+  LevelType           LevelType[]
+  PFESIEditor         PFESIEditor[]
 }
 
 model UserOnBranch {
@@ -217,6 +221,10 @@ model User {
   BloodGroupMasterupdatedBy    BloodGroupMaster[]    @relation(name: "updatedBy")
   CompanyPayStructureCreatedBy CompanyPayStructure[] @relation(name: "createdBy")
   CompanyPayStructureupdatedBy CompanyPayStructure[] @relation(name: "updatedBy")
+  LevelTypeCreatedBy           LevelType[]           @relation(name: "createdBy")
+  LevelTypeupdatedBy           LevelType[]           @relation(name: "updatedBy")
+  PFESIEditorCreatedBy         PFESIEditor[]         @relation(name: "createdBy")
+  PFESIEditorupdatedBy         PFESIEditor[]         @relation(name: "updatedBy")
 }
 
 model Employee {
@@ -1427,6 +1435,7 @@ model PayDetails {
   esi              String?
   pickFrom         String?
   PayStructure     PayStructure[]
+  PFESIEditor      PFESIEditor[]
 }
 
 model BloodGroupMaster {
@@ -1472,10 +1481,54 @@ model PayStructure {
   id                    Int                  @id @default(autoincrement())
   CompanyPayStructure   CompanyPayStructure? @relation(fields: [companyPayStructureId], references: [id], onDelete: Cascade)
   companyPayStructureId Int?
-  PayDetails            PayDetails? @relation(fields: [payDetailsId], references: [id])
+  PayDetails            PayDetails?          @relation(fields: [payDetailsId], references: [id])
   payDetailsId          Int?
-  salaryPercentage     Float?
-  mark                  Boolean?   @default(false)
+  salaryPercentage      Float?
+  mark                  Boolean?             @default(false)
   formula               String?
   notes                 String?
+}
+
+model LevelType {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation("createdBy", fields: [createdById], references: [id])
+  createdById Int?
+  updatedBy   User?    @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById Int?
+  companyId   Int?
+  company     Company? @relation(fields: [companyId], references: [id])
+  branch      Branch?  @relation(fields: [branchId], references: [id])
+  branchId    Int?
+  name        String?
+  active      Boolean? @default(true)
+}
+
+model PFESIEditor {
+  id           Int         @id @default(autoincrement())
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  createdBy    User?       @relation("createdBy", fields: [createdById], references: [id])
+  createdById  Int?
+  updatedBy    User?       @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById  Int?
+  companyId    Int?
+  company      Company?    @relation(fields: [companyId], references: [id])
+  branch       Branch?     @relation(fields: [branchId], references: [id])
+  branchId     Int?
+  PayDetails   PayDetails? @relation(fields: [payDetailsId], references: [id])
+  payDetailsId Int?
+  docId        String?
+  date         DateTime?
+  PfEsiGrid    PfEsiGrid[]
+}
+
+model PfEsiGrid {
+  id            Int          @id @default(autoincrement())
+  PFESIEditor   PFESIEditor? @relation(fields: [pFESIEditorId], references: [id], onDelete: Cascade)
+  pFESIEditorId Int?
+  fromValue     Float?
+  toValue       Float?
+  percentage    Float?
 }

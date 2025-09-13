@@ -45,5 +45,7 @@ export { default as employeeSubCategory } from "./employeeSubCategory.route.js";
 export { default as payfrequency } from "./payFrequency.route.js";
 export { default as payComponents } from "./payComponents.route.js";
 export { default as companyPaycode } from "./companyPayCode.route.js";
-export {default as bloodGroup} from './bloodGroup.route.js' 
-export {default as payStructure} from './payStructure.route.js'
+export { default as bloodGroup } from "./bloodGroup.route.js";
+export { default as payStructure } from "./payStructure.route.js";
+export { default as LevelType } from "./levelType.route.js";
+export { default as pFEsiEditor } from "./pFEsiEditor.route.js";

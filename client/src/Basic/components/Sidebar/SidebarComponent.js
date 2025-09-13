@@ -153,7 +153,7 @@ const SidebarComponent = ({ logo, groups, pages, isMainDropdownOpen, setIsMainDr
             {isMainDropdownOpen === true && (
                 <div className=" "  >
 
-                    <div className=" bg-white p-4 rounded-lg shadow-2xl outline outline-1 outline-gray-300 h-[650px] overflow-y-auto w-[400px] transition-all duration-200 space-y-4">
+                    <div className=" bg-white p-4 rounded-lg shadow-2xl outline outline-1 outline-gray-300 h-[90vh] overflow-y-auto w-[400px] transition-all duration-200 space-y-4">
                         <h1 className="text-lg font-bold">Masters</h1>
                         <div className='relative'>
                             <input className=' w-full pl-3 pr-10 py-2 text-sm text-gray-700 bg-gray-100 rounded-full outline-none focus:ring-2 focus:ring-blue-500'

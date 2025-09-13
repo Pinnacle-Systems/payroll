@@ -307,7 +307,7 @@ const EmployeeSubCategory = () => {
                 </div>
               </div>
 
-              <div className="flex-1 overflow-auto p-3">
+              <div className="flex-1  p-3">
                 <div className="grid grid-cols-1  gap-3  h-full">
                   <div className="lg:col-span- space-y-3">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
@@ -322,7 +322,7 @@ const EmployeeSubCategory = () => {
                               ref={employeeRef}
                               className={`w-full px-2 h-[27px] text-[12px] border border-slate-300 rounded-md 
   focus:border-indigo-300 focus:outline-none transition-all duration-200
-  hover:border-slate-400
+  hover:border-slate-400 overflow-y-scroll
   ${
     readOnly
       ? "bg-gray-100 text-gray-500 cursor-not-allowed"
@@ -333,10 +333,11 @@ const EmployeeSubCategory = () => {
                                 setEmployeeCategoryId(Number(e.target.value));
                               }}
                               disabled={readOnly}
+                               
                             >
                               <option value="">Select Category</option>
 
-                              {console.log(employeeCategory?.data, "dropdown")}
+                            
 
                               {employeeCategory?.data?.map((doc) => (
                                 <option value={doc?.id} key={doc.id}>
