@@ -6,7 +6,6 @@ import FormReport from '../../components/FormReportTemplate';
 import { TextInput, ToggleButton } from '../../../Inputs';
 import { statusDropdown } from '../../../Utils/DropdownData';
 import Modal from '../../../UiComponents/Modal';
-import e from 'cors';
 import Mastertable from '../MasterTable/Mastertable';
 import MasterForm from '../MastersForm/MastersForm';
 import { useAddMachineMutation, useDeleteMachineMutation, useGetMachineByIdQuery, useGetMachineQuery, useUpdateMachineMutation } from '../../../redux/services/MachineMasterService';

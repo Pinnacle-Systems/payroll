@@ -334,32 +334,32 @@ export default function Form() {
       setBankDetails(
         (data?.EmployeeBankDetails || [])?.map((b, i) => ({
           Sno: i + 1,
-          bankName: b.bankName || "",
-          branchName: b.branchName || "",
-          accountNumber: b.accountNumber || "",
-          ifscCode: b.ifscCode || "",
+          bankName: b?.bankName || "",
+          branchName: b?.branchName || "",
+          accountNumber: b?.accountNumber || "",
+          ifscCode: b?.ifscCode || "",
         }))
       );
 
       setEducationDetails(
         (data?.EmployeeEducationdetails || [])?.map((e, i) => ({
           Sno: i + 1,
-          courseName: e.courseName || "",
-          universityName: e.universityName || "",
-          institutionName: e.institutionName || "",
-          yearOfPass: e.yearOfPass || "",
+          courseName: e?.courseName || "",
+          universityName: e?.universityName || "",
+          institutionName: e?.institutionName || "",
+          yearOfPass: e?.yearOfPass || "",
         }))
       );
 
       setFamilyDetails(
         data?.EmployeeFamilyDetails?.map((f, i) => ({
           Sno: i + 1,
-          name: f.name || "",
-          dob: f.dob ? moment.utc(f.dob).format("YYYY-MM-DD") : "",
-          age: f.age || "",
-          relationShip: f.relationShip || "",
-          occupation: f.occupation || "",
-          nominee: f.nominee || "",
+          name: f?.name || "",
+          dob: f?.dob ? moment.utc(f.dob).format("YYYY-MM-DD") : "",
+          age: f?.age || "",
+          relationShip: f?.relationShip || "",
+          occupation: f?.occupation || "",
+          nominee: f?.nominee || "",
         }))
       );
 
@@ -1268,7 +1268,7 @@ export default function Form() {
                   "Bank Details",
                   "Education Details",
                   "Family Details",
-                ].map((tabNumber) => (
+                ]?.map((tabNumber) => (
                   <button
                     key={tabNumber}
                     onClick={() => handleTabClick(tabNumber)}
@@ -1297,7 +1297,7 @@ export default function Form() {
                       />
                     
                     
-                    <div className=" ml-3 grid grid-cols-5 gap-4 ">
+                    <div className="ml-3 grid grid-cols-5 gap-4 ">
                        
                       <div className="col-span-1">
                         <DropdownInput
@@ -1776,7 +1776,7 @@ export default function Form() {
                             <TextArea
                               inputClass="h-12"
                               name="Address"
-                              value={presentAddress.address}
+                              value={presentAddress?.address}
                               setValue={(val) =>
                                 handlePresentChange("address", val)
                               }
@@ -1792,7 +1792,7 @@ export default function Form() {
                           <div className="col-span-1">
                             <TextInput
                               name="Village"
-                              value={presentAddress.village}
+                              value={presentAddress?.village}
                               setValue={(val) =>
                                 handlePresentChange("village", val)
                               }
@@ -1804,7 +1804,7 @@ export default function Form() {
                             <DropdownInput
                               ref={input1Ref}
                               name="Choose City"
-                              value={presentAddress.cityId}
+                              value={presentAddress?.cityId}
                               setValue={(val) =>
                                 handlePresentChange("cityId", val)
                               }
@@ -1831,7 +1831,7 @@ export default function Form() {
                             <DropdownInput
                               ref={input1Ref}
                               name="Choose State"
-                              value={presentAddress.stateId}
+                              value={presentAddress?.stateId}
                               setValue={(val) =>
                                 handlePresentChange("stateId", val)
                               }
@@ -1855,7 +1855,7 @@ export default function Form() {
                             <DropdownInput
                               ref={input1Ref}
                               name="Choose Country"
-                              value={presentAddress.countryId}
+                              value={presentAddress?.countryId}
                               setValue={(val) =>
                                 handlePresentChange("countryId", val)
                               }
@@ -1878,7 +1878,7 @@ export default function Form() {
                           <div className="col-span-1">
                             <TextInput
                               name="Pincode"
-                              value={presentAddress.pincode}
+                              value={presentAddress?.pincode}
                               setValue={(val) =>
                                 handlePresentChange("pincode", val)
                               }
@@ -1889,7 +1889,7 @@ export default function Form() {
                           <div className="col-span-1">
                             <TextInput
                               name="Mobile No"
-                              value={presentAddress.mobile}
+                              value={presentAddress?.mobile}
                               setValue={(val) =>
                                 handlePresentChange("mobile", val)
                               }
@@ -1920,7 +1920,7 @@ export default function Form() {
                             <TextArea
                               inputClass="h-12"
                               name="Address"
-                              value={permanentAddress.address}
+                              value={permanentAddress?.address}
                               setValue={(val) =>
                                 handlePermanentChange("address", val)
                               }
@@ -1933,7 +1933,7 @@ export default function Form() {
                           <div className="col-span-1">
                             <TextInput
                               name="Village"
-                              value={permanentAddress.village}
+                              value={permanentAddress?.village}
                               setValue={(val) =>
                                 handlePermanentChange("village", val)
                               }
@@ -1946,7 +1946,7 @@ export default function Form() {
                           <div className="col-span-1">
                             <DropdownInput
                               name="Choose City"
-                              value={permanentAddress.cityId}
+                              value={permanentAddress?.cityId}
                               setValue={(val) =>
                                 handlePermanentChange("cityId", val)
                               }
@@ -1965,7 +1965,7 @@ export default function Form() {
                           <div className="col-span-1">
                             <DropdownInput
                               name="Choose State"
-                              value={permanentAddress.stateId}
+                              value={permanentAddress?.stateId}
                               setValue={(val) =>
                                 handlePermanentChange("stateId", val)
                               }
@@ -1983,7 +1983,7 @@ export default function Form() {
                           <div className="col-span-1">
                             <DropdownInput
                               name="Choose Country"
-                              value={permanentAddress.countryId}
+                              value={permanentAddress?.countryId}
                               setValue={(val) =>
                                 handlePermanentChange("countryId", val)
                               }
@@ -2001,7 +2001,7 @@ export default function Form() {
                           <div className="col-span-1">
                             <TextInput
                               name="Pincode"
-                              value={permanentAddress.pincode}
+                              value={permanentAddress?.pincode}
                               setValue={(val) =>
                                 handlePermanentChange("pincode", val)
                               }
@@ -2014,7 +2014,7 @@ export default function Form() {
                           <div className="col-span-1">
                             <TextInput
                               name="Mobile No"
-                              value={permanentAddress.mobile}
+                              value={permanentAddress?.mobile}
                               setValue={(val) =>
                                 handlePermanentChange("mobile", val)
                               }
@@ -2109,7 +2109,7 @@ export default function Form() {
                                 <input
                                   // name="Branch Name"
                                   type="text"
-                                  value={item.branchName}
+                                  value={item?.branchName}
                                   onChange={(e) =>
                                     handleBankDetailsChange(
                                       index,
@@ -2126,7 +2126,7 @@ export default function Form() {
                                 <input
                                   // name="Account Number"
                                   type="number"
-                                  value={item.accountNumber}
+                                  value={item?.accountNumber}
                                   onChange={(e) =>
                                     handleBankDetailsChange(
                                       index,
@@ -2143,7 +2143,7 @@ export default function Form() {
                                 <input
                                   // name="IFSC CODE"
                                   type="text"
-                                  value={item.ifscCode}
+                                  value={item?.ifscCode}
                                   onChange={(e) =>
                                     handleBankDetailsChange(
                                       index,
@@ -2298,7 +2298,7 @@ export default function Form() {
                                 <input
                                   // name="IFSC CODE"
                                   type="text"
-                                  value={item.yearOfPass}
+                                  value={item?.yearOfPass}
                                   onChange={(e) =>
                                     handleEDucationDetailsChange(
                                       index,
@@ -2463,7 +2463,7 @@ export default function Form() {
                                 <input
                                   // name="IFSC CODE"
                                   type="text"
-                                  value={item.relationShip}
+                                  value={item?.relationShip}
                                   onChange={(e) =>
                                     handleFamilyDetailsChange(
                                       index,
@@ -2480,7 +2480,7 @@ export default function Form() {
                                 <input
                                   // name="IFSC CODE"
                                   type="text"
-                                  value={item.occupation}
+                                  value={item?.occupation}
                                   onChange={(e) =>
                                     handleFamilyDetailsChange(
                                       index,
@@ -2497,7 +2497,7 @@ export default function Form() {
                                 <input
                                   // name="IFSC CODE"
                                   type="text"
-                                  value={item.nominee}
+                                  value={item?.nominee}
                                   onChange={(e) =>
                                     handleFamilyDetailsChange(
                                       index,

@@ -1918,7 +1918,7 @@ export const CheckBox = ({
 };
 
 export const validateEmail = (data) => {
-  return validator.isEmail(data);
+  return validator?.isEmail(data);
 };
 
 export const validateMobile = (data) => {
@@ -2220,7 +2220,7 @@ export const ReusableTable = ({
 
   return (
     <>
-    <div className="bg-[#F1F1F0] h-[70%]  shadow-sm overflow-hidden ">
+    <div className="bg-[#F1F1F0] h-[70vh]  shadow-sm overflow-hidden ">
       <table className=" border-collapse">
         <thead className="bg-gray-200 text-gray-800">
           <tr>
@@ -2311,7 +2311,7 @@ export const ReusableTable = ({
      
     
     </div>
-    <div className=" h-[8%]">
+    <div className=" h-[8vh]">
 <Pagination />
     </div>
  

@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import secureLocalStorage from 'react-secure-storage';
 import { toast } from 'react-toastify';
 
-import e from 'cors';
 
 import { push } from '../../../redux/features/opentabs';
 import { useDispatch, useSelector } from 'react-redux';

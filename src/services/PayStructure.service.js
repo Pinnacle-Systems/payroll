@@ -38,6 +38,8 @@ async function getNextDocId(
 }
 
 async function get(req) {
+  console.log("pay structute get called");
+  
   const { companyId, active, branchId, finYearId, searchDocId } = req.query;
 
   console.log(companyId, active, finYearId, "received--");
