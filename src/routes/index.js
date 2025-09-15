@@ -49,3 +49,5 @@ export { default as bloodGroup } from "./bloodGroup.route.js";
 export { default as payStructure } from "./payStructure.route.js";
 export { default as LevelType } from "./levelType.route.js";
 export { default as pFEsiEditor } from "./pFEsiEditor.route.js";
+export { default as relationShip } from "./relationShip.route.js";
+export { default as proof } from "./proof.route.js";

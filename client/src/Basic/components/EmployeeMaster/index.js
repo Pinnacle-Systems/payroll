@@ -67,6 +67,7 @@ import { faL } from "@fortawesome/free-solid-svg-icons";
 import { FaQuestionCircle, FaUpload } from "react-icons/fa";
 import { getImageUrlPath } from "../../../Constants";
 import { useGetemployeeSubCategoryQuery } from "../../../redux/services/EmployeeSubCategoryservice";
+import Select from "react-dropdown-select";
 const MODEL = "Employee Master";
 export default function Form() {
   const [view, setView] = useState("table");
@@ -142,15 +143,14 @@ export default function Form() {
   const [bankDetails, setBankDetails] = useState([]);
   const [educationDetails, setEducationDetails] = useState([]);
   const [familyDetails, setFamilyDetails] = useState([]);
-  const [employeeSubCategoryId,setEmployeeSubCategoryId] = useState('')
-  const [open, setOpen] = useState(false);
+  const [employeeSubCategoryId, setEmployeeSubCategoryId] = useState("");
+ 
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageRemoved, setImageRemoved] = useState(false);
   // const [readOnly, setReadOnly] = useState(false)
   // const [id, setId] = useState("");
-  const [showImageTooltip, setShowImageTooltip] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+
   // const [mode, setMode] = useState('view')
   const fileInputRef = useRef(null);
   const [presentAddress, setPresentAddress] = useState({
@@ -194,6 +194,7 @@ export default function Form() {
   const companyId = secureLocalStorage.getItem(
     sessionStorage.getItem("sessionId") + "userCompanyId"
   );
+  const { data: bloodGroupList } = useGetBloodGroupQuery({ params });
   const { data: cityList } = useGetCityQuery({ params });
 
   const { data: stateList } = useGetStateQuery({ params });
@@ -203,10 +204,12 @@ export default function Form() {
   const { data: employeeCategoryList } = useGetEmployeeCategoryQuery({
     params: companyId,
   });
- const { data : employeeSubCategoryList} = useGetemployeeSubCategoryQuery({params})
+  const { data: employeeSubCategoryList } = useGetemployeeSubCategoryQuery({
+    params,
+  });
   const { data: desigination } = useGetdesignationQuery({ params });
 
-  const { data: bloodGroupList } = useGetBloodGroupQuery({ params });
+  
 
   const { data: department } = useGetDepartmentQuery({ params });
   const {
@@ -276,7 +279,7 @@ export default function Form() {
       // Employment Info
       setDepartmentId(data?.departmentId || "");
       setShiftTemplateId(data?.shiftTemplateId || "");
-      setEmployeeSubCategoryId(data?.employeeSubCategoryId || "")
+      setEmployeeSubCategoryId(data?.employeeSubCategoryId || "");
       setEmployeeCategoryId(data?.employeeCategoryId || "");
       setPayCategory(data?.payCategory || "");
       setSalary(data?.salary || "");
@@ -651,7 +654,7 @@ export default function Form() {
         });
 
         setForm(false);
-        Swal.fire({ 
+        Swal.fire({
           icon: "success",
           title: "Deleted successfully",
           timer: 1500,
@@ -712,7 +715,7 @@ export default function Form() {
     setImage(null);
     // Employment Info
     setShiftTemplateId("");
-    setEmployeeSubCategoryId('')
+    setEmployeeSubCategoryId("");
     setPf("");
     setEsi("");
     setSalary("");
@@ -1288,216 +1291,211 @@ export default function Form() {
                 {step === "Basic Details" && (
                   <div className=" bg-white p-3 rounded-md border border-gray-200 overflow-y-auto">
                     <div className="flex gap-x-8">
-                          <SingleImageFileUploadComponent
+                      <SingleImageFileUploadComponent
                         setWebCam={setCameraOpen}
                         disabled={readOnly}
                         image={image}
                         setImage={setImage}
                         className="mb-3"
                       />
-                    
-                    
-                    <div className="ml-3 grid grid-cols-5 gap-4 ">
-                       
-                      <div className="col-span-1">
-                        <DropdownInput
-                          ref={input1Ref}
-                          name="Employee Type"
-                          value={employeeType}
-                          setValue={setEmployeeType}
-                          options={EmployeeType}
-                          required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                        />
-                      </div>
-                      <div className="col-span-1">
-                        <TextInput
-                          ref={input1Ref}
-                          name="First Name"
-                          value={firstName}
-                          setValue={setFirstName}
-                          required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                        />
-                      </div>{" "}
-                      <div className="col-span-1">
-                        <TextInput
-                          ref={input1Ref}
-                          name="Middle Name"
-                          value={middleName}
-                          setValue={setMiddleName}
-                          // required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                        />
-                      </div>{" "}
-                      <div className="col-span-1">
-                        <TextInput
-                          ref={input1Ref}
-                          name="Last Name"
-                          value={lastName}
-                          setValue={setLastName}
-                          // required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                        />
-                      </div>
-                      <div className="col-span-1">
-                        <TextInput
-                          ref={input1Ref}
-                          name="Father Name"
-                          value={fatherName}
-                          setValue={setFatherName}
-                          // required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                        />
-                      </div>{" "}
-                      <div className="col-span-1">
-                        <TextInput
-                          ref={input1Ref}
-                          name="Mother Name"
-                          value={motherName}
-                          setValue={setMotherName}
-                          // required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                        />
-                      </div>{" "}
-                      <div className="col-span-1">
-                        <DateInput
-                          ref={input1Ref}
-                          name="Date of Birth"
-                          value={dob}
-                          setValue={setDob}
-                          required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                        />
-                      </div>{" "}
-                      <div className="col-span-1">
-                        <DropdownInput
-                          ref={input1Ref}
-                          name="Gender"
-                          value={gender}
-                          setValue={setGender}
-                          options={genderList}
-                          required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                        />
-                      </div>{" "}
-                      <div className="col-span-1">
-                        <DropdownInput
-                          ref={input1Ref}
-                          name="Disability"
-                          value={disability}
-                          setValue={setDisability}
-                          required={true}
-                          readOnly={readOnly}
-                          options={common}
-                          disabled={childRecord.current > 0}
-                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                        />
-                      </div>{" "}
-                      <div className="col-span-1">
-                        <TextInput
-                          ref={input1Ref}
-                          name="Identification Mark"
-                          value={identificationMark}
-                          setValue={setIdentificationMark}
-                          // required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                        />
-                      </div>{" "}
-                      <div className="col-span-1">
-                        <DropdownInput
-                          ref={input1Ref}
-                          name=" Blood Group"
-                          value={bloodGroupId}
-                          setValue={setBloodGroupId}
-                          options={dropDownListObject(
-                            bloodGroupList?.data,
-                            "bgFamily",
-                            "id"
-                          )}
-                          required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                        />
-                      </div>{" "}
-                      <div className="col-span-1">
-                        <DropdownInput
-                          ref={input1Ref}
-                          name="Marital Status"
-                          value={maritalStatus}
-                          setValue={setMaritalStatus}
-                          // required={true}
-                          options={married}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                        />
-                      </div>
-                      <div className="col-span-1">
-                        <TextInput
-                          ref={input1Ref}
-                          name="Height in Cms"
-                          value={height}
-                          setValue={setHeight}
-                          // required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                        />
-                      </div>{" "}
-                      <div className="col-span-1">
-                        <TextInput
-                          ref={input1Ref}
-                          name="Weight in Kgs"
-                          value={weight}
-                          setValue={setWeight}
-                          // required={true}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                        />
-                      </div>
-                      
-                      <Modal
-                        isOpen={cameraOpen}
-                        onClose={() => setCameraOpen(false)}
-                      >
-                        <LiveWebCam
-                          picture={image}
-                          setPicture={setImage}
+
+                      <div className="ml-3 flex flex-wrap gap-4 ">
+                        <div className="w-30">
+                          <DropdownInput
+                            ref={input1Ref}
+                            name="Employee Type"
+                            value={employeeType}
+                            setValue={setEmployeeType}
+                            options={EmployeeType}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                        </div>
+                        <div className="w-30">
+                          <TextInput
+                            ref={input1Ref}
+                            name="First Name"
+                            value={firstName}
+                            setValue={setFirstName}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                        </div>{" "}
+                        <div className="w-30">
+                          <TextInput
+                            ref={input1Ref}
+                            name="Middle Name"
+                            value={middleName}
+                            setValue={setMiddleName}
+                            // required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                        </div>{" "}
+                        <div className="w-30">
+                          <TextInput
+                            ref={input1Ref}
+                            name="Last Name"
+                            value={lastName}
+                            setValue={setLastName}
+                            // required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                        </div>
+                        <div className="col-span-1">
+                          <DateInput
+                            ref={input1Ref}
+                            name="Date of Birth"
+                            value={dob}
+                            setValue={setDob}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                        </div>{" "}
+                        <div className="col-span-1">
+                          <DropdownInput
+                            ref={input1Ref}
+                            name="Gender"
+                            value={gender}
+                            setValue={setGender}
+                            options={genderList}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                        </div>{" "}
+                        <div className="w-52">
+                          <TextInput
+                            ref={input1Ref}
+                            name="Father Name"
+                            value={fatherName}
+                            setValue={setFatherName}
+                            // required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                        </div>{" "}
+                        <div className="w-52">
+                          <TextInput
+                            ref={input1Ref}
+                            name="Mother Name"
+                            value={motherName}
+                            setValue={setMotherName}
+                            // required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                        </div>{" "}
+                        <div className="ml-1 w-60">
+                          <TextInput
+                            ref={input1Ref}
+                            name="Identification Mark"
+                            value={identificationMark}
+                            setValue={setIdentificationMark}
+                            // required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                        </div>{" "}
+                        <div className="col-span-1">
+                          <DropdownInput
+                            ref={input1Ref}
+                            name="Marital Status"
+                            value={maritalStatus}
+                            setValue={setMaritalStatus}
+                            // required={true}
+                            options={married}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                        </div>
+                        <div className="w-30">
+                          <DropdownInput
+                            ref={input1Ref}
+                            name="Disability"
+                            value={disability}
+                            setValue={setDisability}
+                            required={true}
+                            readOnly={readOnly}
+                            options={common}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                        </div>
+                        <div className="">
+                          <DropdownInput
+                            ref={input1Ref}
+                            name=" Blood Group"
+                            value={bloodGroupId}
+                            setValue={setBloodGroupId}
+                            options={dropDownListObject(
+                              bloodGroupList?.data,
+                              "bgFamily",
+                              "id"
+                            )}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                         
+                        </div>
+                        <div className="w-24">
+                          <TextInput
+                            ref={input1Ref}
+                            name="Height (Cms)"
+                            value={height}
+                            setValue={setHeight}
+                            // required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                        </div>{" "}
+                        <div className="w-24">
+                          <TextInput
+                            ref={input1Ref}
+                            name="Weight (Kgs)"
+                            value={weight}
+                            setValue={setWeight}
+                            // required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                        </div>
+                        <Modal
+                          isOpen={cameraOpen}
                           onClose={() => setCameraOpen(false)}
-                        />
-                      </Modal>
-                    </div>
+                        >
+                          <LiveWebCam
+                            picture={image}
+                            setPicture={setImage}
+                            onClose={() => setCameraOpen(false)}
+                          />
+                        </Modal>
+                      </div>
                     </div>
                   </div>
                 )}
                 {step === "Employment Details" && (
                   <div className="flex flex-col  gap-4  h-full">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
-                      {/* <h3 className="font-medium text-gray-800 mb-2 text-sm">
-                        Employment Details
-                      </h3> */}
-                      <div className="grid grid-cols-5 md:grid-cols-5 gap-2">
+                      <div className="flex flex-wrap gap-4 ml-3">
                         <div className="">
                           <DateInput
                             name="Joining Date"
@@ -1508,7 +1506,24 @@ export default function Form() {
                             disabled={childRecord.current > 0}
                           />
                         </div>
-                        <div className="col-span-1">
+                        <div className="w-52">
+                          <DropdownInput
+                            ref={input1Ref}
+                            name="Employee Category"
+                            value={employeeCategoryId}
+                            setValue={setEmployeeCategoryId}
+                            options={dropDownListObject(
+                              employeeCategoryList?.data,
+                              "name",
+                              "id"
+                            )}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                        </div>
+                        <div className="w-52">
                           <DropdownInput
                             ref={input1Ref}
                             name=" Department"
@@ -1526,24 +1541,7 @@ export default function Form() {
                           />
                         </div>
 
-                        <div className="col-span-1">
-                          <DropdownInput
-                            ref={input1Ref}
-                            name="Employee Category"
-                            value={employeeCategoryId}
-                            setValue={setEmployeeCategoryId}
-                            options={dropDownListObject(
-                              employeeCategoryList?.data,
-                              "name",
-                              "id"
-                            )}
-                            required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>
-                        <div className="col-span-1">
+                        <div className="w-52">
                           <DropdownInput
                             ref={input1Ref}
                             name="Employee Sub Category"
@@ -1560,7 +1558,7 @@ export default function Form() {
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
                         </div>
-                        <div className="col-span-1">
+                        <div className="w-52">
                           <TextInput
                             ref={input1Ref}
                             name="Pay Category"
@@ -1585,7 +1583,7 @@ export default function Form() {
                           />
                         </div>
 
-                        <div className="col-span-1">
+                        <div className="w-52">
                           <DropdownInput
                             ref={input1Ref}
                             name=" Designation"
@@ -1603,7 +1601,7 @@ export default function Form() {
                           />
                         </div>
 
-                        <div className="col-span-1">
+                        <div className="w-44">
                           <DropdownInput
                             ref={input1Ref}
                             name="Shift Template"
@@ -1648,8 +1646,9 @@ export default function Form() {
                           />
                         </div>
 
-                        <div className="col-span-1">
+                        <div className="w-40">
                           <TextInput
+                            type="number"
                             ref={input1Ref}
                             name="Salary"
                             value={salary}

@@ -6,14 +6,11 @@ import {
   useAddStateMutation,
   useUpdateStateMutation,
   useDeleteStateMutation,
- 
 } from "../../../redux/services/StateMasterService";
 import { useGetCountriesQuery } from "../../../redux/services/CountryMasterService";
 
-
 import {
   TextInput,
-  
   DropdownInput,
   ToggleButton,
   ReusableTable,
@@ -25,14 +22,12 @@ import { useDispatch } from "react-redux";
 import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
 import Swal from "sweetalert2";
-
-
+import Select from "react-dropdown-select";
+import { color, fontSize } from "@mui/system";
 
 export default function Form() {
   const [form, setForm] = useState(false);
   const [errors, setErrors] = useState({});
-
-  
 
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
@@ -55,10 +50,10 @@ export default function Form() {
   };
   const { data: countriesList } = useGetCountriesQuery({ params });
 
-  const {
-    data: allData,
-   
-  } = useGetStateQuery({ params, searchParams: searchValue });
+  const { data: allData } = useGetStateQuery({
+    params,
+    searchParams: searchValue,
+  });
 
   const {
     data: singleData,
@@ -324,7 +319,7 @@ export default function Form() {
     " ",
     " ",
   ];
-  
+
   useEffect(() => {
     if (!country) {
       setStates([]);
@@ -343,6 +338,15 @@ export default function Form() {
       })
       .catch(console.error);
   }, [country]);
+
+  const countryOptions = (
+    id
+      ? countriesList?.data
+      : countriesList?.data?.filter((item) => item.active)
+  )?.map((item) => ({
+    label: item.name, // text shown in dropdown
+    value: item.id, // stored value
+  }));
 
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
@@ -421,7 +425,7 @@ export default function Form() {
                 </div>
               </div>
 
-              <div className="flex-1 overflow-auto p-3">
+              <div className="flex-1  p-3">
                 <div className="grid grid-cols-1  gap-3  h-full">
                   <div className="lg:col-span- space-y-3">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
@@ -478,12 +482,77 @@ export default function Form() {
                             />
                           </div>
                         </div>
-                        {/* <Select
-                          options={states}
-                          placeholder="Select State"
-                          isClearable
-                          isDisabled={!country}
-                        /> */}
+                        {/* <div className="w-72 font-segoe">
+                          <label className="block text-xs  font-bold text-slate-700 mb-1">
+                            Select Country{" "}
+                            <span className="text-red-500">*</span>
+                          </label>
+
+                          <Select
+                            placeholder="Select Country"
+                            options={countryOptions}
+                            isDisabled={readOnly || childRecord.current > 0}
+                            isSearchable
+                            isClearable={false}
+                            onChange={(e) =>{
+                              setCountry(country)
+                            }}
+                            menuShouldScrollIntoView={false}
+                            maxMenuHeight={60} // <-- Reduce height here
+                            onInputChange={(value) => value.toUpperCase()}
+                            className="w-full  px-1 py-1 text-xs border  border-gray-300 rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                            styles={{
+                              control: (base) => ({
+                                ...base,
+                                minHeight: "16px", // Reduce overall height
+                                height: "16px", // Force height
+                                padding: "13px 4px", // Adjust padding inside
+                                fontSize: "12px", // Make text smaller
+                                borderRadius: "8px",
+                                fontFamily: "'Segoe UI'",
+                              }),
+                              valueContainer: (base) => ({
+                                ...base,
+                                padding: "0 6px", // Space for text
+                                marginTop: "-8px",
+                                fontFamily: "'Segoe UI'",
+                              }),
+                              input: (base) => ({
+                                ...base,
+                                margin: 0,
+                                padding: 0,
+                                fontFamily: "'Segoe UI'",
+                              }),
+                              singleValue: (base) => ({
+                                ...base,
+                                fontFamily: "'Segoe UI'",
+                              }),
+                              placeholder: (base) => ({
+                                ...base,
+                                fontFamily: "'Segoe UI'",
+                                fontSize:"12px",
+                                color:'black'
+                              }),
+                              menu: (base) => ({
+                                ...base,
+                                fontFamily: "'Segoe UI'",
+                              }),
+                              option: (base) => ({
+                                ...base,
+                                fontFamily: "'Segoe UI'",
+                                fontSize: "12px",
+                              }),
+                              indicatorsContainer: (base) => ({
+                                ...base,
+                                display: "none",
+                                height: "28px", // Align dropdown arrow
+                                marginTop: "-12px",
+                              }),
+                            }}
+                          />
+                        </div> */}
                         <div>
                           <ToggleButton
                             name="Status"

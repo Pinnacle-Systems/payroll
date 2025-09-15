@@ -32,7 +32,7 @@ const PFEsiEditor = () => {
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
   const [pfEsiGrid, setPfEsiGrid] = useState([]);
-
+    const [payCodeType, setPayCodeType] = useState("");
   const [date, setDate] = useState(moment.utc(today).format("YYYY-MM-DD"));
   const dispatch = useDispatch();
  
@@ -79,7 +79,7 @@ const PFEsiEditor = () => {
       setDocId(data?.docId);
       setDate(
         data?.date
-          ? moment.utc(data.date).format("YYYY-MM-DD")
+          ? moment.utc(data?.date).format("YYYY-MM-DD")
           : moment.utc(today).format("YYYY-MM-DD")
       );
       setPayDetailsId(data?.payDetailsId || "");
@@ -90,8 +90,21 @@ const PFEsiEditor = () => {
       setPickFrom(
         findFromList(data?.payDetailsId,  pfEsiPayDetails, "pickFrom")
       );
+       const fullDetail = pfEsiPayDetails?.find(
+      (pd) => pd.id === data?.payDetailsId
+    );
+    setPayCodeType(fullDetail?.payComponent?.payCode?.toUpperCase() || "");
 
-      setPfEsiGrid(data?.PfEsiGrid || []);
+      // setPfEsiGrid(data?.PfEsiGrid || []);
+      setPfEsiGrid(
+  (data?.PfEsiGrid || []).map((item) => ({
+    ...item,
+    fromValue: item.fromValue ? Number(item.fromValue).toFixed(2) : "",
+    toValue: item.toValue ? Number(item.toValue).toFixed(2) : "",
+    percentage: item.percentage ? Number(item.percentage).toFixed(2) : "",
+  }))
+);
+
     },
     [id]
   );
@@ -114,7 +127,7 @@ const PFEsiEditor = () => {
   };
 
   const validateData = (data) => {
-    console.log(data,"received");
+  
     
     if (
       data?.payDetailsId
@@ -232,7 +245,7 @@ const PFEsiEditor = () => {
     setId("");
     setPayDetailsId("");
     setPickFrom("");
-
+    setPayCodeType('')
     setReadOnly(false);
     setSearchValue("");
     // setCompanyCode(company?.data[0]?.code);
@@ -302,7 +315,10 @@ const PFEsiEditor = () => {
                 onNew();
               }}
               onNew={onNew}
+              form={form}
+              setPayCodeType={setPayCodeType}
               refetch={refetch}
+              payCodeType={payCodeType}
             />
           ) : (
             <>

@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DateInput, DropdownInput, TextInput } from "../../../Inputs";
+import { toast } from "react-toastify";
 
 const TemplateItems = ({
   saveData,
@@ -16,13 +17,21 @@ const TemplateItems = ({
   setPayDetailsId,
   payDetailsId,
   docId,
-
+  setPayCodeType,
+  payCodeType,
   childRecord,
-
+  form,
   setReadOnly,
   setId,
 }) => {
-  const [contextMenu, setContextMenu] = useState(null); 
+  const [contextMenu, setContextMenu] = useState(null);
+  const countryNameRef = useRef(null);
+  useEffect(() => {
+    if (form && !readOnly && countryNameRef.current) {
+      countryNameRef.current.focus();
+    }
+  }, [form, readOnly]);
+
   const handleRightClick = (event, rowIndex, type) => {
     event.preventDefault();
     setContextMenu({
@@ -73,12 +82,7 @@ const TemplateItems = ({
       if (!pd?.payComponent) return false;
       const code = pd.payComponent.payCode?.toUpperCase() || "";
 
-      return (
-        code.includes("PF") ||
-        code.includes("ESI") ||
-        code.includes("ER ESI") ||
-        code.includes("ER PF")
-      );
+      return code.startsWith("PF") || code.startsWith("ESI");
     });
 
   // Step 2: map to dropdown options
@@ -91,6 +95,7 @@ const TemplateItems = ({
 
     const fullDetail = pfEsiPayDetails.find((pd) => pd.id === selectedId);
     setPickFrom(fullDetail?.pickFrom || "");
+    setPayCodeType(fullDetail?.payComponent?.payCode?.toUpperCase() || "");
   };
 
   return (
@@ -168,6 +173,7 @@ const TemplateItems = ({
                     required={true}
                     readOnly={readOnly}
                     disabled={childRecord.current > 0}
+                    ref={countryNameRef}
                   />
                 </div>
                 <div className="w-24">
@@ -221,8 +227,21 @@ const TemplateItems = ({
                   const from = parseFloat(item?.fromValue) || 0;
                   const to = parseFloat(item?.toValue) || 0;
                   const perc = parseFloat(item?.percentage) || 0;
+                  let calculatedAmount = 0;
 
-                  const calculatedAmount = ((to - from) * perc) / 100;
+                  if (payCodeType === "PF") {
+                    if (to > 0 && to <= 15000) {
+                      calculatedAmount = (to * 12) / 100;
+                    } else if (to >= 15001) {
+                      calculatedAmount = 1800;
+                    }
+                  } else if (payCodeType === "ESI") {
+                    if (to > 0 && to <= 21000) {
+                      calculatedAmount = (to * 0.75) / 100;
+                    } else if (to > 21000) {
+                      calculatedAmount = 0;
+                    }
+                  }
 
                   return (
                     <tr className=" w-full table-row">
@@ -263,9 +282,10 @@ const TemplateItems = ({
                           placeHolder="0.00"
                           step="0.01"
                           value={item?.toValue}
-                          onChange={(e) =>
-                            handleInputChange(e.target.value, index, "toValue")
-                          }
+                          onChange={(e) => {
+                            // Always update first so typing isn't blocked
+                            handleInputChange(e.target.value, index, "toValue");
+                          }}
                           onBlur={(e) => {
                             const formatted =
                               e.target.value === ""
@@ -277,7 +297,7 @@ const TemplateItems = ({
                           className={`w-full bg-transparent text-right pr-2 focus:outline-none focus:border-transparent ${
                             readOnly ? "text-gray-600" : "text-black"
                           }`}
-                          disabled={readOnly}
+                          disabled={readOnly || !item?.fromValue}
                         />
                       </td>
                       <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
@@ -285,7 +305,17 @@ const TemplateItems = ({
                           type="number"
                           placeHolder="0.00"
                           step="0.01"
-                          value={item?.percentage}
+                          value={
+                            payCodeType === "PF" && item?.toValue
+                              ? (parseFloat(item?.toValue) || 0) <= 15000
+                                ? (12).toFixed(2) // PF and <= 15000
+                                : '' // PF and > 15000, adjust if needed
+                              : payCodeType === "ESI" && item?.toValue
+                              ? (parseFloat(item?.toValue) || 0) <= 21000
+                                ? (0.75).toFixed(2) // ESI and <= 21000
+                                : '' // ESI and > 21000
+                              : item?.percentage || ""
+                          }
                           onChange={(e) =>
                             handleInputChange(
                               e.target.value,
@@ -304,7 +334,7 @@ const TemplateItems = ({
                           className={`w-full bg-transparent text-right pr-2 focus:outline-none focus:border-transparent ${
                             readOnly ? "text-gray-600" : "text-black"
                           }`}
-                          disabled={readOnly}
+                          disabled={readOnly || !item?.toValue}
                         />
                       </td>
                       <td

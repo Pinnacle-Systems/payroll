@@ -50,7 +50,9 @@ export { default as employeeSubCategoryApi } from "./EmployeeSubCategoryservice"
 export { default as payFrequencyApi } from "./PayFrequencyService";
 export { default as payComponentApi } from "./PayComponentsService";
 export { default as companyPayCodeApi } from "./CompanyPayCodeService";
-export { default as bloodGroupApi} from './BloodGroupService'
-export { default as payStructureApi}  from './PayStructureService'
-export {default as levelTypeApi} from './LevelType.service'
-export {default as pFEsiEditor} from './PFEsiEditorService'
+export { default as bloodGroupApi } from "./BloodGroupService";
+export { default as payStructureApi } from "./PayStructureService";
+export { default as levelTypeApi } from "./LevelType.service";
+export { default as pFEsiEditor } from "./PFEsiEditorService";
+export { default as RelationShipApi } from "./RelationShipService";
+export { default as proofMasterApi } from "./ProofMasterService.js";

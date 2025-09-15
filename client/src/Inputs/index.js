@@ -9,7 +9,6 @@
 // import { useDispatch } from 'react-redux';
 // import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
-
 // export const handleOnChange = (event, setValue) => {
 //     const inputValue = event.target.value;
 //     const inputSelectionStart = event.target.selectionStart;
@@ -33,7 +32,6 @@
 //     const inputSelectionEnd = event.target.selectionEnd;
 
 //     const LowerCaseValue = inputValue.toLowerCase();
-
 
 //     const valueBeforeCursor = LowerCaseValue.slice(0, inputSelectionStart);
 //     const valueAfterCursor = LowerCaseValue.slice(inputSelectionEnd);
@@ -132,9 +130,6 @@
 // //   );
 // // };
 
-
-
-
 // // export const TextInput = ({ name, type, value, setValue, readOnly, className, inputClass, required = false, disabled = false, tabIndex = null, onBlur = null }) => {
 // //     return (
 // //         <div className='input-group grid-cols-1 md:grid-cols-3 items-center md:my-0.5 md:px-1 data gap-1'>
@@ -146,7 +141,6 @@
 // //         </div>
 // //     )
 // // }
-
 
 // export const TextInput = ({ name, type, value, setValue, readOnly, className, required = false, disabled = false, tabIndex = null, onBlur = null, width }) => {
 
@@ -176,7 +170,6 @@
 //                     value={value} onChange={(e) => { type === "number" ? setValue(e.target.value) : handleOnChange(e, setValue) }} readOnly={readOnly}
 //                 />
 //             </div>
-
 
 //         </>
 
@@ -211,7 +204,6 @@
 //                 />
 //             </div>
 
-
 //         </>
 
 //     )
@@ -238,8 +230,8 @@
 //                 id={name}
 //                 name={name}
 //                 rows={rows}
-//                 className={`w-full px-2 py-1 text-sm border border-slate-300 rounded-md 
-//           focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all duration-200 
+//                 className={`w-full px-2 py-1 text-sm border border-slate-300 rounded-md
+//           focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all duration-200
 //           hover:border-slate-400 resize-none ${className}`}
 //                 value={value}
 //                 onChange={(e) => setValue(e.target.value)}
@@ -354,7 +346,6 @@
 //     );
 // };
 
-
 // export const DropdownInput = ({ name, beforeChange = () => { }, onBlur = null, options, value, setValue, defaultValue, className, readOnly, required = false, disabled = false, clear = false, tabIndex = null, autoFocus = false, width = '32' }) => {
 //     const handleOnChange = (e) => {
 //         setValue(e.target.value);
@@ -375,7 +366,6 @@
 //         </div>
 //     )
 // }
-
 
 // export const DropdownInputForm = ({ name, beforeChange = () => { }, onBlur = null, options, value, setValue, defaultValue, className, readOnly, required = false, disabled = false, clear = false, tabIndex = null, autoFocus = false, width = '32' }) => {
 //     const handleOnChange = (e) => {
@@ -429,7 +419,6 @@
 //     );
 // };
 
-
 // export const DropdownInputWithoutLabel = ({ options, value, setValue, readOnly, required = false, disabled = false, tabIndex = null }) => {
 //     const handleOnChange = (e) => {
 //         setValue(e.target.value);
@@ -444,7 +433,6 @@
 //     )
 // }
 
-
 // export const CurrencyInput = ({ name, value, setValue, readOnly, required = false, disabled = false, tabIndex = null }) => {
 //     const handleOnChange = (e) => {
 //         setValue(e.target.value);
@@ -458,8 +446,6 @@
 // }
 
 // const RequiredLabel = ({ name }) => <p>{`${name}`}<span className="text-red-500">*</span> </p>
-
-
 
 // export const DateInput = ({ name, value, setValue, readOnly, required = false, type = "date", disabled = false, tabIndex = null, inputClass, inputHead }) => {
 //     console.log(value, 'value');
@@ -510,8 +496,6 @@
 //     )
 // }
 
-
-
 // export const validateEmail = (data) => {
 //     return validator.isEmail(data);
 // }
@@ -546,7 +530,6 @@
 
 // //     }
 
-
 // //     const [currentIndex, setCurrentIndex] = useState("");
 // //     useEffect(() => setCurrentIndex(new Date()), [])
 // //     useEffect(() => {
@@ -573,14 +556,10 @@
 // //             }
 // //         });
 
-
-
-
 // //         return () => {
 // //             dropDownElement.removeEventListener('keydown', () => { });
 // //         };
 // //     }, [currentIndex]);
-
 
 // //     return (
 // //         <div id={`dropdown${currentIndex}`} className={`${className} px-2`}>
@@ -613,7 +592,6 @@
 // //     );
 
 // // }
-
 
 // export const Modal = ({ isOpen, onClose = null, children, widthClass }) => {
 //     if (!isOpen) return null;
@@ -680,12 +658,10 @@
 //                     <span className='text-xs ml-2'>{value ? "Active" : "Inactive"}</span>
 //                 </div>
 
-
 //             </div>
 //         </div>
 //     )
 // }
-
 
 // export const FancyCheckBox = ({ label, value, onChange, readOnly }) => {
 //     return (
@@ -715,9 +691,7 @@
 
 //     }, [isSetFirstDefault, options, valueField, value, refetch])
 
-
 //     return (
-
 
 //         <>
 
@@ -750,8 +724,6 @@
 //         </>
 //     );
 // }
-
-
 
 // export const ReusableLabeledInput = ({
 //     label,
@@ -789,14 +761,13 @@
 //                 required={required}
 //                 className={`w-1/2 px-2  text-[12px] h-[22px] border border-slate-300 rounded-md
 //           focus:outline-none focus:border-indigo-300 transition-all duration-200
-//           hover:border-slate-400 appearance-none 
+//           hover:border-slate-400 appearance-none
 //           ${readOnly ? 'bg-gray-100 cursor-not-allowed' : ''} ${inputClassName}`}
 //             />
 
 //         </div>
 //     );
 // };
-
 
 // export const ReusableTable = ({
 //   columns,
@@ -988,16 +959,15 @@
 //       <Pagination />
 //     </div>
 
-
 //   );
 // };
 
-
 import validator from "validator";
-import React, { useEffect, useRef, useState,forwardRef } from "react";
+import React, { useEffect, useRef, useState, forwardRef } from "react";
 import { MultiSelect } from "react-multi-select-component";
 import Select from "react-dropdown-select";
-import { findFromList } from "../Utils/helper";
+import { findFromList ,findFromListCustom
+} from "../Utils/helper";
 import "./index.css";
 import { FormControl, MenuItem, TextField } from "@mui/material";
 import { push } from "../redux/features/opentabs";
@@ -1017,17 +987,17 @@ export const handleOnChange = (event, setValue) => {
 
   setValue(
     valueBeforeCursor +
-    inputValue.slice(inputSelectionStart, inputSelectionEnd) +
-    valueAfterCursor
+      inputValue.slice(inputSelectionStart, inputSelectionEnd) +
+      valueAfterCursor
   );
 
   // Set the cursor position to the end of the input value
   setTimeout(() => {
     event.target.setSelectionRange(
       valueBeforeCursor.length +
-      inputValue.slice(inputSelectionStart, inputSelectionEnd).length,
+        inputValue.slice(inputSelectionStart, inputSelectionEnd).length,
       valueBeforeCursor.length +
-      inputValue.slice(inputSelectionStart, inputSelectionEnd).length
+        inputValue.slice(inputSelectionStart, inputSelectionEnd).length
     );
   });
 };
@@ -1035,8 +1005,9 @@ export const FancyCheckBox = ({ label, value, onChange, readOnly }) => {
   return (
     <label
       style={{ fontSize: 11 }}
-      className={`flex items-center gap-2 p-3 border rounded-lg cursor-pointer w-full text-xs font-medium text-gray-700 ${readOnly ? "bg-gray-100 cursor-not-allowed" : "hover:bg-gray-50"
-        }`}
+      className={`flex items-center gap-2 p-3 border rounded-lg cursor-pointer w-full text-xs font-medium text-gray-700 ${
+        readOnly ? "bg-gray-100 cursor-not-allowed" : "hover:bg-gray-50"
+      }`}
     >
       <input
         type="checkbox"
@@ -1061,21 +1032,20 @@ export const handleOnChangeforpassword = (event, setValue) => {
 
   setValue(
     valueBeforeCursor +
-    inputValue.slice(inputSelectionStart, inputSelectionEnd) +
-    valueAfterCursor
+      inputValue.slice(inputSelectionStart, inputSelectionEnd) +
+      valueAfterCursor
   );
 
   // Set the cursor position to the end of the input value
   setTimeout(() => {
     event.target.setSelectionRange(
       valueBeforeCursor.length +
-      inputValue.slice(inputSelectionStart, inputSelectionEnd).length,
+        inputValue.slice(inputSelectionStart, inputSelectionEnd).length,
       valueBeforeCursor.length +
-      inputValue.slice(inputSelectionStart, inputSelectionEnd).length
+        inputValue.slice(inputSelectionStart, inputSelectionEnd).length
     );
   });
 };
-
 
 export const MultiSelectDropdown = ({
   name,
@@ -1094,49 +1064,51 @@ export const MultiSelectDropdown = ({
   const customSelectStyles = {
     control: (provided, state) => ({
       ...provided,
-      minHeight: '22px',
-      height: '22px',
-      fontSize: '12px',
-      borderRadius: '0.5rem', // rounded-lg
-      outline: 'none',
-      transition: 'all 150ms', // transition-all duration-150
-      boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)', // shadow-sm
-      padding: '0.25rem', // p-1
-      borderColor: state.isFocused ? '' : '#cbd5e1', // focus:border-blue-500
-      boxShadow: state.isFocused ? '0 0 0 1px #3b82f6' : undefined, // focus:ring-1 focus:ring-blue-500
-      '&:hover': {
-        borderColor: '#94a3b8'
-      }
+      minHeight: "22px",
+      height: "22px",
+      fontSize: "12px",
+      borderRadius: "0.5rem", // rounded-lg
+      outline: "none",
+      transition: "all 150ms", // transition-all duration-150
+      boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)", // shadow-sm
+      padding: "0.25rem", // p-1
+      borderColor: state.isFocused ? "" : "#cbd5e1", // focus:border-blue-500
+      boxShadow: state.isFocused ? "0 0 0 1px #3b82f6" : undefined, // focus:ring-1 focus:ring-blue-500
+      "&:hover": {
+        borderColor: "#94a3b8",
+      },
     }),
     valueContainer: (provided) => ({
       ...provided,
-      height: '22px',
-      padding: '0 8px'
+      height: "22px",
+      padding: "0 8px",
     }),
     input: (provided) => ({
       ...provided,
-      margin: '0px',
+      margin: "0px",
     }),
     indicatorsContainer: (provided) => ({
       ...provided,
-      height: '22px',
+      height: "22px",
     }),
     option: (provided) => ({
       ...provided,
-      fontSize: '14px',
-      padding: '8px 12px'
+      fontSize: "14px",
+      padding: "8px 12px",
     }),
   };
 
   return (
-    <div
-      className={`m-1  md:grid-cols-2 items-center z-0 data  ${className}`}
-    >
-      <label className={`md:text-start   block text-xs font-bold text-slate-700 mb-1${labelName}`}>{name}</label>
+    <div className={`m-1  md:grid-cols-2 items-center z-0 data  ${className}`}>
+      <label
+        className={`md:text-start   block text-xs font-bold text-slate-700 mb-1${labelName}`}
+      >
+        {name}
+      </label>
       <MultiSelect
         options={options}
         value={selected}
-        onChange={readOnly ? () => { } : setSelected}
+        onChange={readOnly ? () => {} : setSelected}
         labelledBy="Select"
         hasSelectAll={false}
         styles={{
@@ -1171,61 +1143,62 @@ export const MultiSelectDropdown = ({
           }),
         }}
       />
-
-
     </div>
   );
 };
-export const TextInput = forwardRef(({
-  name,
-  label,
-  type = "text",
-  value,
-  setValue,
-  readOnly = false,
-  className = "",
-  required = false,
-  disabled = false,
-  tabIndex = null,
-  onBlur = null,
-  width = "full",
-
-},ref) => {
-  return (
-    <div className={`mb-2 ${width}`}>
-      {name && (
-        <label className="block text-xs font-bold text-slate-700 mb-1">
-          {required ? <RequiredLabel name={label ? label : name} /> : name}
-        </label>
-      )}
-      <input
-      ref={ref} 
-        type={type}
-        value={value}
-        onChange={(e) =>
-          type === "number"
-            ? setValue(e.target.value)
-            : handleOnChange(e, setValue)
-        }
-        onBlur={onBlur}
-        placeholder={name}
-        readOnly={readOnly}
-        disabled={disabled}
-        tabIndex={tabIndex ?? undefined}
-
-        className={`w-full px-2 py-1 text-xs border border-gray-300 rounded-lg
+export const TextInput = forwardRef(
+  (
+    {
+      name,
+      label,
+      type = "text",
+      value,
+      setValue,
+      readOnly = false,
+      className = "",
+      required = false,
+      disabled = false,
+      tabIndex = null,
+      onBlur = null,
+      width = "full",
+    },
+    ref
+  ) => {
+    return (
+      <div className={`mb-2 ${width}`}>
+        {name && (
+          <label className="block text-xs font-bold text-slate-700 mb-1">
+            {required ? <RequiredLabel name={label ? label : name} /> : name}
+          </label>
+        )}
+        <input
+          ref={ref}
+          type={type}
+          value={value}
+          onChange={(e) =>
+            type === "number"
+              ? setValue(e.target.value)
+              : handleOnChange(e, setValue)
+          }
+          onBlur={onBlur}
+          placeholder={name}
+          readOnly={readOnly}
+          disabled={disabled}
+          tabIndex={tabIndex ?? undefined}
+          className={`w-full px-2 py-1 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
-          ${readOnly || disabled
-            ? "bg-gray-100 text-gray-500 cursor-not-allowed"
-            : "bg-white hover:border-gray-400"}
-          ${className}`
-        }
-
-      />
-    </div>
-  );
-});
+          ${
+            readOnly || disabled
+              ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+              : "bg-white hover:border-gray-400"
+          }
+          ${className}`}
+        />
+      </div>
+    );
+  }
+);
 
 export const PasswordTextInput = ({
   name,
@@ -1239,7 +1212,6 @@ export const PasswordTextInput = ({
   tabIndex = null,
   onBlur = null,
   width,
-
 }) => {
   return (
     <>
@@ -1452,7 +1424,7 @@ export const TextArea = ({
     <div className="mb-3 w-full">
       {name && (
         <label className="block text-xs font-bold text-gray-600 mb-1">
-          {required ? <RequiredLabel name={label ?? name} /> : (label ?? name)}
+          {required ? <RequiredLabel name={label ?? name} /> : label ?? name}
         </label>
       )}
 
@@ -1472,19 +1444,20 @@ export const TextArea = ({
         className={`w-full px-1.5 py-1.5 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm resize-none
-          ${readOnly || disabled
-            ? "bg-gray-100 text-gray-500 cursor-not-allowed"
-            : "bg-white hover:border-gray-400"}
+          ${
+            readOnly || disabled
+              ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+              : "bg-white hover:border-gray-400"
+          }
           ${inputClass}`}
       ></textarea>
     </div>
   );
 };
 
-
-export const DropdownInput = ({
+export const DropdownInput = forwardRef(({
   name,
-  beforeChange = () => { },
+  beforeChange = () => {},
   onBlur = null,
   options,
   value,
@@ -1499,18 +1472,14 @@ export const DropdownInput = ({
   autoFocus = false,
   width = "full",
   country
-}) => {
+}, ref) => {
   const handleOnChange = (e) => {
     const val = e.target.value;
-    
     const parsedValue = !isNaN(parseInt(val)) ? parseInt(val) : val;
     setValue(parsedValue);
   };
 
   const isDisabled = readOnly || disabled;
-
-  
-
 
   return (
     <div className={`mb-2 ${width}`}>
@@ -1520,18 +1489,21 @@ export const DropdownInput = ({
         </label>
       )}
       <select
+        ref={ref}
         onBlur={onBlur}
         autoFocus={autoFocus}
         tabIndex={tabIndex ?? undefined}
         defaultValue={defaultValue}
         required={required}
         readOnly={readOnly}
-        className={`w-full px-2 py-1 text-xs border border-gray-300 rounded-lg
+        className={`w-full px-1 py-1 text-xs border  border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
-          ${isDisabled
-            ? "bg-gray-100 text-black-100 cursor-not-allowed"
-            : "bg-white text-gray-900 hover:border-gray-400"}
+          ${
+            isDisabled
+              ? "bg-gray-100 text-black-100 cursor-not-allowed"
+              : "bg-white text-gray-900 hover:border-gray-400"
+          }
           ${className}`}
         value={value}
         onChange={(e) => {
@@ -1539,8 +1511,13 @@ export const DropdownInput = ({
           handleOnChange(e);
         }}
         disabled={isDisabled}
+        
       >
-        <option value="" hidden={!clear} className="text-gray-800">
+        <option
+          value=""
+          hidden={!clear}
+          className="text-gray-800 overflow-scroll"
+        >
           Select {name || "option"}
         </option>
         {options?.map((option, index) => (
@@ -1555,11 +1532,11 @@ export const DropdownInput = ({
       </select>
     </div>
   );
-};
+});
 
 export const DropdownInputForm = ({
   name,
-  beforeChange = () => { },
+  beforeChange = () => {},
   onBlur = null,
   options,
   value,
@@ -1771,7 +1748,7 @@ export const DateInput = ({
 }) => {
   return (
     <div className="flex flex-col gap-1 w-full">
-        {name && (
+      {name && (
         <label className="block text-xs font-bold text-slate-700">
           {required ? (
             <RequiredLabel name={inputHead ?? name} />
@@ -1796,7 +1773,11 @@ export const DateInput = ({
          w-28 px-2 py-1 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
-            ${readOnly ? "bg-gray-100 text-gray-500 cursor-not-allowed" : "bg-white"}
+            ${
+              readOnly
+                ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                : "bg-white"
+            }
             ${disabled ? "opacity-50 bg-gray-100 cursor-not-allowed" : ""}
             ${inputClass}
           `}
@@ -1951,7 +1932,6 @@ export const DropdownWithSearch = ({
 
   const dispatch = useDispatch();
 
-
   const [currentIndex, setCurrentIndex] = useState("");
   useEffect(() => setCurrentIndex(new Date()), []);
   useEffect(() => {
@@ -1981,7 +1961,7 @@ export const DropdownWithSearch = ({
     });
 
     return () => {
-      dropDownElement.removeEventListener("keydown", () => { });
+      dropDownElement.removeEventListener("keydown", () => {});
     };
   }, [currentIndex]);
 
@@ -1990,21 +1970,20 @@ export const DropdownWithSearch = ({
       {label && (
         <label className="block text-xs font-bold text-slate-700 mb-1">
           {required ? <RequiredLabel name={label} /> : `${label}`}
-
         </label>
       )}
       <select
         // className="border border-gray-300 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
         className={`w-full px-2 py-1 text-xs border border-slate-300 rounded-md 
           focus:border-indigo-300 focus:outline-none transition-all duration-200
-          hover:border-slate-400 ${readOnly || disabled ? "bg-slate-100" : ""
+          hover:border-slate-400 ${
+            readOnly || disabled ? "bg-slate-100" : ""
           } ${className}`}
-
         disabled={disabled}
         readOnly={readOnly}
         value={value || ""}
         onChange={(e) => {
-          setValue(e.target.value)
+          setValue(e.target.value);
         }}
       >
         {/* {!value && <option value="">Select {optionName}</option>} */}
@@ -2093,13 +2072,14 @@ export const ToggleButton = ({
             <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full peer-checked:translate-x-6 transition-transform duration-300 shadow-sm"></div>
           </label>
 
-          <span className="ml-2 block text-xs font-bold text-gray-600">{value ? "Active" : "Inactive"}</span>
+          <span className="ml-2 block text-xs font-bold text-gray-600">
+            {value ? "Active" : "Inactive"}
+          </span>
         </div>
       </div>
     </div>
   );
 };
-
 
 const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
 export function isValidPAN(pan) {
@@ -2123,17 +2103,15 @@ export const ReusableTable = ({
   onView,
   onEdit,
   onDelete,
-  emptyStateMessage = 'No data available',
+  emptyStateMessage = "No data available",
   rowActions = true,
-  width
+  width,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math?.ceil(data?.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = data?.slice(indexOfFirstItem, indexOfLastItem);
-
-
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -2147,16 +2125,18 @@ export const ReusableTable = ({
     return (
       <div className="flex flex-col font-segoe sm:flex-row justify-between items-center p-2 bg-white border-t border-gray-200">
         <div className="text-sm text-gray-600 mb-2 sm:mb-0">
-          Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, data?.length)} of {data?.length} entries
+          Showing {indexOfFirstItem + 1} to{" "}
+          {Math.min(indexOfLastItem, data?.length)} of {data?.length} entries
         </div>
         <div className="flex gap-1">
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className={`px-3 py-1 rounded-md ${currentPage === 1
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              : 'bg-white text-gray-600 hover:bg-gray-100'
-              }`}
+            className={`px-3 py-1 rounded-md ${
+              currentPage === 1
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-white text-gray-600 hover:bg-gray-100"
+            }`}
           >
             <FaChevronLeft className="inline" />
           </button>
@@ -2177,10 +2157,11 @@ export const ReusableTable = ({
               <button
                 key={pageNum}
                 onClick={() => handlePageChange(pageNum)}
-                className={`px-3 py-1 rounded-md ${currentPage === pageNum
-                  ? 'bg-indigo-800 text-white'
-                  : 'bg-white text-gray-600 hover:bg-gray-100'
-                  }`}
+                className={`px-3 py-1 rounded-md ${
+                  currentPage === pageNum
+                    ? "bg-indigo-800 text-white"
+                    : "bg-white text-gray-600 hover:bg-gray-100"
+                }`}
               >
                 {pageNum}
               </button>
@@ -2194,10 +2175,11 @@ export const ReusableTable = ({
           {totalPages > 5 && currentPage < totalPages - 2 && (
             <button
               onClick={() => handlePageChange(totalPages)}
-              className={`px-3 py-1 rounded-md ${currentPage === totalPages
-                ? 'bg-indigo-800 text-white'
-                : 'bg-white text-gray-600 hover:bg-gray-100'
-                }`}
+              className={`px-3 py-1 rounded-md ${
+                currentPage === totalPages
+                  ? "bg-indigo-800 text-white"
+                  : "bg-white text-gray-600 hover:bg-gray-100"
+              }`}
             >
               {totalPages}
             </button>
@@ -2206,10 +2188,11 @@ export const ReusableTable = ({
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className={`px-3 py-1 rounded-md ${currentPage === totalPages
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-              : 'bg-white text-gray-600 hover:bg-gray-100'
-              }`}
+            className={`px-3 py-1 rounded-md ${
+              currentPage === totalPages
+                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                : "bg-white text-gray-600 hover:bg-gray-100"
+            }`}
           >
             <FaChevronRight className="inline" />
           </button>
@@ -2220,102 +2203,131 @@ export const ReusableTable = ({
 
   return (
     <>
-    <div className="bg-[#F1F1F0] h-[70vh]  shadow-sm overflow-hidden ">
-      <table className=" border-collapse">
-        <thead className="bg-gray-200 text-gray-800">
-          <tr>
-
-            {columns?.map((column, index) => (
-              <th
-                key={index}
-                className={` font-medium text-gray-900 py-2 text-[12px] px-8 text-center uppercase  ${column.header !== "" ? 'border-r border-white/50' : ''} `}
-
-              >
-                {column.header}
-              </th>
-            ))}
-            {rowActions && (
-              <th className="px-4 py-2 text-center text-[12px] font-medium justify-end">ACTIONS</th>
-            )}
-          </tr>
-        </thead>
-        <tbody>
-          {currentItems?.length === 0 ? (
+      <div className="bg-[#F1F1F0] h-[70vh]  shadow-sm overflow-hidden ">
+        <table className=" border-collapse">
+          <thead className="bg-gray-200 text-gray-800">
             <tr>
-              <td colSpan={columns?.length + (rowActions ? 1 : 0)} className="px-4 py-4 text-center text-gray-500">
-                {emptyStateMessage}
-              </td>
+              {columns?.map((column, index) => (
+                <th
+                  key={index}
+                  className={` font-medium text-gray-900 py-2 text-[12px] px-8 text-center uppercase  ${
+                    column.header !== "" ? "border-r border-white/50" : ""
+                  } `}
+                >
+                  {column.header}
+                </th>
+              ))}
+              {rowActions && (
+                <th className="px-4 py-2 text-center text-[12px] font-medium justify-end">
+                  ACTIONS
+                </th>
+              )}
             </tr>
-          ) : (
-            currentItems?.map((item, index) => (
-              <tr
-                key={item.id}
-                className={`hover:bg-gray-50 transition-colors border-b   border-gray-200 text-[12px] ${index % 2 === 0 ? "bg-white" : "bg-gray-100"
-                  }`}
-              >
-                {columns?.map((column, colIndex) => (
-                  <td
-                    key={colIndex}
-                    className={` ${column.className ? column.className : ""} ${column.header !== "" ? 'border-r  border-white/50' : ''} h-8 `}
-                  >
-                    {column.accessor(item, index)}
-                  </td>
-                ))}
-                {rowActions && (
-                  <td className=" w-[40px]  border-gray-200 gap-1 border-l p-2  h-8 justify-end">
-                    <div className="flex">
-                      {onView && (
-                        <button
-                          className="text-blue-600  flex items-center   px-2 mr-2  bg-blue-50 rounded"
-                          onClick={() => onView(item.id)}
-                          title="View"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                            <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                          </svg>
-                        </button>
-                      )}
-                      {onEdit && (
-                        <button
-                          className="text-green-600 gap-1 px-1 mr-2   bg-green-50 rounded"
-                          onClick={() => onEdit(item.id)}
-                          title="Edit"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                          </svg>
-                        </button>
-                      )}
-                      {onDelete && (
-                        <button
-                          className=" text-red-800 flex items-center gap-1 px-1  bg-red-50 rounded"
-                          onClick={() => onDelete(item.id)}
-                          title="Delete"
-                        >
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
-                          </svg>
-                          {/* <span className="text-xs">delete</span> */}
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                )}
+          </thead>
+          <tbody>
+            {currentItems?.length === 0 ? (
+              <tr>
+                <td
+                  colSpan={columns?.length + (rowActions ? 1 : 0)}
+                  className="px-4 py-4 text-center text-gray-500"
+                >
+                  {emptyStateMessage}
+                </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
- 
-     
-    
-    </div>
-    <div className=" h-[8vh]">
-<Pagination />
-    </div>
- 
-        </>  
+            ) : (
+              currentItems?.map((item, index) => (
+                <tr
+                  key={item.id}
+                  className={`hover:bg-gray-50 transition-colors border-b   border-gray-200 text-[12px] ${
+                    index % 2 === 0 ? "bg-white" : "bg-gray-100"
+                  }`}
+                >
+                  {columns?.map((column, colIndex) => (
+                    <td
+                      key={colIndex}
+                      className={` ${
+                        column.className ? column.className : ""
+                      } ${
+                        column.header !== "" ? "border-r  border-white/50" : ""
+                      } h-8 `}
+                    >
+                      {column.accessor(item, index)}
+                    </td>
+                  ))}
+                  {rowActions && (
+                    <td className=" w-[40px]  border-gray-200 gap-1 border-l p-2  h-8 justify-end">
+                      <div className="flex">
+                        {onView && (
+                          <button
+                            className="text-blue-600  flex items-center   px-2 mr-2  bg-blue-50 rounded"
+                            onClick={() => onView(item.id)}
+                            title="View"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-4 w-4"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                              <path
+                                fillRule="evenodd"
+                                d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </button>
+                        )}
+                        {onEdit && (
+                          <button
+                            className="text-green-600 gap-1 px-1 mr-2   bg-green-50 rounded"
+                            onClick={() => onEdit(item.id)}
+                            title="Edit"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-4 w-4"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                            </svg>
+                          </button>
+                        )}
+                        {onDelete && (
+                          <button
+                            className=" text-red-800 flex items-center gap-1 px-1  bg-red-50 rounded"
+                            onClick={() => onDelete(item.id)}
+                            title="Delete"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-4 w-4"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                            {/* <span className="text-xs">delete</span> */}
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  )}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+      <div className=" h-[8vh]">
+        <Pagination />
+      </div>
+    </>
   );
 };
 
@@ -2328,11 +2340,14 @@ export const TextAreaInput = ({
   disabled = false,
   tabIndex = null,
   rows = 2,
-  className = ""
+  className = "",
 }) => {
   return (
     <div className="group input-group text-md">
-      <label htmlFor={name} className="input-label group-hover:text-blue-600 font-weight: 100">
+      <label
+        htmlFor={name}
+        className="input-label group-hover:text-blue-600 font-weight: 100"
+      >
         <span className="flex items-center gap-2 font-weight: 100">
           {required ? <RequiredLabel name={name} /> : `${name}`}
         </span>

@@ -56,6 +56,8 @@ import {
   payStructure,
   LevelType,
   pFEsiEditor,
+  relationShip,
+  proof,
 } from "./src/routes/index.js";
 
 import { socketMain } from "./src/sockets/socket.js";
@@ -145,6 +147,8 @@ app.use('/bloodGroup',bloodGroup)
 app.use('/payStructure',payStructure)
 app.use('/leveltype',LevelType)
 app.use('/pFEsiEditor',pFEsiEditor)
+app.use('/relationShip',relationShip)
+app.use('/proofMaster',proof)
 
 
 app.get("/retreiveFile/:fileName", (req, res) => {

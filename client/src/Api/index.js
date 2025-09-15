@@ -104,3 +104,5 @@ export const BLOOD_GROUP_API = "bloodGroup";
 export const PAY_STRUCTURE_API = "payStructure";
 export const LEVEL_TYPE_API = "levelType";
 export const PF_ESI_EDITOR = "pFEsiEditor";
+export const RELATIONSHIP_MASTER_API = "relationShip";
+export const PROOF_MASTER_API = "proofMaster";

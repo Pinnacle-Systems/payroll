@@ -69,6 +69,8 @@ model Company {
   CompanyPayStructure CompanyPayStructure[]
   LevelType           LevelType[]
   PFESIEditor         PFESIEditor[]
+  RelationShip        RelationShip[]
+  Proof               Proof[]
 }
 
 model Subscription {
@@ -119,6 +121,8 @@ model Branch {
   CompanyPayStructure CompanyPayStructure[]
   LevelType           LevelType[]
   PFESIEditor         PFESIEditor[]
+  RelationShip        RelationShip[]
+  Proof               Proof[]
 }
 
 model UserOnBranch {
@@ -225,7 +229,11 @@ model User {
   LevelTypeupdatedBy           LevelType[]           @relation(name: "updatedBy")
   PFESIEditorCreatedBy         PFESIEditor[]         @relation(name: "createdBy")
   PFESIEditorupdatedBy         PFESIEditor[]         @relation(name: "updatedBy")
-}
+  RelationShipCreatedBy        RelationShip[]        @relation(name: "createdBy")
+  RelationShipupdatedBy        RelationShip[]        @relation(name: "updatedBy")
+  ProofCreatedBy               Proof[]               @relation(name: "createdBy")
+  ProofupdatedBy               Proof[]               @relation(name: "updatedBy")
+} 
 
 model Employee {
   id                 Int       @id @default(autoincrement())
@@ -1531,4 +1539,34 @@ model PfEsiGrid {
   fromValue     Float?
   toValue       Float?
   percentage    Float?
+}
+model RelationShip {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation("createdBy", fields: [createdById], references: [id])
+  createdById Int?
+  updatedBy   User?    @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById Int?
+  companyId   Int?
+  company     Company? @relation(fields: [companyId], references: [id])
+  branch      Branch?  @relation(fields: [branchId], references: [id])
+  branchId    Int?
+  name        String?
+  active      Boolean? @default(true)
+}
+model Proof {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   User?    @relation("createdBy", fields: [createdById], references: [id])
+  createdById Int?
+  updatedBy   User?    @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById Int?
+  companyId   Int?
+  company     Company? @relation(fields: [companyId], references: [id])
+  branch      Branch?  @relation(fields: [branchId], references: [id])
+  branchId    Int?
+  name        String?
+  active      Boolean? @default(true)
 }

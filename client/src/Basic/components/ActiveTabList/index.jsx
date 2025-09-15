@@ -33,6 +33,8 @@ import {
   PayStructure,
   LevelType,
   PFAndESIEditor,
+  RelationShipMaster,
+  ProofMaster,
 
  
   
@@ -119,6 +121,8 @@ const ActiveTabList = () => {
     "PAY STRUCTURE" : <PayStructure/>,
     "LEVEL TYPE" : <LevelType/>,
     "PF AND ESI EDITOR":<PFAndESIEditor/>,
+    "RELATIONSHIP":<RelationShipMaster/>,
+    'PROOF MASTER' :<ProofMaster/>,
 
 
 
