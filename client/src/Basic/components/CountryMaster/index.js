@@ -28,6 +28,7 @@ import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { text } from "@fortawesome/fontawesome-svg-core";
 import { capitalize } from "@mui/material";
+import { getCommonParams } from "../../../Utils/helper";
 
 export default function Form() {
   const openTabs = useSelector((state) => state.openTabs);
@@ -48,11 +49,9 @@ export default function Form() {
   const [selectedCountry, setSelectedCountry] = useState("");
   const childRecord = useRef(0);
 
-  const params = {
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
-  };
+  const params = getCommonParams();
+
+  const { branchId,companyId } = params;
   const {
     data: allData,
     isLoading,
@@ -102,11 +101,10 @@ export default function Form() {
   const data = {
     name: selectedCountry,
     code: countryCode,
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
+    companyId,
     active,
     id,
+    branchId 
   };
 
   const validateData = (data) => {

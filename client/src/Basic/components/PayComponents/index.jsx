@@ -37,15 +37,11 @@ const PayComponents = () => {
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
   const payCodeRef = useRef(null);
-  const params = {
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
-  };
 
-  const param = getCommonParams();
 
-  const { branchId } = param;
+  const params = getCommonParams();
+
+  const { branchId,companyId } = params;
   const { data: allData } = useGetPayComponentQuery({
     params,
     searchParams: searchValue,
@@ -77,9 +73,7 @@ const PayComponents = () => {
   }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
 
   const data = {
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
+    companyId,
     id,
     payCode,
     payDescription,

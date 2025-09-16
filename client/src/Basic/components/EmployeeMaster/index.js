@@ -18,6 +18,7 @@ import {
   ReusableTable,
   DisabledInput,
   ToggleButton,
+  customSelectStyles,
 } from "../../../Inputs";
 
 import {
@@ -61,13 +62,13 @@ import { useGetdesignationQuery } from "../../../redux/services/DesignationMaste
 import { useGetShiftTemplateMasterQuery } from "../../../redux/services/ShiftTemplateMaster";
 import { useGetStateQuery } from "../../../redux/services/StateMasterService";
 import { useGetCountriesQuery } from "../../../redux/services/CountryMasterService";
-import { log } from "util";
+import Select from "react-select";
 import Swal from "sweetalert2";
 import { faL } from "@fortawesome/free-solid-svg-icons";
 import { FaQuestionCircle, FaUpload } from "react-icons/fa";
 import { getImageUrlPath } from "../../../Constants";
 import { useGetemployeeSubCategoryQuery } from "../../../redux/services/EmployeeSubCategoryservice";
-import Select from "react-dropdown-select";
+
 const MODEL = "Employee Master";
 export default function Form() {
   const [view, setView] = useState("table");
@@ -144,7 +145,7 @@ export default function Form() {
   const [educationDetails, setEducationDetails] = useState([]);
   const [familyDetails, setFamilyDetails] = useState([]);
   const [employeeSubCategoryId, setEmployeeSubCategoryId] = useState("");
- 
+
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [imageRemoved, setImageRemoved] = useState(false);
@@ -177,23 +178,10 @@ export default function Form() {
 
   const childRecord = useRef(0);
   const dispatch = useDispatch();
-  const params = {
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
-    // finYearId: secureLocalStorage.getItem(
-    //   sessionStorage.getItem("sessionId") + "currentFinYear"
-    // ),
-    // userId: secureLocalStorage.getItem(
-    //   sessionStorage.getItem("sessionId") + "userId"
-    // ),
-    // branchId: secureLocalStorage.getItem(
-    //   sessionStorage.getItem("sessionId") + "currentBranchId"
-    // ),
-  };
-  const companyId = secureLocalStorage.getItem(
-    sessionStorage.getItem("sessionId") + "userCompanyId"
-  );
+   const params = getCommonParams();
+
+  const { branchId ,companyId} = params;
+ 
   const { data: bloodGroupList } = useGetBloodGroupQuery({ params });
   const { data: cityList } = useGetCityQuery({ params });
 
@@ -202,14 +190,12 @@ export default function Form() {
   const { data: countryList } = useGetCountriesQuery({ params });
 
   const { data: employeeCategoryList } = useGetEmployeeCategoryQuery({
-    params: companyId,
+    params
   });
   const { data: employeeSubCategoryList } = useGetemployeeSubCategoryQuery({
     params,
   });
   const { data: desigination } = useGetdesignationQuery({ params });
-
-  
 
   const { data: department } = useGetDepartmentQuery({ params });
   const {
@@ -408,9 +394,8 @@ export default function Form() {
   console.log(singleData, "single");
 
   const data = {
-    branchId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "currentBranchId"
-    ),
+    branchId,
+    companyId,
     employeeType,
     firstName,
     middleName,
@@ -1096,9 +1081,6 @@ export default function Form() {
       }); // clear when unchecked
     }
   };
-  console.log(presentAddress, "presentAddress");
-
-  console.log(permanentAddress, "permanentAddress");
 
   const handlePresentChange = (field, value) => {
     setPresentAddress((prev) => {
@@ -1118,7 +1100,47 @@ export default function Form() {
       return updated;
     });
   };
+  const BloodGroupoptions = bloodGroupList?.data?.map((val) => ({
+    value: val?.id,
+    label: val?.bgFamily,
+  }));
 
+  const EmployeeOptions = employeeCategoryList?.data?.map((val) => ({
+    value: val?.id,
+    label: val?.name,
+  }));
+  const DepartmentOptions = department?.data?.map((val) => ({
+    value: val?.id,
+    label: val?.name,
+  }));
+  const EmployeeSubCategoryOptions = employeeSubCategoryList?.data?.map(
+    (val) => ({
+      value: val?.id,
+      label: val?.gradeName,
+    })
+  );
+  const DesignaionOptions = desigination?.data?.map((val) => ({
+    value: val?.id,
+    label: val?.name,
+  }));
+  const ShiftTemplateOptions = shiftTemplate?.data?.map((val) => ({
+    value: val?.id,
+    label: val?.docId,
+  }));
+  const CityOptions = cityList?.data?.map((val) => ({
+    value: val?.id,
+    label: val?.name,
+  }));
+  const StateOptions = stateList?.data?.map((val) => ({
+    value: val?.id,
+    label: val?.name,
+  }));
+ 
+  const CountryOptions = countryList?.data?.map((val) => ({
+    value: val?.id,
+    label: val?.name,
+  }));
+ 
   return (
     <div onKeyDown={handleKeyDown} className="p-1 ">
       {/* Header Section */}
@@ -1177,7 +1199,7 @@ export default function Form() {
         <Modal
           isOpen={form}
           form={form}
-          widthClass={"w-[90%]  h-[85%]"}
+          widthClass={"w-[90%]  h-[78%]"}
           onClose={() => {
             setForm(false);
             setErrors({});
@@ -1261,7 +1283,7 @@ export default function Form() {
               </div>
             </div>
 
-            <div className="flex-1  p-3 h-[100%]">
+            <div className="flex-1  p-3 ">
               <div className="flex text-blue-600 text-[14px] gap-x-1">
                 {[
                   "Basic Details",
@@ -1287,9 +1309,9 @@ export default function Form() {
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 gap-2 h-[90%] mt-2 overflow-y-auto">
+              <div className="grid grid-cols-1 gap-2 h-[90vh] mt-2 overflow-y-auto">
                 {step === "Basic Details" && (
-                  <div className=" bg-white p-3 rounded-md border border-gray-200 overflow-y-auto">
+                  <div className=" bg-white p-3 rounded-md border text-[12px] h-[49vh] border-gray-200 ">
                     <div className="flex gap-x-8">
                       <SingleImageFileUploadComponent
                         setWebCam={setCameraOpen}
@@ -1436,8 +1458,8 @@ export default function Form() {
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
                         </div>
-                        <div className="">
-                          <DropdownInput
+                        <div className="w-28">
+                          {/* <DropdownInput
                             ref={input1Ref}
                             name=" Blood Group"
                             value={bloodGroupId}
@@ -1451,8 +1473,34 @@ export default function Form() {
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          /> */}
+                          <label className="block text-xs  font-bold text-slate-700 mb-1">
+                            Blood Group
+                            <span className="text-red-500">*</span>
+                          </label>
+                          <Select
+                            options={BloodGroupoptions}
+                            value={
+                              BloodGroupoptions?.find(
+                                (opt) => opt?.value === bloodGroupId
+                              ) || null
+                            }
+                            onChange={(selected) =>
+                              setBloodGroupId(selected?.value || "")
+                            }
+                            placeholder="Select"
+                            isClearable={false} // same as required
+                            isDisabled={readOnly || childRecord.current > 0}
+                            isSearchable
+                            menuShouldScrollIntoView={false}
+                            maxMenuHeight={150} // <-- Reduce height here
+                            onInputChange={(value) => value.toUpperCase()}
+                            className="w-full px-1 -ml-1 text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                            styles={customSelectStyles}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
-                         
                         </div>
                         <div className="w-24">
                           <TextInput
@@ -1465,7 +1513,7 @@ export default function Form() {
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
-                        </div>{" "}
+                        </div>
                         <div className="w-24">
                           <TextInput
                             ref={input1Ref}
@@ -1493,8 +1541,8 @@ export default function Form() {
                   </div>
                 )}
                 {step === "Employment Details" && (
-                  <div className="flex flex-col  gap-4  h-full">
-                    <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
+                  <div className="flex flex-col  gap-4">
+                    <div className="bg-white p-3 rounded-md border border-gray-200 h-[49vh] ">
                       <div className="flex flex-wrap gap-4 ml-3">
                         <div className="">
                           <DateInput
@@ -1507,7 +1555,7 @@ export default function Form() {
                           />
                         </div>
                         <div className="w-52">
-                          <DropdownInput
+                          {/* <DropdownInput
                             ref={input1Ref}
                             name="Employee Category"
                             value={employeeCategoryId}
@@ -1521,10 +1569,37 @@ export default function Form() {
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          /> */}
+                          <label className="block text-xs  font-bold text-slate-700 mb-1">
+                            Employee Category
+                            <span className="text-red-500">*</span>
+                          </label>
+                          <Select
+                            options={EmployeeOptions}
+                            value={
+                              EmployeeOptions.find(
+                                (opt) => opt.value === employeeCategoryId
+                              ) || null
+                            }
+                            onChange={(selected) =>
+                              setEmployeeCategoryId(selected?.value || "")
+                            }
+                            placeholder="Select Employee Category"
+                            isClearable={false} // same as required
+                            isDisabled={readOnly || childRecord.current > 0}
+                            isSearchable
+                            menuShouldScrollIntoView={false}
+                            maxMenuHeight={150} // <-- Reduce height here
+                            onInputChange={(value) => value.toUpperCase()}
+                            className="w-full px-1 -ml-1 text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                            styles={customSelectStyles}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
                         </div>
                         <div className="w-52">
-                          <DropdownInput
+                          {/* <DropdownInput
                             ref={input1Ref}
                             name=" Department"
                             value={departmentId}
@@ -1538,11 +1613,38 @@ export default function Form() {
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          /> */}
+                          <label className="block text-xs  font-bold text-slate-700 mb-1">
+                            Department
+                            <span className="text-red-500">*</span>
+                          </label>
+                          <Select
+                            options={DepartmentOptions}
+                            value={
+                              DepartmentOptions.find(
+                                (opt) => opt.value === departmentId
+                              ) || null
+                            }
+                            onChange={(selected) =>
+                              setDepartmentId(selected?.value || "")
+                            }
+                            placeholder="Select Department"
+                            isClearable={false} // same as required
+                            isDisabled={readOnly || childRecord.current > 0}
+                            isSearchable
+                            menuShouldScrollIntoView={false}
+                            maxMenuHeight={150} // <-- Reduce height here
+                            onInputChange={(value) => value.toUpperCase()}
+                            className="w-full px-1 -ml-1 text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                            styles={customSelectStyles}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
                         </div>
 
                         <div className="w-52">
-                          <DropdownInput
+                          {/* <DropdownInput
                             ref={input1Ref}
                             name="Employee Sub Category"
                             value={employeeSubCategoryId}
@@ -1555,6 +1657,33 @@ export default function Form() {
                             required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          /> */}
+                          <label className="block text-xs  font-bold text-slate-700 mb-1">
+                            Employee Sub Category
+                            <span className="text-red-500">*</span>
+                          </label>
+                          <Select
+                            options={EmployeeSubCategoryOptions}
+                            value={
+                              EmployeeSubCategoryOptions.find(
+                                (opt) => opt.value === employeeSubCategoryId
+                              ) || null
+                            }
+                            onChange={(selected) =>
+                              setEmployeeSubCategoryId(selected?.value || "")
+                            }
+                            placeholder="Select Employee Sub Category"
+                            isClearable={false} // same as required
+                            isDisabled={readOnly || childRecord.current > 0}
+                            isSearchable
+                            menuShouldScrollIntoView={false}
+                            maxMenuHeight={150} // <-- Reduce height here
+                            onInputChange={(value) => value.toUpperCase()}
+                            className="w-full px-1 -ml-1 text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                            styles={customSelectStyles}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
                         </div>
@@ -1584,7 +1713,7 @@ export default function Form() {
                         </div>
 
                         <div className="w-52">
-                          <DropdownInput
+                          {/* <DropdownInput
                             ref={input1Ref}
                             name=" Designation"
                             value={desiginationId}
@@ -1598,11 +1727,38 @@ export default function Form() {
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          /> */}
+                          <label className="block text-xs  font-bold text-slate-700 mb-1">
+                            Designation
+                            <span className="text-red-500">*</span>
+                          </label>
+                          <Select
+                            options={DesignaionOptions}
+                            value={
+                              DesignaionOptions.find(
+                                (opt) => opt.value === desiginationId
+                              ) || null
+                            }
+                            onChange={(selected) =>
+                              setDesignationId(selected?.value || "")
+                            }
+                            placeholder="Select Designation"
+                            isClearable={false} // same as required
+                            isDisabled={readOnly || childRecord.current > 0}
+                            isSearchable
+                            menuShouldScrollIntoView={false}
+                            maxMenuHeight={150} // <-- Reduce height here
+                            onInputChange={(value) => value.toUpperCase()}
+                            className="w-full px-1 -ml-1 text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                            styles={customSelectStyles}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
                         </div>
 
                         <div className="w-44">
-                          <DropdownInput
+                          {/* <DropdownInput
                             ref={input1Ref}
                             name="Shift Template"
                             value={shiftTemplateId}
@@ -1615,6 +1771,33 @@ export default function Form() {
                             required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          /> */}
+                          <label className="block text-xs  font-bold text-slate-700 mb-1">
+                            Shift Template
+                            <span className="text-red-500">*</span>
+                          </label>
+                          <Select
+                            options={ShiftTemplateOptions}
+                            value={
+                              ShiftTemplateOptions.find(
+                                (opt) => opt.value === shiftTemplateId
+                              ) || null
+                            }
+                            onChange={(selected) =>
+                              setShiftTemplateId(selected?.value || "")
+                            }
+                            placeholder="Select Shift Template"
+                            isClearable={false} // same as required
+                            isDisabled={readOnly || childRecord.current > 0}
+                            isSearchable
+                            menuShouldScrollIntoView={false}
+                            maxMenuHeight={150} // <-- Reduce height here
+                            onInputChange={(value) => value.toUpperCase()}
+                            className="w-full px-1 -ml-1 text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                            styles={customSelectStyles}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
                         </div>
@@ -1677,11 +1860,11 @@ export default function Form() {
                   </div>
                 )}
                 {step === "Personal Details" && (
-                  <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
+                  <div className="bg-white p-3 rounded-md border border-gray-200 h-[49vh]">
                     <h3 className="font-medium text-gray-800 mb-2 text-sm">
                       Personal Details
                     </h3>
-                    <div className="grid grid-cols-4 md:grid-cols-4 gap-2">
+                    <div className="flex flex-wrap gap-x-6">
                       <div>
                         <TextInput
                           name="Religion"
@@ -1764,14 +1947,14 @@ export default function Form() {
                   </div>
                 )}
                 {step === "Contact Details" && (
-                  <div className="flex flex-col  gap-4  h-full">
-                    <div className="bg-white p-3 rounded-md border border-gray-200 h-full overflow-y-auto ">
+                  <div className="flex flex-col  gap-4   h-[45vh]">
+                    <div className="bg-white p-3 rounded-md border border-gray-200 ">
                       <div className="grid grid-cols-2 gap-2 justify-between ">
-                        <div className="grid grid-cols-2 gap-3 border-r border-gray-300  pr-3">
-                          <h3 className="font-medium text-gray-800 mb-2 text-sm">
+                        <div className="grid grid-cols-2 gap-x-3 border-r border-gray-300  pr-3">
+                          <h3 className="font-medium text-gray-800  text-sm">
                             PRESENT ADDRESS
                           </h3>
-                          <div className="col-span-2 -mt-2 ">
+                          <div className="col-span-2 mt-1">
                             <TextArea
                               inputClass="h-12"
                               name="Address"
@@ -1788,7 +1971,7 @@ export default function Form() {
                               </span>
                             )}
                           </div>
-                          <div className="col-span-1">
+                          <div className="col-span-1 mt-1 mb-2">
                             <TextInput
                               name="Village"
                               value={presentAddress?.village}
@@ -1799,8 +1982,8 @@ export default function Form() {
                               disabled={childRecord.current > 0}
                             />
                           </div>
-                          <div className="col-span-1">
-                            <DropdownInput
+                          <div className="col-span-1 mt-1 mb-2">
+                            {/* <DropdownInput
                               ref={input1Ref}
                               name="Choose City"
                               value={presentAddress?.cityId}
@@ -1818,16 +2001,41 @@ export default function Form() {
                                 childRecord.current > 0 ? true : undefined
                               }
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            /> */}
+                            <label className="block text-xs  font-bold text-slate-700 mb-1">
+                              City
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <Select
+                              options={CityOptions}
+                              value={
+                                CityOptions.find(
+                                  (opt) => opt.value === presentAddress?.cityId
+                                ) || null
+                              }
+                              onChange={(selected) =>
+                                handlePresentChange(
+                                  "cityId",
+                                  selected?.value || ""
+                                )
+                              }
+                              placeholder="Select City"
+                              isClearable={false} // same as required
+                              isDisabled={readOnly || childRecord.current > 0}
+                              isSearchable
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className="w-full px-1 -ml-1 text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                              styles={customSelectStyles}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
-                            {errors.name && (
-                              <span className="text-red-500 text-xs ml-1">
-                                {errors.name}
-                              </span>
-                            )}
                           </div>
 
-                          <div className="col-span-1">
-                            <DropdownInput
+                          <div className="col-span-1 w-[270px] mb-2">
+                            {/* <DropdownInput
                               ref={input1Ref}
                               name="Choose State"
                               value={presentAddress?.stateId}
@@ -1843,15 +2051,41 @@ export default function Form() {
                               readOnly={readOnly}
                               disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            /> */}
+                                    <label className="block text-xs  font-bold text-slate-700 mb-1">
+                              State
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <Select
+                              options={StateOptions}
+                              value={
+                                StateOptions.find(
+                                  (opt) => opt.value === presentAddress?.stateId
+                                ) || null
+                              }
+                              onChange={(selected) =>
+                                handlePresentChange(
+                                  "stateId",
+                                  selected?.value || ""
+                                )
+                              }
+                              placeholder="Select State"
+                              isClearable={false} // same as required
+                              isDisabled={readOnly || childRecord.current > 0}
+                              isSearchable
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className="w-full px-1 -ml-1 text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                              styles={customSelectStyles}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
-                            {errors.name && (
-                              <span className="text-red-500 text-xs ml-1">
-                                {errors.name}
-                              </span>
-                            )}
+                         
                           </div>
-                          <div className="col-span-1">
-                            <DropdownInput
+                          <div className="col-span-1 mb-2" >
+                            {/* <DropdownInput
                               ref={input1Ref}
                               name="Choose Country"
                               value={presentAddress?.countryId}
@@ -1867,14 +2101,40 @@ export default function Form() {
                               readOnly={readOnly}
                               disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            /> */}
+                                        <label className="block text-xs  font-bold text-slate-700 mb-1">
+                              Country
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <Select
+                              options={CountryOptions}
+                              value={
+                                CountryOptions.find(
+                                  (opt) => opt.value === presentAddress?.countryId
+                                ) || null
+                              }
+                              onChange={(selected) =>
+                                handlePresentChange(
+                                  "countryId",
+                                  selected?.value || ""
+                                )
+                              }
+                              placeholder="Select Country"
+                              isClearable={false} // same as required
+                              isDisabled={readOnly || childRecord.current > 0}
+                              isSearchable
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className="w-full px-1 -ml-1 text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                              styles={customSelectStyles}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
-                            {errors.name && (
-                              <span className="text-red-500 text-xs ml-1">
-                                {errors.name}
-                              </span>
-                            )}
+                         
                           </div>
-                          <div className="col-span-1">
+                          <div className="col-span-1 mt-2 w-32">
                             <TextInput
                               name="Pincode"
                               value={presentAddress?.pincode}
@@ -1885,7 +2145,7 @@ export default function Form() {
                               disabled={childRecord.current > 0}
                             />
                           </div>
-                          <div className="col-span-1">
+                          <div className="col-span-1 w-[255px] mt-2">
                             <TextInput
                               name="Mobile No"
                               value={presentAddress?.mobile}
@@ -1899,12 +2159,12 @@ export default function Form() {
                         </div>
 
                         {/* PERMANENT ADDRESS */}
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="col-span-2 flex items-center gap-2">
+                        <div className="grid grid-cols-2 gap-x-3   pr-3">
+                          <div className="col-span-2 flex items-center gap-x-3">
                             <h3 className="font-medium text-gray-800 text-sm">
                               PERMANENT ADDRESS
                             </h3>
-                            <label className="flex items-center gap-1 text-xs text-gray-600">
+                            <label className="flex items-center gap-x-1 text-xs text-gray-600">
                               <input
                                 type="checkbox"
                                 checked={sameAsPresent}
@@ -1915,7 +2175,7 @@ export default function Form() {
                             </label>
                           </div>
 
-                          <div className="col-span-2">
+                          <div className="col-span-2 mt-1">
                             <TextArea
                               inputClass="h-12"
                               name="Address"
@@ -1929,7 +2189,7 @@ export default function Form() {
                               }
                             />
                           </div>
-                          <div className="col-span-1">
+                          <div className="col-span-1 w-[265px] mt-1 mb-2">
                             <TextInput
                               name="Village"
                               value={permanentAddress?.village}
@@ -1942,8 +2202,8 @@ export default function Form() {
                               }
                             />
                           </div>
-                          <div className="col-span-1">
-                            <DropdownInput
+                          <div className="col-span-1 mt-1 mb-2">
+                            {/* <DropdownInput
                               name="Choose City"
                               value={permanentAddress?.cityId}
                               setValue={(val) =>
@@ -1958,11 +2218,39 @@ export default function Form() {
                               disabled={
                                 childRecord.current > 0 || sameAsPresent
                               }
+                            /> */}
+
+                            <label className="block text-xs  font-bold text-slate-700 mb-1">
+                              City
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <Select
+                              options={CityOptions}
+                              value={
+                                CityOptions.find(
+                                  (opt) => opt.value === permanentAddress?.cityId
+                                ) || null
+                              }
+                              onChange={(selected) =>
+                                handlePermanentChange("cityId", selected?.value)
+                              }
+                              placeholder="Select City"
+                              isClearable={false} // same as required
+                              isDisabled={readOnly || childRecord.current > 0 || sameAsPresent}
+                              isSearchable
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className="w-full px-1 -ml-1 text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                              styles={customSelectStyles}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
 
-                          <div className="col-span-1">
-                            <DropdownInput
+                          <div className="col-span-1 mb-2 w-[270px]">
+                            {/* <DropdownInput
                               name="Choose State"
                               value={permanentAddress?.stateId}
                               setValue={(val) =>
@@ -1977,10 +2265,40 @@ export default function Form() {
                               disabled={
                                 childRecord.current > 0 || sameAsPresent
                               }
+                            /> */}
+                            <label className="block text-xs  font-bold text-slate-700 mb-1">
+                              State
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <Select
+                              options={StateOptions}
+                              value={
+                                StateOptions.find(
+                                  (opt) => opt.value === permanentAddress?.stateId
+                                ) || null
+                              }
+                              onChange={(selected) =>
+                                handlePermanentChange(
+                                  "stateId",
+                                  selected?.value || ""
+                                )
+                              }
+                              placeholder="Select State"
+                              isClearable={false} // same as required
+                              isDisabled={readOnly || childRecord.current > 0 || sameAsPresent}
+                              isSearchable
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className="w-full px-1 -ml-1 text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                              styles={customSelectStyles}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
-                          <div className="col-span-1">
-                            <DropdownInput
+                          <div className="col-span-1 mb-2">
+                            {/* <DropdownInput
                               name="Choose Country"
                               value={permanentAddress?.countryId}
                               setValue={(val) =>
@@ -1995,9 +2313,39 @@ export default function Form() {
                               disabled={
                                 childRecord.current > 0 || sameAsPresent
                               }
+                            /> */}
+                                            <label className="block text-xs  font-bold text-slate-700 mb-1">
+                              Country
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <Select
+                              options={CountryOptions}
+                              value={
+                                CountryOptions.find(
+                                  (opt) => opt.value === permanentAddress?.countryId
+                                ) || null
+                              }
+                              onChange={(selected) =>
+                                handlePermanentChange(
+                                  "countryId",
+                                  selected?.value || ""
+                                )
+                              }
+                              placeholder="Select Country"
+                              isClearable={false} // same as required
+                              isDisabled={readOnly || childRecord.current > 0 || sameAsPresent}
+                              isSearchable
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className="w-full px-1 -ml-1 text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                              styles={customSelectStyles}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
-                          <div className="col-span-1">
+                          <div className="col-span-1  w-32 mt-2">
                             <TextInput
                               name="Pincode"
                               value={permanentAddress?.pincode}
@@ -2010,7 +2358,7 @@ export default function Form() {
                               }
                             />
                           </div>
-                          <div className="col-span-1">
+                          <div className="col-span-1 w-[260px] mt-2">
                             <TextInput
                               name="Mobile No"
                               value={permanentAddress?.mobile}
@@ -2029,8 +2377,8 @@ export default function Form() {
                   </div>
                 )}
                 {step === "Bank Details" && (
-                  <div className="flex flex-col gap-4 h-full">
-                    <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
+                  <div className="flex flex-col gap-4 ">
+                    <div className="bg-white h-[49vh] p-3 rounded-md border border-gray-200 ">
                       <div className="flex justify-between items-center mb-3">
                         <h3 className="font-medium text-gray-800 text-sm">
                           Bank Details
@@ -2044,8 +2392,8 @@ export default function Form() {
                           Add Item
                         </button>
                       </div>
-
-                      <table className="w-full border-collapse table-fixed ">
+                    <div className={`w-full   p-2 overflow-auto bg-white max-h-[200px]`}>
+                      <table className="w-full border-collapse table-fixed  ">
                         <thead className="bg-gray-200 text-gray-800">
                           <tr>
                             <th
@@ -2084,10 +2432,10 @@ export default function Form() {
                           {bankDetails.map((item, index) => (
                             <tr
                               key={index}
-                              className=" border border-gray-300 text-[13px] py-0.5 px-1 text-center"
+                              className=" border border-gray-300 text-[12px] py-0.5 px-1 text-center"
                             >
                               <td className=" text-center px-1">{index + 1}</td>
-                              <td className="border border-gray-300 text-[13px] py-1.5 px-1 item-center">
+                              <td className="border border-gray-300 text-[12px] py-1.5 px-1 item-center">
                                 <input
                                   // name="Bank Name"
                                   type="text"
@@ -2104,7 +2452,7 @@ export default function Form() {
                                   className="w-full focus:outline-none uppercase focus:border-none pl-2"
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
+                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
                                 <input
                                   // name="Branch Name"
                                   type="text"
@@ -2121,7 +2469,7 @@ export default function Form() {
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
+                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
                                 <input
                                   // name="Account Number"
                                   type="number"
@@ -2138,7 +2486,7 @@ export default function Form() {
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[13px] py-1.5 items-center">
+                              <td className=" border border-gray-300 text-[12px] py-1.5 items-center">
                                 <input
                                   // name="IFSC CODE"
                                   type="text"
@@ -2155,7 +2503,7 @@ export default function Form() {
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
+                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
                                 <button
                                   type="button"
                                   title="Delete Row"
@@ -2180,12 +2528,13 @@ export default function Form() {
                           ))}
                         </tbody>
                       </table>
+                      </div>
                     </div>
                   </div>
                 )}
                 {step === "Education Details" && (
-                  <div className="flex flex-col gap-4 h-full">
-                    <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
+                  <div className="flex flex-col gap-4 ">
+                    <div className="bg-white p-3 rounded-md border border-gray-200 h-[49vh]">
                       <div className="flex justify-between items-center mb-3">
                         <h3 className="font-medium text-gray-800 text-sm">
                           Education Details
@@ -2199,7 +2548,7 @@ export default function Form() {
                           Add Item
                         </button>
                       </div>
-
+                      <div className={`w-full   p-2 overflow-auto bg-white max-h-[200px]`}>
                       <table className="w-full border-collapse table-fixed ">
                         <thead className="bg-gray-200 text-gray-800">
                           <tr>
@@ -2242,7 +2591,7 @@ export default function Form() {
                               className=" border border-gray-300 text-[11px] py-1.5 px-1 text-center"
                             >
                               <td className=" text-center px-1">{index + 1}</td>
-                              <td className="border border-gray-300 text-[13px] py-1.5 px-1 item-center">
+                              <td className="border border-gray-300 text-[12px] py-1.5 px-1 item-center">
                                 <input
                                   // name="Bank Name"
                                   type="text"
@@ -2259,7 +2608,7 @@ export default function Form() {
                                   className="w-full pl-2 focus:outline-none uppercase focus:border-none"
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
+                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
                                 <input
                                   // name="Branch Name"
                                   type="text"
@@ -2276,7 +2625,7 @@ export default function Form() {
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
+                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
                                 <input
                                   // name="Account Number"
                                   type="text"
@@ -2293,7 +2642,7 @@ export default function Form() {
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
+                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
                                 <input
                                   // name="IFSC CODE"
                                   type="text"
@@ -2310,7 +2659,7 @@ export default function Form() {
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
+                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
                                 <button
                                   type="button"
                                   title="Delete Row"
@@ -2334,13 +2683,13 @@ export default function Form() {
                             </tr>
                           ))}
                         </tbody>
-                      </table>
+                      </table></div>
                     </div>
                   </div>
                 )}
                 {step === "Family Details" && (
-                  <div className="flex flex-col gap-4 h-full">
-                    <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
+                  <div className="flex flex-col gap-4 ">
+                    <div className="bg-white p-3 rounded-md border border-gray-200 h-[49vh]">
                       <div className="flex justify-between items-center mb-3">
                         <h3 className="font-medium text-gray-800 text-sm">
                           Family Details
@@ -2354,7 +2703,7 @@ export default function Form() {
                           Add Item
                         </button>
                       </div>
-
+                      <div className={`w-full   p-2 overflow-auto bg-white max-h-[200px]`}>
                       <table className="w-full border-collapse table-fixed ">
                         <thead className="bg-gray-200 text-gray-800">
                           <tr>
@@ -2404,10 +2753,10 @@ export default function Form() {
                           {familyDetails.map((item, index) => (
                             <tr
                               key={index}
-                              className=" border border-gray-300 text-[11px] py-0.5 px-1 text-center"
+                              className=" border border-gray-300 text-[12px] py-0.5 px-1 text-center"
                             >
                               <td className=" text-center px-1">{index + 1}</td>
-                              <td className="border border-gray-300 text-[11px] py-1.5 px-1 item-center">
+                              <td className="border border-gray-300 text-[12px] py-1.5 px-1 item-center">
                                 <input
                                   // name="Bank Name"
                                   type="text"
@@ -2424,7 +2773,7 @@ export default function Form() {
                                   className="w-full pl-2 focus:outline-none uppercase focus:border-none"
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
+                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
                                 <input
                                   // name="Branch Name"
                                   type="date"
@@ -2441,7 +2790,7 @@ export default function Form() {
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
+                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
                                 <input
                                   // name="Account Number"
                                   type="number"
@@ -2458,7 +2807,7 @@ export default function Form() {
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
+                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
                                 <input
                                   // name="IFSC CODE"
                                   type="text"
@@ -2475,7 +2824,7 @@ export default function Form() {
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
+                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
                                 <input
                                   // name="IFSC CODE"
                                   type="text"
@@ -2492,7 +2841,7 @@ export default function Form() {
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
+                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
                                 <input
                                   // name="IFSC CODE"
                                   type="text"
@@ -2509,7 +2858,7 @@ export default function Form() {
                                   // disabled={childRecord.current > 0}
                                 />
                               </td>
-                              <td className=" border border-gray-300 text-[13px] py-1.5 item-center">
+                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
                                 <button
                                   type="button"
                                   title="Delete Row"
@@ -2534,6 +2883,7 @@ export default function Form() {
                           ))}
                         </tbody>
                       </table>
+                        </div>
                     </div>
                   </div>
                 )}

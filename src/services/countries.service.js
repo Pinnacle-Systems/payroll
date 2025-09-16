@@ -66,14 +66,15 @@ async function getSearch(req) {
 //     return { statusCode: 0, data };
 // }
 async function create(body) {
-    const { name, code, companyId, active } = body;
+    const { name, code, companyId, active ,branchId} = body;
 
     const data = await prisma.country.create({
         data: {
             name: typeof name === "object" && name?.label ? name.label : String(name),
             code: typeof code === "object" && code?.value ? code.value : String(code),
-            companyId: parseInt(companyId),
-            active
+            companyId:companyId ?  parseInt(companyId) : undefined,
+            active,
+            branchId:branchId ? parseInt(branchId) : undefined
         }
     });
 

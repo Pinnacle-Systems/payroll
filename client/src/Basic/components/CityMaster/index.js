@@ -8,7 +8,7 @@ import {
   useDeleteCityMutation,
 } from "../../../redux/services/CityMasterService";
 import { useGetStateQuery } from "../../../redux/services/StateMasterService";
-
+import Select from "react-select";
 import { toast } from "react-toastify";
 import {
   TextInput,
@@ -16,6 +16,7 @@ import {
   DisabledInput,
   ToggleButton,
   ReusableTable,
+  customSelectStyles,
 } from "../../../Inputs";
 import { dropDownListObject } from "../../../Utils/contructObject";
 import { useDispatch } from "react-redux";
@@ -26,6 +27,7 @@ import { push } from "../../../redux/features/opentabs";
 import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
 import Swal from "sweetalert2";
+import { getCommonParams } from "../../../Utils/helper";
 const MODEL = "City Master";
 
 export default function Form() {
@@ -43,13 +45,10 @@ export default function Form() {
 
   const childRecord = useRef(0);
   const dispatch = useDispatch();
-   const cityNameRef = useRef(null);
+  const cityNameRef = useRef(null);
 
-  const params = {
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
-  };
+  const params = getCommonParams()
+  const {branchId,companyId} = params
   const {
     data: stateList,
     isLoading: isStateLoading,
@@ -92,6 +91,7 @@ export default function Form() {
     active,
     state,
     id,
+    branchId,companyId
   };
   useEffect(() => {
     if (form && !readOnly && cityNameRef.current) {
@@ -138,7 +138,7 @@ export default function Form() {
       });
       return;
     }
-   
+
     if (id) {
       handleSubmitCustom(updateData, data, "Updated");
     } else {
@@ -146,7 +146,7 @@ export default function Form() {
     }
   };
 
-   const deleteData = async (id) => {
+  const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
         return;
@@ -168,10 +168,10 @@ export default function Form() {
           timer: 1000,
         });
         setForm(false);
-         dispatch({
-        type: `StateMaster/invalidateTags`,
-        payload: ["State"],
-      });
+        dispatch({
+          type: `StateMaster/invalidateTags`,
+          payload: ["State"],
+        });
       } catch (error) {
         Swal.fire({
           icon: "error",
@@ -291,7 +291,12 @@ export default function Form() {
           ?.name
       : "";
   }
-
+  const options = stateList?.data?.map((val) => ({
+    value: val?.id,
+    label: val?.name,
+  }));
+  const selectedOption = options?.find((opt) => opt?.value === state) || null;
+  
   return (
     <>
       <div onKeyDown={handleKeyDown} className="p-1">
@@ -325,7 +330,7 @@ export default function Form() {
             <Modal
               isOpen={form}
               form={form}
-              widthClass={"w-[45%] h-[55%]"}
+              widthClass={"w-[45%] h-[65%]"}
               onClose={() => {
                 setForm(false);
                 setErrors({});
@@ -336,9 +341,7 @@ export default function Form() {
                 <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                   <div className="flex items-center gap-2">
                     <h2 className="text-lg  py-0.5 font-semibold  text-gray-800">
-                      
-                          City Master
-                        
+                      City Master
                     </h2>
                   </div>
                   <div className="flex gap-2">
@@ -389,7 +392,7 @@ export default function Form() {
                                   disabled={
                                     childRecord.current > 0 ? true : undefined
                                   }
-                                   ref={cityNameRef}
+                                  ref={cityNameRef}
                                 />
                               </div>
                               <div className="mb-3 w-[90px] ml-6">
@@ -408,7 +411,7 @@ export default function Form() {
                             </div>
                             <div className="flex flex-wrap w-full gap-x-6">
                               <div className="mb-3 w-60">
-                                <DropdownInput
+                                {/* <DropdownInput
                                   name="State"
                                   options={dropDownListObject(
                                     id
@@ -427,6 +430,28 @@ export default function Form() {
                                     childRecord.current > 0 ? true : undefined
                                   }
                                   // disabled={true}
+                                /> */}
+                                <label className="block text-xs  font-bold text-slate-700 mb-1">
+                                  Select State{" "}
+                                  <span className="text-red-500">*</span>
+                                </label>
+                                <Select
+                                  options={options}
+                                  value={selectedOption}
+                                  onChange={(selected) =>
+                                    setState(selected?.value || "")
+                                  }
+                                  isDisabled={readOnly}
+                                  isSearchable
+                                  isClearable={false}
+                                  menuShouldScrollIntoView={false}
+                                  maxMenuHeight={150} // <-- Reduce height here
+                                  onInputChange={(value) => value.toUpperCase()}
+                                  className="w-full px-1 -ml-1  text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                                  placeholder="Select Country"
+                                  styles={customSelectStyles}
                                 />
                               </div>
                               <div className="w-16">
@@ -445,7 +470,7 @@ export default function Form() {
                             </div>
 
                             <div>
-                              <div className="mb-3">
+                              <div className="pt-5">
                                 <ToggleButton
                                   name="Status"
                                   options={statusDropdown}

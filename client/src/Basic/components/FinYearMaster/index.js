@@ -19,7 +19,7 @@ import {
   TextInput,
 } from "../../../Inputs";
 import ReportTemplate from "../ReportTemplate";
-import { getYearShortCode } from "../../../Utils/helper";
+import { getCommonParams, getYearShortCode } from "../../../Utils/helper";
 
 import Mastertable from "../MasterTable/Mastertable";
 import MastersForm from "../MastersForm/MastersForm";
@@ -30,8 +30,6 @@ import { Check, Power } from "lucide-react";
 import Modal from "../../../UiComponents/Modal";
 import { ReusableInput } from "../../../Uniform/Components/styleesheet/CommonInput";
 import Swal from "sweetalert2";
-
-const MODEL = "Fin Year Master";
 
 export default function Form() {
   const [form, setForm] = useState(false);
@@ -44,12 +42,10 @@ export default function Form() {
   const [code, setCode] = useState("");
   const childRecord = useRef(0);
   const [errors, setErrors] = useState({});
-    const designationRef = useRef(null);
-  const params = {
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
-  };
+  const designationRef = useRef(null);
+  const params = getCommonParams();
+
+  const { branchId, companyId } = params;
   const {
     data: allData,
     isLoading,
@@ -60,6 +56,12 @@ export default function Form() {
     isFetching: isSingleFetching,
     isLoading: isSingleLoading,
   } = useGetFinYearByIdQuery(id, { skip: !id });
+  const FinyearRef = useRef(null);
+  useEffect(() => {
+    if (form && !readOnly && FinyearRef.current) {
+      FinyearRef.current.focus();
+    }
+  }, [form, readOnly]);
 
   const [addData] = useAddFinYearMutation();
   const [updateData] = useUpdateFinYearMutation();
@@ -86,11 +88,10 @@ export default function Form() {
     from,
     to,
     active,
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
+    companyId,
     id,
     code,
+    branchId,
   };
 
   const validateData = (data) => {
@@ -99,11 +100,11 @@ export default function Form() {
     }
     return false;
   };
-     useEffect(() => {
-       if (form && !readOnly && designationRef.current) {
-         designationRef.current.focus();
-       }
-     }, [form, readOnly]);
+  useEffect(() => {
+    if (form && !readOnly && designationRef.current) {
+      designationRef.current.focus();
+    }
+  }, [form, readOnly]);
   const validateOneActiveFinYear = (active) => {
     if (Boolean(active)) {
       return !allData.data.some((finYear) =>
@@ -148,14 +149,14 @@ export default function Form() {
       return;
     }
     if (!validateData(data)) {
-         Swal.fire({
-           icon: "error",
-           title: "Submission error",
-           text: "Please fill all required fields...!",
-         });
-         return;
-       }
-    
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Please fill all required fields...!",
+      });
+      return;
+    }
+
     if (id) {
       handleSubmitCustom(updateData, data, "Updated");
     } else {
@@ -211,7 +212,7 @@ export default function Form() {
     setTo("");
     setFrom("");
     setCode("");
-    setActive(true)
+    setActive(true);
   };
 
   function onDataClick(id) {
@@ -412,7 +413,7 @@ export default function Form() {
                             required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
-                             ref={designationRef}
+                            ref={FinyearRef}
                           />
 
                           {errors.name && (

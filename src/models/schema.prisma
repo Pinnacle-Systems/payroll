@@ -71,6 +71,10 @@ model Company {
   PFESIEditor         PFESIEditor[]
   RelationShip        RelationShip[]
   Proof               Proof[]
+  State               State[]
+  City                City[]
+  Employee            Employee[]
+  EmployeeCategory    EmployeeCategory[]
 }
 
 model Subscription {
@@ -123,6 +127,12 @@ model Branch {
   PFESIEditor         PFESIEditor[]
   RelationShip        RelationShip[]
   Proof               Proof[]
+  State               State[]
+  Country             Country[]
+  City                City[]
+  Department          Department[]
+  Designation         Designation[]
+  FinYear             FinYear[]
 }
 
 model UserOnBranch {
@@ -233,7 +243,21 @@ model User {
   RelationShipupdatedBy        RelationShip[]        @relation(name: "updatedBy")
   ProofCreatedBy               Proof[]               @relation(name: "createdBy")
   ProofupdatedBy               Proof[]               @relation(name: "updatedBy")
-} 
+  CountryCreatedBy             Country[]             @relation(name: "createdBy")
+  CountryupdatedBy             Country[]             @relation(name: "updatedBy")
+  StateCreatedBy               State[]               @relation(name: "createdBy")
+  StateupdatedBy               State[]               @relation(name: "updatedBy")
+  CityCreatedBy                City[]                @relation(name: "createdBy")
+  CityupdatedBy                City[]                @relation(name: "updatedBy")
+  DepartmentCreatedBy          Department[]          @relation(name: "createdBy")
+  DepartmentupdatedBy          Department[]          @relation(name: "updatedBy")
+  DesignationCreatedBy         Designation[]         @relation(name: "createdBy")
+  DesignationupdatedBy         Designation[]         @relation(name: "updatedBy")
+  FinYearCreatedBy             FinYear[]             @relation(name: "createdBy")
+  FinYearupdatedBy             FinYear[]             @relation(name: "updatedBy")
+  EmployeeCategoryCreatedBy    EmployeeCategory[]    @relation(name: "createdBy")
+  EmployeeCategoryupdatedBy    EmployeeCategory[]    @relation(name: "updatedBy")
+}
 
 model Employee {
   id                 Int       @id @default(autoincrement())
@@ -313,6 +337,8 @@ model Employee {
   EmployeeSubCategory   EmployeSubCategory @relation(fields: [employeeSubCategoryId], references: [id])
   employeeSubCategoryId Int
   image                 Bytes?             @db.LongBlob
+  Company               Company?           @relation(fields: [companyId], references: [id])
+  companyId             Int?
 }
 
 model EmployeeBankDetails {
@@ -356,6 +382,12 @@ model FinYear {
   active       Boolean        @default(true)
   code         String?
   PayFrequency PayFrequency[]
+  branch       Branch?        @relation(fields: [branchId], references: [id])
+  branchId     Int?
+  createdBy    User?          @relation("createdBy", fields: [createdById], references: [id])
+  createdById  Int?
+  updatedBy    User?          @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById  Int?
 }
 
 model EmployeeCategory {
@@ -370,31 +402,51 @@ model EmployeeCategory {
   ShiftCommonTemplate ShiftCommonTemplate[]
   EmployeSubCategory  EmployeSubCategory[]
   CompanyPayStructure CompanyPayStructure[]
+  createdBy           User?                 @relation("createdBy", fields: [createdById], references: [id])
+  createdById         Int?
+  updatedBy           User?                 @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById         Int?
+  Company             Company?              @relation(fields: [companyId], references: [id])
+  companyId           Int?
 }
 
 model Country {
   id                    Int        @id @default(autoincrement())
-  name                  String
-  code                  String
+  name                  String?
+  code                  String?
   state                 State[]
-  active                Boolean    @default(true)
-  Company               Company    @relation(fields: [companyId], references: [id])
-  companyId             Int
+  active                Boolean?    @default(true)
+  Company               Company?   @relation(fields: [companyId], references: [id])
+  companyId             Int?
   employeePresentCity   Employee[] @relation(name: "PresentCountryId")
   employeePermanentCity Employee[] @relation(name: "PermanentCountryId")
+  branch                Branch?    @relation(fields: [branchId], references: [id])
+  branchId              Int?
+  createdBy             User?      @relation("createdBy", fields: [createdById], references: [id])
+  createdById           Int?
+  updatedBy             User?      @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById           Int?
 }
 
 model State {
   id                     Int        @id @default(autoincrement())
-  name                   String
-  code                   String
-  gstNo                  String
-  country                Country    @relation(fields: [countryId], references: [id])
+  name                   String?
+  code                   String?
+  gstNo                  String?
+  country                Country   @relation(fields: [countryId], references: [id])
   countryId              Int
   city                   City[]
   active                 Boolean    @default(true)
   employeePresentState   Employee[] @relation(name: "PresentStateId")
   employeePermanentState Employee[] @relation(name: "PermanentStateId")
+  companyId              Int?
+  company                Company?   @relation(fields: [companyId], references: [id])
+  branch                 Branch?    @relation(fields: [branchId], references: [id])
+  branchId               Int?
+  createdBy              User?      @relation("createdBy", fields: [createdById], references: [id])
+  createdById            Int?
+  updatedBy              User?      @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById            Int?
 }
 
 model City {
@@ -408,6 +460,15 @@ model City {
   doctorPermCity  Employee[]       @relation(name: "presentCityId")
   Party           Party[]
   PartyMasterNew  PartyMasterNew[]
+
+  companyId   Int?
+  company     Company? @relation(fields: [companyId], references: [id])
+  branch      Branch?  @relation(fields: [branchId], references: [id])
+  branchId    Int?
+  createdBy   User?    @relation("createdBy", fields: [createdById], references: [id])
+  createdById Int?
+  updatedBy   User?    @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById Int?
 }
 
 model Department {
@@ -416,9 +477,15 @@ model Department {
   code        String
   active      Boolean       @default(true)
   doctor      Employee[]    @relation()
-  Company     Company       @relation(fields: [companyId], references: [id])
-  companyId   Int
+  Company     Company?       @relation(fields: [companyId], references: [id])
+  companyId   Int?
   Designation Designation[]
+  branch      Branch?       @relation(fields: [branchId], references: [id])
+  branchId    Int?
+  createdBy   User?         @relation("createdBy", fields: [createdById], references: [id])
+  createdById Int?
+  updatedBy   User?         @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById Int?
 }
 
 enum PageType {
@@ -1234,16 +1301,21 @@ model poAttachments {
 }
 
 model Designation {
-  id           Int      @id @default(autoincrement())
+  id           Int         @id @default(autoincrement())
   name         String?
   code         String?
-  active       Boolean? @default(true)
+  active       Boolean?    @default(true)
   departmentId Int?
   companyId    Int?
-
-  department Department? @relation(fields: [departmentId], references: [id], onDelete: Cascade)
-  company    Company?    @relation(fields: [companyId], references: [id])
-  Employee   Employee[]
+  department   Department? @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  company      Company?    @relation(fields: [companyId], references: [id])
+  Employee     Employee[]
+  createdBy    User?       @relation("createdBy", fields: [createdById], references: [id])
+  createdById  Int?
+  updatedBy    User?       @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById  Int?
+  branch       Branch?     @relation(fields: [branchId], references: [id])
+  branchId     Int?
 }
 
 model Shift {
@@ -1279,8 +1351,8 @@ model ShiftCommonTemplate {
   company             Company?             @relation(fields: [companyId], references: [id])
   branch              Branch?              @relation(fields: [branchId], references: [id])
   branchId            Int?
-  employeeCategory    EmployeeCategory?    @relation(fields: [employeeCategoryId], references: [id])
-  employeeCategoryId  Int?
+  employeeCategory    EmployeeCategory    @relation(fields: [employeeCategoryId], references: [id])
+  employeeCategoryId  Int
   docId               String?
   active              Boolean?             @default(true)
   shiftCommonTemplate ShiftTemplateItems[]
@@ -1355,8 +1427,8 @@ model PayFrequency {
   name        String?
   active      Boolean?  @default(true)
 
-  finYear          FinYear?           @relation(fields: [finYearId], references: [id], onDelete: Cascade)
-  finYearId        Int?
+  finYear          FinYear           @relation(fields: [finYearId], references: [id], onDelete: Cascade)
+  finYearId        Int
   companyId        Int?
   company          Company?           @relation(fields: [companyId], references: [id])
   branch           Branch?            @relation(fields: [branchId], references: [id])
@@ -1540,6 +1612,7 @@ model PfEsiGrid {
   toValue       Float?
   percentage    Float?
 }
+
 model RelationShip {
   id          Int      @id @default(autoincrement())
   createdAt   DateTime @default(now())
@@ -1555,6 +1628,7 @@ model RelationShip {
   name        String?
   active      Boolean? @default(true)
 }
+
 model Proof {
   id          Int      @id @default(autoincrement())
   createdAt   DateTime @default(now())

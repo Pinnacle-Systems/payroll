@@ -14,6 +14,7 @@ import {
   DropdownInput,
   ToggleButton,
   ReusableTable,
+  customSelectStyles,
 } from "../../../Inputs";
 
 import { dropDownListObject } from "../../../Utils/contructObject";
@@ -22,8 +23,9 @@ import { useDispatch } from "react-redux";
 import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
 import Swal from "sweetalert2";
-import Select from "react-dropdown-select";
-import { color, fontSize } from "@mui/system";
+import Select from "react-select";
+import { color, fontSize, margin } from "@mui/system";
+import { getCommonParams } from "../../../Utils/helper";
 
 export default function Form() {
   const [form, setForm] = useState(false);
@@ -43,12 +45,17 @@ export default function Form() {
   const dispatch = useDispatch();
   const [states, setStates] = useState([]);
 
-  const params = {
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
-  };
+ const params = getCommonParams();
+ 
+   const { branchId ,companyId} = params;
   const { data: countriesList } = useGetCountriesQuery({ params });
+  const options =
+    countriesList?.data?.map((item) => ({
+      value: item?.id, // actual value
+      label: item?.name, // displayed name
+    })) || [];
+  const selectedOption = options.find((opt) => opt.value === country) || null;
+
 
   const { data: allData } = useGetStateQuery({
     params,
@@ -77,7 +84,7 @@ export default function Form() {
     [id]
   );
 
-  console.log(childRecord.current, "childRecord.current");
+
 
   useEffect(() => {
     syncFormWithDb(singleData?.data);
@@ -90,6 +97,8 @@ export default function Form() {
     country,
     gstNo,
     id,
+    branchId,
+     companyId
   };
   useEffect(() => {
     if (form && !readOnly && stateNameRef.current) {
@@ -149,43 +158,6 @@ export default function Form() {
     }
   };
 
-  // const deleteData = async (id) => {
-  //   // if (!id) return;
-  //   // const result = await getStateById(id).unwrap();
-
-  //   // if (result?.data?.childRecord > 0) {
-  //   //   toast.info("Child Record Exist", { position: "top-center" });
-  //   //   return;
-  //   // }
-
-  //   if (!window.confirm("Are you sure to delete...?")) {
-  //     return;
-  //   }
-  //   try {
-  //     let deldata = await removeData(id).unwrap();
-  //     if (deldata?.statusCode == 1) {
-  //       toast.info("Child Record Exist", { position: "top-center" });
-  //       return;
-  //     }
-  //     setId("");
-  //     // dispatch({
-  //     //   type: `countryMaster/invalidateTags`,
-  //     //   payload: ["Countries"],
-  //     // });
-  //     Swal.fire({
-  //       title: "Deleted Successfully",
-  //       icon: "success",
-  //       timer: 1000,
-  //     });
-  //     setForm(false);
-  //   } catch (error) {
-  //     Swal.fire({
-  //       icon: "error",
-  //       title: "Submission error",
-  //       text: error.data?.message || "Something went wrong!",
-  //     });
-  //   }
-  // };
   const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
@@ -347,6 +319,7 @@ export default function Form() {
     label: item.name, // text shown in dropdown
     value: item.id, // stored value
   }));
+ 
 
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
@@ -381,7 +354,7 @@ export default function Form() {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[40%] h-[60%]"}
+            widthClass={"w-[40%] h-[70%]"}
             onClose={() => {
               setForm(false);
               setErrors({});
@@ -460,7 +433,7 @@ export default function Form() {
 
                         <div className="flex">
                           <div className="w-72 mb-3 ">
-                            <DropdownInput
+                            {/* <DropdownInput
                               name="Country"
                               options={dropDownListObject(
                                 id
@@ -479,81 +452,33 @@ export default function Form() {
                               disabled={
                                 childRecord.current > 0 ? true : undefined
                               }
+                            /> */}
+                            <label className="block text-xs  font-bold text-slate-700 mb-1">
+                              Select Country{" "}
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <Select
+                              options={options}
+                              value={selectedOption}
+                              onChange={(selected) =>
+                                setCountry(selected?.value || "")
+                              }
+                              isDisabled={readOnly}
+                              isSearchable
+                              isClearable={false}
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className="w-full px-1 -ml-1  text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                              placeholder="Select Country"
+                              styles={customSelectStyles}
                             />
                           </div>
                         </div>
-                        {/* <div className="w-72 font-segoe">
-                          <label className="block text-xs  font-bold text-slate-700 mb-1">
-                            Select Country{" "}
-                            <span className="text-red-500">*</span>
-                          </label>
 
-                          <Select
-                            placeholder="Select Country"
-                            options={countryOptions}
-                            isDisabled={readOnly || childRecord.current > 0}
-                            isSearchable
-                            isClearable={false}
-                            onChange={(e) =>{
-                              setCountry(country)
-                            }}
-                            menuShouldScrollIntoView={false}
-                            maxMenuHeight={60} // <-- Reduce height here
-                            onInputChange={(value) => value.toUpperCase()}
-                            className="w-full  px-1 py-1 text-xs border  border-gray-300 rounded-lg
-          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-          transition-all duration-150 shadow-sm"
-                            styles={{
-                              control: (base) => ({
-                                ...base,
-                                minHeight: "16px", // Reduce overall height
-                                height: "16px", // Force height
-                                padding: "13px 4px", // Adjust padding inside
-                                fontSize: "12px", // Make text smaller
-                                borderRadius: "8px",
-                                fontFamily: "'Segoe UI'",
-                              }),
-                              valueContainer: (base) => ({
-                                ...base,
-                                padding: "0 6px", // Space for text
-                                marginTop: "-8px",
-                                fontFamily: "'Segoe UI'",
-                              }),
-                              input: (base) => ({
-                                ...base,
-                                margin: 0,
-                                padding: 0,
-                                fontFamily: "'Segoe UI'",
-                              }),
-                              singleValue: (base) => ({
-                                ...base,
-                                fontFamily: "'Segoe UI'",
-                              }),
-                              placeholder: (base) => ({
-                                ...base,
-                                fontFamily: "'Segoe UI'",
-                                fontSize:"12px",
-                                color:'black'
-                              }),
-                              menu: (base) => ({
-                                ...base,
-                                fontFamily: "'Segoe UI'",
-                              }),
-                              option: (base) => ({
-                                ...base,
-                                fontFamily: "'Segoe UI'",
-                                fontSize: "12px",
-                              }),
-                              indicatorsContainer: (base) => ({
-                                ...base,
-                                display: "none",
-                                height: "28px", // Align dropdown arrow
-                                marginTop: "-12px",
-                              }),
-                            }}
-                          />
-                        </div> */}
-                        <div>
+                        <div className="pt-5 ">
                           <ToggleButton
                             name="Status"
                             value={active}

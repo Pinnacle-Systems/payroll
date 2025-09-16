@@ -48,7 +48,7 @@ const ShiftTemplateMaster = () => {
   const params = getCommonParams();
   const[shiftId,setshiftId] = useState('')
 
-  const { branchId } = params;
+  const { branchId,companyId } = params;
   const dispatch = useDispatch();
   const { data: company } = useGetCompanyQuery({ params });
   const [companyCode, setCompanyCode] = useState(company?.data[0].code);
@@ -122,16 +122,14 @@ const ShiftTemplateMaster = () => {
     description,
     docId,
     active,
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
+    companyId,
     id,
     branchId,
     ShiftTemplateItems: ShiftTemplateItems?.filter((item) => item.templateId),
     categoryId,
   };
 
-  console.log(ShiftTemplateItems, "ShiftTemplateItems");
+  
 
   // const validateData = (data) => {
   //     if (!data?.categoryId) {

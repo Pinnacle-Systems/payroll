@@ -52,7 +52,7 @@ async function getSearch(req) {
 }
 
 async function create(body) {
-  const { name, code, companyId, active } = await body;
+  const { name, code, companyId, active,branchId } = await body;
   const data = await prisma.designation.create({
     data: {
       name,
@@ -60,7 +60,8 @@ async function create(body) {
       code,
       active,
      
-      companyId:  parseInt(companyId) ,
+        branchId: branchId ? parseInt(branchId) : undefined,
+      companyId: companyId ? parseInt(companyId) : undefined,
      
     },
   });

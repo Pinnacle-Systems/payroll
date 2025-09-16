@@ -23,6 +23,7 @@ import { statusDropdown } from "../../../Utils/DropdownData";
 import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
 import Swal from "sweetalert2";
+import { getCommonParams } from "../../../Utils/helper";
 const MODEL = "Employee Category Master";
 export default function Form() {
   const [form, setForm] = useState(false);
@@ -39,11 +40,9 @@ export default function Form() {
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
 
-  const params = {
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "currentBranchId"
-    ),
-  };
+   const params = getCommonParams();
+ 
+   const { branchId ,companyId} = params;
   const {
     data: allData,
     isLoading,
@@ -77,10 +76,9 @@ export default function Form() {
     name,
     code,
     active,
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
+    companyId,
     id,
+    branchId
 
   };
   useEffect(() => {

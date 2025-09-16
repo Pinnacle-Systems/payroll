@@ -53,7 +53,7 @@ const CompanyPaycode = () => {
 
   const params = getCommonParams();
 
-  const { branchId } = params;
+  const { branchId,companyId } = params;
 
   const { data: company } = useGetCompanyQuery({ params });
   const [companyCode, setCompanyCode] = useState(company?.data[0].code);
@@ -128,9 +128,7 @@ const CompanyPaycode = () => {
 
     docId,
 
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
+    companyId,
     id,
     branchId,
     payDetails,

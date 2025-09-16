@@ -96,7 +96,7 @@ const TemplateItems = ({
 
   return (
     <>
-      <div className="w-full bg-gray-100 mx-auto rounded-md shadow-md px-2 py-1">
+      <div className="w-full bg-gray-100 mx-auto rounded-md shadow-md  overflow-auto px-2 py-1">
         <div className="flex justify-between items-center mb-1">
           <h1 className="text-2xl font-bold text-gray-800">Shift Template </h1>
           <div className="flex gap-2">
@@ -133,7 +133,7 @@ const TemplateItems = ({
             )}
           </div>
         </div>
-        <div className="space-y-3  h-[580px] ">
+        <div className="space-y-3   overflow-auto ">
           <div className="grid grid-cols-1 md:grid-cols-1 gap-2">
             <div className="border border-slate-200 p-2 bg-white rounded-md shadow-sm col-span-1">
               <h2 className="font-medium text-slate-700 mb-2">Basic Details</h2>
@@ -175,16 +175,7 @@ const TemplateItems = ({
               </div>
             </div>
           </div>
-          <div
-            className={`w-full   p-2 overflow-x-auto bg-white`}
-            // tabIndex={0} // Make it focusable
-            // onKeyDown={(e) => {
-            //   if (e.key === "Enter") {
-            //     e.preventDefault(); // Prevent default Enter behavior
-            //     addNewRow();
-            //   }
-            // }}
-          >
+          <div className={`w-full   p-2 overflow-auto bg-white max-h-[370px]`}>
             <table className="w-full border-collapse table-fixed ">
               <thead className="bg-gray-200 text-gray-800">
                 <tr>
@@ -279,7 +270,7 @@ const TemplateItems = ({
                     <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
                       <select
                         // onKeyDown={e => { if (e.key === "Delete") { handleInputChange("", index, "accessoryGroupId") } }}
-                       disabled={childRecord.current > 0}
+                        disabled={childRecord.current > 0}
                         readOnly={readOnly}
                         className="text-left w-full focus:outline-none rounded py-1 bg-transparent"
                         value={item.templateId}
@@ -453,11 +444,11 @@ const TemplateItems = ({
                                               "toleranceInBeforeStart"
                                             )
                                           }
-                                          className="w-[120px] px-3 py-1 text-xs border border-gray-300 rounded-lg
+                                          className="w-[120px] px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
                                           disabled={childRecord.current > 0}
-                        readOnly={readOnly}
+                                          readOnly={readOnly}
                                         />
                                       </div>
 
@@ -478,11 +469,11 @@ const TemplateItems = ({
                                               "toleranceInAfterEnd"
                                             )
                                           }
-                                          className="w-[120px] px-3 py-1  text-xs border border-gray-300 rounded-lg
+                                          className="w-[120px] px-3 py-1  text-xs border uppercase border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
-                                         disabled={childRecord.current > 0}
-                        readOnly={readOnly}
+                                          disabled={childRecord.current > 0}
+                                          readOnly={readOnly}
                                         />
                                       </div>
 
@@ -503,11 +494,11 @@ const TemplateItems = ({
                                               "toleranceOutBeforeStart"
                                             )
                                           }
-                                          className="w-[120px] px-3 py-1 text-xs border border-gray-300 rounded-lg
+                                          className="w-[120px] px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
                                           disabled={childRecord.current > 0}
-                        readOnly={readOnly}
+                                          readOnly={readOnly}
                                         />
                                       </div>
 
@@ -528,11 +519,11 @@ const TemplateItems = ({
                                               "toleranceOutAfterEnd"
                                             )
                                           }
-                                          className=" w-[120px] px-3 py-1  text-xs border border-gray-300 rounded-lg
+                                          className=" w-[120px] px-3 py-1  text-xs border uppercase border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
                                           disabled={childRecord.current > 0}
-                        readOnly={readOnly}
+                                          readOnly={readOnly}
                                         />
                                       </div>
                                     </div>
@@ -589,11 +580,11 @@ const TemplateItems = ({
                                               "fbOut"
                                             )
                                           }
-                                          className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
+                                          className="w-full px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
                       focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                       transition-all duration-150 shadow-sm"
                                           disabled={childRecord.current > 0}
-                        readOnly={readOnly}
+                                          readOnly={readOnly}
                                         />
                                       </div>
 
@@ -614,11 +605,11 @@ const TemplateItems = ({
                                               "fbIn"
                                             )
                                           }
-                                          className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
+                                          className="w-full px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
                       focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                       transition-all duration-150 shadow-sm"
-                                         disabled={childRecord.current > 0}
-                        readOnly={readOnly}
+                                          disabled={childRecord.current > 0}
+                                          readOnly={readOnly}
                                         />
                                       </div>
 
@@ -639,11 +630,11 @@ const TemplateItems = ({
                                               "lunchBst"
                                             )
                                           }
-                                          className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
+                                          className="w-full px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
                       focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                       transition-all duration-150 shadow-sm"
-                                         disabled={childRecord.current > 0}
-                        readOnly={readOnly}
+                                          disabled={childRecord.current > 0}
+                                          readOnly={readOnly}
                                         />
                                       </div>
 
@@ -653,9 +644,9 @@ const TemplateItems = ({
                                           LB.SNDay
                                         </label>
                                         <select
-                                         disabled={childRecord.current > 0}
-                        readOnly={readOnly}
-                                          className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
+                                          disabled={childRecord.current > 0}
+                                          readOnly={readOnly}
+                                          className="w-full px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
                       focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                       transition-all duration-150 shadow-sm"
                                           value={item?.lBSNDay}
@@ -696,11 +687,11 @@ const TemplateItems = ({
                                               "lunchBET"
                                             )
                                           }
-                                          className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
+                                          className="w-full px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
                       focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                       transition-all duration-150 shadow-sm"
-                                         disabled={childRecord.current > 0}
-                        readOnly={readOnly}
+                                          disabled={childRecord.current > 0}
+                                          readOnly={readOnly}
                                         />
                                       </div>
 
@@ -710,9 +701,9 @@ const TemplateItems = ({
                                           LB.ENDay
                                         </label>
                                         <select
-                                         disabled={childRecord.current > 0}
-                        readOnly={readOnly}
-                                          className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
+                                          disabled={childRecord.current > 0}
+                                          readOnly={readOnly}
+                                          className="w-full px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
                       focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                       transition-all duration-150 shadow-sm"
                                           value={item?.lBEnday}
@@ -753,11 +744,11 @@ const TemplateItems = ({
                                               "sbOut"
                                             )
                                           }
-                                          className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
+                                          className="w-full px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
                       focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                       transition-all duration-150 shadow-sm"
-                                         disabled={childRecord.current > 0}
-                        readOnly={readOnly}
+                                          disabled={childRecord.current > 0}
+                                          readOnly={readOnly}
                                         />
                                       </div>
 
@@ -778,11 +769,11 @@ const TemplateItems = ({
                                               "sbIn"
                                             )
                                           }
-                                          className="w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
+                                          className="w-full px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
                       focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                       transition-all duration-150 shadow-sm"
-                                         disabled={childRecord.current > 0}
-                        readOnly={readOnly}
+                                          disabled={childRecord.current > 0}
+                                          readOnly={readOnly}
                                         />
                                       </div>
                                     </div>
@@ -798,7 +789,7 @@ const TemplateItems = ({
                     {/* Out Next Day */}
                     <td className="border border-gray-300 text-[11px] py-0.5 item-center">
                       <select
-                       disabled={childRecord.current > 0}
+                        disabled={childRecord.current > 0}
                         readOnly={readOnly}
                         className="text-left w-full bg-transparent focus:outline-none rounded py-1 "
                         value={item.outNxtDay}
@@ -854,7 +845,9 @@ const TemplateItems = ({
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             e.preventDefault();
-                            addNewRow();
+                            if (item?.date) {
+                              addNewRow();
+                            }
                           }
                         }}
                       />
@@ -863,7 +856,6 @@ const TemplateItems = ({
                 ))}
               </tbody>
             </table>
-            
           </div>
         </div>
 

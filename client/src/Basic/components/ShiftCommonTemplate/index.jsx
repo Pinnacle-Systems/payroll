@@ -40,7 +40,7 @@ const ShiftCommonTemplateMaster = () => {
   const [employeeCategoryId, setEmployeeCategoryId] = useState("");
   const params = getCommonParams();
 
-  const { branchId } = params;
+  const { branchId ,companyId} = params;
 
   const { data: company } = useGetCompanyQuery({ params });
   const [companyName, setCompanyName] = useState(company?.data[0].name);
@@ -92,9 +92,7 @@ const ShiftCommonTemplateMaster = () => {
     docId,
     employeeCategoryId,
     active,
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
+    companyId,
     id,
     branchId,
     

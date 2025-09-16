@@ -24,6 +24,7 @@ import { useGetdesignationByIdQuery } from "../../../redux/services/DesignationM
 import { Check, Power } from "lucide-react";
 import Modal from "../../../UiComponents/Modal";
 import Swal from "sweetalert2";
+import { getCommonParams } from "../../../Utils/helper";
 const MODEL = "Department Master";
 
 export default function Form() {
@@ -39,12 +40,9 @@ export default function Form() {
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
  const departmentNameref = useRef(null);
-  console.log(form, "form");
-  const params = {
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
-  };
+   const params = getCommonParams();
+ 
+   const { branchId,companyId } = params;;
   const { data: allData } = useGetDepartmentQuery({
     params,
     searchParams: searchValue,
@@ -80,10 +78,9 @@ export default function Form() {
     name,
     code,
     active,
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
+    companyId,
     id,
+    branchId
   };
 
   const validateData = (data) => {

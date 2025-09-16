@@ -41,7 +41,7 @@ export default function Form() {
     params,
     searchParams: searchValue,
   });
-  const { branchId } = params;
+  const { branchId ,companyId} = params;
   const {
     data: singleData,
     isFetching: isSingleFetching,
@@ -73,9 +73,7 @@ export default function Form() {
     postive,
     bgFamily,
     active,
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
+    companyId,
     id,
     branchId,
   };

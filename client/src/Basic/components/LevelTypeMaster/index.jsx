@@ -30,11 +30,11 @@ export default function Form() {
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
   const levelNameref = useRef(null);
-  console.log(form, "form");
+
 
   const params = getCommonParams();
 
-  const { branchId } = params;
+  const { branchId ,companyId} = params;
 
   const { data: allData } = useGetLevelTypeQuery({
     params,
@@ -65,15 +65,13 @@ export default function Form() {
     syncFormWithDb(singleData?.data);
   }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
 
-  console.log(singleData?.data, "singleData?.data");
+  
 
   const data = {
     name,
 
     active,
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
+    companyId,
     id,
     branchId,
   };

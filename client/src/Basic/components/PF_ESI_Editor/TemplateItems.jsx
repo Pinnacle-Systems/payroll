@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { DateInput, DropdownInput, TextInput } from "../../../Inputs";
+
 import { toast } from "react-toastify";
 
 const TemplateItems = ({
@@ -156,7 +157,7 @@ const TemplateItems = ({
 
                 <div className="w-[120px]">
                   <DateInput
-                    name="Date"
+                    name="Effective Date"
                     value={date}
                     setValue={setDate}
                     required={true}
@@ -228,18 +229,19 @@ const TemplateItems = ({
                   const to = parseFloat(item?.toValue) || 0;
                   const perc = parseFloat(item?.percentage) || 0;
                   let calculatedAmount = 0;
-
-                  if (payCodeType === "PF") {
-                    if (to > 0 && to <= 15000) {
-                      calculatedAmount = (to * 12) / 100;
-                    } else if (to >= 15001) {
-                      calculatedAmount = 1800;
-                    }
-                  } else if (payCodeType === "ESI") {
-                    if (to > 0 && to <= 21000) {
-                      calculatedAmount = (to * 0.75) / 100;
-                    } else if (to > 21000) {
-                      calculatedAmount = 0;
+                  if (to > from) {
+                    if (payCodeType === "PF") {
+                      if (to > 0 && to <= 15000) {
+                        calculatedAmount = (to * 12) / 100;
+                      } else if (to >= 15001) {
+                        calculatedAmount = 1800;
+                      }
+                    } else if (payCodeType === "ESI") {
+                      if (to > 0 && to <= 21000) {
+                        calculatedAmount = (to * 0.75) / 100;
+                      } else if (to > 21000) {
+                        calculatedAmount = 0;
+                      }
                     }
                   }
 
@@ -273,7 +275,7 @@ const TemplateItems = ({
                           className={`w-full bg-transparent text-right pr-2 focus:outline-none focus:border-transparent ${
                             readOnly ? "text-gray-600" : "text-black"
                           }`}
-                          disabled={readOnly}
+                          disabled={readOnly || !payDetailsId}
                         />
                       </td>
                       <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
@@ -283,14 +285,38 @@ const TemplateItems = ({
                           step="0.01"
                           value={item?.toValue}
                           onChange={(e) => {
-                            // Always update first so typing isn't blocked
                             handleInputChange(e.target.value, index, "toValue");
                           }}
                           onBlur={(e) => {
+                            const rawValue = e.target.value;
                             const formatted =
-                              e.target.value === ""
+                              rawValue === ""
                                 ? ""
-                                : Number(e.target.value).toFixed(2);
+                                : Number(rawValue).toFixed(2);
+
+                            if (formatted !== "") {
+                              const from = Number(item?.fromValue || 0);
+                              const to = Number(formatted);
+
+                              if (to < from) {
+                                //  Show error toast
+                                toast.error(
+                                  "To Value cannot be smaller than From Value",
+                                  {
+                                    position: "top-right",
+                                    autoClose: 3000,
+                                  }
+                                );
+
+                                // Reset both toValue & percentage
+                                handleInputChange("", index, "toValue");
+                                handleInputChange("", index, "percentage");
+                                e.target.value = "";
+                                return;
+                              }
+                            }
+
+                            // Valid case → update state
                             e.target.value = formatted;
                             handleInputChange(formatted, index, "toValue");
                           }}
@@ -306,15 +332,20 @@ const TemplateItems = ({
                           placeHolder="0.00"
                           step="0.01"
                           value={
-                            payCodeType === "PF" && item?.toValue
-                              ? (parseFloat(item?.toValue) || 0) <= 15000
-                                ? (12).toFixed(2) // PF and <= 15000
-                                : '' // PF and > 15000, adjust if needed
-                              : payCodeType === "ESI" && item?.toValue
-                              ? (parseFloat(item?.toValue) || 0) <= 21000
-                                ? (0.75).toFixed(2) // ESI and <= 21000
-                                : '' // ESI and > 21000
-                              : item?.percentage || ""
+                            item?.toValue &&
+                            item?.fromValue &&
+                            parseFloat(item.toValue) >
+                              parseFloat(item.fromValue)
+                              ? payCodeType === "PF"
+                                ? parseFloat(item.toValue) <= 15000
+                                  ? (12).toFixed(2) // PF and <= 15000
+                                  : "" // PF and > 15000 (or cap logic)
+                                : payCodeType === "ESI"
+                                ? parseFloat(item.toValue) <= 21000
+                                  ? (0.75).toFixed(2) // ESI and <= 21000
+                                  : "" // ESI and > 21000
+                                : item?.percentage || ""
+                              : "" // toValue not greater than fromValue
                           }
                           onChange={(e) =>
                             handleInputChange(
@@ -359,7 +390,9 @@ const TemplateItems = ({
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {
                               e.preventDefault();
-                              addNewRow();
+                              if (item?.fromValue  && item.fromValue.toString().trim() !== "") {
+                                addNewRow();
+                              }
                             }
                           }}
                         />

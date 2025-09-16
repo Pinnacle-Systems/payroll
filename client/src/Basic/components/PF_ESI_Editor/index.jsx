@@ -39,7 +39,7 @@ const PFEsiEditor = () => {
 
   const params = getCommonParams();
 
-  const { branchId } = params;
+  const { branchId,companyId } = params;
 
   const { data: allData, refetch } = useGetPFEsiEditorQuery({
     params,
@@ -121,9 +121,7 @@ const PFEsiEditor = () => {
     id,
     branchId,
     pfEsiGrid,
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
+    companyId
   };
 
   const validateData = (data) => {

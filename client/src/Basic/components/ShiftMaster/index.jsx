@@ -57,9 +57,9 @@ const ShiftMaster = () => {
 
   const params = getCommonParams();
 
-  console.log(params, "params");
 
-  const { branchId } = params;
+
+  const { branchId,companyId } = params;
 
   const { data: company } = useGetCompanyQuery({ params });
   const [companyName, setCompanyName] = useState(company?.data[0]?.name);
@@ -116,9 +116,7 @@ const ShiftMaster = () => {
     from,
     to,
     active,
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
+    companyId,
     id,
     branchId,
   };

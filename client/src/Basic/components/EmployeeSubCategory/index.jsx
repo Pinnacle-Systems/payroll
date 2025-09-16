@@ -30,7 +30,7 @@ const EmployeeSubCategory = () => {
   const params = getCommonParams();
      const employeeRef = useRef(null);
 
-  const { branchId } = params;
+  const { branchId ,companyId} = params;
 
   const { data: company } = useGetCompanyQuery({ params });
   const [companyName, setCompanyName] = useState(company?.data[0].name);
@@ -68,9 +68,7 @@ const EmployeeSubCategory = () => {
     gradeName,
     employeeCategoryId,
     active,
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
+    companyId,
     id,
     branchId,
   };

@@ -31,7 +31,7 @@ export default function Form() {
 
   const params = getCommonParams();
 
-  const { branchId } = params;
+  const { branchId,companyId } = params;
 
   const { data: allData } = useGetRelationShipQuery({
     params,
@@ -68,9 +68,7 @@ export default function Form() {
     name,
 
     active,
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
+    companyId,
     id,
     branchId,
   };

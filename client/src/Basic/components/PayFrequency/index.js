@@ -48,7 +48,7 @@ const PayFrequencymaster = () => {
 
   const params = getCommonParams();
 
-  const { branchId } = params;
+  const { branchId,companyId } = params;
 
   const { data: company } = useGetCompanyQuery({ params });
   const [companyCode, setCompanyCode] = useState(company?.data[0].code);
@@ -62,7 +62,7 @@ const PayFrequencymaster = () => {
     params,
     searchParams: searchValue,
   });
-  console.log(allData, "allData");
+  
 
   const {
     data: singleData,
@@ -112,7 +112,7 @@ const PayFrequencymaster = () => {
         setActive(data?.active ?? true);
         setFinYearId(data?.finYearId || "");
 
-        // ✅ Normalize PayFrequencyType from backend
+        // Normalize PayFrequencyType from backend
         const normalized = data?.PayFrequencyType?.map((type) => ({
           id: type.id,
           type: type.payFrequencyType, // backend string
@@ -142,9 +142,7 @@ const PayFrequencymaster = () => {
     description,
     docId,
     active,
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
+    companyId,
     id,
     branchId,
     payFrequencyType,
@@ -331,6 +329,7 @@ const PayFrequencymaster = () => {
             finYearId={finYearId}
             setFinYearId={setFinYearId}
             childRecord={childRecord}
+            form={form}
           />
         ) : (
           <>

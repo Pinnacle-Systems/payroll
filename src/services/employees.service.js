@@ -275,6 +275,7 @@ async function create(req) {
   const image = req.file;
   const {
     branchId,
+    companyId,
     employeeType,
     middleName,
     firstName,
@@ -384,6 +385,9 @@ async function create(req) {
         : undefined,
 
       Branch: branchId ? { connect: { id: parseInt(branchId) } } : undefined,
+      Company: companyId ? { connect: { id: parseInt(companyId) } } : undefined,
+     
+      
       // shiftTemplateId: shiftTemplateId ? parseInt(shiftTemplateId) : null,
         BloodGroup: bloodGroupId ? {connect :{id :parseInt(bloodGroupId) }} : undefined,
       shiftTemplate: shiftTemplateId

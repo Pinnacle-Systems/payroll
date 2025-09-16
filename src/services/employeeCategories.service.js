@@ -52,13 +52,14 @@ async function getSearch(req) {
 }
 
 async function create(body) {
-    const { name, code,companyId } = await body
+    const { name, code,companyId,branchId } = await body
   
 
     const data = await prisma.employeeCategory.create({
         data: {
             name, code,
-            branchId: companyId ? parseInt(companyId) : undefined,
+            companyId: companyId ? parseInt(companyId) : undefined,
+            branchId: branchId ? parseInt(branchId) : undefined,
         },
     });
     return { statusCode: 0, data };

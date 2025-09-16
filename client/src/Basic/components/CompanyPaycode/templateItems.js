@@ -233,8 +233,8 @@ const TemplateItems = ({
                         placeholder="Select Pay Code"
                         value={(payComponent?.data || [])
                           .map((blend) => ({
-                            value: blend.id,
-                            label: blend.payCode,
+                            value: blend?.id,
+                            label: blend?.payCode,
                           }))
                           .find((opt) => opt.value === item?.payComponentId)}
                         menuPlacement="auto"

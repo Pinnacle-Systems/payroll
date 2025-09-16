@@ -31,6 +31,7 @@ import { useGetCompanyQuery } from "../../../redux/services/CompanyMasterService
 import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
 import Swal from "sweetalert2";
+import { getCommonParams } from "../../../Utils/helper";
 const Designation = () => {
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
@@ -44,13 +45,10 @@ const Designation = () => {
   const childRecord = useRef(0);
   const [companyName, setCompanyName] = useState("");
   const [companyCode, setCompanyCode] = useState("");
-  const MODEL = "DESIGNATION";
-  console.log(form, "form");
-  const params = {
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
-  };
+
+  const params = getCommonParams();
+
+  const { branchId ,companyId} = params;
    const designationRef = useRef(null);
   const { data: company } = useGetCompanyQuery({ params });
   const {
@@ -95,10 +93,9 @@ const Designation = () => {
     name,
     code,
     active,
-    companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
+    companyId,
     id,
+    branchId
   };
 
   const validateData = (data) => {

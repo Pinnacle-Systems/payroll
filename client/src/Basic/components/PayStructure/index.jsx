@@ -57,7 +57,7 @@ const PayStructure = () => {
 
   const params = getCommonParams();
 
-  const { branchId } = params;
+  const { branchId ,companyId} = params;
 
   const { data: company } = useGetCompanyQuery({ params });
   const [companyCode, setCompanyCode] = useState(company?.data[0].code);
@@ -143,9 +143,7 @@ const syncFormWithDb = useCallback(
     id,
     branchId,
     payStructure,
-     companyId: secureLocalStorage.getItem(
-      sessionStorage.getItem("sessionId") + "userCompanyId"
-    ),
+     companyId,
   };
 
   

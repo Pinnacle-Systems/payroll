@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DropdownInput, TextInput } from "../../../Inputs";
 import { dropDownFinYear } from "../../../Utils/contructObject";
 import { payCategory } from "../../../Utils/DropdownData";
@@ -18,9 +18,15 @@ const TemplateItems = ({
   setPayFrequencyType,
   setReadOnly,
   setId,
+  form,
 }) => {
-  console.log(payFrequencyType, "payFrequencyType");
-
+  
+  const payref = useRef(null);
+   useEffect(() => {
+      if (form && !readOnly && payref.current) {
+        payref.current.focus();
+      }
+    }, [form, readOnly]);
   const [contextMenu, setContextMenu] = useState(null);
   const handleRightClick = (event, rowIndex, type) => {
     event.preventDefault();
@@ -106,64 +112,65 @@ const TemplateItems = ({
     }
   };
 
-useEffect(() => {
-  const defaultTypes = [
-    "Monthly - 2 Pay Frequency",
-    "Monthly Pay Frequency",
-    "Weekly Pay Frequency",
-  ];
+  useEffect(() => {
+    const defaultTypes = [
+      "Monthly - 2 Pay Frequency",
+      "Monthly Pay Frequency",
+      "Weekly Pay Frequency",
+    ];
 
-  if (id) {
-    // Edit/View Mode: Ensure all types exist and have at least one row
-    if (payFrequencyType && payFrequencyType.length > 0) {
-      const updatedTypes = defaultTypes.map((typeName) => {
-        const existingType = payFrequencyType.find((t) => t.type === typeName);
+    if (id) {
+      // Edit/View Mode: Ensure all types exist and have at least one row
+      if (payFrequencyType && payFrequencyType.length > 0) {
+        const updatedTypes = defaultTypes.map((typeName) => {
+          const existingType = payFrequencyType.find(
+            (t) => t.type === typeName
+          );
 
-        return existingType
-          ? {
-              ...existingType,
-              payFrequencyItems:
-                existingType.payFrequencyItems?.length > 0
-                  ? existingType.payFrequencyItems
-                  : [
-                      {
-                        startDate: "",
-                        endDate: "",
-                        salaryDate: "",
-                        notes: "",
-                      },
-                    ],
-            }
-          : {
-              type: typeName,
-              payFrequencyItems: [
-                {
-                  startDate: "",
-                  endDate: "",
-                  salaryDate: "",
-                  notes: "",
-                },
-              ],
-            };
-      });
+          return existingType
+            ? {
+                ...existingType,
+                payFrequencyItems:
+                  existingType.payFrequencyItems?.length > 0
+                    ? existingType.payFrequencyItems
+                    : [
+                        {
+                          startDate: "",
+                          endDate: "",
+                          salaryDate: "",
+                          notes: "",
+                        },
+                      ],
+              }
+            : {
+                type: typeName,
+                payFrequencyItems: [
+                  {
+                    startDate: "",
+                    endDate: "",
+                    salaryDate: "",
+                    notes: "",
+                  },
+                ],
+              };
+        });
 
-      setPayFrequencyType(updatedTypes);
+        setPayFrequencyType(updatedTypes);
+      }
+    } else {
+      // New form: Initialize if empty
+      if (!payFrequencyType || payFrequencyType.length === 0) {
+        setPayFrequencyType(
+          defaultTypes.map((type) => ({
+            type,
+            payFrequencyItems: [
+              { startDate: "", endDate: "", salaryDate: "", notes: "" },
+            ],
+          }))
+        );
+      }
     }
-  } else {
-    // New form: Initialize if empty
-    if (!payFrequencyType || payFrequencyType.length === 0) {
-      setPayFrequencyType(
-        defaultTypes.map((type) => ({
-          type,
-          payFrequencyItems: [
-            { startDate: "", endDate: "", salaryDate: "", notes: "" },
-          ],
-        }))
-      );
-    }
-  }
-}, [id, payFrequencyType]);
-
+  }, [id, payFrequencyType]);
 
   const calculatePayPeriod = (startDate, endDate) => {
     if (!startDate || !endDate) return { totalDays: 0, sundays: 0 };
@@ -186,7 +193,7 @@ useEffect(() => {
 
   return (
     <>
-      <div className="h-[90vh] flex flex-col bg-gray-100 overflow-x-auto">
+      <div className=" flex flex-col bg-gray-100 overflow-auto">
         {/* Header */}
         <div className=" flex  justify-between items-center  ">
           <h1 className="text-2xl font-semibold text-gray-800">
@@ -227,7 +234,7 @@ useEffect(() => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 mt-2">
+        <div className="grid grid-cols-1 mt-2 overflow-auto">
           <div className="bg-white p-3 rounded-md border  border-gray-200 w-full">
             <div className="flex gap-x-8 ">
               <DropdownInput
@@ -244,42 +251,48 @@ useEffect(() => {
                 required={true}
                 readOnly={readOnly}
                 disabled={childRecord.current > 0}
+               ref={payref}
+
               />
               <div className="w-24">
-              <TextInput
-                name="Start Date"
-                type="text"
-                value={
-                  finYearId
-                    ? moment(
-                        yearData?.data?.find((i) => i.id == finYearId)?.from
-                      )
-                        .utc()
-                        .format("DD-MM-YYYY")
-                    : ""
-                }
-                setValue={() => {}}
-                required={true}
-                disabled={true}
-              /></div>
-                <div className="w-24">
-              <TextInput
-                name="End Date"
-                type="text"
-                value={
-                  finYearId
-                    ? moment(yearData?.data?.find((i) => i.id == finYearId)?.to)
-                        .utc()
-                        .format("DD-MM-YYYY")
-                    : ""
-                }
-                setValue={() => {}}
-                required={true}
-                disabled={true}
-              /></div>
+                <TextInput
+                  name="Start Date"
+                  type="text"
+                  value={
+                    finYearId
+                      ? moment(
+                          yearData?.data?.find((i) => i.id == finYearId)?.from
+                        )
+                          .utc()
+                          .format("DD-MM-YYYY")
+                      : ""
+                  }
+                  setValue={() => {}}
+                  required={true}
+                  disabled={true}
+                />
+              </div>
+              <div className="w-24">
+                <TextInput
+                  name="End Date"
+                  type="text"
+                  value={
+                    finYearId
+                      ? moment(
+                          yearData?.data?.find((i) => i.id == finYearId)?.to
+                        )
+                          .utc()
+                          .format("DD-MM-YYYY")
+                      : ""
+                  }
+                  setValue={() => {}}
+                  required={true}
+                  disabled={true}
+                />
+              </div>
             </div>
           </div>
-          <div className="bg-white   rounded-md border mt-1 border-gray-200 h-full w-full p-3">
+          <div className="bg-white overflow-auto  rounded-md border mt-1 border-gray-200 max-h-[370px] w-full p-3">
             {/* Tabs */}
             <div className="flex border-b ">
               {payFrequencyType?.map((t) => (
@@ -313,11 +326,15 @@ useEffect(() => {
                   <table className="w-80 border-collapse table-fixed">
                     <thead className="bg-gray-200 text-gray-800">
                       <tr>
-                        <th className="w-12 px-4 py-2 text-center font-medium text-[13px]">S.No</th>
+                        <th className="w-12 px-4 py-2 text-center font-medium text-[13px]">
+                          S.No
+                        </th>
                         <th className="w-28 px-2 py-2 text-center font-medium text-[13px]">
                           Start Date
                         </th>
-                        <th className="w-28  px-2  py-2 text-center font-medium text-[13px]">End Date</th>
+                        <th className="w-28  px-2  py-2 text-center font-medium text-[13px]">
+                          End Date
+                        </th>
                         <th className="w-28  px-2  py-2 text-center font-medium text-[13px]">
                           Salary Date
                         </th>
@@ -327,7 +344,9 @@ useEffect(() => {
                         <th className="w-28 py-2 text-center font-medium text-[13px]">
                           Pay Period Days
                         </th>
-                        <th className="w-24 px-4 py-2 text-center font-medium text-[13px]">Holidays</th>
+                        <th className="w-24 px-4 py-2 text-center font-medium text-[13px]">
+                          Holidays
+                        </th>
                         <th className="w-44 px-4 py-2 text-center font-medium text-[13px]">
                           Notes
                         </th>
@@ -362,10 +381,10 @@ useEffect(() => {
                             <td className="border border-gray-300">
                               <input
                                 type="date"
-                                value={item.startDate}
+                                value={item?.startDate}
                                 onChange={(e) =>
                                   handleInputChange(
-                                    activeType.type,
+                                    activeType?.type,
                                     index,
                                     "startDate",
                                     e.target.value
@@ -378,7 +397,7 @@ useEffect(() => {
                             <td className="border border-gray-300">
                               <input
                                 type="date"
-                                value={item.endDate}
+                                value={item?.endDate}
                                 onChange={(e) =>
                                   handleInputChange(
                                     activeType.type,
@@ -394,7 +413,7 @@ useEffect(() => {
                             <td className="border border-gray-300">
                               <input
                                 type="date"
-                                value={item.salaryDate}
+                                value={item?.salaryDate}
                                 onChange={(e) =>
                                   handleInputChange(
                                     activeType.type,
@@ -408,7 +427,7 @@ useEffect(() => {
                               />
                             </td>
                             <td className="border border-gray-300 p-1">
-                              {item.salaryDate
+                              {item?.salaryDate
                                 ? new Date(item.salaryDate).toLocaleString(
                                     "default",
                                     { month: "long" }
@@ -431,7 +450,7 @@ useEffect(() => {
                             >
                               <input
                                 type="text"
-                                value={item.notes}
+                                value={item?.notes}
                                 onChange={(e) =>
                                   handleInputChange(
                                     activeType.type,
@@ -443,7 +462,9 @@ useEffect(() => {
                                 onKeyDown={(e) => {
                                   if (e.key === "Enter") {
                                     e.preventDefault();
-                                    addNewRow(activeType.type);
+                                    if (item?.startDate) {
+                                      addNewRow(activeType.type);
+                                    }
                                   }
                                 }}
                                 className="focus:outline-none focus:border-transparent bg-transparent p-1"
@@ -474,11 +495,11 @@ useEffect(() => {
             zIndex: 1000,
           }}
           onMouseLeave={handleCloseContextMenu} // Close when the mouse leaves
-              className="bg-gray-100"
+          className="bg-gray-100"
         >
           <div className="flex flex-col gap-1">
             <button
-             className=" text-black text-[12px] text-left rounded px-1"
+              className=" text-black text-[12px] text-left rounded px-1"
               onClick={() => {
                 handleDeleteRow(contextMenu.type, contextMenu.rowId);
                 handleCloseContextMenu();
@@ -487,7 +508,7 @@ useEffect(() => {
               Delete{" "}
             </button>
             <button
-           className=" text-black text-[12px] text-left rounded px-1"
+              className=" text-black text-[12px] text-left rounded px-1"
               onClick={() => handleDeleteAllRows(contextMenu.type)}
             >
               Delete All

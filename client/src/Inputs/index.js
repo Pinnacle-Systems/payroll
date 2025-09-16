@@ -1185,7 +1185,7 @@ export const TextInput = forwardRef(
           readOnly={readOnly}
           disabled={disabled}
           tabIndex={tabIndex ?? undefined}
-          className={`w-full px-2 py-1 text-xs border border-gray-300 rounded-lg
+          className={`w-full px-2 py-1 text-xs text-[12px] border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
           ${
@@ -1496,7 +1496,7 @@ export const DropdownInput = forwardRef(({
         defaultValue={defaultValue}
         required={required}
         readOnly={readOnly}
-        className={`w-full px-1 py-1 text-xs border  border-gray-300 rounded-lg
+        className={`w-full px-1 py-1 text-xs border text-[12px]  border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
           ${
@@ -1734,7 +1734,7 @@ const RequiredLabel = ({ name }) => (
   </p>
 );
 
-export const DateInput = ({
+export const DateInput = forwardRef(({
   name,
   value,
   setValue,
@@ -1745,7 +1745,7 @@ export const DateInput = ({
   tabIndex = null,
   inputClass = "",
   inputHead = null,
-}) => {
+}, ref) => {
   return (
     <div className="flex flex-col gap-1 w-full">
       {name && (
@@ -1761,6 +1761,7 @@ export const DateInput = ({
       <div className="relative">
         <input
           id={name}
+           ref={ref}
           name={name}
           type={type}
           tabIndex={tabIndex}
@@ -1785,7 +1786,7 @@ export const DateInput = ({
       </div>
     </div>
   );
-};
+});
 
 export const DateInputNew = ({
   name,
@@ -2368,3 +2369,65 @@ export const TextAreaInput = ({
     </div>
   );
 };
+
+export  const customSelectStyles = {
+    control: (base) => ({
+      ...base,
+      minHeight: "16px",
+      height: "16px",
+      padding: "13px 4px",
+      fontSize: "12px",
+      borderRadius: "8px",
+      fontFamily: "'Segoe UI'",
+    }),
+    valueContainer: (base) => ({
+      ...base,
+      padding: "0 3px",
+      marginTop: "-8px",
+      fontFamily: "'Segoe UI'",
+    }),
+    input: (base) => ({
+      ...base,
+      margin: 0,
+     
+      padding: 0,
+      fontFamily: "'Segoe UI'",
+    }),
+    singleValue: (base) => ({
+      ...base,
+      fontFamily: "'Segoe UI'",
+    }),
+    placeholder: (base) => ({
+      ...base,
+      fontFamily: "'Segoe UI'",
+      color:'black'
+    }),
+    menu: (base) => ({
+      ...base,
+      fontFamily: "'Segoe UI'",
+      maxHeight: 150,
+      overflowY: "auto",
+    }),
+    option: (base) => ({
+      ...base,
+      fontFamily: "'Segoe UI'",
+      fontSize: "12px",
+    }),
+ dropdownIndicator: (base) => ({
+      ...base,
+      padding: 2, 
+      svg: {
+        width: 14, // icon width
+        height: 14, // icon height
+      },
+      color: "black",
+      marginTop:'-9px'
+    }),
+
+    indicatorSeparator: () => ({ display: "none" }),
+    menuList: (base) => ({
+      ...base,
+      maxHeight: 150,
+      overflowY: "auto",
+    }),
+  };
