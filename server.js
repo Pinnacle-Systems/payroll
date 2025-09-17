@@ -58,6 +58,8 @@ import {
   pFEsiEditor,
   relationShip,
   proof,
+  leaveCode,
+  leaveOpeningBalance,
 } from "./src/routes/index.js";
 
 import { socketMain } from "./src/sockets/socket.js";
@@ -149,6 +151,8 @@ app.use('/leveltype',LevelType)
 app.use('/pFEsiEditor',pFEsiEditor)
 app.use('/relationShip',relationShip)
 app.use('/proofMaster',proof)
+app.use('/leaveCode',leaveCode)
+app.use('/leaveopeningBalance',leaveOpeningBalance)
 
 
 app.get("/retreiveFile/:fileName", (req, res) => {

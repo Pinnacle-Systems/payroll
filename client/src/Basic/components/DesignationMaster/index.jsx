@@ -14,12 +14,7 @@ import ReportTemplate from "../ReportTemplate";
 import Mastertable from "../MasterTable/Mastertable";
 import MastersForm from "../MastersForm/MastersForm";
 import { statusDropdown } from "../../../Utils/DropdownData";
-import {
-  useAdddesignMutation,
-  useGetdesignByIdQuery,
-  useGetdesignQuery,
-  useUpdatedesignMutation,
-} from "../../../redux/uniformService/DesignMasterServices";
+
 import {
   useAdddesignationMutation,
   useDeletedesignationMutation,
@@ -48,7 +43,10 @@ const Designation = () => {
 
   const params = getCommonParams();
 
-  const { branchId ,companyId} = params;
+  const { branchId ,companyId , branchCode} = params;
+
+  console.log(branchCode,"branchCode");
+  
    const designationRef = useRef(null);
   const { data: company } = useGetCompanyQuery({ params });
   const {
@@ -398,7 +396,7 @@ const Designation = () => {
                             disabled={childRecord.current > 0}
                             ref={designationRef}
                           /></div>
-                          <div className="mb-3 w-[20%] ml-6">
+                          <div className="mb-3 w-20 ml-6">
                             <TextInput
                               name="Code"
                               type="text"

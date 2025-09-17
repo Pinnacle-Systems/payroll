@@ -117,7 +117,7 @@ async function getEmployeeId(branchId, startTime, endTime) {
       id: "desc",
     },
   });
-  console.log(lastObject, "lastObject");
+  
 
   const code = "EMP";
   const branchObj = await getTableRecordWithId(branchId, "branch");
@@ -125,16 +125,18 @@ async function getEmployeeId(branchId, startTime, endTime) {
 
   if (lastObject) {
     newDocId = `${branchObj.branchCode}/${code}/${
-      parseInt(lastObject.regNo.split("/").at(-1)) + 1
+      parseInt(lastObject?.regNo?.split("/").at(-1)) + 1
     }`;
   }
+
+  console.log(newDocId,'newDocId--');
+  
   return newDocId;
 }
 
 async function get(req) {
   const { branchId, active, employeeCategory, finYearId, companyId } =
     req.query;
-  console.log("API Calls");
 
   const data = await prisma.employee.findMany({
     where: {
@@ -145,30 +147,26 @@ async function get(req) {
       // }
     },
     include: {
-      department: {
-        select: {
-          name: true,
-        },
-      },
-      EmployeeCategory: true,
-      shiftTemplate: { select: { name: true } }, // optional
-      designation: { select: { name: true } }, // optional
-      presentCity: { select: { name: true } }, // optional
-      permanentCity: { select: { name: true } }, // optional
-      presentState: { select: { name: true } }, // optional
-      permanentState: { select: { name: true } }, // optional
-      presentCountry: { select: { name: true } }, // optional
+      department: { select: { name: true } },
+      BloodGroup: { select: { bgFamily: true } },
+      shiftTemplate: { select: { name: true } }, 
+      designation: { select: { name: true } }, 
+      presentCity: { select: { name: true } }, 
+      permanentCity: { select: { name: true } }, 
+      presentState: { select: { name: true } }, 
+      permanentState: { select: { name: true } }, 
+      presentCountry: { select: { name: true } }, 
       permanentCountry: { select: { name: true } },
       EmployeeCategory: true,
-      EmployeeBankDetails: true, // include all bank details
-      EmployeeEducationdetails: true, // include all education details
+      EmployeeSubCategory: true,
+      EmployeeBankDetails: true, 
+      EmployeeEducationdetails: true, 
       EmployeeFamilyDetails: true,
     },
   });
-  console.log(data, "apidata");
 
   let finYearDate = await getFinYearStartTimeEndTime(finYearId);
-  console.log(finYearDate, "finYearDate");
+
   let Regno = finYearDate
     ? await getEmployeeId(
         branchId,
@@ -176,6 +174,9 @@ async function get(req) {
         finYearDate?.endDateEndTime
       )
     : "";
+
+    
+    
   return {
     statusCode: 0,
     data: data.map((item) => exclude({ ...item }, ["image"])),
@@ -286,7 +287,7 @@ async function create(req) {
     disability,
     identificationMark,
     dob,
-    bloodGroup,
+
     height,
     weight,
     maritalStatus,
@@ -324,7 +325,6 @@ async function create(req) {
     ? JSON.parse(permanentAddress)
     : {};
 
-  console.log(req.body, "form");
 
   const data = await prisma.employee.create({
     data: {
@@ -338,7 +338,7 @@ async function create(req) {
       disability: disability ? disability : "",
       identificationMark: identificationMark ? identificationMark : "",
       dob: dob ? new Date(dob) : null,
-      bloodGroup: bloodGroup ? bloodGroup : "",
+    
       height: height ? height : "",
       weight: weight ? weight : "",
       maritalStatus: maritalStatus ? maritalStatus : "",
@@ -357,7 +357,7 @@ async function create(req) {
       email: email ? email : "",
       uanNo: uanNo ? uanNo : "",
       image: image ? image.buffer : null,
-    
+
       presentAddress: presentAddressObj.address
         ? presentAddressObj.address
         : undefined,
@@ -386,10 +386,10 @@ async function create(req) {
 
       Branch: branchId ? { connect: { id: parseInt(branchId) } } : undefined,
       Company: companyId ? { connect: { id: parseInt(companyId) } } : undefined,
-     
-      
-      // shiftTemplateId: shiftTemplateId ? parseInt(shiftTemplateId) : null,
-        BloodGroup: bloodGroupId ? {connect :{id :parseInt(bloodGroupId) }} : undefined,
+
+      BloodGroup: bloodGroupId
+        ? { connect: { id: parseInt(bloodGroupId) } }
+        : undefined,
       shiftTemplate: shiftTemplateId
         ? { connect: { id: parseInt(shiftTemplateId) } }
         : undefined,
@@ -482,7 +482,7 @@ async function update(id, req) {
     disability,
     identificationMark,
     dob,
-    bloodGroup,
+    
     height,
     weight,
     maritalStatus,
@@ -513,7 +513,7 @@ async function update(id, req) {
     bankDetails,
     educationDetails,
     familyDetails,
-    employeeSubCategoryId
+    employeeSubCategoryId,
   } = await req.body;
 
   const presentAddressObj = presentAddress ? JSON.parse(presentAddress) : {};
@@ -521,7 +521,7 @@ async function update(id, req) {
     ? JSON.parse(permanentAddress)
     : {};
 
-  console.log(req.body, "form");
+  
 
   const dataFound = await prisma.employee.findFirst({
     where: {
@@ -545,7 +545,7 @@ async function update(id, req) {
       disability: disability ? disability : "",
       identificationMark: identificationMark ? identificationMark : "",
       dob: dob ? new Date(dob) : null,
-      bloodGroup: bloodGroup ? bloodGroup : "",
+     
       height: height ? height : "",
       weight: weight ? weight : "",
       maritalStatus: maritalStatus ? maritalStatus : "",
@@ -564,7 +564,9 @@ async function update(id, req) {
       email: email ? email : "",
       uanNo: uanNo ? uanNo : "",
       image: image ? image.buffer : removeImage ? null : undefined,
-      BloodGroup: bloodGroupId ? {connect :{id :parseInt(bloodGroupId) }} : undefined,
+      BloodGroup: bloodGroupId
+        ? { connect: { id: parseInt(bloodGroupId) } }
+        : undefined,
       presentAddress: presentAddressObj.address
         ? presentAddressObj.address
         : undefined,
@@ -605,7 +607,7 @@ async function update(id, req) {
       EmployeeCategory: employeeCategoryId
         ? { connect: { id: parseInt(employeeCategoryId) } }
         : undefined,
-          EmployeeSubCategory: employeeSubCategoryId
+      EmployeeSubCategory: employeeSubCategoryId
         ? { connect: { id: parseInt(employeeSubCategoryId) } }
         : undefined,
 

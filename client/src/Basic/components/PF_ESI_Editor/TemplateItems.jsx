@@ -231,14 +231,13 @@ const TemplateItems = ({
                   let calculatedAmount = 0;
                   if (to > from) {
                     if (payCodeType === "PF") {
-                      if (to > 0 && to <= 15000) {
-                        calculatedAmount = (to * 12) / 100;
-                      } else if (to >= 15001) {
-                        calculatedAmount = 1800;
+                      if (to > 0) {
+                        const tempAmount = (to * perc) / 100;
+                        calculatedAmount = to >= 15001 ? 1800 : tempAmount;
                       }
                     } else if (payCodeType === "ESI") {
                       if (to > 0 && to <= 21000) {
-                        calculatedAmount = (to * 0.75) / 100;
+                        calculatedAmount = (to * perc) / 100; 
                       } else if (to > 21000) {
                         calculatedAmount = 0;
                       }
@@ -331,22 +330,7 @@ const TemplateItems = ({
                           type="number"
                           placeHolder="0.00"
                           step="0.01"
-                          value={
-                            item?.toValue &&
-                            item?.fromValue &&
-                            parseFloat(item.toValue) >
-                              parseFloat(item.fromValue)
-                              ? payCodeType === "PF"
-                                ? parseFloat(item.toValue) <= 15000
-                                  ? (12).toFixed(2) // PF and <= 15000
-                                  : "" // PF and > 15000 (or cap logic)
-                                : payCodeType === "ESI"
-                                ? parseFloat(item.toValue) <= 21000
-                                  ? (0.75).toFixed(2) // ESI and <= 21000
-                                  : "" // ESI and > 21000
-                                : item?.percentage || ""
-                              : "" // toValue not greater than fromValue
-                          }
+                          value={item?.percentage}
                           onChange={(e) =>
                             handleInputChange(
                               e.target.value,
@@ -390,7 +374,10 @@ const TemplateItems = ({
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {
                               e.preventDefault();
-                              if (item?.fromValue  && item.fromValue.toString().trim() !== "") {
+                              if (
+                                item?.fromValue &&
+                                item.fromValue.toString().trim() !== ""
+                              ) {
                                 addNewRow();
                               }
                             }

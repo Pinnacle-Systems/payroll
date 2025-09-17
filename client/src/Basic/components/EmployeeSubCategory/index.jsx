@@ -344,6 +344,8 @@ const EmployeeSubCategory = () => {
                               ))}
                             
                             </select>
+                            {console.log(employeeCategoryId,"employeeCategoryId")
+                            }
                           </div>
 
                           <div className="w-42">

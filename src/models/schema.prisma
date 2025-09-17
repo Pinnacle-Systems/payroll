@@ -75,6 +75,8 @@ model Company {
   City                City[]
   Employee            Employee[]
   EmployeeCategory    EmployeeCategory[]
+  LeaveCode           LeaveCode[]
+  LeaveOPeningBalance LeaveOPeningBalance[]
 }
 
 model Subscription {
@@ -133,6 +135,8 @@ model Branch {
   Department          Department[]
   Designation         Designation[]
   FinYear             FinYear[]
+  LeaveCode           LeaveCode[]
+  LeaveOPeningBalance LeaveOPeningBalance[]
 }
 
 model UserOnBranch {
@@ -257,6 +261,10 @@ model User {
   FinYearupdatedBy             FinYear[]             @relation(name: "updatedBy")
   EmployeeCategoryCreatedBy    EmployeeCategory[]    @relation(name: "createdBy")
   EmployeeCategoryupdatedBy    EmployeeCategory[]    @relation(name: "updatedBy")
+  LeaveCodeCreatedBy           LeaveCode[]           @relation(name: "createdBy")
+  LeaveCodeupdatedBy           LeaveCode[]           @relation(name: "updatedBy")
+  LeaveOPeningBalanceCreatedBy LeaveOPeningBalance[] @relation(name: "createdBy")
+  LeaveOPeningBalanceupdatedBy LeaveOPeningBalance[] @relation(name: "updatedBy")
 }
 
 model Employee {
@@ -332,13 +340,14 @@ model Employee {
   EmployeeEducationdetails EmployeeEducationDetails[]
   EmployeeFamilyDetails    EmployeeFamilyDetails[]
 
-  BloodGroup            BloodGroupMaster   @relation(fields: [bloodGroupId], references: [id])
+  BloodGroup            BloodGroupMaster      @relation(fields: [bloodGroupId], references: [id])
   bloodGroupId          Int
-  EmployeeSubCategory   EmployeSubCategory @relation(fields: [employeeSubCategoryId], references: [id])
+  EmployeeSubCategory   EmployeSubCategory    @relation(fields: [employeeSubCategoryId], references: [id])
   employeeSubCategoryId Int
-  image                 Bytes?             @db.LongBlob
-  Company               Company?           @relation(fields: [companyId], references: [id])
+  image                 Bytes?                @db.LongBlob
+  Company               Company?              @relation(fields: [companyId], references: [id])
   companyId             Int?
+  LeaveOPeningBalance   LeaveOPeningBalance[]
 }
 
 model EmployeeBankDetails {
@@ -374,20 +383,21 @@ model EmployeeFamilyDetails {
 }
 
 model FinYear {
-  id           Int            @id @default(autoincrement())
-  from         DateTime
-  to           DateTime
-  Company      Company?       @relation(fields: [companyId], references: [id])
-  companyId    Int?
-  active       Boolean        @default(true)
-  code         String?
-  PayFrequency PayFrequency[]
-  branch       Branch?        @relation(fields: [branchId], references: [id])
-  branchId     Int?
-  createdBy    User?          @relation("createdBy", fields: [createdById], references: [id])
-  createdById  Int?
-  updatedBy    User?          @relation("updatedBy", fields: [updatedById], references: [id])
-  updatedById  Int?
+  id                  Int                   @id @default(autoincrement())
+  from                DateTime
+  to                  DateTime
+  Company             Company?              @relation(fields: [companyId], references: [id])
+  companyId           Int?
+  active              Boolean               @default(true)
+  code                String?
+  PayFrequency        PayFrequency[]
+  branch              Branch?               @relation(fields: [branchId], references: [id])
+  branchId            Int?
+  createdBy           User?                 @relation("createdBy", fields: [createdById], references: [id])
+  createdById         Int?
+  updatedBy           User?                 @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById         Int?
+  LeaveOPeningBalance LeaveOPeningBalance[]
 }
 
 model EmployeeCategory {
@@ -415,7 +425,7 @@ model Country {
   name                  String?
   code                  String?
   state                 State[]
-  active                Boolean?    @default(true)
+  active                Boolean?   @default(true)
   Company               Company?   @relation(fields: [companyId], references: [id])
   companyId             Int?
   employeePresentCity   Employee[] @relation(name: "PresentCountryId")
@@ -433,7 +443,7 @@ model State {
   name                   String?
   code                   String?
   gstNo                  String?
-  country                Country   @relation(fields: [countryId], references: [id])
+  country                Country    @relation(fields: [countryId], references: [id])
   countryId              Int
   city                   City[]
   active                 Boolean    @default(true)
@@ -477,7 +487,7 @@ model Department {
   code        String
   active      Boolean       @default(true)
   doctor      Employee[]    @relation()
-  Company     Company?       @relation(fields: [companyId], references: [id])
+  Company     Company?      @relation(fields: [companyId], references: [id])
   companyId   Int?
   Designation Designation[]
   branch      Branch?       @relation(fields: [branchId], references: [id])
@@ -1351,7 +1361,7 @@ model ShiftCommonTemplate {
   company             Company?             @relation(fields: [companyId], references: [id])
   branch              Branch?              @relation(fields: [branchId], references: [id])
   branchId            Int?
-  employeeCategory    EmployeeCategory    @relation(fields: [employeeCategoryId], references: [id])
+  employeeCategory    EmployeeCategory     @relation(fields: [employeeCategoryId], references: [id])
   employeeCategoryId  Int
   docId               String?
   active              Boolean?             @default(true)
@@ -1427,7 +1437,7 @@ model PayFrequency {
   name        String?
   active      Boolean?  @default(true)
 
-  finYear          FinYear           @relation(fields: [finYearId], references: [id], onDelete: Cascade)
+  finYear          FinYear            @relation(fields: [finYearId], references: [id], onDelete: Cascade)
   finYearId        Int
   companyId        Int?
   company          Company?           @relation(fields: [companyId], references: [id])
@@ -1643,4 +1653,39 @@ model Proof {
   branchId    Int?
   name        String?
   active      Boolean? @default(true)
+}
+
+model LeaveCode {
+  id                  Int                   @id @default(autoincrement())
+  Company             Company?              @relation(fields: [companyId], references: [id])
+  companyId           Int?
+  branch              Branch?               @relation(fields: [branchId], references: [id])
+  branchId            Int?
+  createdBy           User?                 @relation("createdBy", fields: [createdById], references: [id])
+  createdById         Int?
+  updatedBy           User?                 @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById         Int?
+  name                String
+  code                String
+  active              Boolean               @default(true)
+  LeaveOPeningBalance LeaveOPeningBalance[]
+}
+
+model LeaveOPeningBalance {
+  id             Int       @id @default(autoincrement())
+  Company        Company?  @relation(fields: [companyId], references: [id])
+  companyId      Int?
+  branch         Branch?   @relation(fields: [branchId], references: [id])
+  branchId       Int?
+  createdBy      User?     @relation("createdBy", fields: [createdById], references: [id])
+  createdById    Int?
+  updatedBy      User?     @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById    Int?
+  Employee       Employee  @relation(fields: [employeeId], references: [id])
+  employeeId     Int
+  finYear        FinYear   @relation(fields: [finYearId], references: [id])
+  finYearId      Int
+  leave          LeaveCode @relation(fields: [leaveId], references: [id])
+  leaveId        Int
+  openingBalance Int?
 }

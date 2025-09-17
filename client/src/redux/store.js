@@ -36,6 +36,8 @@ import {
   pFEsiEditor,
   RelationShipApi,
   proofMasterApi,
+  leaveCodeApi,
+  leaveopeningBalanceApi,
 
 } from "./services"
 import projectPaymentFormApi from "./services/ProjectPaymentService";
@@ -183,6 +185,8 @@ const commonReducers = {
   [pFEsiEditor.reducerPath] : pFEsiEditor.reducer,
   [RelationShipApi.reducerPath] : RelationShipApi.reducer,
   [proofMasterApi.reducerPath] : proofMasterApi.reducer,
+  [leaveCodeApi.reducerPath] : leaveCodeApi.reducer,
+  [leaveopeningBalanceApi.reducerPath] : leaveopeningBalanceApi.reducer,
 
 }
 const commonMiddleware = [countryMasterApi.middleware,
@@ -287,6 +291,8 @@ levelTypeApi.middleware,
 pFEsiEditor.middleware,
 RelationShipApi.middleware,
 proofMasterApi.middleware,
+leaveCodeApi.middleware,
+leaveopeningBalanceApi.middleware,
 ];
 
 

@@ -95,8 +95,7 @@ const ShoppingCartIcon = ({ className }) => (
         data: data,
       }).then(
         (result) => {
-          console.log(result, "result")
-                  console.log(isGlobalOpen,"isGlobalOpen")
+         
 
           if (result.status === 200) {
             if (result.data.statusCode === 0) {

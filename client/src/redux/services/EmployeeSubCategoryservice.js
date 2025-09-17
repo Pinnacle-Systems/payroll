@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import {EMPLOYEE_SUB_CATEGORY_API} from '../../Api'
+import { EMPLOYEE_SUB_CATEGORY_API } from "../../Api";
 
 const BASE_URL = process.env.REACT_APP_SERVER_URL;
 
@@ -11,15 +11,15 @@ const employeesubCategoryApi = createApi({
   tagTypes: ["employeeSubCategory"],
   endpoints: (builder) => ({
     getemployeeSubCategory: builder.query({
-      query: ({params, searchParams}) => {
-        if(searchParams){
+      query: ({ params, searchParams }) => {
+        if (searchParams) {
           return {
-            url: EMPLOYEE_SUB_CATEGORY_API +"/search/"+searchParams,
+            url: EMPLOYEE_SUB_CATEGORY_API + "/search/" + searchParams,
             method: "GET",
             headers: {
               "Content-type": "application/json; charset=UTF-8",
             },
-            params
+            params,
           };
         }
         return {
@@ -28,7 +28,7 @@ const employeesubCategoryApi = createApi({
           headers: {
             "Content-type": "application/json; charset=UTF-8",
           },
-          params
+          params,
         };
       },
       providesTags: ["employeeSubCategory"],
@@ -54,7 +54,8 @@ const employeesubCategoryApi = createApi({
       invalidatesTags: ["employeeSubCategory"],
     }),
     updateemployeeSubCategory: builder.mutation({
-      query: ({id, body}) => {
+      query: (payload) => {
+        const { id, ...body } = payload;
         return {
           url: `${EMPLOYEE_SUB_CATEGORY_API}/${id}`,
           method: "PUT",

@@ -106,3 +106,5 @@ export const LEVEL_TYPE_API = "levelType";
 export const PF_ESI_EDITOR = "pFEsiEditor";
 export const RELATIONSHIP_MASTER_API = "relationShip";
 export const PROOF_MASTER_API = "proofMaster";
+export const LEAVE_CODE_API =  'leaveCode'
+export const LEAVE_OPENING_BALANCE_API =   'leaveopeningBalance'

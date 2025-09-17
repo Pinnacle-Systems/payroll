@@ -35,6 +35,9 @@ import {
   PFAndESIEditor,
   RelationShipMaster,
   ProofMaster,
+  LeaveCodeMaster,
+  LeaveOpeningBalanceMaster,
+  MachineInOutMaster,
 
  
   
@@ -123,6 +126,9 @@ const ActiveTabList = () => {
     "PF AND ESI EDITOR":<PFAndESIEditor/>,
     "RELATIONSHIP":<RelationShipMaster/>,
     'PROOF MASTER' :<ProofMaster/>,
+    "LEAVE CODE" :<LeaveCodeMaster/>,
+    "LEAVE OPENING BALANCE":<LeaveOpeningBalanceMaster/>,
+    "MACHINE IN OUT IP ENTRY" :<MachineInOutMaster/>,
 
 
 

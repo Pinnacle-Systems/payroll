@@ -34,7 +34,8 @@ async function getNextDocId(
     newDocId = `${code}/${parseInt(lastObject?.docId?.split("/").at(-1)) + 1
       }`;
   }
-
+  console.log(newDocId,"newDocId");
+  
 
   return newDocId;
 }
@@ -42,7 +43,7 @@ async function getNextDocId(
 async function get(req) {
   const { companyId, active, branchId, finYearId, searchDocId, } = req.query;
 
-  console.log(companyId, active, finYearId, "received--");
+  console.log(companyId, finYearId, "received--");
 
   const data = await prisma.shiftTemplate.findMany({
 

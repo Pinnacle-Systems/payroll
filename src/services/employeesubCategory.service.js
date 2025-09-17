@@ -83,7 +83,7 @@ async function create(body) {
 }
 
 async function update(id, body) {
-  const { gradeName, active, employeeCategoryId, branchId, companyId } =
+  const { gradeName, active, employeeCategoryId } =
     await body;
   const dataFound = await prisma.employeSubCategory.findUnique({
     where: {
@@ -98,11 +98,11 @@ async function update(id, body) {
     data: {
       gradeName,
       active,
-      companyId: companyId ? parseInt(companyId) : undefined,
+      
       employeeCategoryId: employeeCategoryId
         ? parseInt(employeeCategoryId)
         : undefined,
-      branchId: branchId ? parseInt(branchId) : undefined,
+      
     },
   });
   return { statusCode: 0, data };

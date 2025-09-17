@@ -1,34 +1,30 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import secureLocalStorage from "react-secure-storage";
+
 import {
-  useGetDepartmentQuery,
-  useGetDepartmentByIdQuery,
-  useAddDepartmentMutation,
-  useUpdateDepartmentMutation,
-  useDeleteDepartmentMutation,
-} from "../../../redux/services/DepartmentMasterService";
-import FormHeader from "../FormHeader";
-import FormReport from "../FormReportTemplate";
-import { toast } from "react-toastify";
+  useGetLeaveCodeQuery,
+  useGetLeaveCodeByIdQuery,
+  useAddLeaveCodeMutation,
+  useUpdateLeaveCodeMutation,
+  useDeleteLeaveCodeMutation,
+} from "../../../redux/services/LeaveCode.servive";
+
 import {
   TextInput,
-  CheckBox,
+
   ToggleButton,
   ReusableTable,
 } from "../../../Inputs";
-import ReportTemplate from "../ReportTemplate";
-import Mastertable from "../MasterTable/Mastertable";
-import MastersForm from "../MastersForm/MastersForm";
+
 import { statusDropdown } from "../../../Utils/DropdownData";
-import { useGetdesignationByIdQuery } from "../../../redux/services/DesignationMasterService";
+
 import { Check, Power } from "lucide-react";
 import Modal from "../../../UiComponents/Modal";
 import Swal from "sweetalert2";
 import { getCommonParams } from "../../../Utils/helper";
-const MODEL = "Department Master";
+
 
 export default function Form() {
-  // const [openTable, setOpenTable] = useState(false);
+ 
 
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
@@ -43,7 +39,7 @@ export default function Form() {
    const params = getCommonParams();
  
    const { branchId,companyId } = params;;
-  const { data: allData } = useGetDepartmentQuery({
+  const { data: allData } = useGetLeaveCodeQuery({
     params,
     searchParams: searchValue,
   });
@@ -51,11 +47,11 @@ export default function Form() {
     data: singleData,
     isFetching: isSingleFetching,
     isLoading: isSingleLoading,
-  } = useGetDepartmentByIdQuery(id, { skip: !id });
+  } = useGetLeaveCodeByIdQuery(id, { skip: !id });
 
-  const [addData] = useAddDepartmentMutation();
-  const [updateData] = useUpdateDepartmentMutation();
-  const [removeData] = useDeleteDepartmentMutation();
+  const [addData] = useAddLeaveCodeMutation();
+  const [updateData] = useUpdateLeaveCodeMutation();
+  const [removeData] = useDeleteLeaveCodeMutation();
 
   const syncFormWithDb = useCallback(
     (data) => {
@@ -72,7 +68,6 @@ export default function Form() {
     syncFormWithDb(singleData?.data);
   }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
 
-  console.log(singleData?.data, "singleData?.data");
 
   const data = {
     name,
@@ -84,7 +79,7 @@ export default function Form() {
   };
 
   const validateData = (data) => {
-    if (data.name) {
+    if (data?.name) {
       return true;
     }
     return false;
@@ -186,45 +181,7 @@ export default function Form() {
     setSearchValue("");
   };
 
-  function onDataClick(id) {
-    setId(id);
-    setForm(true);
-  }
 
-  const tableHeaders = [
-    "S.NO",
-    "Code",
-    "Name",
-    "Status",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-  ];
-  const tableDataNames = [
-    "index+1",
-    "dataObj.code",
-    "dataObj.name",
-    "dataObj.active ? ACTIVE : INACTIVE",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-    " ",
-  ];
   const ACTIVE = (
     <div className="bg-gradient-to-r from-green-200 to-green-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-green-500 shadow-lg text-white hover:scale-110 transition-transform duration-300">
       <Power size={10} />
@@ -243,7 +200,7 @@ export default function Form() {
     },
 
     {
-      header: "Department Name",
+      header: "Leave Description",
       accessor: (item) => item?.name,
       //   cellClass: () => "font-medium  text-gray-900",
       className: " text-gray-900 text-left pl-2 uppercase w-72",
@@ -260,18 +217,18 @@ export default function Form() {
     setId(id);
     setForm(true);
     setReadOnly(true);
-    console.log("view");
+
   };
   const handleEdit = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(false);
-    console.log("Edit");
+    
   };
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
       <div className="w-full flex bg-white p-1 justify-between  items-center">
-        <h1 className="text-2xl font-bold text-gray-800">Department Master</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Leave Code Master</h1>
         <div className="flex items-center">
           <button
             onClick={() => {
@@ -280,23 +237,11 @@ export default function Form() {
             }}
             className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
           >
-            + Add New Department
+            + Add New Leave Code
           </button>
         </div>
       </div>
-      {/* <div className="w-full flex items-start">
-        <Mastertable
-          header={"Department list"}
-          searchValue={searchValue}
-          setSearchValue={setSearchValue}
-          onDataClick={onDataClick}
-          // setOpenTable={setOpenTable}
-          tableHeaders={tableHeaders}
-          tableDataNames={tableDataNames}
-          data={allData?.data}
-          loading={isLoading || isFetching}
-        />
-      </div> */}
+    
       <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-3">
         <ReusableTable
           columns={columns}
@@ -322,7 +267,7 @@ export default function Form() {
             <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
               <div className="flex items-center gap-2">
                 <h2 className="text-lg  py-0.5 font-semibold  text-gray-800">
-                  Department Master
+                  Leave Code Master
                 </h2>
               </div>
               <div className="flex gap-2">
@@ -363,7 +308,7 @@ export default function Form() {
                       <div className="flex flex-wrap">
                         <div className="mb-3 w-72">
                           <TextInput
-                            name="Department Name"
+                            name="Leave Description"
                             type="text"
                             value={name}
                             setValue={setName}
