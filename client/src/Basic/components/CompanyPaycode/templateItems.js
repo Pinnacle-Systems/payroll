@@ -57,20 +57,40 @@ const TemplateItems = ({
     setPayDetails([...payDetails, newRow]);
   };
 
+  // const handleDeleteRow = (id) => {
+  //   setPayDetails((yarnBlend) => {
+  //     if (yarnBlend.length <= 1) {
+  //       return yarnBlend;
+  //     }
+  //     return yarnBlend.filter((_, index) => index !== parseInt(id));
+  //   });
+  // };
+  // const handleDeleteAllRows = () => {
+  //   setPayDetails((prevRows) => {
+  //     if (prevRows.length <= 1) return prevRows;
+  //     return [prevRows[0]];
+  //   });
+  // };
   const handleDeleteRow = (id) => {
-    setPayDetails((yarnBlend) => {
-      if (yarnBlend.length <= 1) {
-        return yarnBlend;
-      }
-      return yarnBlend.filter((_, index) => index !== parseInt(id));
+    setPayDetails((prevRows) => {
+      const row = prevRows[id];
+      // Prevent deletion if row has childRecord
+      if (row?.childRecord > 0) return prevRows;
+
+      // Otherwise delete the row
+      return prevRows.filter((_, index) => index !== parseInt(id));
     });
   };
+
   const handleDeleteAllRows = () => {
     setPayDetails((prevRows) => {
-      if (prevRows.length <= 1) return prevRows;
-      return [prevRows[0]];
+      // Keep first row and all rows with childRecord > 0
+      return prevRows.filter(
+        (row, index) => index === 0 || row.childRecord > 0
+      );
     });
   };
+
   console.log(payComponent, "payComponent");
 
   return (
@@ -197,7 +217,7 @@ const TemplateItems = ({
                       {index + 1}
                     </td>
 
-                    <td className=" border border-gray-300 text-[11px] py-0.5 px-1 item-center ">
+                    <td className=" border border-gray-300 text-[12px] py-0.5 px-1 item-center ">
                       {/* <select
                         disabled={readOnly}
                         className="text-left w-full focus:outline-none  bg-transparent rounded py-1 "
@@ -222,7 +242,7 @@ const TemplateItems = ({
                           value: blend.id,
                           label: blend.payCode,
                         }))}
-                        isDisabled={readOnly}
+                        isDisabled={readOnly || item.childRecord > 0}
                         onChange={(selected) =>
                           handleInputChange(
                             selected.value,
@@ -255,8 +275,8 @@ const TemplateItems = ({
                           }),
                           singleValue: (base) => ({
                             ...base,
-                            color: readOnly ? "gray" : "black", 
-                            fontSize: "11px", // optional: adjust font size
+                            color: readOnly ? "gray" : "black",
+                            fontSize: "12px", // optional: adjust font size
                           }),
 
                           dropdownIndicator: (base) => ({
@@ -293,7 +313,7 @@ const TemplateItems = ({
                       />
                     </td>
 
-                    <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className=" border border-gray-300 text-[12px] py-0.5 item-center">
                       <input
                         type="text"
                         value={
@@ -308,14 +328,14 @@ const TemplateItems = ({
                             "payDescription"
                           )
                         }
-                            className={`w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent ${
-      readOnly ? "text-gray-600" : "text-black"
-    }`}
+                        className={`w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent ${
+                          readOnly ? "text-gray-600" : "text-black"
+                        }`}
                         disabled={true}
                       />
                     </td>
 
-                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
                       <input
                         type="text"
                         value={
@@ -330,15 +350,15 @@ const TemplateItems = ({
                             "earningsType"
                           )
                         }
-                           className={`w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent ${
-      readOnly ? "text-gray-600" : "text-black"
-    }`}
+                        className={`w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent ${
+                          readOnly ? "text-gray-600" : "text-black"
+                        }`}
                         disabled={true}
                       />
                     </td>
-                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
                       <select
-                        disabled={readOnly}
+                        disabled={readOnly || item.childRecord > 0}
                         className="text-left w-full bg-transparent focus:outline-none rounded py-1"
                         value={item?.lop}
                         onChange={(e) =>
@@ -353,9 +373,9 @@ const TemplateItems = ({
                         ))}
                       </select>
                     </td>
-                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
                       <select
-                        disabled={readOnly}
+                        disabled={readOnly || item.childRecord > 0}
                         className="text-left w-full bg-transparent focus:outline-none rounded py-1"
                         value={item?.pf}
                         onChange={(e) =>
@@ -370,9 +390,9 @@ const TemplateItems = ({
                         ))}
                       </select>
                     </td>
-                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
                       <select
-                        disabled={readOnly}
+                        disabled={readOnly || item.childRecord > 0}
                         className="text-left w-full bg-transparent focus:outline-none rounded py-1"
                         value={item?.esi}
                         onChange={(e) =>
@@ -387,10 +407,10 @@ const TemplateItems = ({
                         ))}
                       </select>
                     </td>
-                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
                       <select
-                        disabled={readOnly}
-                        className="text-left w-full text-[11px] bg-transparent focus:outline-none rounded py-1"
+                        disabled={readOnly || item.childRecord > 0}
+                        className="text-left w-full text-[12px] bg-transparent focus:outline-none rounded py-1"
                         value={item?.pickFrom}
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "pickFrom")

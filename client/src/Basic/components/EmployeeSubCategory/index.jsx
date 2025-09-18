@@ -9,11 +9,16 @@ import {
   useGetemployeeSubCategoryQuery,
   useUpdateemployeeSubCategoryMutation,
 } from "../../../redux/services/EmployeeSubCategoryservice";
-import secureLocalStorage from "react-secure-storage";
-import { toast } from "react-toastify";
+import Select from "react-select";
+
 import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
-import { TextInput, ToggleButton, ReusableTable } from "../../../Inputs";
+import {
+  TextInput,
+  ToggleButton,
+  ReusableTable,
+  customSelectStyles,
+} from "../../../Inputs";
 import { statusDropdown } from "../../../Utils/DropdownData";
 import Swal from "sweetalert2";
 const EmployeeSubCategory = () => {
@@ -28,9 +33,9 @@ const EmployeeSubCategory = () => {
   const childRecord = useRef(0);
   const [employeeCategoryId, setEmployeeCategoryId] = useState("");
   const params = getCommonParams();
-     const employeeRef = useRef(null);
+  const employeeRef = useRef(null);
 
-  const { branchId ,companyId} = params;
+  const { branchId, companyId } = params;
 
   const { data: company } = useGetCompanyQuery({ params });
   const [companyName, setCompanyName] = useState(company?.data[0].name);
@@ -56,6 +61,7 @@ const EmployeeSubCategory = () => {
       setGradeName(data?.gradeName || "");
       setEmployeeCategoryId(data?.employeeCategoryId || "");
       setActive(id ? data?.active ?? false : true);
+      childRecord.current = data?.childRecord ? data?.childRecord : 0;
     },
     [id]
   );
@@ -78,12 +84,12 @@ const EmployeeSubCategory = () => {
       return true;
     }
     return false;
-  }; 
-    useEffect(() => {
-         if (form && !readOnly && employeeRef.current) {
-           employeeRef.current.focus();
-         }
-       }, [form, readOnly]);
+  };
+  useEffect(() => {
+    if (form && !readOnly && employeeRef.current) {
+      employeeRef.current.focus();
+    }
+  }, [form, readOnly]);
 
   const handleSubmitCustom = async (callback, data, text) => {
     try {
@@ -101,11 +107,11 @@ const EmployeeSubCategory = () => {
       });
       setForm(false);
     } catch (error) {
-        Swal.fire({
-              icon: "error",
-              title: "Submission error",
-              text: error.data?.message || "Something went wrong!",
-            });
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: error.data?.message || "Something went wrong!",
+      });
     }
   };
 
@@ -126,34 +132,38 @@ const EmployeeSubCategory = () => {
     }
   };
 
-  const deleteData = async (id) => {
-    if (id) {
-      if (!window.confirm("Are you sure to delete...?")) {
-        return;
-      }
-      try {
-        const deldata = await removeData(id).unwrap();
-        if (deldata?.statusCode == 1) {
-          toast.error(deldata?.message);
-          setForm(false);
-          return;
+    const deleteData = async (id) => {
+        if (id) {
+          if (!window.confirm("Are you sure to delete...?")) {
+            return;
+          }
+          try {
+            let deldata = await removeData(id).unwrap();
+            if (deldata?.statusCode == 1) {
+              Swal.fire({
+                icon: "error",
+                title: "Child record Exists",
+                text: deldata.data?.message || "Data cannot be deleted!",
+              });
+              return;
+            }
+            setId("");
+            Swal.fire({
+              title: "Deleted Successfully",
+              icon: "success",
+              timer: 1000,
+            });
+            setForm(false);
+          } catch (error) {
+            Swal.fire({
+              icon: "error",
+              title: "Submission error",
+              text: error.data?.message || "Something went wrong!",
+            });
+            setForm(false);
+          }
         }
-        setId("");
-        Swal.fire({
-          title: "Deleted Successfully",
-          icon: "success",
-          timer: 1000,
-        });
-        setForm(false);
-      } catch (error) {
-        Swal.fire({
-          icon: "error",
-          title: "Submission error",
-          text: error.data?.message || "Something went wrong!",
-        });
-      }
-    }
-  };
+      };
 
   const handleKeyDown = (event) => {
     let charCode = String.fromCharCode(event.which).toLowerCase();
@@ -207,13 +217,13 @@ const EmployeeSubCategory = () => {
       header: "Employee Category Name",
       accessor: (item) => item?.employeeCategory?.name,
       //   cellClass: () => "  text-gray-900",
-      className: " text-gray-900 text-center uppercase w-72",
+      className: " text-gray-900 text-left pl-2 uppercase w-72",
     },
     {
       header: "Grade Name",
       accessor: (item) => item?.gradeName,
       //   cellClass: () => "  text-gray-900",
-      className: " text-gray-900 text-center uppercase w-44",
+      className: " text-gray-900 text-left pl-2 uppercase w-44",
     },
 
     {
@@ -223,10 +233,10 @@ const EmployeeSubCategory = () => {
       className: " text-gray-900 text-center uppercase w-36",
     },
   ];
-  function onDataClick(id) {
-    setId(id);
-    setForm(true);
-  }
+  const EmployeeOptions = employeeCategory?.data?.map((val) => ({
+    value: val?.id,
+    label: val?.name,
+  }));
   return (
     <div>
       <div onKeyDown={handleKeyDown} className="p-1 ">
@@ -261,7 +271,7 @@ const EmployeeSubCategory = () => {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[40%]  h-[45%]"}
+            widthClass={"w-[40%]  h-[55%]"}
             onClose={() => {
               setForm(false);
               setErrors({});
@@ -311,41 +321,33 @@ const EmployeeSubCategory = () => {
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
                       <div className="space-y-4 ">
                         <div className="flex gap-x-8">
-                          <div className="w-44">
-                            <label className="block text-xs font-bold text-slate-700 mb-1">
-                              Employee Category{" "}
-                              <span className="text-red-500">*</span>{" "}
+                          <div className="w-52">
+                            <label className="block text-xs  font-bold text-slate-700 mb-1">
+                              Employee Category
+                              <span className="text-red-500">*</span>
                             </label>
-                            <select
-                              ref={employeeRef}
-                              className={`w-full px-2 h-[27px] text-[12px] border border-slate-300 rounded-md 
-  focus:border-indigo-300 focus:outline-none transition-all duration-200
-  hover:border-slate-400 overflow-y-scroll
-  ${
-    readOnly
-      ? "bg-gray-100 text-gray-500 cursor-not-allowed"
-      : "bg-white hover:border-gray-400"
-  }`}
-                              value={employeeCategoryId}
-                              onChange={(e) => {
-                                setEmployeeCategoryId(Number(e.target.value));
-                              }}
-                              disabled={readOnly}
-                               
-                            >
-                              <option value="">Select Category</option>
-
-                            
-
-                              {employeeCategory?.data?.map((doc) => (
-                                <option value={doc?.id} key={doc.id}>
-                                  {doc.name}
-                                </option>
-                              ))}
-                            
-                            </select>
-                            {console.log(employeeCategoryId,"employeeCategoryId")
-                            }
+                            <Select
+                              options={EmployeeOptions}
+                              value={
+                                EmployeeOptions.find(
+                                  (opt) => opt.value === employeeCategoryId
+                                ) || null
+                              }
+                              onChange={(selected) =>
+                                setEmployeeCategoryId(selected?.value || "")
+                              }
+                              placeholder="Select Employee Category"
+                              isClearable={false} // same as required
+                              isDisabled={readOnly || childRecord.current > 0}
+                              isSearchable
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className="w-full px-1 text-[12px] text-black -ml-1 text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                              styles={customSelectStyles}
+                            />
                           </div>
 
                           <div className="w-42">

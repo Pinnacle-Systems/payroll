@@ -20,13 +20,12 @@ const TemplateItems = ({
   setId,
   form,
 }) => {
-  
   const payref = useRef(null);
-   useEffect(() => {
-      if (form && !readOnly && payref.current) {
-        payref.current.focus();
-      }
-    }, [form, readOnly]);
+  useEffect(() => {
+    if (form && !readOnly && payref.current) {
+      payref.current.focus();
+    }
+  }, [form, readOnly]);
   const [contextMenu, setContextMenu] = useState(null);
   const handleRightClick = (event, rowIndex, type) => {
     event.preventDefault();
@@ -251,8 +250,7 @@ const TemplateItems = ({
                 required={true}
                 readOnly={readOnly}
                 disabled={childRecord.current > 0}
-               ref={payref}
-
+                ref={payref}
               />
               <div className="w-24">
                 <TextInput
@@ -390,8 +388,12 @@ const TemplateItems = ({
                                     e.target.value
                                   )
                                 }
-                                className="pl-1 bg-transparent  focus:outline-none focus:border-transparent"
-                                disabled={readOnly}
+                                className={`pl-1 bg-transparent  focus:outline-none focus:border-transparent ${
+                                  readOnly || childRecord.current > 0
+                                    ? "text-gray-600"
+                                    : "text-black"
+                                }`}
+                                disabled={readOnly || childRecord.current > 0}
                               />
                             </td>
                             <td className="border border-gray-300">
@@ -406,8 +408,12 @@ const TemplateItems = ({
                                     e.target.value
                                   )
                                 }
-                                className="pl-1 bg-transparent focus:outline-none focus:border-transparent"
-                                disabled={readOnly}
+                                className={`pl-1 bg-transparent focus:outline-none focus:border-transparent ${
+                                  readOnly || childRecord.current > 0
+                                    ? "text-gray-600"
+                                    : "text-black"
+                                }`}
+                                disabled={readOnly || childRecord.current > 0}
                               />
                             </td>
                             <td className="border border-gray-300">
@@ -422,11 +428,15 @@ const TemplateItems = ({
                                     e.target.value
                                   )
                                 }
-                                className="pl-1 bg-transparent focus:outline-none focus:border-transparent"
-                                disabled={readOnly}
+                                className={`pl-1 bg-transparent focus:outline-none focus:border-transparent ${
+                                  readOnly || childRecord.current > 0
+                                    ? "text-gray-600"
+                                    : "text-black"
+                                }`}
+                                disabled={readOnly || childRecord.current > 0}
                               />
                             </td>
-                            <td className="border border-gray-300 p-1">
+                            <td className="border border-gray-300 text-gray-600 p-1">
                               {item?.salaryDate
                                 ? new Date(item.salaryDate).toLocaleString(
                                     "default",
@@ -434,14 +444,14 @@ const TemplateItems = ({
                                   )
                                 : ""}
                             </td>
-                            <td className="border border-gray-300 text-right p-1">
+                            <td className="border border-gray-300 text-[12px] text-gray-600 text-right p-1">
                               {totalDays}
                             </td>
-                            <td className="border border-gray-300 text-right  p-1">
+                            <td className="border border-gray-300 text-right text-gray-600  p-1">
                               {sundays}
                             </td>
                             <td
-                              className="border border-gray-300 bg-transparent"
+                              className="border border-gray-300 text-[12px] bg-transparent"
                               onContextMenu={(e) => {
                                 if (!readOnly) {
                                   handleRightClick(e, index, activeType.type);
@@ -467,8 +477,12 @@ const TemplateItems = ({
                                     }
                                   }
                                 }}
-                                className="focus:outline-none focus:border-transparent bg-transparent p-1"
-                                disabled={readOnly}
+                                className={`focus:outline-none text-[12px] focus:border-transparent bg-transparent p-1 ${
+                                  readOnly || childRecord.current > 0
+                                    ? "text-gray-600"
+                                    : "text-black"
+                                }`}
+                                disabled={readOnly || childRecord.current > 0}
                               />
                             </td>
                           </tr>

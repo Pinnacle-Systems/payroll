@@ -250,7 +250,7 @@ const TemplateItems = ({
                         {index + 1}
                       </td>
 
-                      <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+                      <td className=" border border-gray-300 text-[12px] py-0.5 item-center">
                         <input
                           type="number"
                           placeHolder="0.00"
@@ -277,7 +277,7 @@ const TemplateItems = ({
                           disabled={readOnly || !payDetailsId}
                         />
                       </td>
-                      <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+                      <td className=" border border-gray-300 text-[12px] py-0.5 item-center">
                         <input
                           type="number"
                           placeHolder="0.00"
@@ -325,7 +325,7 @@ const TemplateItems = ({
                           disabled={readOnly || !item?.fromValue}
                         />
                       </td>
-                      <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+                      <td className=" border border-gray-300 text-[12px] py-0.5 item-center">
                         <input
                           type="number"
                           placeHolder="0.00"
@@ -353,7 +353,7 @@ const TemplateItems = ({
                         />
                       </td>
                       <td
-                        className=" border border-gray-300 text-[11px] py-0.5 item-center"
+                        className=" border border-gray-300 text-[12px] py-0.5 item-center"
                         onContextMenu={(e) => {
                           if (!readOnly) {
                             handleRightClick(e, index, "amount");

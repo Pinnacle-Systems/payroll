@@ -302,3 +302,8 @@ export const machinetype = [
   { show: "OUT", value: "OUT" },
   { show: "IN / OUT", value: "IN / OUT" },
 ];
+
+export const payType = [
+  {show:"MONTH",value:"MONTH"},
+  {show:"WEEK",value:"WEEK"},
+]

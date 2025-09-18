@@ -38,6 +38,7 @@ import {
   LeaveCodeMaster,
   LeaveOpeningBalanceMaster,
   MachineInOutMaster,
+  BandMaster,
 
  
   
@@ -129,6 +130,7 @@ const ActiveTabList = () => {
     "LEAVE CODE" :<LeaveCodeMaster/>,
     "LEAVE OPENING BALANCE":<LeaveOpeningBalanceMaster/>,
     "MACHINE IN OUT IP ENTRY" :<MachineInOutMaster/>,
+    "BAND MASTER" : <BandMaster/>,
 
 
 

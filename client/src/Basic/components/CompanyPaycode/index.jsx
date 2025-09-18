@@ -53,7 +53,7 @@ const CompanyPaycode = () => {
 
   const params = getCommonParams();
 
-  const { branchId,companyId } = params;
+  const { branchId, companyId } = params;
 
   const { data: company } = useGetCompanyQuery({ params });
   const [companyCode, setCompanyCode] = useState(company?.data[0].code);
@@ -86,13 +86,6 @@ const CompanyPaycode = () => {
     searchParams: searchValue,
   });
 
-  // useEffect(() => {
-  //   if (company?.data?.length > 0) {
-  //     // setCompanyName(company.data[0].name);
-  //     setCompanyCode(company.data[0].code);
-  //   }
-  // }, [company]);
-
   useEffect(() => {
     if (payDetails?.length >= 1) return;
     setPayDetails((prev) => {
@@ -114,7 +107,13 @@ const CompanyPaycode = () => {
           : moment.utc(today).format("YYYY-MM-DD")
       );
 
-      setPayDetails(data?.PayDetails ? data?.PayDetails : []);
+      const payDetailsWithChild =
+        data?.PayDetails?.map((item) => ({
+          ...item,
+          childRecord: item._count?.PayStructure || 0, // each PayDetails row child count
+        })) || [];
+
+      setPayDetails(payDetailsWithChild);
     },
     [id]
   );

@@ -35,6 +35,7 @@ import {
   common,
   SalaryMethod,
   married,
+  payType,
 } from "../../../Utils/DropdownData";
 import moment from "moment";
 import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCategoryMasterService";
@@ -178,10 +179,10 @@ export default function Form() {
 
   const childRecord = useRef(0);
   const dispatch = useDispatch();
-   const params = getCommonParams();
+  const params = getCommonParams();
 
-  const { branchId ,companyId} = params;
- 
+  const { branchId, companyId } = params;
+
   const { data: bloodGroupList } = useGetBloodGroupQuery({ params });
   const { data: cityList } = useGetCityQuery({ params });
 
@@ -190,7 +191,7 @@ export default function Form() {
   const { data: countryList } = useGetCountriesQuery({ params });
 
   const { data: employeeCategoryList } = useGetEmployeeCategoryQuery({
-    params
+    params,
   });
   const { data: employeeSubCategoryList } = useGetemployeeSubCategoryQuery({
     params,
@@ -1135,12 +1136,12 @@ export default function Form() {
     value: val?.id,
     label: val?.name,
   }));
- 
+
   const CountryOptions = countryList?.data?.map((val) => ({
     value: val?.id,
     label: val?.name,
   }));
- 
+
   return (
     <div onKeyDown={handleKeyDown} className="p-1 ">
       {/* Header Section */}
@@ -1688,15 +1689,14 @@ export default function Form() {
                           />
                         </div>
                         <div className="w-52">
-                          <TextInput
-                            ref={input1Ref}
+                          <DropdownInput
                             name="Pay Category"
                             value={payCategory}
                             setValue={setPayCategory}
-                            // required={true}
+                            required={true}
                             readOnly={readOnly}
+                            options={payType}
                             disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
                         </div>
                         <div className="col-span-1">
@@ -2052,7 +2052,7 @@ export default function Form() {
                               disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             /> */}
-                                    <label className="block text-xs  font-bold text-slate-700 mb-1">
+                            <label className="block text-xs  font-bold text-slate-700 mb-1">
                               State
                               <span className="text-red-500">*</span>
                             </label>
@@ -2082,9 +2082,8 @@ export default function Form() {
                               styles={customSelectStyles}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
-                         
                           </div>
-                          <div className="col-span-1 mb-2" >
+                          <div className="col-span-1 mb-2">
                             {/* <DropdownInput
                               ref={input1Ref}
                               name="Choose Country"
@@ -2102,7 +2101,7 @@ export default function Form() {
                               disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             /> */}
-                                        <label className="block text-xs  font-bold text-slate-700 mb-1">
+                            <label className="block text-xs  font-bold text-slate-700 mb-1">
                               Country
                               <span className="text-red-500">*</span>
                             </label>
@@ -2110,7 +2109,8 @@ export default function Form() {
                               options={CountryOptions}
                               value={
                                 CountryOptions.find(
-                                  (opt) => opt.value === presentAddress?.countryId
+                                  (opt) =>
+                                    opt.value === presentAddress?.countryId
                                 ) || null
                               }
                               onChange={(selected) =>
@@ -2132,7 +2132,6 @@ export default function Form() {
                               styles={customSelectStyles}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
-                         
                           </div>
                           <div className="col-span-1 mt-2 w-32">
                             <TextInput
@@ -2228,7 +2227,8 @@ export default function Form() {
                               options={CityOptions}
                               value={
                                 CityOptions.find(
-                                  (opt) => opt.value === permanentAddress?.cityId
+                                  (opt) =>
+                                    opt.value === permanentAddress?.cityId
                                 ) || null
                               }
                               onChange={(selected) =>
@@ -2236,7 +2236,11 @@ export default function Form() {
                               }
                               placeholder="Select City"
                               isClearable={false} // same as required
-                              isDisabled={readOnly || childRecord.current > 0 || sameAsPresent}
+                              isDisabled={
+                                readOnly ||
+                                childRecord.current > 0 ||
+                                sameAsPresent
+                              }
                               isSearchable
                               menuShouldScrollIntoView={false}
                               maxMenuHeight={150} // <-- Reduce height here
@@ -2274,7 +2278,8 @@ export default function Form() {
                               options={StateOptions}
                               value={
                                 StateOptions.find(
-                                  (opt) => opt.value === permanentAddress?.stateId
+                                  (opt) =>
+                                    opt.value === permanentAddress?.stateId
                                 ) || null
                               }
                               onChange={(selected) =>
@@ -2285,7 +2290,11 @@ export default function Form() {
                               }
                               placeholder="Select State"
                               isClearable={false} // same as required
-                              isDisabled={readOnly || childRecord.current > 0 || sameAsPresent}
+                              isDisabled={
+                                readOnly ||
+                                childRecord.current > 0 ||
+                                sameAsPresent
+                              }
                               isSearchable
                               menuShouldScrollIntoView={false}
                               maxMenuHeight={150} // <-- Reduce height here
@@ -2314,7 +2323,7 @@ export default function Form() {
                                 childRecord.current > 0 || sameAsPresent
                               }
                             /> */}
-                                            <label className="block text-xs  font-bold text-slate-700 mb-1">
+                            <label className="block text-xs  font-bold text-slate-700 mb-1">
                               Country
                               <span className="text-red-500">*</span>
                             </label>
@@ -2322,7 +2331,8 @@ export default function Form() {
                               options={CountryOptions}
                               value={
                                 CountryOptions.find(
-                                  (opt) => opt.value === permanentAddress?.countryId
+                                  (opt) =>
+                                    opt.value === permanentAddress?.countryId
                                 ) || null
                               }
                               onChange={(selected) =>
@@ -2333,7 +2343,11 @@ export default function Form() {
                               }
                               placeholder="Select Country"
                               isClearable={false} // same as required
-                              isDisabled={readOnly || childRecord.current > 0 || sameAsPresent}
+                              isDisabled={
+                                readOnly ||
+                                childRecord.current > 0 ||
+                                sameAsPresent
+                              }
                               isSearchable
                               menuShouldScrollIntoView={false}
                               maxMenuHeight={150} // <-- Reduce height here
@@ -2392,142 +2406,146 @@ export default function Form() {
                           Add Item
                         </button>
                       </div>
-                    <div className={`w-full   p-2 overflow-auto bg-white max-h-[200px]`}>
-                      <table className="w-full border-collapse table-fixed  ">
-                        <thead className="bg-gray-200 text-gray-800">
-                          <tr>
-                            <th
-                              className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              S.No
-                            </th>
-                            <th
-                              className={` px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              Bank Name
-                            </th>
-                            <th
-                              className={` px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              Branch Name
-                            </th>
-                            <th
-                              className={` px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              Account Number
-                            </th>
-                            <th
-                              className={` px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              IFSC Code
-                            </th>
-                            <th
-                              className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              Action
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {bankDetails.map((item, index) => (
-                            <tr
-                              key={index}
-                              className=" border border-gray-300 text-[12px] py-0.5 px-1 text-center"
-                            >
-                              <td className=" text-center px-1">{index + 1}</td>
-                              <td className="border border-gray-300 text-[12px] py-1.5 px-1 item-center">
-                                <input
-                                  // name="Bank Name"
-                                  type="text"
-                                  value={item?.bankName}
-                                  onChange={(e) =>
-                                    handleBankDetailsChange(
-                                      index,
-                                      "bankName",
-                                      e.target.value
-                                    )
-                                  }
-                                  readOnly={readOnly}
-                                  // disabled={childRecord.current > 0}
-                                  className="w-full focus:outline-none uppercase focus:border-none pl-2"
-                                />
-                              </td>
-                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                <input
-                                  // name="Branch Name"
-                                  type="text"
-                                  value={item?.branchName}
-                                  onChange={(e) =>
-                                    handleBankDetailsChange(
-                                      index,
-                                      "branchName",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full focus:outline-none uppercase focus:border-none pl-3"
-                                  readOnly={readOnly}
-                                  // disabled={childRecord.current > 0}
-                                />
-                              </td>
-                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                <input
-                                  // name="Account Number"
-                                  type="number"
-                                  value={item?.accountNumber}
-                                  onChange={(e) =>
-                                    handleBankDetailsChange(
-                                      index,
-                                      "accountNumber",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full focus:outline-none uppercase focus:border-none text-right pr-3"
-                                  readOnly={readOnly}
-                                  // disabled={childRecord.current > 0}
-                                />
-                              </td>
-                              <td className=" border border-gray-300 text-[12px] py-1.5 items-center">
-                                <input
-                                  // name="IFSC CODE"
-                                  type="text"
-                                  value={item?.ifscCode}
-                                  onChange={(e) =>
-                                    handleBankDetailsChange(
-                                      index,
-                                      "ifscCode",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full focus:outline-none uppercase focus:border-none text-left pl-2"
-                                  readOnly={readOnly}
-                                  // disabled={childRecord.current > 0}
-                                />
-                              </td>
-                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                <button
-                                  type="button"
-                                  title="Delete Row"
-                                  onClick={() => deleteRow(index)}
-                                  className="text-red-600 hover:text-red-800"
-                                >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-4 w-4 inline-block"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                  >
-                                    <path
-                                      fillRule="evenodd"
-                                      d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                      clipRule="evenodd"
-                                    />
-                                  </svg>
-                                </button>
-                              </td>
+                      <div
+                        className={`w-full   p-2 overflow-auto bg-white max-h-[200px]`}
+                      >
+                        <table className="w-full border-collapse table-fixed  ">
+                          <thead className="bg-gray-200 text-gray-800">
+                            <tr>
+                              <th
+                                className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
+                              >
+                                S.No
+                              </th>
+                              <th
+                                className={` px-4 py-2 text-center font-medium text-[13px] `}
+                              >
+                                Bank Name
+                              </th>
+                              <th
+                                className={` px-4 py-2 text-center font-medium text-[13px] `}
+                              >
+                                Branch Name
+                              </th>
+                              <th
+                                className={` px-4 py-2 text-center font-medium text-[13px] `}
+                              >
+                                Account Number
+                              </th>
+                              <th
+                                className={` px-4 py-2 text-center font-medium text-[13px] `}
+                              >
+                                IFSC Code
+                              </th>
+                              <th
+                                className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
+                              >
+                                Action
+                              </th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody>
+                            {bankDetails.map((item, index) => (
+                              <tr
+                                key={index}
+                                className=" border border-gray-300 text-[12px] py-0.5 px-1 text-center"
+                              >
+                                <td className=" text-center px-1">
+                                  {index + 1}
+                                </td>
+                                <td className="border border-gray-300 text-[12px] py-1.5 px-1 item-center">
+                                  <input
+                                    // name="Bank Name"
+                                    type="text"
+                                    value={item?.bankName}
+                                    onChange={(e) =>
+                                      handleBankDetailsChange(
+                                        index,
+                                        "bankName",
+                                        e.target.value
+                                      )
+                                    }
+                                    readOnly={readOnly}
+                                    // disabled={childRecord.current > 0}
+                                    className="w-full focus:outline-none uppercase focus:border-none pl-2"
+                                  />
+                                </td>
+                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                  <input
+                                    // name="Branch Name"
+                                    type="text"
+                                    value={item?.branchName}
+                                    onChange={(e) =>
+                                      handleBankDetailsChange(
+                                        index,
+                                        "branchName",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="w-full focus:outline-none uppercase focus:border-none pl-3"
+                                    readOnly={readOnly}
+                                    // disabled={childRecord.current > 0}
+                                  />
+                                </td>
+                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                  <input
+                                    // name="Account Number"
+                                    type="number"
+                                    value={item?.accountNumber}
+                                    onChange={(e) =>
+                                      handleBankDetailsChange(
+                                        index,
+                                        "accountNumber",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="w-full focus:outline-none uppercase focus:border-none text-right pr-3"
+                                    readOnly={readOnly}
+                                    // disabled={childRecord.current > 0}
+                                  />
+                                </td>
+                                <td className=" border border-gray-300 text-[12px] py-1.5 items-center">
+                                  <input
+                                    // name="IFSC CODE"
+                                    type="text"
+                                    value={item?.ifscCode}
+                                    onChange={(e) =>
+                                      handleBankDetailsChange(
+                                        index,
+                                        "ifscCode",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="w-full focus:outline-none uppercase focus:border-none text-left pl-2"
+                                    readOnly={readOnly}
+                                    // disabled={childRecord.current > 0}
+                                  />
+                                </td>
+                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                  <button
+                                    type="button"
+                                    title="Delete Row"
+                                    onClick={() => deleteRow(index)}
+                                    className="text-red-600 hover:text-red-800"
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="h-4 w-4 inline-block"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                    >
+                                      <path
+                                        fillRule="evenodd"
+                                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                        clipRule="evenodd"
+                                      />
+                                    </svg>
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
                       </div>
                     </div>
                   </div>
@@ -2548,142 +2566,147 @@ export default function Form() {
                           Add Item
                         </button>
                       </div>
-                      <div className={`w-full   p-2 overflow-auto bg-white max-h-[200px]`}>
-                      <table className="w-full border-collapse table-fixed ">
-                        <thead className="bg-gray-200 text-gray-800">
-                          <tr>
-                            <th
-                              className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              S.No
-                            </th>
-                            <th
-                              className={`w-44 px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              Course / Degree
-                            </th>
-                            <th
-                              className={` px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              Board / University
-                            </th>
-                            <th
-                              className={` px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              Institution
-                            </th>
-                            <th
-                              className={`w-52 px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              Year & Month of Passing
-                            </th>
-                            <th
-                              className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              Action
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {educationDetails.map((item, index) => (
-                            <tr
-                              key={index}
-                              className=" border border-gray-300 text-[11px] py-1.5 px-1 text-center"
-                            >
-                              <td className=" text-center px-1">{index + 1}</td>
-                              <td className="border border-gray-300 text-[12px] py-1.5 px-1 item-center">
-                                <input
-                                  // name="Bank Name"
-                                  type="text"
-                                  value={item?.courseName}
-                                  onChange={(e) =>
-                                    handleEDucationDetailsChange(
-                                      index,
-                                      "courseName",
-                                      e.target.value
-                                    )
-                                  }
-                                  readOnly={readOnly}
-                                  // disabled={childRecord.current > 0}
-                                  className="w-full pl-2 focus:outline-none uppercase focus:border-none"
-                                />
-                              </td>
-                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                <input
-                                  // name="Branch Name"
-                                  type="text"
-                                  value={item?.universityName}
-                                  onChange={(e) =>
-                                    handleEDucationDetailsChange(
-                                      index,
-                                      "universityName",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full pl-2 focus:outline-none  uppercase focus:border-none"
-                                  readOnly={readOnly}
-                                  // disabled={childRecord.current > 0}
-                                />
-                              </td>
-                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                <input
-                                  // name="Account Number"
-                                  type="text"
-                                  value={item?.institutionName}
-                                  onChange={(e) =>
-                                    handleEDucationDetailsChange(
-                                      index,
-                                      "institutionName",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full pl-2 focus:outline-none uppercase focus:border-none"
-                                  readOnly={readOnly}
-                                  // disabled={childRecord.current > 0}
-                                />
-                              </td>
-                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                <input
-                                  // name="IFSC CODE"
-                                  type="text"
-                                  value={item?.yearOfPass}
-                                  onChange={(e) =>
-                                    handleEDucationDetailsChange(
-                                      index,
-                                      "yearOfPass",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full pl-2 focus:outline-none uppercase focus:border-none"
-                                  readOnly={readOnly}
-                                  // disabled={childRecord.current > 0}
-                                />
-                              </td>
-                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                <button
-                                  type="button"
-                                  title="Delete Row"
-                                  onClick={() => deleteEducationRow(index)}
-                                  className="text-red-600 hover:text-red-800"
-                                >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-4 w-4 inline-block"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                  >
-                                    <path
-                                      fillRule="evenodd"
-                                      d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                      clipRule="evenodd"
-                                    />
-                                  </svg>
-                                </button>
-                              </td>
+                      <div
+                        className={`w-full   p-2 overflow-auto bg-white max-h-[200px]`}
+                      >
+                        <table className="w-full border-collapse table-fixed ">
+                          <thead className="bg-gray-200 text-gray-800">
+                            <tr>
+                              <th
+                                className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
+                              >
+                                S.No
+                              </th>
+                              <th
+                                className={`w-44 px-4 py-2 text-center font-medium text-[13px] `}
+                              >
+                                Course / Degree
+                              </th>
+                              <th
+                                className={` px-4 py-2 text-center font-medium text-[13px] `}
+                              >
+                                Board / University
+                              </th>
+                              <th
+                                className={` px-4 py-2 text-center font-medium text-[13px] `}
+                              >
+                                Institution
+                              </th>
+                              <th
+                                className={`w-52 px-4 py-2 text-center font-medium text-[13px] `}
+                              >
+                                Year & Month of Passing
+                              </th>
+                              <th
+                                className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
+                              >
+                                Action
+                              </th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table></div>
+                          </thead>
+                          <tbody>
+                            {educationDetails.map((item, index) => (
+                              <tr
+                                key={index}
+                                className=" border border-gray-300 text-[11px] py-1.5 px-1 text-center"
+                              >
+                                <td className=" text-center px-1">
+                                  {index + 1}
+                                </td>
+                                <td className="border border-gray-300 text-[12px] py-1.5 px-1 item-center">
+                                  <input
+                                    // name="Bank Name"
+                                    type="text"
+                                    value={item?.courseName}
+                                    onChange={(e) =>
+                                      handleEDucationDetailsChange(
+                                        index,
+                                        "courseName",
+                                        e.target.value
+                                      )
+                                    }
+                                    readOnly={readOnly}
+                                    // disabled={childRecord.current > 0}
+                                    className="w-full pl-2 focus:outline-none uppercase focus:border-none"
+                                  />
+                                </td>
+                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                  <input
+                                    // name="Branch Name"
+                                    type="text"
+                                    value={item?.universityName}
+                                    onChange={(e) =>
+                                      handleEDucationDetailsChange(
+                                        index,
+                                        "universityName",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="w-full pl-2 focus:outline-none  uppercase focus:border-none"
+                                    readOnly={readOnly}
+                                    // disabled={childRecord.current > 0}
+                                  />
+                                </td>
+                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                  <input
+                                    // name="Account Number"
+                                    type="text"
+                                    value={item?.institutionName}
+                                    onChange={(e) =>
+                                      handleEDucationDetailsChange(
+                                        index,
+                                        "institutionName",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="w-full pl-2 focus:outline-none uppercase focus:border-none"
+                                    readOnly={readOnly}
+                                    // disabled={childRecord.current > 0}
+                                  />
+                                </td>
+                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                  <input
+                                    // name="IFSC CODE"
+                                    type="text"
+                                    value={item?.yearOfPass}
+                                    onChange={(e) =>
+                                      handleEDucationDetailsChange(
+                                        index,
+                                        "yearOfPass",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="w-full pl-2 focus:outline-none uppercase focus:border-none"
+                                    readOnly={readOnly}
+                                    // disabled={childRecord.current > 0}
+                                  />
+                                </td>
+                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                  <button
+                                    type="button"
+                                    title="Delete Row"
+                                    onClick={() => deleteEducationRow(index)}
+                                    className="text-red-600 hover:text-red-800"
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="h-4 w-4 inline-block"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                    >
+                                      <path
+                                        fillRule="evenodd"
+                                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                        clipRule="evenodd"
+                                      />
+                                    </svg>
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -2703,187 +2726,191 @@ export default function Form() {
                           Add Item
                         </button>
                       </div>
-                      <div className={`w-full   p-2 overflow-auto bg-white max-h-[200px]`}>
-                      <table className="w-full border-collapse table-fixed ">
-                        <thead className="bg-gray-200 text-gray-800">
-                          <tr>
-                            <th
-                              className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              S.No
-                            </th>
-                            <th
-                              className={`w-44 px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              Name
-                            </th>
-                            <th
-                              className={`w-24 px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              Date of Birth
-                            </th>
-                            <th
-                              className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              Age
-                            </th>
-                            <th
-                              className={`w-32 px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              RelationShip
-                            </th>
-                            <th
-                              className={`w-52 px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              Occupation
-                            </th>
-                            <th
-                              className={`w-24 px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              Nominee
-                            </th>
-                            <th
-                              className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
-                            >
-                              Action
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {familyDetails.map((item, index) => (
-                            <tr
-                              key={index}
-                              className=" border border-gray-300 text-[12px] py-0.5 px-1 text-center"
-                            >
-                              <td className=" text-center px-1">{index + 1}</td>
-                              <td className="border border-gray-300 text-[12px] py-1.5 px-1 item-center">
-                                <input
-                                  // name="Bank Name"
-                                  type="text"
-                                  value={item?.name}
-                                  onChange={(e) =>
-                                    handleFamilyDetailsChange(
-                                      index,
-                                      "name",
-                                      e.target.value
-                                    )
-                                  }
-                                  readOnly={readOnly}
-                                  // disabled={childRecord.current > 0}
-                                  className="w-full pl-2 focus:outline-none uppercase focus:border-none"
-                                />
-                              </td>
-                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                <input
-                                  // name="Branch Name"
-                                  type="date"
-                                  value={item?.dob}
-                                  onChange={(e) =>
-                                    handleFamilyDetailsChange(
-                                      index,
-                                      "dob",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full pl-1 focus:outline-none uppercase  focus:border-none"
-                                  readOnly={readOnly}
-                                  // disabled={childRecord.current > 0}
-                                />
-                              </td>
-                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                <input
-                                  // name="Account Number"
-                                  type="number"
-                                  value={item?.age}
-                                  onChange={(e) =>
-                                    handleFamilyDetailsChange(
-                                      index,
-                                      "age",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full pr-2 text-right focus:outline-none uppercase  focus:border-none"
-                                  readOnly={readOnly}
-                                  // disabled={childRecord.current > 0}
-                                />
-                              </td>
-                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                <input
-                                  // name="IFSC CODE"
-                                  type="text"
-                                  value={item?.relationShip}
-                                  onChange={(e) =>
-                                    handleFamilyDetailsChange(
-                                      index,
-                                      "relationShip",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full pl-2 focus:outline-none uppercase  focus:border-none"
-                                  readOnly={readOnly}
-                                  // disabled={childRecord.current > 0}
-                                />
-                              </td>
-                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                <input
-                                  // name="IFSC CODE"
-                                  type="text"
-                                  value={item?.occupation}
-                                  onChange={(e) =>
-                                    handleFamilyDetailsChange(
-                                      index,
-                                      "occupation",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full pl-2 focus:outline-none uppercase  focus:border-none"
-                                  readOnly={readOnly}
-                                  // disabled={childRecord.current > 0}
-                                />
-                              </td>
-                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                <input
-                                  // name="IFSC CODE"
-                                  type="text"
-                                  value={item?.nominee}
-                                  onChange={(e) =>
-                                    handleFamilyDetailsChange(
-                                      index,
-                                      "nominee",
-                                      e.target.value
-                                    )
-                                  }
-                                  className="w-full pl-2 focus:outline-none uppercase  focus:border-none"
-                                  readOnly={readOnly}
-                                  // disabled={childRecord.current > 0}
-                                />
-                              </td>
-                              <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                <button
-                                  type="button"
-                                  title="Delete Row"
-                                  onClick={() => deleteFamilyRow(index)}
-                                  className="text-red-600 hover:text-red-800"
-                                >
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-4 w-4 inline-block"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                  >
-                                    <path
-                                      fillRule="evenodd"
-                                      d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                      clipRule="evenodd"
-                                    />
-                                  </svg>
-                                </button>
-                              </td>
+                      <div
+                        className={`w-full   p-2 overflow-auto bg-white max-h-[200px]`}
+                      >
+                        <table className="w-full border-collapse table-fixed ">
+                          <thead className="bg-gray-200 text-gray-800">
+                            <tr>
+                              <th
+                                className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
+                              >
+                                S.No
+                              </th>
+                              <th
+                                className={`w-44 px-4 py-2 text-center font-medium text-[13px] `}
+                              >
+                                Name
+                              </th>
+                              <th
+                                className={`w-24 px-4 py-2 text-center font-medium text-[13px] `}
+                              >
+                                Date of Birth
+                              </th>
+                              <th
+                                className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
+                              >
+                                Age
+                              </th>
+                              <th
+                                className={`w-32 px-4 py-2 text-center font-medium text-[13px] `}
+                              >
+                                RelationShip
+                              </th>
+                              <th
+                                className={`w-52 px-4 py-2 text-center font-medium text-[13px] `}
+                              >
+                                Occupation
+                              </th>
+                              <th
+                                className={`w-24 px-4 py-2 text-center font-medium text-[13px] `}
+                              >
+                                Nominee
+                              </th>
+                              <th
+                                className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
+                              >
+                                Action
+                              </th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                        </div>
+                          </thead>
+                          <tbody>
+                            {familyDetails.map((item, index) => (
+                              <tr
+                                key={index}
+                                className=" border border-gray-300 text-[12px] py-0.5 px-1 text-center"
+                              >
+                                <td className=" text-center px-1">
+                                  {index + 1}
+                                </td>
+                                <td className="border border-gray-300 text-[12px] py-1.5 px-1 item-center">
+                                  <input
+                                    // name="Bank Name"
+                                    type="text"
+                                    value={item?.name}
+                                    onChange={(e) =>
+                                      handleFamilyDetailsChange(
+                                        index,
+                                        "name",
+                                        e.target.value
+                                      )
+                                    }
+                                    readOnly={readOnly}
+                                    // disabled={childRecord.current > 0}
+                                    className="w-full pl-2 focus:outline-none uppercase focus:border-none"
+                                  />
+                                </td>
+                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                  <input
+                                    // name="Branch Name"
+                                    type="date"
+                                    value={item?.dob}
+                                    onChange={(e) =>
+                                      handleFamilyDetailsChange(
+                                        index,
+                                        "dob",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="w-full pl-1 focus:outline-none uppercase  focus:border-none"
+                                    readOnly={readOnly}
+                                    // disabled={childRecord.current > 0}
+                                  />
+                                </td>
+                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                  <input
+                                    // name="Account Number"
+                                    type="number"
+                                    value={item?.age}
+                                    onChange={(e) =>
+                                      handleFamilyDetailsChange(
+                                        index,
+                                        "age",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="w-full pr-2 text-right focus:outline-none uppercase  focus:border-none"
+                                    readOnly={readOnly}
+                                    // disabled={childRecord.current > 0}
+                                  />
+                                </td>
+                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                  <input
+                                    // name="IFSC CODE"
+                                    type="text"
+                                    value={item?.relationShip}
+                                    onChange={(e) =>
+                                      handleFamilyDetailsChange(
+                                        index,
+                                        "relationShip",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="w-full pl-2 focus:outline-none uppercase  focus:border-none"
+                                    readOnly={readOnly}
+                                    // disabled={childRecord.current > 0}
+                                  />
+                                </td>
+                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                  <input
+                                    // name="IFSC CODE"
+                                    type="text"
+                                    value={item?.occupation}
+                                    onChange={(e) =>
+                                      handleFamilyDetailsChange(
+                                        index,
+                                        "occupation",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="w-full pl-2 focus:outline-none uppercase  focus:border-none"
+                                    readOnly={readOnly}
+                                    // disabled={childRecord.current > 0}
+                                  />
+                                </td>
+                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                  <input
+                                    // name="IFSC CODE"
+                                    type="text"
+                                    value={item?.nominee}
+                                    onChange={(e) =>
+                                      handleFamilyDetailsChange(
+                                        index,
+                                        "nominee",
+                                        e.target.value
+                                      )
+                                    }
+                                    className="w-full pl-2 focus:outline-none uppercase  focus:border-none"
+                                    readOnly={readOnly}
+                                    // disabled={childRecord.current > 0}
+                                  />
+                                </td>
+                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                  <button
+                                    type="button"
+                                    title="Delete Row"
+                                    onClick={() => deleteFamilyRow(index)}
+                                    className="text-red-600 hover:text-red-800"
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="h-4 w-4 inline-block"
+                                      viewBox="0 0 20 20"
+                                      fill="currentColor"
+                                    >
+                                      <path
+                                        fillRule="evenodd"
+                                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                        clipRule="evenodd"
+                                      />
+                                    </svg>
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   </div>
                 )}

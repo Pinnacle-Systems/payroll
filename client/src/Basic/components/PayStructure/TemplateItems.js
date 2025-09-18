@@ -301,7 +301,7 @@ const TemplateItems = ({
                       />
                     </td> */}
 
-                    <td className=" border border-gray-300 text-[11px] py-0.5 px-1 item-center ">
+                    <td className=" border border-gray-300 text-[12px] py-0.5 px-1 item-center ">
                       {/* <select
                         disabled={readOnly}
                         className="text-left w-full focus:outline-none  bg-transparent rounded py-1 "
@@ -367,7 +367,7 @@ const TemplateItems = ({
                           singleValue: (base) => ({
                             ...base,
                             color: readOnly ? "gray" : "black",
-                            fontSize: "11px", // optional: adjust font size
+                            fontSize: "12px", // optional: adjust font size
                             // textTransform: "uppercase",
                           }),
 
@@ -415,7 +415,7 @@ const TemplateItems = ({
                         }}
                       />
                     </td>
-                    <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className=" border border-gray-300 text-[12px] py-0.5 item-center">
                       <input
                         type="number"
                         placeHolder="0.00"
@@ -447,7 +447,7 @@ const TemplateItems = ({
                       />
                     </td>
 
-                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
                       <input
                         type="text"
                         value={
@@ -463,7 +463,7 @@ const TemplateItems = ({
                       />
                     </td>
 
-                    <td className="border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className="border border-gray-300 text-[12px] py-0.5 item-center">
                       <input
                         type="text"
                         value={item?.payDescription || ""}
@@ -473,7 +473,7 @@ const TemplateItems = ({
                         disabled
                       />
                     </td>
-                    <td className="border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className="border border-gray-300 text-[12px] py-0.5 item-center">
                       <input
                         type="text"
                         value={item?.pickFrom || ""}
@@ -483,7 +483,7 @@ const TemplateItems = ({
                         disabled
                       />
                     </td>
-                    <td className="border border-gray-300 text-[11px] py-0.5 text-center">
+                    <td className="border border-gray-300 text-[12px] py-0.5 text-center">
                       <button
                         type="button"
                         onClick={() => {
@@ -510,7 +510,7 @@ const TemplateItems = ({
                       </button>
                     </td>
 
-                    <td className="border border-gray-300 text-[11px] py-1.5 text-center px-1">
+                    <td className="border border-gray-300 text-[12px] py-1.5 text-center px-1">
                       <textarea
                         type="text"
                         value={item?.formula || ""}
@@ -536,7 +536,7 @@ const TemplateItems = ({
                         <Copy size={12} />
                       </button>
                     </td> */}
-                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
                       <input
                         type="text"
                         value={item?.notes || ""}

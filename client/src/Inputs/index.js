@@ -966,8 +966,7 @@ import validator from "validator";
 import React, { useEffect, useRef, useState, forwardRef } from "react";
 import { MultiSelect } from "react-multi-select-component";
 import Select from "react-dropdown-select";
-import { findFromList ,findFromListCustom
-} from "../Utils/helper";
+import { findFromList, findFromListCustom } from "../Utils/helper";
 import "./index.css";
 import { FormControl, MenuItem, TextField } from "@mui/material";
 import { push } from "../redux/features/opentabs";
@@ -1455,84 +1454,88 @@ export const TextArea = ({
   );
 };
 
-export const DropdownInput = forwardRef(({
-  name,
-  beforeChange = () => {},
-  onBlur = null,
-  options,
-  value,
-  setValue,
-  defaultValue,
-  className = "",
-  readOnly = false,
-  required = false,
-  disabled = false,
-  clear = false,
-  tabIndex = null,
-  autoFocus = false,
-  width = "full",
-  country
-}, ref) => {
-  const handleOnChange = (e) => {
-    const val = e.target.value;
-    const parsedValue = !isNaN(parseInt(val)) ? parseInt(val) : val;
-    setValue(parsedValue);
-  };
+export const DropdownInput = forwardRef(
+  (
+    {
+      name,
+      beforeChange = () => {},
+      onBlur = null,
+      options,
+      value,
+      setValue,
+      defaultValue,
+      className = "",
+      readOnly = false,
+      required = false,
+      disabled = false,
+      clear = false,
+      tabIndex = null,
+      autoFocus = false,
+      width = "full",
+      country,
+    },
+    ref
+  ) => {
+    const handleOnChange = (e) => {
+      const val = e.target.value;
+      const parsedValue = !isNaN(parseInt(val)) ? parseInt(val) : val;
+      setValue(parsedValue);
+    };
 
-  const isDisabled = readOnly || disabled;
+    const isDisabled = readOnly || disabled;
 
-  return (
-    <div className={`mb-2 ${width}`}>
-      {name && (
-        <label className="block text-xs font-bold text-slate-700 mb-1">
-          {required ? <RequiredLabel name={name} /> : name}
-        </label>
-      )}
-      <select
-        ref={ref}
-        onBlur={onBlur}
-        autoFocus={autoFocus}
-        tabIndex={tabIndex ?? undefined}
-        defaultValue={defaultValue}
-        required={required}
-        readOnly={readOnly}
-        className={`w-full px-1 py-1 text-xs border text-[12px]  border-gray-300 rounded-lg
-          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-          transition-all duration-150 shadow-sm
-          ${
-            isDisabled
-              ? "bg-gray-100 text-black-100 cursor-not-allowed"
-              : "bg-white text-gray-900 hover:border-gray-400"
-          }
-          ${className}`}
-        value={value}
-        onChange={(e) => {
-          beforeChange();
-          handleOnChange(e);
-        }}
-        disabled={isDisabled}
-        
-      >
-        <option
-          value=""
-          hidden={!clear}
-          className="text-gray-800 overflow-scroll"
+    return (
+      <div className={`mb-2 ${width}`}>
+        {name && (
+          <label className="block text-xs font-bold text-slate-700 mb-1">
+            {required ? <RequiredLabel name={name} /> : name}
+          </label>
+        )}
+        <select
+          ref={ref}
+          onBlur={onBlur}
+          autoFocus={autoFocus}
+          tabIndex={tabIndex ?? undefined}
+          defaultValue={defaultValue}
+          required={required}
+          readOnly={readOnly}
+          className={`w-full px-2 py-1 text-xs text-[12px] border border-gray-300 rounded-lg
+    focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+    transition-all duration-150 shadow-sm
+    ${
+      isDisabled
+        ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+        : "bg-white text-gray-900 hover:border-gray-400"
+    }
+    ${className}`}
+          value={value}
+          onChange={(e) => {
+            beforeChange();
+            handleOnChange(e);
+          }}
+          disabled={isDisabled}
         >
-          Select {name || "option"}
-        </option>
-        {options?.map((option, index) => (
           <option
-            key={index}
-            value={option.value}
-            className="text-xs py-1.5 text-gray-800"
+            value=""
+            hidden={!clear}
+            className="text-gray-800 overflow-scroll"
           >
-            {option.show}
+            Select {name || "option"}
           </option>
-        ))}
-      </select>
-    </div>
-  );
-});
+          {options?.map((option, index) => (
+            <option
+              key={index}
+              value={option.value}
+              className="text-xs py-1.5 text-gray-800"
+            >
+              {option.show}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  }
+);
 
 export const DropdownInputForm = ({
   name,
@@ -1734,43 +1737,47 @@ const RequiredLabel = ({ name }) => (
   </p>
 );
 
-export const DateInput = forwardRef(({
-  name,
-  value,
-  setValue,
-  readOnly,
-  required = false,
-  type = "date",
-  disabled = false,
-  tabIndex = null,
-  inputClass = "",
-  inputHead = null,
-}, ref) => {
-  return (
-    <div className="flex flex-col gap-1 w-full">
-      {name && (
-        <label className="block text-xs font-bold text-slate-700">
-          {required ? (
-            <RequiredLabel name={inputHead ?? name} />
-          ) : (
-            inputHead ?? name
-          )}
-        </label>
-      )}
+export const DateInput = forwardRef(
+  (
+    {
+      name,
+      value,
+      setValue,
+      readOnly,
+      required = false,
+      type = "date",
+      disabled = false,
+      tabIndex = null,
+      inputClass = "",
+      inputHead = null,
+    },
+    ref
+  ) => {
+    return (
+      <div className="flex flex-col gap-1 w-full">
+        {name && (
+          <label className="block text-xs font-bold text-slate-700">
+            {required ? (
+              <RequiredLabel name={inputHead ?? name} />
+            ) : (
+              inputHead ?? name
+            )}
+          </label>
+        )}
 
-      <div className="relative">
-        <input
-          id={name}
-           ref={ref}
-          name={name}
-          type={type}
-          tabIndex={tabIndex}
-          disabled={disabled}
-          required={required}
-          readOnly={readOnly}
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          className={`
+        <div className="relative">
+          <input
+            id={name}
+            ref={ref}
+            name={name}
+            type={type}
+            tabIndex={tabIndex}
+            disabled={disabled}
+            required={required}
+            readOnly={readOnly}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            className={`
          w-28 px-2 py-1 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
@@ -1782,11 +1789,12 @@ export const DateInput = forwardRef(({
             ${disabled ? "opacity-50 bg-gray-100 cursor-not-allowed" : ""}
             ${inputClass}
           `}
-        />
+          />
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 export const DateInputNew = ({
   name,
@@ -2370,64 +2378,82 @@ export const TextAreaInput = ({
   );
 };
 
-export  const customSelectStyles = {
-    control: (base) => ({
-      ...base,
-      minHeight: "16px",
-      height: "16px",
-      padding: "13px 4px",
-      fontSize: "12px",
-      borderRadius: "8px",
-      fontFamily: "'Segoe UI'",
-    }),
-    valueContainer: (base) => ({
-      ...base,
-      padding: "0 3px",
-      marginTop: "-8px",
-      fontFamily: "'Segoe UI'",
-    }),
-    input: (base) => ({
-      ...base,
-      margin: 0,
-     
-      padding: 0,
-      fontFamily: "'Segoe UI'",
-    }),
-    singleValue: (base) => ({
-      ...base,
-      fontFamily: "'Segoe UI'",
-    }),
-    placeholder: (base) => ({
-      ...base,
-      fontFamily: "'Segoe UI'",
-      color:'black'
-    }),
-    menu: (base) => ({
-      ...base,
-      fontFamily: "'Segoe UI'",
-      maxHeight: 150,
-      overflowY: "auto",
-    }),
-    option: (base) => ({
-      ...base,
-      fontFamily: "'Segoe UI'",
-      fontSize: "12px",
-    }),
- dropdownIndicator: (base) => ({
-      ...base,
-      padding: 2, 
-      svg: {
-        width: 14, // icon width
-        height: 14, // icon height
-      },
-      color: "black",
-      marginTop:'-9px'
-    }),
+export const customSelectStyles = {
+  control: (base,state) => ({
+    ...base,
+    minHeight: "13px",
+    height: "13px",
+    padding: "13px 4px",
+    fontSize: "12px",
+    borderRadius: "8px",
+    fontFamily: "'Segoe UI'",
+    color: state.isDisabled ? "#6b7280" : "black",
+     backgroundColor: state.isDisabled ? "#f3f4f6" : "white", // bg-gray-100 vs bg-white
+    cursor: state.isDisabled ? "not-allowed" : "default",
+    borderColor: state.isFocused ? "#3b82f6" : "#d1d5db",    // blue-500 vs gray-300
+    boxShadow: state.isFocused ? "0 0 0 1px #3b82f6" : base.boxShadow,
+    "&:hover": {
+      borderColor: state.isDisabled ? "#d1d5db" : "#9ca3af", // keep gray when disabled
+    },
+  }),
+  valueContainer: (base,state) => ({
+    ...base,
+    padding: "0 3px",
+    marginTop: "-8px",
+    fontSize: "12px",
+    fontFamily: "'Segoe UI'",
+    color: state.isDisabled ? "#6b7280" : "black"
+  }),
+  input: (base,state) => ({
+    ...base,
+    margin: 0,
+    fontSize: "12px",
+    padding: 0,
+    fontFamily: "'Segoe UI'",
+    color: state.isDisabled ? "#6b7280" : "black"
+  }),
+  singleValue: (base,state) => ({
+    ...base,
+    fontFamily: "'Segoe UI'",
+    fontSize: "12px",
+    color: state.isDisabled ? "#6b7280" : "black"
+  }),
+  placeholder: (base) => ({
+    ...base,
+    fontFamily: "'Segoe UI'",
+    color: "black",
+    fontSize: "12px",
+  }),
+  menu: (base,state) => ({
+    ...base,
+    fontFamily: "'Segoe UI'",
+    maxHeight: 140,
+    // overflowY: "auto",
+    fontSize: "12px",
+    color: state.isDisabled ? "#6b7280" : "black"
+  }),
+  option: (base,state) => ({
+    ...base,
+    fontFamily: "'Segoe UI'",
+    fontSize: "12px",
+    color: state.isDisabled ? "#6b7280" : "black",
+    padding:'6px 8px'
+  }),
+  dropdownIndicator: (base) => ({
+    ...base,
+    padding: 2,
+    svg: {
+      width: 14, // icon width
+      height: 14, // icon height
+    },
+    color: "black",
+    marginTop: "-9px",
+  }),
 
-    indicatorSeparator: () => ({ display: "none" }),
-    menuList: (base) => ({
-      ...base,
-      maxHeight: 150,
-      overflowY: "auto",
-    }),
-  };
+  indicatorSeparator: () => ({ display: "none" }),
+  menuList: (base) => ({
+    ...base,
+    maxHeight: 140,
+    // overflowY: "auto",
+  }),
+};

@@ -53,23 +53,21 @@ async function get(req) {
     },
     include: {
       PayDetails: {
-        select:{
-        payComponent:{
-          
-          select:{
-          id:true,
-          payCode:true,
-          payDescription:true
-        
+        select: {
+          payComponent: {
+            select: {
+              id: true,
+              payCode: true,
+              payDescription: true,
+            },
+          },
+          id: true,
+          payComponentId: true,
+          pf: true,
+          lop: true,
+          esi: true,
+          pickFrom: true,
         },
-        },
-        id:true,
-        payComponentId:true,
-        pf:true,
-        lop:true,
-        esi:true,
-        pickFrom:true,
-      }
       },
     },
     orderBy: { id: "desc" },
@@ -96,34 +94,38 @@ async function get(req) {
 }
 
 async function getOne(id) {
-  const childRecord = await prisma.payStructure.count({where : {payDetailsId : parseInt(id)}});
+  // const childRecord = await prisma.payStructure.count({
+  //   where: { payDetailsId: parseInt(id) },
+  // });
   const data = await prisma.companyPaycode.findUnique({
     where: {
       id: parseInt(id),
     },
     include: {
       PayDetails: {
-        select:{
-         
-        payComponent:{
-          select:{
-          id:true,
-          payCode:true,
-          payDescription:true
+        select: {
+          payComponent: {
+            select: {
+              id: true,
+              payCode: true,
+              payDescription: true,
+            },
+          },
+          id: true,
+          payComponentId: true,
+          pf: true,
+          lop: true,
+          esi: true,
+          pickFrom: true,
+           _count: {
+            select: { PayStructure: true }, 
+          },
         },
-        },
-         id:true,
-         payComponentId:true,
-        pf:true,
-        lop:true,
-        esi:true,
-        pickFrom:true,
-      }
       },
     },
   });
   if (!data) return NoRecordFound("Company Pay Code");
-  return { statusCode: 0, data: { ...data, ...{ childRecord } } };
+  return { statusCode: 0, data };
 }
 
 async function getSearch(req) {

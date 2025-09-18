@@ -71,12 +71,10 @@ const Form = () => {
         date: value?.date
           ? new Date(value?.date).toISOString().split("T")[0]
           : null,
-        
       }));
       setMachineInOutGrid(mappedGrid || []);
 
-      console.log(mappedGrid,"mappedGrid");
-      
+      console.log(mappedGrid, "mappedGrid");
     },
     [id]
   );
@@ -413,15 +411,13 @@ const Form = () => {
                     </thead>
                     <tbody>
                       {machineInOutGrid?.map((item, index) => {
-                       
-
                         return (
                           <tr className=" w-full table-row">
                             <td className="border border-gray-300 py-1.5  text-center px-1">
                               {index + 1}
                             </td>
 
-                            <td className=" border border-gray-300 text-[11px] py-0.5 item-center ">
+                            <td className=" border border-gray-300 text-[12px] py-0.5 item-center ">
                               <input
                                 type="date"
                                 value={item?.date}
@@ -432,14 +428,17 @@ const Form = () => {
                                     "date"
                                   )
                                 }
-                                className="pl-1 bg-transparent   focus:outline-none focus:border-transparent"
-                                disabled={readOnly}
+                                className={`pl-1 bg-transparent   focus:outline-none focus:border-transparent ${
+                                  readOnly || childRecord.current > 0
+                                    ? "text-gray-600"
+                                    : "text-black"
+                                }`}
+                                disabled={readOnly || childRecord.current > 0}
                               />
                             </td>
-                            <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+                            <td className=" border border-gray-300 text-[12px] py-0.5 item-center">
                               <select
-                                disabled={childRecord.current > 0}
-                                readOnly={readOnly}
+                                disabled={readOnly || childRecord.current > 0}
                                 className="text-left w-full bg-transparent focus:outline-none rounded py-1 "
                                 value={item?.machineTypeOne}
                                 onChange={(e) =>
@@ -459,7 +458,7 @@ const Form = () => {
                               </select>
                             </td>
 
-                            <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                            <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
                               <input
                                 min="0"
                                 type="text"
@@ -473,14 +472,14 @@ const Form = () => {
                                   )
                                 }
                                 className={`w-full bg-transparent text-right pr-2 focus:outline-none focus:border-transparent ${
-                                  readOnly ? "text-gray-600" : "text-black"
+                                  readOnly || childRecord.current > 0 ? "text-gray-600" : "text-black"
                                 } `}
-                                disabled={childRecord.current > 0}
-                                readOnly={readOnly}
+                               disabled={readOnly || childRecord.current > 0}
+
                               />
                             </td>
 
-                            <td className="border border-gray-300 text-[11px] py-0.5 item-center">
+                            <td className="border border-gray-300 text-[12px] py-0.5 item-center">
                               <input
                                 min="0"
                                 type="number"
@@ -494,13 +493,12 @@ const Form = () => {
                                   )
                                 }
                                 className={`w-full bg-transparent text-right pr-2 focus:outline-none focus:border-transparent ${
-                                  readOnly ? "text-gray-600" : "text-black"
+                                  readOnly || childRecord.current > 0 ? "text-gray-600" : "text-black"
                                 } `}
-                                disabled={childRecord.current > 0}
-                                readOnly={readOnly}
+                                 disabled={readOnly || childRecord.current > 0}
                               />
                             </td>
-                            <td className="border border-gray-300 text-[11px] py-0.5 item-center">
+                            <td className="border border-gray-300 text-[12px] py-0.5 item-center">
                               <input
                                 type="text"
                                 value={item?.machineTypeTwo || ""}
@@ -518,10 +516,9 @@ const Form = () => {
                               />
                             </td>
 
-                            <td className="border border-gray-300 text-[11px] text-center px-1">
+                            <td className="border border-gray-300 text-[12px] text-center px-1">
                               <select
-                                disabled={childRecord.current > 0}
-                                readOnly={readOnly}
+                                disabled={readOnly || childRecord.current > 0}
                                 className="text-left w-full bg-transparent focus:outline-none rounded py-1 "
                                 value={item?.currentMachine}
                                 onChange={(e) =>
@@ -541,10 +538,9 @@ const Form = () => {
                               </select>
                             </td>
 
-                            <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                            <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
                               <select
-                                disabled={childRecord.current > 0}
-                                readOnly={readOnly}
+                                disabled={readOnly || childRecord.current > 0}
                                 className="text-left w-full bg-transparent focus:outline-none rounded py-1 "
                                 value={item?.default}
                                 onChange={(e) =>
@@ -564,7 +560,7 @@ const Form = () => {
                               </select>
                             </td>
                             <td
-                              className="  border border-gray-300 text-[11px] py-0.5 item-center"
+                              className="  border border-gray-300 text-[12px] py-0.5 item-center"
                               onContextMenu={(e) => {
                                 if (!readOnly) {
                                   handleRightClick(e, index, "notes");
@@ -591,9 +587,9 @@ const Form = () => {
                                   }
                                 }}
                                 className={`w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent ${
-                                  readOnly ? "text-gray-600" : "text-black"
+                                  readOnly || childRecord.current > 0 ? "text-gray-600" : "text-black"
                                 } `}
-                                disabled={readOnly}
+                                disabled={readOnly || childRecord.current > 0}
                               />
                             </td>
                           </tr>

@@ -1,46 +1,43 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
-
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCategoryMasterService";
+import { getCommonParams } from "../../../Utils/helper";
+import {
+  useAddemployeeSubCategoryMutation,
+  useDeleteemployeeSubCategoryMutation,
+  useGetemployeeSubCategoryByIdQuery,
+  useGetemployeeSubCategoryQuery,
+  useUpdateemployeeSubCategoryMutation,
+} from "../../../redux/services/EmployeeSubCategoryservice";
+import { toast } from "react-toastify";
+import Modal from "../../../UiComponents/Modal";
+import { Check, Power } from "lucide-react";
 import {
   TextInput,
   ToggleButton,
   ReusableTable,
   customSelectStyles,
+  DropdownInput,
 } from "../../../Inputs";
-import Select from "react-select";
-import { statusDropdown } from "../../../Utils/DropdownData";
-
-import { useGetCompanyQuery } from "../../../redux/services/CompanyMasterService";
-import Modal from "../../../UiComponents/Modal";
-import { Check, Power } from "lucide-react";
-
-import { getCommonParams } from "../../../Utils/helper";
-import {
-  useAddShiftCommonTemplateMutation,
-  useDeleteShiftCommonTemplateMutation,
-  useGetShiftCommonTemplateByIdQuery,
-  useGetShiftCommonTemplateQuery,
-  useUpdateShiftCommonTemplateMutation,
-} from "../../../redux/services/ShiftCommonTemplate.service";
-
-import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCategoryMasterService";
+import {  payType, statusDropdown } from "../../../Utils/DropdownData";
 import Swal from "sweetalert2";
-
-const ShiftCommonTemplateMaster = () => {
+import Select from "react-select";
+const Form = () => {
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
 
-  const [docId, setDocId] = useState("");
+  const [bandName, setBandName] = useState("");
+  const [payMethod,setPayMethod] = useState("")
   const [active, setActive] = useState(true);
-  const [errors, setErrors] = useState({});
   const [form, setForm] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
   const [employeeCategoryId, setEmployeeCategoryId] = useState("");
   const params = getCommonParams();
+  const employeeRef = useRef(null);
 
   const { branchId, companyId } = params;
 
-  const { data: allData } = useGetShiftCommonTemplateQuery({
+  const { data: allData } = useGetemployeeSubCategoryQuery({
     params,
     searchParams: searchValue,
   });
@@ -48,28 +45,19 @@ const ShiftCommonTemplateMaster = () => {
     data: singleData,
     isFetching: isSingleFetching,
     isLoading: isSingleLoading,
-  } = useGetShiftCommonTemplateByIdQuery(id, { skip: !id });
+  } = useGetemployeeSubCategoryByIdQuery(id, { skip: !id });
 
   const { data: employeeCategory } = useGetEmployeeCategoryQuery({ params });
 
-  // useEffect(() => {
-  //   if (company?.data?.length > 0) {
-  //     setCompanyName(company.data[0].name);
-  //     setCompanyCode(company.data[0].code);
-  //   }
-  // }, [company]);
-
-  const [addData] = useAddShiftCommonTemplateMutation();
-  const [updateData] = useUpdateShiftCommonTemplateMutation();
-  const [removeData] = useDeleteShiftCommonTemplateMutation();
+  const [addData] = useAddemployeeSubCategoryMutation();
+  const [updateData] = useUpdateemployeeSubCategoryMutation();
+  const [removeData] = useDeleteemployeeSubCategoryMutation();
 
   const syncFormWithDb = useCallback(
     (data) => {
-      setDocId(data?.docId || "");
-
+      setBandName(data?.bandName || "");
       setEmployeeCategoryId(data?.employeeCategoryId || "");
       setActive(id ? data?.active ?? false : true);
-      childRecord.current = data?.childRecord ? data?.childRecord : 0;
     },
     [id]
   );
@@ -78,10 +66,8 @@ const ShiftCommonTemplateMaster = () => {
     syncFormWithDb(singleData?.data);
   }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
 
-  console.log(singleData?.data, "singleData?.data");
-
   const data = {
-    docId,
+    bandName,
     employeeCategoryId,
     active,
     companyId,
@@ -90,11 +76,16 @@ const ShiftCommonTemplateMaster = () => {
   };
 
   const validateData = (data) => {
-    if (data.employeeCategoryId) {
+    if (data?.bandName && data?.employeeCategoryId) {
       return true;
     }
     return false;
   };
+  useEffect(() => {
+    if (form && !readOnly && employeeRef.current) {
+      employeeRef.current.focus();
+    }
+  }, [form, readOnly]);
 
   const handleSubmitCustom = async (callback, data, text) => {
     try {
@@ -136,19 +127,17 @@ const ShiftCommonTemplateMaster = () => {
       handleSubmitCustom(addData, data, "Added");
     }
   };
+
   const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
         return;
       }
       try {
-        let deldata = await removeData(id).unwrap();
+        const deldata = await removeData(id).unwrap();
         if (deldata?.statusCode == 1) {
-          Swal.fire({
-            icon: "error",
-            title: "Child record Exists",
-            text: deldata.data?.message || "Data cannot be deleted!",
-          });
+          toast.error(deldata?.message);
+          setForm(false);
           return;
         }
         setId("");
@@ -164,18 +153,10 @@ const ShiftCommonTemplateMaster = () => {
           title: "Submission error",
           text: error.data?.message || "Something went wrong!",
         });
-        setForm(false);
       }
     }
   };
-  const getNextDocId = useCallback(() => {
-    if (id) return;
-    if (allData?.nextDocId) {
-      setDocId(allData?.nextDocId);
-    }
-  }, [allData, id]);
 
-  useEffect(getNextDocId, [getNextDocId]);
   const handleKeyDown = (event) => {
     let charCode = String.fromCharCode(event.which).toLowerCase();
     if ((event.ctrlKey || event.metaKey) && charCode === "s") {
@@ -186,9 +167,11 @@ const ShiftCommonTemplateMaster = () => {
 
   const onNew = () => {
     setId("");
+    setEmployeeCategoryId("");
+    setBandName("");
     setReadOnly(false);
-    setForm(true);
     setActive(true);
+    setForm(true);
     setSearchValue("");
   };
   const handleView = (id) => {
@@ -221,10 +204,16 @@ const ShiftCommonTemplateMaster = () => {
     },
 
     {
-      header: "Common Template Name",
+      header: "Employee Category Name",
       accessor: (item) => item?.employeeCategory?.name,
       //   cellClass: () => "  text-gray-900",
       className: " text-gray-900 text-center uppercase w-72",
+    },
+    {
+      header: "Grade Name",
+      accessor: (item) => item?.bandName,
+      //   cellClass: () => "  text-gray-900",
+      className: " text-gray-900 text-center uppercase w-44",
     },
 
     {
@@ -238,14 +227,11 @@ const ShiftCommonTemplateMaster = () => {
     value: val?.id,
     label: val?.name,
   }));
-
   return (
     <div>
       <div onKeyDown={handleKeyDown} className="p-1 ">
         <div className="w-full flex bg-white p-1 justify-between  items-center">
-          <h1 className="text-2xl font-bold text-gray-800">
-            Shift Common Template Master
-          </h1>
+          <h1 className="text-2xl font-semibold text-gray-800">Band Master</h1>
           <div className="flex items-center gap-4">
             <button
               onClick={() => {
@@ -254,7 +240,7 @@ const ShiftCommonTemplateMaster = () => {
               }}
               className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
             >
-              + Add New Shift Common Template
+              + Add New Band
             </button>
           </div>
         </div>
@@ -273,19 +259,17 @@ const ShiftCommonTemplateMaster = () => {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[45%]  h-[55%]"}
+            widthClass={"w-[50%]  h-[50%]"}
             onClose={() => {
               setForm(false);
-              setErrors({});
               setId("");
-              setEmployeeCategoryId("");
             }}
           >
             <div className="h-full flex flex-col bg-gray-100">
               <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
-                    Shift Common Template Master
+                  <h2 className="text-lg -ml-1 py-0.5 font-semibold  text-gray-800">
+                    Band Master
                   </h2>
                 </div>
                 <div className="flex gap-2">
@@ -318,26 +302,12 @@ const ShiftCommonTemplateMaster = () => {
                 </div>
               </div>
 
-              <div className="flex-1 overflow-auto p-3">
+              <div className="flex-1  p-3">
                 <div className="grid grid-cols-1  gap-3  h-full">
                   <div className="lg:col-span- space-y-3">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
                       <div className="space-y-4 ">
-                        <div className="flex gap-x-6">
-                          <div className="w-42">
-                            <TextInput
-                              name="Shift Common Template Code"
-                              type="text"
-                              value={docId}
-                              // setValue={setDocId}
-                              required={true}
-                              readOnly={readOnly}
-                              disabled={
-                                childRecord.current > 0 ? true : undefined
-                              }
-                            />
-                          </div>
-
+                        <div className="flex gap-x-8">
                           <div className="w-52">
                             <label className="block text-xs  font-bold text-slate-700 mb-1">
                               Employee Category
@@ -360,14 +330,37 @@ const ShiftCommonTemplateMaster = () => {
                               menuShouldScrollIntoView={false}
                               maxMenuHeight={150} // <-- Reduce height here
                               onInputChange={(value) => value.toUpperCase()}
-                              className="w-full px-1 text-[12px] text-black -ml-1 text-xs rounded-lg
+                              className="w-full px-1 -ml-1 text-xs rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
                               styles={customSelectStyles}
                             />
                           </div>
-                        </div>
 
+                          <div className="w-42">
+                            <TextInput
+                              name="Band Name"
+                              type="text"
+                              value={bandName}
+                              setValue={setBandName}
+                              required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                          </div>
+                          <div className="w-30">
+                            <DropdownInput
+                          
+                              name="Pay Type"
+                              value={payMethod}
+                              setValue={setPayMethod}
+                              required={true}
+                              readOnly={readOnly}
+                              options={payType}
+                              disabled={childRecord.current > 0}
+                            />
+                          </div>
+                        </div>
                         <div className="mt-5">
                           <ToggleButton
                             name="Status"
@@ -391,4 +384,4 @@ const ShiftCommonTemplateMaster = () => {
   );
 };
 
-export default ShiftCommonTemplateMaster;
+export default Form;

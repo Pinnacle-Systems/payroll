@@ -46,12 +46,10 @@ const ShiftTemplateMaster = () => {
   const [categoryId, setCategoryId] = useState("");
   const [date, setDate] = useState(null);
   const params = getCommonParams();
-  const[shiftId,setshiftId] = useState('')
+  const [shiftId, setshiftId] = useState("");
 
-  const { branchId,companyId } = params;
+  const { branchId, companyId } = params;
 
-  
-  
   const dispatch = useDispatch();
   const { data: company } = useGetCompanyQuery({ params });
   const [companyCode, setCompanyCode] = useState(company?.data[0].code);
@@ -106,9 +104,14 @@ const ShiftTemplateMaster = () => {
 
       setDescription(data?.description || "");
       setActive(id ? data?.active ?? false : true);
-      setShiftTemplateItems(
-        data?.ShiftTemplateItems ? data?.ShiftTemplateItems : []
-      );
+
+      const mappedGrid = data?.ShiftTemplateItems?.map((val) => ({
+        ...val,
+        date: val?.date
+          ? new Date(val?.date).toISOString().split("T")[0]
+          : null,
+      }));
+      setShiftTemplateItems(mappedGrid ? mappedGrid : []);
       setCategoryId(data?.category ? data?.category : "");
       childRecord.current = data?.childRecord ? data?.childRecord : 0;
     },
@@ -131,8 +134,6 @@ const ShiftTemplateMaster = () => {
     ShiftTemplateItems: ShiftTemplateItems?.filter((item) => item.templateId),
     categoryId,
   };
-
-  
 
   // const validateData = (data) => {
   //     if (!data?.categoryId) {
@@ -238,7 +239,7 @@ const ShiftTemplateMaster = () => {
 
   console.log(id, "id");
 
-   const deleteData = async (id) => {
+  const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
         return;
@@ -269,7 +270,7 @@ const ShiftTemplateMaster = () => {
         setForm(false);
       }
     }
-  };;
+  };
 
   const handleKeyDown = (event) => {
     let charCode = String.fromCharCode(event.which).toLowerCase();
@@ -342,7 +343,6 @@ const ShiftTemplateMaster = () => {
       //   cellClass: () => "  text-gray-900",
       className: " text-gray-900 text-center uppercase w-32",
     },
-    
   ];
 
   return (

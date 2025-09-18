@@ -263,7 +263,7 @@ const ShiftMaster = () => {
       header: "Shift Name",
       accessor: (item) => item?.name,
       //   cellClass: () => " text-gray-900",
-      className: "text-gray-900 text-center uppercase w-72",
+      className: "text-gray-900 text-left pl-2 uppercase w-60",
     },
 
     {

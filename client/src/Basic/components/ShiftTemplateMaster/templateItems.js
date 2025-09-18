@@ -50,6 +50,9 @@ const TemplateItems = ({
   refetch,
 }) => {
   const [modal, setModal] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedIndex, setSelectedIndex] = useState(null);
+
   const [secondModal, setSecondModal] = useState(false);
   const [contextMenu, setContextMenu] = useState(null);
   const [errors, setErrors] = useState({});
@@ -72,6 +75,9 @@ const TemplateItems = ({
     newBlend[index][field] = value;
 
     setShiftTemplateItems(newBlend);
+    if (index === selectedIndex) {
+      setSelectedRow((prev) => ({ ...prev, [field]: value }));
+    }
   };
 
   const addNewRow = () => {
@@ -145,7 +151,8 @@ const TemplateItems = ({
                   setValue={setCompanyCode}
                   required={true}
                   // readOnly={readOnly}
-                  disabled={true}
+                                         disabled={readOnly || childRecord.current > 0 }
+
                 /> */}
                 <div className="">
                   <TextInput
@@ -185,7 +192,7 @@ const TemplateItems = ({
                     S.No
                   </th>
                   <th
-                    className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
+                    className={`w-[55px] py-2 text-center font-medium text-[13px] `}
                   >
                     Applied On
                   </th>
@@ -251,7 +258,7 @@ const TemplateItems = ({
                       {index + 1}
                     </td>
 
-                    <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className=" border border-gray-300 text-[12px] py-0.5 item-center">
                       <input
                         type="date"
                         value={
@@ -262,16 +269,18 @@ const TemplateItems = ({
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "date")
                         }
-                        className="bg-transparent"
-                        disabled={childRecord.current > 0}
-                        readOnly={readOnly}
+                        className={`bg-transparent pl-1 focus:outline-none ${
+                          readOnly || childRecord.current > 0
+                            ? "text-gray-600"
+                            : "text-black"
+                        }`}
+                        disabled={readOnly || childRecord.current > 0}
                       />
                     </td>
-                    <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className=" border border-gray-300 text-[12px] py-0.5 item-center">
                       <select
                         // onKeyDown={e => { if (e.key === "Delete") { handleInputChange("", index, "accessoryGroupId") } }}
-                        disabled={childRecord.current > 0}
-                        readOnly={readOnly}
+                        disabled={readOnly || childRecord.current > 0}
                         className="text-left w-full focus:outline-none rounded py-1 bg-transparent"
                         value={item.templateId}
                         onChange={(e) =>
@@ -292,10 +301,9 @@ const TemplateItems = ({
                       </select>
                     </td>
 
-                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
                       <select
-                        disabled={childRecord.current > 0}
-                        readOnly={readOnly}
+                        disabled={readOnly || childRecord.current > 0}
                         className="text-left focus:outline-none w-full rounded py-1 bg-transparent"
                         value={item.shiftId}
                         onChange={(e) =>
@@ -313,7 +321,7 @@ const TemplateItems = ({
                         ))}
                       </select>
                     </td>
-                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
                       <input
                         type="text"
                         value={
@@ -323,11 +331,15 @@ const TemplateItems = ({
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "shiftFrom")
                         }
-                        className="w-full bg-transparent text-center  focus:outline-none focus:border-transparent"
-                        disabled={true}
+                        className={`w-full bg-transparent text-center  focus:outline-none focus:border-transparent ${
+                          readOnly || childRecord.current > 0
+                            ? "text-gray-600"
+                            : "text-black"
+                        }`}
+                        readOnly
                       />
                     </td>
-                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
                       <input
                         type="text"
                         value={
@@ -337,15 +349,18 @@ const TemplateItems = ({
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "shiftTo")
                         }
-                        className="w-full bg-transparent text-center  focus:outline-none focus:border-transparent"
-                        disabled={true}
+                        className={`w-full bg-transparent text-center  focus:outline-none focus:border-transparent ${
+                          readOnly || childRecord.current > 0
+                            ? "text-gray-600"
+                            : "text-black"
+                        }`}
+                        readOnly
                       />
                     </td>
                     {/* In Next Day */}
-                    <td className="border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className="border border-gray-300 text-[12px] py-0.5 item-center">
                       <select
-                        disabled={childRecord.current > 0}
-                        readOnly={readOnly}
+                        disabled={readOnly || childRecord.current > 0}
                         className="text-left w-full bg-transparent focus:outline-none rounded py-1"
                         value={item.inNextDay}
                         onChange={(e) =>
@@ -363,7 +378,11 @@ const TemplateItems = ({
                     <td className="border border-gray-300  text-center">
                       <button
                         className="text-blue-600 text-center   bg-blue-50 rounded"
-                        onClick={() => setModal(true)}
+                        onClick={() => {
+                          setModal(true);
+                          setSelectedRow(item);
+                          setSelectedIndex(index);
+                        }}
                         title="Open"
                       >
                         <svg
@@ -384,7 +403,11 @@ const TemplateItems = ({
                     <td className="text-center border border-gray-300">
                       <button
                         className="text-blue-600 text-center   bg-blue-50 rounded"
-                        onClick={() => setSecondModal(true)}
+                        onClick={() => {
+                          setSecondModal(true);
+                          setSelectedRow(item);
+                          setSelectedIndex(index);
+                        }}
                         title="Open"
                       >
                         <svg
@@ -402,396 +425,12 @@ const TemplateItems = ({
                         </svg>
                       </button>
                     </td>
-                    {modal === true && (
-                      <Modal
-                        isOpen={modal}
-                        form={modal}
-                        widthClass={"w-[50%]  h-[45%]"}
-                        onClose={() => {
-                          setModal(false);
-                          setErrors({});
-                        }}
-                      >
-                        <div className="h-full flex flex-col bg-gray-100">
-                          <div className="border-b py-2 px-2 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
-                            <div className="flex items-center">
-                              <h2 className="text-lg  py-0.5 font-semibold  text-gray-800">
-                                Tolerance
-                              </h2>
-                            </div>
-                          </div>
-
-                          <div className="flex-1 overflow-auto p-3">
-                            <div className="grid grid-cols-1  gap-3  h-full">
-                              <div className="lg:col-span- space-y-3">
-                                <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
-                                  <div className="space-y-4 ">
-                                    <div className="flex gap-y-6  gap-x-6">
-                                      {/* Tolerance Before Start */}
-                                      <div className="mb-3">
-                                        <label className="block text-xs font-bold text-slate-700 mb-1">
-                                          Tolerance Before Start
-                                        </label>
-                                        <input
-                                          min="0"
-                                          type="text"
-                                          value={item?.toleranceInBeforeStart}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "toleranceInBeforeStart"
-                                            )
-                                          }
-                                          className="w-[120px] px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
-          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-          transition-all duration-150 shadow-sm"
-                                          disabled={childRecord.current > 0}
-                                          readOnly={readOnly}
-                                        />
-                                      </div>
-
-                                      {/* Tolerance After End */}
-                                      <div className="mb-3 ">
-                                        <label className="block text-xs  font-bold text-slate-700 mb-1">
-                                          Tolerance After Start
-                                        </label>
-                                        <input
-                                          min="0"
-                                          type="text"
-                                          value={item?.toleranceInAfterEnd}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "toleranceInAfterEnd"
-                                            )
-                                          }
-                                          className="w-[120px] px-3 py-1  text-xs border uppercase border-gray-300 rounded-lg
-          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-          transition-all duration-150 shadow-sm"
-                                          disabled={childRecord.current > 0}
-                                          readOnly={readOnly}
-                                        />
-                                      </div>
-
-                                      {/* Tolerance Before Start (Out) */}
-                                      <div className="mb-3 ">
-                                        <label className="block text-xs  font-bold text-slate-700 mb-1">
-                                          Tolerance Before End
-                                        </label>
-                                        <input
-                                          min="0"
-                                          type="text"
-                                          value={item?.toleranceOutBeforeStart}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "toleranceOutBeforeStart"
-                                            )
-                                          }
-                                          className="w-[120px] px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
-          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-          transition-all duration-150 shadow-sm"
-                                          disabled={childRecord.current > 0}
-                                          readOnly={readOnly}
-                                        />
-                                      </div>
-
-                                      {/* Tolerance After End (Out) */}
-                                      <div className="mb-3">
-                                        <label className="block text-xs  font-bold text-slate-700 mb-1">
-                                          Tolerance After End
-                                        </label>
-                                        <input
-                                          min="0"
-                                          type="text"
-                                          value={item?.toleranceOutAfterEnd}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "toleranceOutAfterEnd"
-                                            )
-                                          }
-                                          className=" w-[120px] px-3 py-1  text-xs border uppercase border-gray-300 rounded-lg
-          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-          transition-all duration-150 shadow-sm"
-                                          disabled={childRecord.current > 0}
-                                          readOnly={readOnly}
-                                        />
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </Modal>
-                    )}
-
-                    {secondModal && (
-                      <Modal
-                        isOpen={secondModal}
-                        form={secondModal}
-                        widthClass={"w-[50%] h-[55%]"} // Adjust width/height if needed
-                        onClose={() => {
-                          setSecondModal(false);
-                          setErrors({});
-                        }}
-                      >
-                        <div className="h-full flex flex-col bg-gray-100">
-                          {/* Header */}
-                          <div className="border-b py-2 px-2 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
-                            <div className="flex items-center">
-                              <h2 className="text-lg py-0.5 font-semibold text-gray-800">
-                                Break
-                              </h2>
-                            </div>
-                          </div>
-
-                          {/* Body */}
-                          <div className="flex-1 overflow-auto p-3">
-                            <div className="grid grid-cols-1 gap-3 h-full">
-                              <div className="space-y-3">
-                                <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
-                                  <div className="space-y-4">
-                                    <div className="flex flex-wrap gap-y-6 gap-x-10">
-                                      {/* First Break Out */}
-                                      <div className="mb-3 w-24">
-                                        <label className="block text-xs font-bold  text-slate-700 mb-1">
-                                          First Break Out
-                                        </label>
-                                        <input
-                                          min="0"
-                                          type="text"
-                                          value={item?.fbOut}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "fbOut"
-                                            )
-                                          }
-                                          className="w-full px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
-                      focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                      transition-all duration-150 shadow-sm"
-                                          disabled={childRecord.current > 0}
-                                          readOnly={readOnly}
-                                        />
-                                      </div>
-
-                                      {/* First Break In */}
-                                      <div className="mb-3 w-24">
-                                        <label className="block text-xs font-bold  text-slate-700 mb-1">
-                                          First Break In
-                                        </label>
-                                        <input
-                                          min="0"
-                                          type="text"
-                                          value={item?.fbIn}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "fbIn"
-                                            )
-                                          }
-                                          className="w-full px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
-                      focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                      transition-all duration-150 shadow-sm"
-                                          disabled={childRecord.current > 0}
-                                          readOnly={readOnly}
-                                        />
-                                      </div>
-
-                                      {/* Lunch B.ST */}
-                                      <div className="mb-3 w-24">
-                                        <label className="block text-xs font-bold  text-slate-700 mb-1">
-                                          Lunch Start
-                                        </label>
-                                        <input
-                                          min="0"
-                                          type="text"
-                                          value={item?.lunchBst}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "lunchBst"
-                                            )
-                                          }
-                                          className="w-full px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
-                      focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                      transition-all duration-150 shadow-sm"
-                                          disabled={childRecord.current > 0}
-                                          readOnly={readOnly}
-                                        />
-                                      </div>
-
-                                      {/* LB.SNDay */}
-                                      <div className="mb-3 w-24">
-                                        <label className="block text-xs font-bold text-slate-700 mb-1">
-                                          LB.SNDay
-                                        </label>
-                                        <select
-                                          disabled={childRecord.current > 0}
-                                          readOnly={readOnly}
-                                          className="w-full px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
-                      focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                      transition-all duration-150 shadow-sm"
-                                          value={item?.lBSNDay}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "lBSNDay"
-                                            )
-                                          }
-                                        >
-                                          <option>Select</option>
-                                          {commonNew.map((blend) => (
-                                            <option
-                                              value={blend.value}
-                                              key={blend.value}
-                                            >
-                                              {blend?.show}
-                                            </option>
-                                          ))}
-                                        </select>
-                                      </div>
-
-                                      {/* Lunch B.ET */}
-                                      <div className="mb-3 w-24">
-                                        <label className="block text-xs font-bold text-slate-700 mb-1">
-                                          Lunch End
-                                        </label>
-                                        <input
-                                          min="0"
-                                          type="text"
-                                          value={item?.lunchBET}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "lunchBET"
-                                            )
-                                          }
-                                          className="w-full px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
-                      focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                      transition-all duration-150 shadow-sm"
-                                          disabled={childRecord.current > 0}
-                                          readOnly={readOnly}
-                                        />
-                                      </div>
-
-                                      {/* LB.ENDay */}
-                                      <div className="mb-3 w-24">
-                                        <label className="block text-xs font-bold  text-slate-700 mb-1">
-                                          LB.ENDay
-                                        </label>
-                                        <select
-                                          disabled={childRecord.current > 0}
-                                          readOnly={readOnly}
-                                          className="w-full px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
-                      focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                      transition-all duration-150 shadow-sm"
-                                          value={item?.lBEnday}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "lBEnday"
-                                            )
-                                          }
-                                        >
-                                          <option>Select</option>
-                                          {commonNew.map((blend) => (
-                                            <option
-                                              value={blend.value}
-                                              key={blend.value}
-                                            >
-                                              {blend?.show}
-                                            </option>
-                                          ))}
-                                        </select>
-                                      </div>
-
-                                      {/* Second Break Out */}
-                                      <div className="mb-3 w-[100px]">
-                                        <label className="block text-xs font-bold -ml-1 text-slate-700 mb-1">
-                                          Second Break Out
-                                        </label>
-                                        <input
-                                          min="0"
-                                          type="text"
-                                          value={item?.sbOut}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "sbOut"
-                                            )
-                                          }
-                                          className="w-full px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
-                      focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                      transition-all duration-150 shadow-sm"
-                                          disabled={childRecord.current > 0}
-                                          readOnly={readOnly}
-                                        />
-                                      </div>
-
-                                      {/* Second Break In */}
-                                      <div className="mb-3 w-24">
-                                        <label className="block text-xs font-bold  text-slate-700 mb-1">
-                                          Second Break In
-                                        </label>
-                                        <input
-                                          min="0"
-                                          type="text"
-                                          value={item?.sbIn}
-                                          onFocus={(e) => e.target.select()}
-                                          onChange={(e) =>
-                                            handleInputChange(
-                                              e.target.value,
-                                              index,
-                                              "sbIn"
-                                            )
-                                          }
-                                          className="w-full px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
-                      focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                      transition-all duration-150 shadow-sm"
-                                          disabled={childRecord.current > 0}
-                                          readOnly={readOnly}
-                                        />
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </Modal>
-                    )}
 
                     {/* Out Next Day */}
-                    <td className="border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className="border border-gray-300 text-[12px] py-0.5 item-center">
                       <select
-                        disabled={childRecord.current > 0}
-                        readOnly={readOnly}
-                        className="text-left w-full bg-transparent focus:outline-none rounded py-1 "
+                        disabled={readOnly || childRecord.current > 0}
+                        className="text-left w-full bg-transparent text-[12px] focus:outline-none rounded py-1 "
                         value={item.outNxtDay}
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "outNxtDay")
@@ -806,10 +445,10 @@ const TemplateItems = ({
                       </select>
                     </td>
                     {/* Shift Time Hrs */}
-                    <td className="border border-gray-300 text-[11px] py-0.5 item-center ">
+                    <td className="border border-gray-300 text-[12px] py-0.5 item-center ">
                       <input
                         min={"0"}
-                        type="text"
+                        type="number"
                         value={item?.shiftTimeHrs}
                         onFocus={(e) => e.target.select()}
                         onChange={(e) =>
@@ -819,24 +458,30 @@ const TemplateItems = ({
                             "shiftTimeHrs"
                           )
                         }
-                        className="w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2"
-                        disabled={childRecord.current > 0}
-                        readOnly={readOnly}
+                        className={`w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2 ${
+                          readOnly || childRecord.current > 0
+                            ? "text-gray-600"
+                            : "text-black"
+                        }`}
+                        disabled={readOnly || childRecord.current > 0}
                       />
                     </td>
                     {/* OT Hrs */}
-                    <td className="border border-gray-300 text-[11px] py-0.5 item-center">
+                    <td className="border border-gray-300 text-[12px] py-0.5 item-center">
                       <input
                         min={"0"}
-                        type="text"
+                        type="number"
                         value={item?.otHrs}
                         onFocus={(e) => e.target.select()}
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "otHrs")
                         }
-                        className="w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2"
-                        disabled={childRecord.current > 0}
-                        readOnly={readOnly}
+                        className={`w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2 ${
+                          readOnly || childRecord.current > 0
+                            ? "text-gray-600"
+                            : "text-black"
+                        }`}
+                        disabled={readOnly || childRecord.current > 0}
                         onContextMenu={(e) => {
                           if (!readOnly) {
                             handleRightClick(e, index, "shiftTimeHrs");
@@ -858,6 +503,409 @@ const TemplateItems = ({
             </table>
           </div>
         </div>
+        {modal && selectedRow && (
+          <Modal
+            isOpen={modal}
+            widthClass="w-[50%] h-[45%]"
+            onClose={() => {
+              setModal(false);
+              setErrors({});
+            }}
+          >
+            <div className="h-full flex flex-col bg-gray-100">
+              <div className="border-b py-2 px-2 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
+                <div className="flex items-center">
+                  <h2 className="text-lg py-0.5 font-semibold text-gray-800">
+                    Tolerance
+                  </h2>
+                </div>
+              </div>
+
+              <div className="flex-1 overflow-auto p-3">
+                <div className="grid grid-cols-1 gap-3 h-full">
+                  <div className="space-y-3">
+                    <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
+                      <div className="space-y-4">
+                        <div className="flex gap-y-6 gap-x-6">
+                          {/* Tolerance Before Start */}
+                          <div className="mb-3">
+                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                              Tolerance Before Start
+                            </label>
+                            <input
+                              min="0"
+                              type="text"
+                              value={selectedRow?.toleranceInBeforeStart || ""}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e.target.value,
+                                  selectedIndex,
+                                  "toleranceInBeforeStart"
+                                )
+                              }
+                              className={`w-[120px] px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
+                        focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                        transition-all duration-150 shadow-sm ${
+                          readOnly || childRecord.current > 0
+                            ? "text-gray-600"
+                            : "text-black"
+                        } `}
+                              disabled={readOnly || childRecord.current > 0}
+                            />
+                          </div>
+
+                          {/* Tolerance After End */}
+                          <div className="mb-3">
+                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                              Tolerance After Start
+                            </label>
+                            <input
+                              min="0"
+                              type="text"
+                              value={selectedRow?.toleranceInAfterEnd || ""}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e.target.value,
+                                  selectedIndex,
+                                  "toleranceInAfterEnd"
+                                )
+                              }
+                              className={`w-[120px] px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
+                        focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                        transition-all duration-150 shadow-sm ${
+                          readOnly || childRecord.current > 0
+                            ? "text-gray-600"
+                            : "text-black"
+                        } `}
+                              disabled={readOnly || childRecord.current > 0}
+                            />
+                          </div>
+
+                          {/* Tolerance Before End */}
+                          <div className="mb-3">
+                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                              Tolerance Before End
+                            </label>
+                            <input
+                              min="0"
+                              type="text"
+                              value={selectedRow?.toleranceOutBeforeStart || ""}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e.target.value,
+                                  selectedIndex,
+                                  "toleranceOutBeforeStart"
+                                )
+                              }
+                              className={`w-[120px] px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
+                        focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                        transition-all duration-150 shadow-sm ${
+                          readOnly || childRecord.current > 0
+                            ? "text-gray-600"
+                            : "text-black"
+                        }`}
+                              disabled={readOnly || childRecord.current > 0}
+                            />
+                          </div>
+
+                          {/* Tolerance After End */}
+                          <div className="mb-3">
+                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                              Tolerance After End
+                            </label>
+                            <input
+                              min="0"
+                              type="text"
+                              value={selectedRow?.toleranceOutAfterEnd || ""}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e.target.value,
+                                  selectedIndex,
+                                  "toleranceOutAfterEnd"
+                                )
+                              }
+                              className={`w-[120px] px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
+                        focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                        transition-all duration-150 shadow-sm ${
+                          readOnly || childRecord.current > 0
+                            ? "text-gray-600"
+                            : "text-black"
+                        }`}
+                              disabled={readOnly || childRecord.current > 0}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Modal>
+        )}
+
+        {secondModal && selectedRow && (
+          <Modal
+            isOpen={secondModal}
+            widthClass="w-[50%] h-[55%]"
+            onClose={() => {
+              setSecondModal(false);
+              setErrors({});
+            }}
+          >
+            <div className="h-full flex flex-col bg-gray-100">
+              {/* Header */}
+              <div className="border-b py-2 px-2 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
+                <div className="flex items-center">
+                  <h2 className="text-lg py-0.5 font-semibold text-gray-800">
+                    Break
+                  </h2>
+                </div>
+              </div>
+
+              {/* Body */}
+              <div className="flex-1 overflow-auto p-3">
+                <div className="grid grid-cols-1 gap-3 h-full">
+                  <div className="space-y-3">
+                    <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
+                      <div className="space-y-4">
+                        <div className="flex flex-wrap gap-y-6 gap-x-10">
+                          {/* First Break Out */}
+                          <div className="mb-3 w-24">
+                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                              First Break Out
+                            </label>
+                            <input
+                              min="0"
+                              type="text"
+                              value={selectedRow?.fbOut || ""}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e.target.value,
+                                  selectedIndex,
+                                  "fbOut"
+                                )
+                              }
+                              className={`w-full px-3 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
+                        focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                        transition-all duration-150 shadow-sm ${
+                          readOnly || childRecord.current > 0
+                            ? "text-gray-600"
+                            : "text-black"
+                        }`}
+                              disabled={readOnly || childRecord.current > 0}
+                            />
+                          </div>
+
+                          {/* First Break In */}
+                          <div className="mb-3 w-24">
+                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                              First Break In
+                            </label>
+                            <input
+                              min="0"
+                              type="text"
+                              value={selectedRow?.fbIn || ""}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e.target.value,
+                                  selectedIndex,
+                                  "fbIn"
+                                )
+                              }
+                              className={`w-full px-3 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
+                        focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                        transition-all duration-150 shadow-sm ${
+                          readOnly || childRecord.current > 0
+                            ? "text-gray-600"
+                            : "text-black"
+                        } `}
+                              disabled={readOnly || childRecord.current > 0}
+                            />
+                          </div>
+
+                          {/* Lunch Start */}
+                          <div className="mb-3 w-24">
+                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                              Lunch Start
+                            </label>
+                            <input
+                              min="0"
+                              type="text"
+                              value={selectedRow?.lunchBst || ""}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e.target.value,
+                                  selectedIndex,
+                                  "lunchBst"
+                                )
+                              }
+                              className={`w-full px-3 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
+                        focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                        transition-all duration-150 shadow-sm ${
+                          readOnly || childRecord.current > 0
+                            ? "text-gray-600"
+                            : "text-black"
+                        } `}
+                              disabled={readOnly || childRecord.current > 0}
+                            />
+                          </div>
+
+                          {/* LB.SNDay */}
+                          <div className="mb-3 w-24">
+                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                              LB.SNDay
+                            </label>
+                            <select
+                              disabled={readOnly || childRecord.current > 0}
+                              className="w-full px-1 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
+                        focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                        transition-all duration-150 shadow-sm"
+                              value={selectedRow?.lBSNDay || ""}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e.target.value,
+                                  selectedIndex,
+                                  "lBSNDay"
+                                )
+                              }
+                            >
+                              <option value="">Select</option>
+                              {commonNew.map((blend) => (
+                                <option value={blend.value} key={blend.value}>
+                                  {blend?.show}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          {/* Lunch End */}
+                          <div className="mb-3 w-24">
+                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                              Lunch End
+                            </label>
+                            <input
+                              min="0"
+                              type="text"
+                              value={selectedRow?.lunchBET || ""}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e.target.value,
+                                  selectedIndex,
+                                  "lunchBET"
+                                )
+                              }
+                              className={`w-full px-3 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
+                        focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                        transition-all duration-150 shadow-sm ${
+                          readOnly || childRecord.current > 0
+                            ? "text-gray-600"
+                            : "text-black"
+                        } `}
+                              disabled={readOnly || childRecord.current > 0}
+                            />
+                          </div>
+
+                          {/* LB.ENDay */}
+                          <div className="mb-3 w-24">
+                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                              LB.ENDay
+                            </label>
+                            <select
+                              disabled={readOnly || childRecord.current > 0}
+                              className="w-full px-1 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
+                        focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                        transition-all duration-150 shadow-sm"
+                              value={selectedRow?.lBEnday || ""}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e.target.value,
+                                  selectedIndex,
+                                  "lBEnday"
+                                )
+                              }
+                            >
+                              <option value="">Select</option>
+                              {commonNew.map((blend) => (
+                                <option value={blend.value} key={blend.value}>
+                                  {blend?.show}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          {/* Second Break Out */}
+                          <div className="mb-3 w-[100px]">
+                            <label className="block text-xs font-bold -ml-1 text-slate-700 mb-1">
+                              Second Break Out
+                            </label>
+                            <input
+                              min="0"
+                              type="text"
+                              value={selectedRow?.sbOut || ""}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e.target.value,
+                                  selectedIndex,
+                                  "sbOut"
+                                )
+                              }
+                              className={`w-full px-3 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
+                        focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                        transition-all duration-150 shadow-sm ${
+                          readOnly || childRecord.current > 0
+                            ? "text-gray-600"
+                            : "text-black"
+                        }`}
+                              disabled={readOnly || childRecord.current > 0}
+                            />
+                          </div>
+
+                          {/* Second Break In */}
+                          <div className="mb-3 w-24">
+                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                              Second Break In
+                            </label>
+                            <input
+                              min="0"
+                              type="text"
+                              value={selectedRow?.sbIn || ""}
+                              onFocus={(e) => e.target.select()}
+                              onChange={(e) =>
+                                handleInputChange(
+                                  e.target.value,
+                                  selectedIndex,
+                                  "sbIn"
+                                )
+                              }
+                              className={`w-full px-3 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
+                        focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+                        transition-all duration-150 shadow-sm ${
+                          readOnly || childRecord.current > 0
+                            ? "text-gray-600"
+                            : "text-black"
+                        }`}
+                              disabled={readOnly || childRecord.current > 0}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Modal>
+        )}
 
         {contextMenu && (
           <div
