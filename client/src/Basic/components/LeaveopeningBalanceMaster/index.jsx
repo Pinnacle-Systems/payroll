@@ -25,6 +25,7 @@ import { useGetBranchQuery } from "../../../redux/services/BranchMasterService";
 import { useGetEmployeeQuery } from "../../../redux/services/EmployeeMasterService";
 import Select from "react-select";
 import { useGetLeaveCodeQuery } from "../../../redux/services/LeaveCode.servive";
+import { useDispatch } from "react-redux";
 const Designation = () => {
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
@@ -38,6 +39,7 @@ const Designation = () => {
   const [code, setCode] = useState("");
   const [openingBalance, setOpeningBalance] = useState("");
   const [active, setActive] = useState(true);
+  const dispatch = useDispatch();
 
   const [form, setForm] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -138,6 +140,10 @@ const Designation = () => {
           Swal.showLoading();
         },
       });
+      dispatch({
+        type: `leaveCode/invalidateTags`,
+        payload: ["leaveCode"],
+      });
       setForm(false);
     } catch (error) {
       Swal.fire({
@@ -185,6 +191,10 @@ const Designation = () => {
           title: "Deleted Successfully",
           icon: "success",
           timer: 1000,
+        });
+        dispatch({
+          type: `leaveCode/invalidateTags`,
+          payload: ["leaveCode"],
         });
         setForm(false);
       } catch (error) {
@@ -476,7 +486,6 @@ const Designation = () => {
                               // required={true}
                               readOnly={readOnly}
                               disabled={childRecord.current > 0}
-                              
                             />
                           </div>
                         </div>

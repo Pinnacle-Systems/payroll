@@ -54,18 +54,29 @@ const Form = () => {
   useEffect(() => {
     if (machineInOutGrid?.length >= 1) return;
     setMachineInOutGrid((prev) => {
-      let newArray = Array?.from({ length: 1 - prev?.length }, () => {
-        return {
-         machineInOutGridId : "",
-        };
-      }) || []
+      let newArray =
+        Array?.from({ length: 1 - prev?.length }, () => {
+          return {
+            machineInOutGridId: "",
+          };
+        }) || [];
       return [...prev, ...newArray];
     });
   }, [machineInOutGrid, setMachineInOutGrid]);
 
   const syncFormWithDb = useCallback(
     (data) => {
-      setMachineInOutGrid(data?.machineInOutGrid || []);
+      const mappedGrid = data?.MachineInOutGrid?.map((value) => ({
+        ...value,
+        date: value?.date
+          ? new Date(value?.date).toISOString().split("T")[0]
+          : null,
+        
+      }));
+      setMachineInOutGrid(mappedGrid || []);
+
+      console.log(mappedGrid,"mappedGrid");
+      
     },
     [id]
   );
@@ -93,7 +104,9 @@ const Form = () => {
     }
 
     if (
-      machineInOutGrid?.some((i) => !i.machineInOutGridId || i.machineInOutGridId === "")
+      machineInOutGrid?.some(
+        (i) => !i.machineInOutGridId || i.machineInOutGridId === ""
+      )
     ) {
       Swal.fire({
         icon: "error",
@@ -137,9 +150,9 @@ const Form = () => {
   };
 
   const saveData = () => {
-    if (!validateData(data)) {
-      return;
-    }
+    // if (!validateData(data)) {
+    //   return;
+    // }
 
     if (id) {
       handleSubmitCustom(updateData, data, "Updated");
@@ -199,7 +212,7 @@ const Form = () => {
 
     setReadOnly(false);
     setSearchValue("");
-   
+
     setMachineInOutGrid([]);
 
     refetch();
@@ -208,13 +221,11 @@ const Form = () => {
     setId(id);
     setForm(true);
     setReadOnly(true);
-   
   };
   const handleEdit = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(false);
-   
   };
 
   const columns = [
@@ -225,16 +236,10 @@ const Form = () => {
     },
 
     {
-      header: "Doc Id",
-      accessor: (item) => item?.docId,
+      header: "Company Code",
+      accessor: (item) => item?.branchCode,
       //   cellClass: () => "  text-gray-900",
-      className: " text-gray-900 text-left pl-2 uppercase w-32",
-    },
-    {
-      header: "Date",
-      accessor: (item) => new Date(item?.date).toISOString().split("T")[0],
-      //   cellClass: () => "  text-gray-900",
-      className: " text-gray-900 text-center uppercase w-32",
+      className: " text-gray-900 text-left pl-2 uppercase w-44",
     },
   ];
   const handleRightClick = (event, rowIndex, type) => {
@@ -251,14 +256,25 @@ const Form = () => {
     setContextMenu(null);
   };
   console.log(machineInOutGrid, "machineInOutGrid");
-
   const handleInputChange = (value, index, field) => {
     const newBlend = structuredClone(machineInOutGrid);
 
     newBlend[index][field] = value;
 
+    // Auto-calculate machineTypeTwo if machineTypeOne changes
+    if (field === "machineTypeOne") {
+      if (value === "IN" || value === "OUT") {
+        newBlend[index].machineTypeTwo = "SEPARATE MACHINE";
+      } else if (value) {
+        newBlend[index].machineTypeTwo = "SINGLE MACHINE";
+      } else {
+        newBlend[index].machineTypeTwo = ""; // keep empty if not chosen
+      }
+    }
+
     setMachineInOutGrid(newBlend);
   };
+
   const addNewRow = () => {
     const newRow = { machineInOutGridId: "" };
     setMachineInOutGrid([...machineInOutGrid, newRow]);
@@ -341,7 +357,7 @@ const Form = () => {
                   </div>
                 </div>
                 <div
-                  className={`w-[80vw]   p-2 overflow-auto bg-white max-h-[370px]`}
+                  className={`w-[85vw]   p-2 overflow-auto bg-white max-h-[370px]`}
                 >
                   <table className="w-full border-collapse table-fixed ">
                     <thead className="bg-gray-200 text-gray-800">
@@ -353,7 +369,7 @@ const Form = () => {
                         </th>
 
                         <th
-                          className={`w-7  py-2 text-center font-medium text-[13px] `}
+                          className={`w-[30px]  py-2 text-center font-medium text-[13px] `}
                         >
                           Date
                         </th>
@@ -397,19 +413,7 @@ const Form = () => {
                     </thead>
                     <tbody>
                       {machineInOutGrid?.map((item, index) => {
-                        let machineTypeTwo = "";
-
-                        // Only set value if machineTypeOne exists
-                        if (item?.machineTypeOne) {
-                          if (
-                            item.machineTypeOne === "IN" ||
-                            item.machineTypeOne === "OUT"
-                          ) {
-                            machineTypeTwo = "SEPARATE MACHINE";
-                          } else {
-                            machineTypeTwo = "SINGLE MACHINE";
-                          }
-                        }
+                       
 
                         return (
                           <tr className=" w-full table-row">
@@ -417,7 +421,7 @@ const Form = () => {
                               {index + 1}
                             </td>
 
-                            <td className=" border border-gray-300 text-[11px] ">
+                            <td className=" border border-gray-300 text-[11px] py-0.5 item-center ">
                               <input
                                 type="date"
                                 value={item?.date}
@@ -428,7 +432,7 @@ const Form = () => {
                                     "date"
                                   )
                                 }
-                                className="pl-1 bg-transparent  focus:outline-none focus:border-transparent"
+                                className="pl-1 bg-transparent   focus:outline-none focus:border-transparent"
                                 disabled={readOnly}
                               />
                             </td>
@@ -479,7 +483,7 @@ const Form = () => {
                             <td className="border border-gray-300 text-[11px] py-0.5 item-center">
                               <input
                                 min="0"
-                                type="text"
+                                type="number"
                                 value={item?.machineNo}
                                 onFocus={(e) => e.target.select()}
                                 onChange={(e) =>
@@ -499,7 +503,7 @@ const Form = () => {
                             <td className="border border-gray-300 text-[11px] py-0.5 item-center">
                               <input
                                 type="text"
-                                value={machineTypeTwo || ""}
+                                value={item?.machineTypeTwo || ""}
                                 // onChange={(e) =>
                                 //   handleInputChange(
                                 //     e.target.value,

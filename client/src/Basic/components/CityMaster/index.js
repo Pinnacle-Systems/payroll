@@ -47,8 +47,8 @@ export default function Form() {
   const dispatch = useDispatch();
   const cityNameRef = useRef(null);
 
-  const params = getCommonParams()
-  const {branchId,companyId} = params
+  const params = getCommonParams();
+  const { branchId, companyId } = params;
   const {
     data: stateList,
     isLoading: isStateLoading,
@@ -91,7 +91,8 @@ export default function Form() {
     active,
     state,
     id,
-    branchId,companyId
+    branchId,
+    companyId,
   };
   useEffect(() => {
     if (form && !readOnly && cityNameRef.current) {
@@ -296,12 +297,12 @@ export default function Form() {
     label: val?.name,
   }));
   const selectedOption = options?.find((opt) => opt?.value === state) || null;
-  
+
   return (
     <>
       <div onKeyDown={handleKeyDown} className="p-1">
         <div className="w-full flex bg-white p-1 justify-between  items-center">
-          <h5 className="text-2xl font-bold text-gray-800">City Master</h5>
+          <h5 className="text-2xl font-semibold text-gray-800">City Master</h5>
           <div className="flex items-center gap-4">
             <button
               onClick={() => {
@@ -330,7 +331,7 @@ export default function Form() {
             <Modal
               isOpen={form}
               form={form}
-              widthClass={"w-[45%] h-[65%]"}
+              widthClass={"w-[45%] h-[70%]"}
               onClose={() => {
                 setForm(false);
                 setErrors({});
@@ -340,7 +341,7 @@ export default function Form() {
               <div className="h-full flex flex-col bg-gray-100">
                 <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                   <div className="flex items-center gap-2">
-                    <h2 className="text-lg  py-0.5 font-semibold  text-gray-800">
+                    <h2 className="text-lg -ml-2  py-0.5 font-semibold  text-gray-800">
                       City Master
                     </h2>
                   </div>
@@ -374,7 +375,7 @@ export default function Form() {
                   </div>
                 </div>
 
-                <div className="flex-1 overflow-auto p-3">
+                <div className="flex-1  p-3">
                   <div className="grid grid-cols-1  gap-3  h-full">
                     <div className="lg:col-span- space-y-3">
                       <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
@@ -409,8 +410,8 @@ export default function Form() {
                                 />
                               </div>
                             </div>
-                            <div className="flex flex-wrap w-full gap-x-6">
-                              <div className="mb-3 w-60">
+                            <div className="flex flex-wrap w-full gap-x-4">
+                              <div className="mb-3 w-[250px]">
                                 {/* <DropdownInput
                                   name="State"
                                   options={dropDownListObject(
@@ -441,7 +442,9 @@ export default function Form() {
                                   onChange={(selected) =>
                                     setState(selected?.value || "")
                                   }
-                                  isDisabled={readOnly}
+                                  isDisabled={
+                                    readOnly || childRecord.current > 0
+                                  }
                                   isSearchable
                                   isClearable={false}
                                   menuShouldScrollIntoView={false}
@@ -454,10 +457,9 @@ export default function Form() {
                                   styles={customSelectStyles}
                                 />
                               </div>
-                              <div className="w-16">
+                              <div className="w-30">
                                 <TextInput
                                   name="Country"
-                                  width={"w-[150px]"}
                                   type="text"
                                   value={countryFromState()}
                                   readOnly={readOnly}

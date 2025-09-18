@@ -45,9 +45,9 @@ export default function Form() {
   const dispatch = useDispatch();
   const [states, setStates] = useState([]);
 
- const params = getCommonParams();
- 
-   const { branchId ,companyId} = params;
+  const params = getCommonParams();
+
+  const { branchId, companyId } = params;
   const { data: countriesList } = useGetCountriesQuery({ params });
   const options =
     countriesList?.data?.map((item) => ({
@@ -55,7 +55,6 @@ export default function Form() {
       label: item?.name, // displayed name
     })) || [];
   const selectedOption = options.find((opt) => opt.value === country) || null;
-
 
   const { data: allData } = useGetStateQuery({
     params,
@@ -84,8 +83,6 @@ export default function Form() {
     [id]
   );
 
-
-
   useEffect(() => {
     syncFormWithDb(singleData?.data);
   }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
@@ -98,7 +95,7 @@ export default function Form() {
     gstNo,
     id,
     branchId,
-     companyId
+    companyId,
   };
   useEffect(() => {
     if (form && !readOnly && stateNameRef.current) {
@@ -319,12 +316,11 @@ export default function Form() {
     label: item.name, // text shown in dropdown
     value: item.id, // stored value
   }));
- 
 
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
       <div className="w-full flex bg-white p-1 justify-between  items-center">
-        <h5 className="text-2xl font-bold text-gray-800">State Master</h5>
+        <h5 className="text-2xl font-semibold text-gray-800">State Master</h5>
         <div className="flex items-center gap-4">
           <button
             onClick={() => {
@@ -364,7 +360,7 @@ export default function Form() {
             <div className="h-full flex flex-col bg-gray-100">
               <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg  py-0.5 font-semibold  text-gray-800">
+                  <h2 className="text-lg -ml-2  py-0.5 font-semibold  text-gray-800">
                     State Master
                   </h2>
                 </div>
@@ -431,7 +427,7 @@ export default function Form() {
                           </div>
                         </div>
 
-                        <div className="flex">
+                        <div className="flex ">
                           <div className="w-72 mb-3 ">
                             {/* <DropdownInput
                               name="Country"
@@ -454,7 +450,7 @@ export default function Form() {
                               }
                             /> */}
                             <label className="block text-xs  font-bold text-slate-700 mb-1">
-                              Select Country{" "}
+                              Country Name
                               <span className="text-red-500">*</span>
                             </label>
                             <Select
@@ -463,7 +459,7 @@ export default function Form() {
                               onChange={(selected) =>
                                 setCountry(selected?.value || "")
                               }
-                              isDisabled={readOnly}
+                              isDisabled={readOnly || childRecord.current > 0}
                               isSearchable
                               isClearable={false}
                               menuShouldScrollIntoView={false}

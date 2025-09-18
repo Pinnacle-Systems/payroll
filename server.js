@@ -60,6 +60,7 @@ import {
   proof,
   leaveCode,
   leaveOpeningBalance,
+  MachineInOutEntry,
 } from "./src/routes/index.js";
 
 import { socketMain } from "./src/sockets/socket.js";
@@ -153,6 +154,7 @@ app.use('/relationShip',relationShip)
 app.use('/proofMaster',proof)
 app.use('/leaveCode',leaveCode)
 app.use('/leaveopeningBalance',leaveOpeningBalance)
+app.use('/machineInOutEntry',MachineInOutEntry)
 
 
 app.get("/retreiveFile/:fileName", (req, res) => {

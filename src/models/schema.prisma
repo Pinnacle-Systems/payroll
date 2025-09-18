@@ -77,7 +77,7 @@ model Company {
   EmployeeCategory    EmployeeCategory[]
   LeaveCode           LeaveCode[]
   LeaveOPeningBalance LeaveOPeningBalance[]
-  MAchineInOutEntry   MAchineInOutEntry[]
+  MAchineInOutEntry   MachineInOutEntry[]
 }
 
 model Subscription {
@@ -138,7 +138,7 @@ model Branch {
   FinYear             FinYear[]
   LeaveCode           LeaveCode[]
   LeaveOPeningBalance LeaveOPeningBalance[]
-  MAchineInOutEntry   MAchineInOutEntry[]
+  MAchineInOutEntry   MachineInOutEntry[]
 }
 
 model UserOnBranch {
@@ -267,8 +267,8 @@ model User {
   LeaveCodeupdatedBy           LeaveCode[]           @relation(name: "updatedBy")
   LeaveOPeningBalanceCreatedBy LeaveOPeningBalance[] @relation(name: "createdBy")
   LeaveOPeningBalanceupdatedBy LeaveOPeningBalance[] @relation(name: "updatedBy")
-  MAchineInOutEntry            MAchineInOutEntry[]
-  MAchineInOutEntry            MAchineInOutEntry[]
+  MAchineInOutEntryCreatedBy   MachineInOutEntry[]   @relation(name: "createdBy")
+  MAchineInOutEntryupdatedBy   MachineInOutEntry[]   @relation(name: "updatedBy")
 }
 
 model Employee {
@@ -1694,15 +1694,30 @@ model LeaveOPeningBalance {
   openingBalance Int?
 }
 
-model MAchineInOutEntry {
-  id          Int      @id @default(autoincrement())
-  Company     Company? @relation(fields: [companyId], references: [id])
-  companyId   Int?
-  branch      Branch?  @relation(fields: [branchId], references: [id])
-  branchId    Int?
-  createdBy   User?    @relation("createdBy", fields: [createdById], references: [id])
-  createdById Int?
-  updatedBy   User?    @relation("updatedBy", fields: [updatedById], references: [id])
-  updatedById Int?
-  branchCode String?
+model MachineInOutEntry {
+  id               Int                @id @default(autoincrement())
+  Company          Company?           @relation(fields: [companyId], references: [id])
+  companyId        Int?
+  branch           Branch?            @relation(fields: [branchId], references: [id])
+  branchId         Int?
+  createdBy        User?              @relation("createdBy", fields: [createdById], references: [id])
+  createdById      Int?
+  updatedBy        User?              @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById      Int?
+  branchCode       String?
+  MachineInOutGrid MachineInOutGrid[]
+}
+
+model MachineInOutGrid {
+  id                  Int                @id @default(autoincrement())
+  MachineInOutEntry   MachineInOutEntry? @relation(fields: [machineInOutEntryId], references: [id])
+  machineInOutEntryId Int?
+  date                DateTime?
+  machineTypeOne      String?
+  machineIP           String?
+  machineNo           Int?
+  machineTypeTwo      String?
+  currentMachine      String?
+  default             String?
+  notes               String?
 }

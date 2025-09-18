@@ -336,7 +336,7 @@ export default function Form() {
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
       <div className="w-full flex bg-white p-1 justify-between  items-center">
-        <h5 className="text-2xl font-bold font-segoe text-gray-800 ">
+        <h5 className="text-2xl font-semibold font-segoe text-gray-800 ">
           Country Master
         </h5>
         <div className="flex items-center">
@@ -379,7 +379,7 @@ export default function Form() {
             <div className="h-full flex flex-col bg-gray-100">
               <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg   py-0.5 font-semibold  text-gray-800">
+                  <h2 className="text-lg -ml-2   py-0.5 font-semibold  text-gray-800">
                     Country Master
                   </h2>
                 </div>
@@ -416,43 +416,14 @@ export default function Form() {
               <div className="flex-1  p-3">
                 <div className="grid grid-cols-1 font-segoe  gap-3  h-full">
                   <div className="lg:col-span- space-y-3">
-                    <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
-                      <div className="space-y-4 ">
-                        <div className="p-2">
-                          {/* <div className="flex">
-                            <div className="mb-3 w-[60%]">
-                              <TextInput
-                                name="Country Name"
-                                type="text"
-                                value={name}
-                                setValue={setName}
-                                ref={countryNameRef}
-                                required={true}
-                                readOnly={readOnly}
-                                // disabled={ childRecord > 0 ? true : undefined}
-                                disabled={
-                                  childRecord.current > 0 ? true : undefined
-                                }
-                              />
-                            </div>
-                            <div className="mb-3 ml-5 ">
-                              <TextInput
-                                name="Code"
-                                type="text"
-                                value={code}
-                                setValue={setCode}
-                                // required={true}
-                                readOnly={readOnly}
-                                disabled={
-                                  childRecord.current > 0 ? true : undefined
-                                }
-                              />
-                            </div>
-                          </div> */}
+                    <div className="bg-white py-3 rounded-md border border-gray-200 h-full">
+                      <div className="space-y-4 px-3">
+                       
+                         
                           <div className="flex gap-x-3 font-segoe">
                             <div className="w-72 font-segoe">
                               <label className="block text-xs  font-bold text-slate-700 mb-1">
-                                Select Country{" "}
+                                Country Name
                                 <span className="text-red-500">*</span>
                               </label>
 
@@ -468,9 +439,9 @@ export default function Form() {
                                 menuShouldScrollIntoView={false}
                                 maxMenuHeight={150} // <-- Reduce height here
                                 onInputChange={(value) => value.toUpperCase()}
-                                className="w-full px-1   text-xs rounded-lg
+                                className={`w-full px-1 -ml-1   text-xs rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-          transition-all duration-150 shadow-sm"
+          transition-all duration-150 shadow-sm `}
                                 styles={{
                                   control: (base) => ({
                                     ...base,
@@ -551,7 +522,7 @@ export default function Form() {
                               readOnly={readOnly}
                             />
                           </div>
-                        </div>
+                    
                       </div>
                     </div>
                   </div>
