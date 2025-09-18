@@ -77,6 +77,7 @@ model Company {
   EmployeeCategory    EmployeeCategory[]
   LeaveCode           LeaveCode[]
   LeaveOPeningBalance LeaveOPeningBalance[]
+  MAchineInOutEntry   MAchineInOutEntry[]
 }
 
 model Subscription {
@@ -137,6 +138,7 @@ model Branch {
   FinYear             FinYear[]
   LeaveCode           LeaveCode[]
   LeaveOPeningBalance LeaveOPeningBalance[]
+  MAchineInOutEntry   MAchineInOutEntry[]
 }
 
 model UserOnBranch {
@@ -265,6 +267,8 @@ model User {
   LeaveCodeupdatedBy           LeaveCode[]           @relation(name: "updatedBy")
   LeaveOPeningBalanceCreatedBy LeaveOPeningBalance[] @relation(name: "createdBy")
   LeaveOPeningBalanceupdatedBy LeaveOPeningBalance[] @relation(name: "updatedBy")
+  MAchineInOutEntry            MAchineInOutEntry[]
+  MAchineInOutEntry            MAchineInOutEntry[]
 }
 
 model Employee {
@@ -1688,4 +1692,17 @@ model LeaveOPeningBalance {
   leave          LeaveCode @relation(fields: [leaveId], references: [id])
   leaveId        Int
   openingBalance Int?
+}
+
+model MAchineInOutEntry {
+  id          Int      @id @default(autoincrement())
+  Company     Company? @relation(fields: [companyId], references: [id])
+  companyId   Int?
+  branch      Branch?  @relation(fields: [branchId], references: [id])
+  branchId    Int?
+  createdBy   User?    @relation("createdBy", fields: [createdById], references: [id])
+  createdById Int?
+  updatedBy   User?    @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById Int?
+  branchCode String?
 }

@@ -5,12 +5,12 @@ import { ReusableTable, TextInput } from "../../../Inputs";
 import { getCommonParams } from "../../../Utils/helper";
 
 import {
-  useAddPayStructureMutation,
-  useDeletePayStructureMutation,
-  useGetPayStructureByIdQuery,
-  useGetPayStructureQuery,
-  useUpdatePayStructureMutation,
-} from "../../../redux/services/PayStructureService";
+  useAddMachineInOutMutation,
+  useDeleteMachineInOutMutation,
+  useGetMachineInOutByIdQuery,
+  useGetMachineInOutQuery,
+  useUpdateMachineInOutMutation,
+} from "../../../redux/services/MachineInOutService";
 
 import Swal from "sweetalert2";
 
@@ -36,7 +36,7 @@ const Form = () => {
 
   const { branchId, companyId, branchCode } = params;
 
-  const { data: allData, refetch } = useGetPayStructureQuery({
+  const { data: allData, refetch } = useGetMachineInOutQuery({
     params,
     searchParams: searchValue,
   });
@@ -45,11 +45,11 @@ const Form = () => {
     data: singleData,
     isFetching: isSingleFetching,
     isLoading: isSingleLoading,
-  } = useGetPayStructureByIdQuery(id, { skip: !id });
+  } = useGetMachineInOutByIdQuery(id, { skip: !id });
 
-  const [addData] = useAddPayStructureMutation();
-  const [updateData] = useUpdatePayStructureMutation();
-  const [removeData] = useDeletePayStructureMutation();
+  const [addData] = useAddMachineInOutMutation();
+  const [updateData] = useUpdateMachineInOutMutation();
+  const [removeData] = useDeleteMachineInOutMutation();
 
   useEffect(() => {
     if (machineInOutGrid?.length >= 1) return;
@@ -93,7 +93,7 @@ const Form = () => {
     }
 
     if (
-      machineInOutGrid?.some((i) => !i.payDetailsId || i.payDetailsId === "")
+      machineInOutGrid?.some((i) => !i.machineInOutGridId || i.machineInOutGridId === "")
     ) {
       Swal.fire({
         icon: "error",
@@ -260,7 +260,7 @@ const Form = () => {
     setMachineInOutGrid(newBlend);
   };
   const addNewRow = () => {
-    const newRow = { payDetailsId: "" };
+    const newRow = { machineInOutGridId: "" };
     setMachineInOutGrid([...machineInOutGrid, newRow]);
   };
 

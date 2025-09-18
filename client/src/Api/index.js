@@ -108,3 +108,4 @@ export const RELATIONSHIP_MASTER_API = "relationShip";
 export const PROOF_MASTER_API = "proofMaster";
 export const LEAVE_CODE_API =  'leaveCode'
 export const LEAVE_OPENING_BALANCE_API =   'leaveopeningBalance'
+export const MACHINE_IN_OUT_ENTRY_API = 'machineInOutEntry'

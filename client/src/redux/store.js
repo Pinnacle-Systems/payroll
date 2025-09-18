@@ -38,6 +38,7 @@ import {
   proofMasterApi,
   leaveCodeApi,
   leaveopeningBalanceApi,
+  MachineInoutApi,
 
 } from "./services"
 import projectPaymentFormApi from "./services/ProjectPaymentService";
@@ -187,6 +188,7 @@ const commonReducers = {
   [proofMasterApi.reducerPath] : proofMasterApi.reducer,
   [leaveCodeApi.reducerPath] : leaveCodeApi.reducer,
   [leaveopeningBalanceApi.reducerPath] : leaveopeningBalanceApi.reducer,
+  [MachineInoutApi.reducerPath] : MachineInoutApi.reducer,
 
 }
 const commonMiddleware = [countryMasterApi.middleware,
@@ -293,6 +295,7 @@ RelationShipApi.middleware,
 proofMasterApi.middleware,
 leaveCodeApi.middleware,
 leaveopeningBalanceApi.middleware,
+MachineInoutApi.middleware,
 ];
 
 

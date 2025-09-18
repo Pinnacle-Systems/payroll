@@ -58,3 +58,4 @@ export { default as RelationShipApi } from "./RelationShipService";
 export { default as proofMasterApi } from "./ProofMasterService.js";
 export { default as leaveCodeApi} from './LeaveCode.servive'
 export {default as leaveopeningBalanceApi} from './LeaveopeningBalanceService.js'
+export {default as MachineInoutApi} from './MachineInOutService.js'
