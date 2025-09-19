@@ -104,7 +104,7 @@ const TemplateItems = ({
     <>
       <div className="w-full bg-gray-100 mx-auto rounded-md shadow-md  overflow-auto px-2 py-1">
         <div className="flex justify-between items-center mb-1">
-          <h1 className="text-2xl font-bold text-gray-800">Shift Template </h1>
+          <h1 className="master-header">Shift Template </h1>
           <div className="flex gap-2">
             {readOnly && (
               <button
@@ -269,7 +269,7 @@ const TemplateItems = ({
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "date")
                         }
-                        className={`bg-transparent pl-1 focus:outline-none ${
+                        className={`bg-transparent pl-1  w-[110px] text-[12px] focus:outline-none ${
                           readOnly || childRecord.current > 0
                             ? "text-gray-600"
                             : "text-black"
@@ -506,7 +506,7 @@ const TemplateItems = ({
         {modal && selectedRow && (
           <Modal
             isOpen={modal}
-            widthClass="w-[50%] h-[45%]"
+            widthClass="w-[53%] h-[45%]"
             onClose={() => {
               setModal(false);
               setErrors({});
@@ -529,7 +529,7 @@ const TemplateItems = ({
                         <div className="flex gap-y-6 gap-x-6">
                           {/* Tolerance Before Start */}
                           <div className="mb-3">
-                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                            <label className="react-select-tag-label">
                               Tolerance Before Start
                             </label>
                             <input
@@ -557,7 +557,7 @@ const TemplateItems = ({
 
                           {/* Tolerance After End */}
                           <div className="mb-3">
-                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                            <label className="react-select-tag-label">
                               Tolerance After Start
                             </label>
                             <input
@@ -585,7 +585,7 @@ const TemplateItems = ({
 
                           {/* Tolerance Before End */}
                           <div className="mb-3">
-                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                            <label className="react-select-tag-label">
                               Tolerance Before End
                             </label>
                             <input
@@ -613,7 +613,7 @@ const TemplateItems = ({
 
                           {/* Tolerance After End */}
                           <div className="mb-3">
-                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                            <label className="react-select-tag-label">
                               Tolerance After End
                             </label>
                             <input
@@ -676,7 +676,7 @@ const TemplateItems = ({
                         <div className="flex flex-wrap gap-y-6 gap-x-10">
                           {/* First Break Out */}
                           <div className="mb-3 w-24">
-                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                            <label className="react-select-tag-label">
                               First Break Out
                             </label>
                             <input
@@ -704,7 +704,7 @@ const TemplateItems = ({
 
                           {/* First Break In */}
                           <div className="mb-3 w-24">
-                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                            <label className="react-select-tag-label">
                               First Break In
                             </label>
                             <input
@@ -732,7 +732,7 @@ const TemplateItems = ({
 
                           {/* Lunch Start */}
                           <div className="mb-3 w-24">
-                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                            <label className="react-select-tag-label">
                               Lunch Start
                             </label>
                             <input
@@ -760,7 +760,7 @@ const TemplateItems = ({
 
                           {/* LB.SNDay */}
                           <div className="mb-3 w-24">
-                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                            <label className="react-select-tag-label">
                               LB.SNDay
                             </label>
                             <select
@@ -788,7 +788,7 @@ const TemplateItems = ({
 
                           {/* Lunch End */}
                           <div className="mb-3 w-24">
-                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                            <label className="react-select-tag-label">
                               Lunch End
                             </label>
                             <input
@@ -816,7 +816,7 @@ const TemplateItems = ({
 
                           {/* LB.ENDay */}
                           <div className="mb-3 w-24">
-                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                            <label className="react-select-tag-label">
                               LB.ENDay
                             </label>
                             <select
@@ -843,8 +843,8 @@ const TemplateItems = ({
                           </div>
 
                           {/* Second Break Out */}
-                          <div className="mb-3 w-[100px]">
-                            <label className="block text-xs font-bold -ml-1 text-slate-700 mb-1">
+                          <div className="mb-3 w-[110px]">
+                            <label className="react-select-tag-label">
                               Second Break Out
                             </label>
                             <input
@@ -859,7 +859,7 @@ const TemplateItems = ({
                                   "sbOut"
                                 )
                               }
-                              className={`w-full px-3 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
+                              className={`w-[95px] px-3 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
                         focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                         transition-all duration-150 shadow-sm ${
                           readOnly || childRecord.current > 0
@@ -871,8 +871,8 @@ const TemplateItems = ({
                           </div>
 
                           {/* Second Break In */}
-                          <div className="mb-3 w-24">
-                            <label className="block text-xs font-bold text-slate-700 mb-1">
+                          <div className="mb-3 w-[110px] -ml-4">
+                            <label className="react-select-tag-label">
                               Second Break In
                             </label>
                             <input
@@ -887,7 +887,7 @@ const TemplateItems = ({
                                   "sbIn"
                                 )
                               }
-                              className={`w-full px-3 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
+                              className={`w-full w-[95px] px-3 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
                         focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                         transition-all duration-150 shadow-sm ${
                           readOnly || childRecord.current > 0

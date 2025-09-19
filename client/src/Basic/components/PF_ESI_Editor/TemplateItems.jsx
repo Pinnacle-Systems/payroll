@@ -103,7 +103,7 @@ const TemplateItems = ({
     <>
       <div className="w-full bg-gray-100 mx-auto rounded-md shadow-md px-2 overflow-auto py-1 ">
         <div className="flex justify-between items-center mb-1">
-          <h1 className="text-2xl font-bold text-gray-800">
+          <h1 className="master-header">
             PF and ESI Rate Editor
           </h1>
           <div className="flex gap-2">

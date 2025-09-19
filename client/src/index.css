@@ -1,41 +1,71 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,600;1,400;1,600&display=swap'); */
-
-/* html,
+html,
 body {
-  background-color: #F1F1F0 !important;
-   font-family: "Segoe UI" !important;
-} */
- * {
-  font-family: 'Segoe UI' !important;
+  background-color: #f1f1f0 !important;
+  font-family: "Poppins", sans-serif !important;
 }
-html, body {
-  font-family: "Segoe UI" !important;
-  background-color: #F1F1F0;
-  
+label,
+input,
+select,
+textarea,
+button,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+a,
+table,
+th,
+td {
+  font-family: "Poppins", sans-serif !important;
 }
-.font-segoe {
-  font-family: 'Segoe UI';
-}
-@font-face {
-  font-family: "Segoe UI";
-  /* src: url("/fonts/SegoeUI-Regular.ttf") format("truetype"); */
 
+.input-font {
+  font-weight: 400;
 }
-label,input,h1,h2,h3,h4,h5,h6,header,nav,ul,li,a,table,thead,tbody,th,tr,td,p,span,button,form,select {
-  font-family: 'Segoe UI' !important;
-  z-index: 0; 
+
+.react-select-tag-label {
+  display: block; /* block */
+  font-size: 0.75rem; /* text-xs (12px) */
+  line-height: 1rem; /* text-xs line-height */
+  font-weight: 600; /* font-semibold */
+  color: rgb(51 65 85); /* text-slate-700 */
+  margin-bottom: 0.25rem;
+}
+
+.master-header {
+  font-size: 1.25rem; /* text-xl */
+  font-weight: 500; /* font-medium */
+
+  color: #1f2937;
+}
+.master-header-modal {
+  font-size: 1rem; /* text-xl */
+  font-weight: 400; /* font-medium */
+
+  color: #1f2937;
+}
+
+label {
+  font-family: "Poppins", sans-serif !important;
+  z-index: 0;
 }
 .scrollbar-hide {
-  scrollbar-width: none;       /* Firefox */
-  -ms-overflow-style: none;    /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-  display: none;               /* Safari and Chrome */
+  display: none; /* Safari and Chrome */
 }
 
 .Select {
@@ -55,17 +85,16 @@ label,input,h1,h2,h3,h4,h5,h6,header,nav,ul,li,a,table,thead,tbody,th,tr,td,p,sp
 }
 
 @media print {
-  html {}
+  html {
+  }
 }
 
 @layer base {
-
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
   }
 }
-
 
 @layer utilities {
   .container-w-h {
@@ -116,7 +145,6 @@ label,input,h1,h2,h3,h4,h5,h6,header,nav,ul,li,a,table,thead,tbody,th,tr,td,p,sp
     @apply text-xs text-gray-600 font-bold;
   }
 
-
   .frame {
     @apply border-2;
   }
@@ -154,7 +182,7 @@ label,input,h1,h2,h3,h4,h5,h6,header,nav,ul,li,a,table,thead,tbody,th,tr,td,p,sp
   }
 
   .sub-navbar-active {
-    @apply bg-gray-300 text-white rounded p-1 text-sm hover:bg-slate-400
+    @apply bg-gray-300 text-white rounded p-1 text-sm hover:bg-slate-400;
   }
 
   .button-border {
@@ -176,7 +204,6 @@ label,input,h1,h2,h3,h4,h5,h6,header,nav,ul,li,a,table,thead,tbody,th,tr,td,p,sp
   }
 }
 
-
 .select-all-on-touch {
   -webkit-user-select: all;
   user-select: all;
@@ -190,13 +217,11 @@ label,input,h1,h2,h3,h4,h5,h6,header,nav,ul,li,a,table,thead,tbody,th,tr,td,p,sp
 .bor th {
   border: none;
   margin-top: 2rem;
-
 }
 
 .bor td {
   border: none;
   margin-top: 2rem;
-
 }
 
 @media print {
@@ -204,7 +229,6 @@ label,input,h1,h2,h3,h4,h5,h6,header,nav,ul,li,a,table,thead,tbody,th,tr,td,p,sp
     display: none;
   }
 }
-
 
 .notification-icon {
   position: relative;
@@ -221,8 +245,6 @@ label,input,h1,h2,h3,h4,h5,h6,header,nav,ul,li,a,table,thead,tbody,th,tr,td,p,sp
   padding: 4px 8px;
   font-size: 10px;
 }
-
-
 
 .toast {
   position: fixed;
@@ -255,7 +277,6 @@ label,input,h1,h2,h3,h4,h5,h6,header,nav,ul,li,a,table,thead,tbody,th,tr,td,p,sp
 }
 
 @keyframes fadeInOut {
-
   0%,
   100% {
     opacity: 0;
@@ -267,18 +288,16 @@ label,input,h1,h2,h3,h4,h5,h6,header,nav,ul,li,a,table,thead,tbody,th,tr,td,p,sp
   }
 }
 
-
 .header {
   border-bottom-color: rgba(184, 77, 196);
 }
 
 .headerText {
   color: rgba(184, 77, 196);
-
 }
 
 .form-font {
-  font-family: "Segoe UI", serif;
+  font-family: "Inter", serif;
   font-size: 13px;
 }
 
@@ -287,8 +306,7 @@ label,input,h1,h2,h3,h4,h5,h6,header,nav,ul,li,a,table,thead,tbody,th,tr,td,p,sp
 }
 
 .divider {
-
-  color: #016B65
+  color: #016b65;
 }
 
 :root {
@@ -296,16 +314,15 @@ label,input,h1,h2,h3,h4,h5,h6,header,nav,ul,li,a,table,thead,tbody,th,tr,td,p,sp
 }
 
 .bg-beige {
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
 }
 
 .font-2 {
-  font-family: "Segoe UI";
-
+  font-family: "Poppins", serif;
 }
 
 .font-1 {
-  font-family: "Segoe UI";
+  font-family: "Poppins", serif;
   font-size: 13px;
 }
 
@@ -313,7 +330,6 @@ label,input,h1,h2,h3,h4,h5,h6,header,nav,ul,li,a,table,thead,tbody,th,tr,td,p,sp
   font-size: 12px;
   padding: 5px;
 }
-
 
 @layer components {
   .input-base {
@@ -335,16 +351,14 @@ label,input,h1,h2,h3,h4,h5,h6,header,nav,ul,li,a,table,thead,tbody,th,tr,td,p,sp
   .input-hover {
     @apply text-gray-600 hover:text-gray-800;
   }
- 
 }
 
 .maxBlue {
- color: #303AB2;
+  color: #303ab2;
 }
 
 .maxRed {
-  color: #E4002B;
+  color: #e4002b;
 }
 
 /* styles.css */
-

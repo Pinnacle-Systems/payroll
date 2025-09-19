@@ -225,7 +225,7 @@ export default function Form() {
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
       <div className="w-full flex bg-white p-1 justify-between  items-center">
-        <h1 className="text-2xl font-bold text-gray-800">Level Type Master</h1>
+        <h1 className="master-header">Level Type Master</h1>
         <div className="flex items-center">
           <button
             onClick={() => {
@@ -263,7 +263,7 @@ export default function Form() {
           <div className="h-full flex flex-col bg-gray-100">
             <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
               <div className="flex items-center gap-2">
-                <h2 className="text-lg  py-0.5 font-semibold  text-gray-800">
+                <h2 className=" -ml-2   py-0.5 master-header-modal">
                   Level Type Master
                 </h2>
               </div>

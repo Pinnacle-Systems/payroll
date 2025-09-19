@@ -123,7 +123,7 @@ const TemplateItems = ({
     <>
       <div className="w-full bg-gray-100 mx-auto rounded-md shadow-md px-2 overflow-auto py-1 ">
         <div className="flex justify-between items-center mb-1">
-          <h1 className="text-2xl font-bold text-gray-800">Pay Structure</h1>
+          <h1 className="master-header">Pay Structure</h1>
           <div className="flex gap-2">
             {readOnly && (
               <button
@@ -554,7 +554,9 @@ const TemplateItems = ({
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             e.preventDefault();
+                            if(item?.payDetailsId){
                             addNewRow();
+                            }
                           }
                         }}
                         disabled={readOnly}
@@ -578,7 +580,7 @@ const TemplateItems = ({
             <div className="h-full flex flex-col bg-gray-100">
               <div className="border-b py-2 px-2 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center">
-                  <h2 className="text-lg  py-0.5 font-semibold  text-gray-800">
+                  <h2 className=" -ml-2   py-0.5 master-header-modal">
                     Formula
                   </h2>
                 </div>

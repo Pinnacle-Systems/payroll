@@ -195,7 +195,7 @@ const TemplateItems = ({
       <div className=" flex flex-col bg-gray-100 overflow-auto">
         {/* Header */}
         <div className=" flex  justify-between items-center  ">
-          <h1 className="text-2xl font-semibold text-gray-800">
+          <h1 className="master-header">
             Pay Frequency Master
           </h1>
           <div className="flex gap-2">

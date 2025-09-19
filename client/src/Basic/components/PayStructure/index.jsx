@@ -86,12 +86,7 @@ const PayStructure = () => {
 
   
 
-  // useEffect(() => {
-  //   if (company?.data?.length > 0) {
-  //     // setCompanyName(company.data[0].name);
-  //     setCompanyCode(company.data[0].code);
-  //   }
-  // }, [company]);
+ 
 
   useEffect(() => {
     if (payStructure?.length >= 1) return;
@@ -188,8 +183,8 @@ const validateData = (data) => {
       });
       setForm(false);
       dispatch({
-        type: `payComponent/invalidateTags`,
-        payload: ["payComponent"],
+        type: `companyPayCode/invalidateTags`,
+        payload: ["companyPayCode"],
       });
     } catch (error) {
       Swal.fire({
@@ -239,8 +234,8 @@ const validateData = (data) => {
         });
         setForm(false);
          dispatch({
-        type: `payComponent/invalidateTags`,
-        payload: ["payComponent"],
+        type: `companyPayCode/invalidateTags`,
+        payload: ["companyPayCode"],
       });
       } catch (error) {
         Swal.fire({
@@ -358,7 +353,7 @@ const validateData = (data) => {
           ) : (
             <>
               <div className="w-full flex bg-white p-1 justify-between  items-center">
-                <h1 className="text-2xl font-bold text-gray-800">
+                <h1 className="master-header">
                   Pay Structure
                 </h1>
                 <div className="flex items-center gap-4">

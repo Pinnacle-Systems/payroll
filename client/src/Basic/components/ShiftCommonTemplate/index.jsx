@@ -243,7 +243,7 @@ const ShiftCommonTemplateMaster = () => {
     <div>
       <div onKeyDown={handleKeyDown} className="p-1 ">
         <div className="w-full flex bg-white p-1 justify-between  items-center">
-          <h1 className="text-2xl font-bold text-gray-800">
+          <h1 className="master-header">
             Shift Common Template Master
           </h1>
           <div className="flex items-center gap-4">
@@ -284,7 +284,7 @@ const ShiftCommonTemplateMaster = () => {
             <div className="h-full flex flex-col bg-gray-100">
               <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg px-2 py-0.5 font-semibold  text-gray-800">
+                  <h2 className=" -ml-2  py-0.5 master-header-modal">
                     Shift Common Template Master
                   </h2>
                 </div>
@@ -339,7 +339,7 @@ const ShiftCommonTemplateMaster = () => {
                           </div>
 
                           <div className="w-52">
-                            <label className="block text-xs  font-bold text-slate-700 mb-1">
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
                               Employee Category
                               <span className="text-red-500">*</span>
                             </label>

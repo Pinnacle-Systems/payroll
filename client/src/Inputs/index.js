@@ -1166,7 +1166,7 @@ export const TextInput = forwardRef(
     return (
       <div className={`mb-2 ${width}`}>
         {name && (
-          <label className="block text-xs font-bold text-slate-700 mb-1">
+          <label className="block text-xs font-semibold text-slate-700 mb-1">
             {required ? <RequiredLabel name={label ? label : name} /> : name}
           </label>
         )}
@@ -1184,7 +1184,7 @@ export const TextInput = forwardRef(
           readOnly={readOnly}
           disabled={disabled}
           tabIndex={tabIndex ?? undefined}
-          className={`w-full px-2 py-1 text-xs text-[12px] border border-gray-300 rounded-lg
+          className={`w-full px-2 py-1 text-xs text-[12px]  border input-font border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
           ${
@@ -1422,7 +1422,7 @@ export const TextArea = ({
   return (
     <div className="mb-3 w-full">
       {name && (
-        <label className="block text-xs font-bold text-gray-600 mb-1">
+        <label className="react-select-tag-label">
           {required ? <RequiredLabel name={label ?? name} /> : label ?? name}
         </label>
       )}
@@ -1487,7 +1487,7 @@ export const DropdownInput = forwardRef(
     return (
       <div className={`mb-2 ${width}`}>
         {name && (
-          <label className="block text-xs font-bold text-slate-700 mb-1">
+          <label className="block text-xs font-semibold text-slate-700 mb-1">
             {required ? <RequiredLabel name={name} /> : name}
           </label>
         )}
@@ -1499,7 +1499,7 @@ export const DropdownInput = forwardRef(
           defaultValue={defaultValue}
           required={required}
           readOnly={readOnly}
-          className={`w-full px-2 py-1 text-xs text-[12px] border border-gray-300 rounded-lg
+          className={`w-full px-1 py-0.5 text-xs text-[12px] border border-gray-300 rounded-lg
     focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
     transition-all duration-150 shadow-sm
     ${
@@ -1756,7 +1756,7 @@ export const DateInput = forwardRef(
     return (
       <div className="flex flex-col gap-1 w-full">
         {name && (
-          <label className="block text-xs font-bold text-slate-700">
+          <label className="bblock text-xs font-semibold text-slate-700 ">
             {required ? (
               <RequiredLabel name={inputHead ?? name} />
             ) : (
@@ -1778,7 +1778,7 @@ export const DateInput = forwardRef(
             value={value}
             onChange={(e) => setValue(e.target.value)}
             className={`
-         w-28 px-2 py-1 text-xs border border-gray-300 rounded-lg
+         w-[120px] px-2 py-1 text-xs text-[12px]  border input-font border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
             ${
@@ -2383,10 +2383,10 @@ export const customSelectStyles = {
     ...base,
     minHeight: "13px",
     height: "13px",
-    padding: "13px 4px",
+    padding: "12px 4px",
     fontSize: "12px",
     borderRadius: "8px",
-    fontFamily: "'Segoe UI'",
+    fontFamily: 'Poppins',
     color: state.isDisabled ? "#6b7280" : "black",
      backgroundColor: state.isDisabled ? "#f3f4f6" : "white", // bg-gray-100 vs bg-white
     cursor: state.isDisabled ? "not-allowed" : "default",
@@ -2401,7 +2401,7 @@ export const customSelectStyles = {
     padding: "0 3px",
     marginTop: "-8px",
     fontSize: "12px",
-    fontFamily: "'Segoe UI'",
+    fontFamily: 'Poppins',
     color: state.isDisabled ? "#6b7280" : "black"
   }),
   input: (base,state) => ({
@@ -2409,24 +2409,24 @@ export const customSelectStyles = {
     margin: 0,
     fontSize: "12px",
     padding: 0,
-    fontFamily: "'Segoe UI'",
+    fontFamily: 'Poppins',
     color: state.isDisabled ? "#6b7280" : "black"
   }),
   singleValue: (base,state) => ({
     ...base,
-    fontFamily: "'Segoe UI'",
+    fontFamily: 'Poppins',
     fontSize: "12px",
     color: state.isDisabled ? "#6b7280" : "black"
   }),
   placeholder: (base) => ({
     ...base,
-    fontFamily: "'Segoe UI'",
+    fontFamily: 'Poppins',
     color: "black",
     fontSize: "12px",
   }),
   menu: (base,state) => ({
     ...base,
-    fontFamily: "'Segoe UI'",
+    fontFamily: 'Poppins',
     maxHeight: 140,
     // overflowY: "auto",
     fontSize: "12px",
@@ -2434,7 +2434,7 @@ export const customSelectStyles = {
   }),
   option: (base,state) => ({
     ...base,
-    fontFamily: "'Segoe UI'",
+    fontFamily: 'Poppins',
     fontSize: "12px",
     color: state.isDisabled ? "#6b7280" : "black",
     padding:'6px 8px'

@@ -37,9 +37,7 @@ async function getNextDocId(
 }
 
 async function get(req) {
-  const { companyId, active, branchId, finYearId, searchDocId } = req.query;
-
-  console.log(companyId, active, finYearId, "received--");
+  const { companyId, branchId, finYearId, searchDocId } = req.query;
 
   const data = await prisma.companyPaycode.findMany({
     where: {
@@ -67,6 +65,9 @@ async function get(req) {
           lop: true,
           esi: true,
           pickFrom: true,
+          _count: {
+            select: { PayStructure: true, PFESIEditor: true },
+          },
         },
       },
     },
@@ -117,8 +118,8 @@ async function getOne(id) {
           lop: true,
           esi: true,
           pickFrom: true,
-           _count: {
-            select: { PayStructure: true }, 
+          _count: {
+            select: { PayStructure: true, PFESIEditor: true },
           },
         },
       },

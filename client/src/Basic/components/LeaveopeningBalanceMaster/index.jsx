@@ -5,6 +5,7 @@ import {
   DropdownInput,
   customSelectStyles,
   TextInput,
+  DateInput,
 } from "../../../Inputs";
 
 import {
@@ -144,6 +145,10 @@ const Designation = () => {
         type: `leaveCode/invalidateTags`,
         payload: ["leaveCode"],
       });
+      dispatch({
+        type: `employeeMaster/invalidateTags`,
+        payload: ["Employee"],
+      });
       setForm(false);
     } catch (error) {
       Swal.fire({
@@ -195,6 +200,10 @@ const Designation = () => {
         dispatch({
           type: `leaveCode/invalidateTags`,
           payload: ["leaveCode"],
+        });
+        dispatch({
+          type: `employeeMaster/invalidateTags`,
+          payload: ["Employee"],
         });
         setForm(false);
       } catch (error) {
@@ -285,9 +294,7 @@ const Designation = () => {
     <div>
       <div onKeyDown={handleKeyDown} className="p-1 ">
         <div className="w-full flex bg-white p-1 justify-between  items-center">
-          <h1 className="text-2xl font-bold text-gray-800">
-            Leave Opening Balance Master
-          </h1>
+          <h1 className="master-header">Leave Opening Balance Master</h1>
           <div className="flex items-center gap-4">
             <button
               onClick={() => {
@@ -325,7 +332,7 @@ const Designation = () => {
             <div className="h-full flex flex-col bg-gray-100">
               <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg  py-0.5 font-semibold  text-gray-800">
+                  <h2 className=" -ml-2   py-0.5 master-header-modal">
                     Leave Opening Balance Master
                   </h2>
                 </div>
@@ -365,7 +372,7 @@ const Designation = () => {
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
                       <div className="space-y-4 ">
                         <div className="flex flex-wrap gap-x-8">
-                          <div className="mb-3 w-20">
+                          <div className="mb-3 w-26">
                             <DropdownInput
                               name="Fin Year"
                               options={dropDownFinYear(
@@ -385,8 +392,8 @@ const Designation = () => {
                               ref={payref}
                             />
                           </div>
-                          <div className="mb-3 w-36 ">
-                            <label className="block text-xs  font-bold text-slate-700 mb-1">
+                          <div className="mb-3 w-40 ">
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
                               ID Number
                               <span className="text-red-500">*</span>
                             </label>
@@ -428,7 +435,7 @@ const Designation = () => {
                             disabled={childRecord.current > 0}
                           />
                           <div className="w-28">
-                            <TextInput
+                            <DateInput
                               name="Joined Date"
                               type="date"
                               value={joinedDate}
@@ -439,8 +446,8 @@ const Designation = () => {
                             />
                           </div>
 
-                          <div className="mb-3 w-36 ">
-                            <label className="block text-xs  font-bold text-slate-700 mb-1">
+                          <div className="mb-3 w-40 ">
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
                               Leave Type
                               <span className="text-red-500">*</span>
                             </label>

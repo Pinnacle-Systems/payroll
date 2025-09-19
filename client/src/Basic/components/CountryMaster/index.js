@@ -16,7 +16,7 @@ import {
   useUpdateCountryMutation,
 } from "../../../redux/services/CountryMasterService";
 import { Country } from "country-state-city";
-import { TextInput, ToggleButton, ReusableTable } from "../../../Inputs";
+import { TextInput, ToggleButton, ReusableTable, customSelectStyles } from "../../../Inputs";
 import { statusDropdown } from "../../../Utils/DropdownData";
 import Modal from "../../../UiComponents/Modal";
 
@@ -51,7 +51,7 @@ export default function Form() {
 
   const params = getCommonParams();
 
-  const { branchId,companyId } = params;
+  const { branchId, companyId } = params;
   const {
     data: allData,
     isLoading,
@@ -104,7 +104,7 @@ export default function Form() {
     companyId,
     active,
     id,
-    branchId 
+    branchId,
   };
 
   const validateData = (data) => {
@@ -233,21 +233,21 @@ export default function Form() {
     {
       header: "S.NO",
       accessor: (item, index) => index + 1,
-      className: " text-gray-900 font-segoe uppercase  text-center",
+      className: " text-gray-900 font-sans uppercase  text-center",
     },
 
     {
       header: "COUNTRY NAME",
       accessor: (item) => item?.name,
       //   cellClass: () => "font-medium  text-gray-900",
-      className: " text-gray-900 pl-2 font-segoe text-left uppercase w-72",
+      className: " text-gray-900 pl-2 font-sans text-left uppercase w-72",
     },
 
     {
       header: "STATUS",
       accessor: (item) => (item.active ? ACTIVE : INACTIVE),
       //   cellClass: () => "font-medium text-gray-900",
-      className: " text-gray-900 font-segoe text-center uppercase w-16",
+      className: " text-gray-900 font-sans text-center uppercase w-16",
     },
     // {
     //   header: "",
@@ -306,8 +306,7 @@ export default function Form() {
           .sort((a, b) => a.label.localeCompare(b.label));
 
         setCountries(formatted);
-        console.log(data,"data---");
-        
+        console.log(data, "data---");
       })
       .catch(console.error);
   }, []);
@@ -322,21 +321,10 @@ export default function Form() {
     }
   };
 
-  const [filterData, setFilterData] = useState([]);
-  let val = 3;
-  const filtered = allData?.data.filter((item, index) => index < val);
-
-  // useEffect(() =>{
-
-  //   console.log(filtered,"filtered");
-
-  //   setFilterData(filtered)
-  // },[allData])
-
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
       <div className="w-full flex bg-white p-1 justify-between  items-center">
-        <h5 className="text-2xl font-semibold font-segoe text-gray-800 ">
+        <h5 className="master-header">
           Country Master
         </h5>
         <div className="flex items-center">
@@ -345,7 +333,7 @@ export default function Form() {
               setForm(true);
               onNew();
             }}
-            className="bg-white border font-segoe border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+            className="bg-white border font-sans border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
           >
             + Add New Country
           </button>
@@ -376,10 +364,10 @@ export default function Form() {
               setId("");
             }}
           >
-            <div className="h-full flex flex-col bg-gray-100">
+            <div className="h-full font-sans flex flex-col bg-gray-100">
               <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg -ml-2   py-0.5 font-semibold  text-gray-800">
+                  <h2 className=" -ml-2   py-0.5 master-header-modal">
                     Country Master
                   </h2>
                 </div>
@@ -391,7 +379,7 @@ export default function Form() {
                         onClick={() => {
                           setReadOnly(false);
                         }}
-                        className="px-3 py-1 font-segoe text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
+                        className="px-3 py-1 font-sans text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
                       >
                         Edit
                       </button>
@@ -402,7 +390,7 @@ export default function Form() {
                       <button
                         type="button"
                         onClick={saveData}
-                        className="px-3 py-1 font-segoe hover:bg-green-600 hover:text-white rounded text-green-600 
+                        className="px-3 py-1 font-sans hover:bg-green-600 hover:text-white rounded text-green-600 
                           border border-green-600 flex items-center gap-1 text-xs"
                       >
                         <Check size={14} />
@@ -414,115 +402,122 @@ export default function Form() {
               </div>
 
               <div className="flex-1  p-3">
-                <div className="grid grid-cols-1 font-segoe  gap-3  h-full">
+                <div className="grid grid-cols-1 font-sans  gap-3  h-full">
                   <div className="lg:col-span- space-y-3">
                     <div className="bg-white py-3 rounded-md border border-gray-200 h-full">
                       <div className="space-y-4 px-3">
-                       
-                         
-                          <div className="flex gap-x-3 font-segoe">
-                            <div className="w-72 font-segoe">
-                              <label className="block text-xs  font-bold text-slate-700 mb-1">
-                                Country Name
-                                <span className="text-red-500">*</span>
-                              </label>
+                        <div className="flex gap-x-3 font-sans">
+                          <div className="w-72 font-sans">
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              Country Name
+                              <span className="text-red-500">*</span>
+                            </label>
 
-                              <Select
-                                options={countries}
-                                ref={countryNameRef}
-                                onChange={handleSelect}
-                                value={selectedCountry}
-                                placeholder="Type to search..."
-                                isDisabled={readOnly || childRecord.current > 0}
-                                isSearchable
-                                isClearable={false}
-                                menuShouldScrollIntoView={false}
-                                maxMenuHeight={150} // <-- Reduce height here
-                                onInputChange={(value) => value.toUpperCase()}
-                                className={`w-full px-1 -ml-1   text-xs rounded-lg
+                            <Select
+                              options={countries}
+                              ref={countryNameRef}
+                              onChange={handleSelect}
+                              value={selectedCountry}
+                              placeholder="Type to search..."
+                              isDisabled={readOnly || childRecord.current > 0}
+                              isSearchable
+                              isClearable={false}
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className={`w-full px-1 -ml-1   text-xs rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm `}
-                                styles={{
-                                  control: (base) => ({
-                                    ...base,
-                                    minHeight: "16px", // Reduce overall height
-                                    height: "16px", // Force height
-                                    padding: "13px 4px", // Adjust padding inside
-                                    fontSize: "12px", // Make text smaller
-                                    borderRadius: "8px",
-                                    fontFamily: "'Segoe UI'",
-                                  }),
-                                  valueContainer: (base) => ({
-                                    ...base,
-                                    padding: "0 6px", // Space for text
-                                    marginTop: "-8px",
-                                    fontFamily: "'Segoe UI'",
-                                  }),
-                                  input: (base) => ({
-                                    ...base,
-                                    margin: 0,
-                                    padding: 0,
-                                    fontFamily: "'Segoe UI'",
-                                  }),
-                                  singleValue: (base) => ({
-                                    ...base,
-                                    fontFamily: "'Segoe UI'",
-                                  }),
-                                  placeholder: (base) => ({
-                                    ...base,
-                                    fontFamily: "'Segoe UI'",
-                                  }),
-                                  menu: (base) => ({
-                                    ...base,
-                                    fontFamily: "'Segoe UI'",
-                                  }),
-                                  option: (base) => ({
-                                    ...base,
-                                    fontFamily: "'Segoe UI'",
-                                    fontSize: "12px",
-                                  }),
-                                  indicatorsContainer: (base) => ({
-                                    ...base,
-                                    display: "none",
-                                    height: "28px", // Align dropdown arrow
-                                    marginTop: "-12px",
-                                  }),
-                                }}
-                              />
-                            </div>
-                            <div className="w-16">
-                              <label className="block text-xs font-bold text-slate-700 mb-1">
-                                Code
-                              </label>
-                              <input
-                                type="text"
-                                value={countryCode}
-                                readOnly={readOnly || childRecord.current > 0}
-                                className={`w-full px-3 py-1 text-xs border border-gray-300 rounded-lg
-  focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-  transition-all duration-150 shadow-sm
+                              // styles={{
+                              //   control: (base) => ({
+                              //     ...base,
+                              //     minHeight: "16px", // Reduce overall height
+                              //     height: "16px", // Force height
+                              //     padding: "13px 4px", // Adjust padding inside
+                              //     fontSize: "12px", // Make text smaller
+                              //     borderRadius: "8px",
+                              //     fontFamily: "Poppins",
+                              //   }),
+                              //   valueContainer: (base) => ({
+                              //     ...base,
+                              //     padding: "0 6px", // Space for text
+                              //     marginTop: "-8px",
+                              //     fontFamily: "Poppins",
+                              //   }),
+                              //   input: (base) => ({
+                              //     ...base,
+                              //     margin: 0,
+                              //     padding: 0,
+                              //     fontFamily: "Poppins",
+                              //         fontSize: "12px",
+
+                              //   }),
+                              //   singleValue: (base) => ({
+                              //     ...base,
+                              //     fontFamily: "Poppins",
+                              //         fontSize: "12px",
+
+                              //   }),
+                              //   placeholder: (base) => ({
+                              //     ...base,
+                              //     fontFamily: "Poppins",
+                              //         fontSize: "12px",
+
+                              //   }),
+                              //   menu: (base) => ({
+                              //     ...base,
+                              //     fontFamily: "Poppins",
+                              //         fontSize: "12px",
+
+                              //   }),
+                              //   option: (base) => ({
+                              //     ...base,
+                              //     fontFamily: "Poppins",
+                              //     fontSize: "12px",
+                              //   }),
+                              //   indicatorsContainer: (base) => ({
+                              //     ...base,
+                              //     display: "none",
+                              //     height: "28px", // Align dropdown arrow
+                              //     marginTop: "-12px",
+                              //   }),
+                              // }}
+                              styles={customSelectStyles}
+                            />
+                          </div>
+                          <div className="w-16">
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              Code
+                            </label>
+                            <input
+                              type="text"
+                              value={countryCode}
+                              readOnly={readOnly || childRecord.current > 0}
+                              className={`w-full px-2 py-1 text-xs text-[12px] text-black border input-font border-gray-300 rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm
   ${
     readOnly || childRecord.current > 0
       ? "bg-gray-100 text-gray-500 cursor-not-allowed"
       : "bg-white hover:border-gray-400"
   }`}
-                                disabled={readOnly || childRecord.current > 0}
-                                placeholder="Code"
-                              />
-                            </div>
-                          </div>
-
-                          <div className=" pt-10">
-                            <ToggleButton
-                              name="Status"
-                              options={statusDropdown}
-                              value={active}
-                              setActive={setActive}
-                              required={true}
-                              readOnly={readOnly}
+                              disabled={readOnly || childRecord.current > 0}
+                              placeholder="Code"
                             />
                           </div>
-                    
+                        </div>
+
+                        <div className=" pt-10">
+                          <ToggleButton
+                            name="Status"
+                            options={statusDropdown}
+                            value={active}
+                            setActive={setActive}
+                            required={true}
+                            readOnly={readOnly}
+                          />
+                        </div>
+                       
                       </div>
                     </div>
                   </div>

@@ -299,7 +299,7 @@ const Form = () => {
           {form === true ? (
             <div className="w-full bg-gray-100 mx-auto rounded-md shadow-md px-2 overflow-auto py-1 ">
               <div className="flex justify-between items-center mb-1">
-                <h1 className="text-2xl font-bold text-gray-800">
+                <h1 className="master-header">
                   Machine In/Out IP Entry
                 </h1>
                 <div className="flex gap-2">
@@ -428,7 +428,7 @@ const Form = () => {
                                     "date"
                                   )
                                 }
-                                className={`pl-1 bg-transparent   focus:outline-none focus:border-transparent ${
+                                className={`pl-1 bg-transparent w-[110px]  focus:outline-none focus:border-transparent ${
                                   readOnly || childRecord.current > 0
                                     ? "text-gray-600"
                                     : "text-black"
@@ -580,10 +580,10 @@ const Form = () => {
                                 onKeyDown={(e) => {
                                   if (e.key === "Enter") {
                                     e.preventDefault();
-                                    addNewRow();
-                                    // if (item?.date) {
-                                    //   addNewRow();
-                                    // }
+                                  
+                                    if (item?.date) {
+                                      addNewRow();
+                                    }
                                   }
                                 }}
                                 className={`w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent ${
@@ -642,7 +642,7 @@ const Form = () => {
           ) : (
             <>
               <div className="w-full flex bg-white p-1 justify-between  items-center">
-                <h1 className="text-2xl font-bold text-gray-800">
+                <h1 className="master-header">
                   Machine In/Out IP Entry
                 </h1>
                 <div className="flex items-center gap-4">

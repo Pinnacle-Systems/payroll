@@ -154,8 +154,8 @@ const PFEsiEditor = () => {
       });
       setForm(false);
       dispatch({
-        type: `payComponent/invalidateTags`,
-        payload: ["payComponent"],
+        type: `companyPayCode/invalidateTags`,
+        payload: ["companyPayCode"],
       });
     } catch (error) {
       Swal.fire({
@@ -207,8 +207,8 @@ const PFEsiEditor = () => {
         });
         setForm(false);
         dispatch({
-          type: `payComponent/invalidateTags`,
-          payload: ["payComponent"],
+          type: `companyPayCode/invalidateTags`,
+          payload: ["companyPayCode"],
         });
       } catch (error) {
         Swal.fire({
@@ -321,7 +321,7 @@ const PFEsiEditor = () => {
           ) : (
             <>
               <div className="w-full flex bg-white p-1 justify-between  items-center">
-                <h1 className="text-2xl font-bold text-gray-800">
+                <h1 className="master-header">
                   PF and ESI Rate Editor
                 </h1>
                 <div className="flex items-center gap-4">

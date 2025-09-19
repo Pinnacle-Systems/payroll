@@ -119,7 +119,7 @@ const ActiveTabList = () => {
     "SHIFT MASTER":<ShiftMaster/>,
     "SHIFT TEMPLATE MASTER" : <ShiftTemplateMaster/>,
     "EMPLOYEE SUB CATEGORY":<EmployeeSubCategory/>,
-    "PAYCOMPONENTS" :<PayComponents/>,
+    "PAY COMPONENTS" :<PayComponents/>,
     "COMPANY PAYCODE":<CompanyPaycode/>,
     "BLOOD GROUP" : <BloodGroup/>,
     "PAY STRUCTURE" : <PayStructure/>,

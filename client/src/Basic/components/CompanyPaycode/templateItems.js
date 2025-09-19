@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DateInput, TextInput } from "../../../Inputs";
 import { common, pickFrom } from "../../../Utils/DropdownData";
 import Select from "react-select";
@@ -29,8 +29,16 @@ const TemplateItems = ({
   setReadOnly,
   setId,
   refetch,
+  form,
 }) => {
   const [contextMenu, setContextMenu] = useState(null);
+
+  const payref = useRef(null);
+  useEffect(() => {
+    if (form && !readOnly && payref.current) {
+      payref.current.focus();
+    }
+  }, [form, readOnly]);
   const handleRightClick = (event, rowIndex, type) => {
     event.preventDefault();
     setContextMenu({
@@ -90,14 +98,13 @@ const TemplateItems = ({
       );
     });
   };
-
-  console.log(payComponent, "payComponent");
+  console.log(payDetails, "payDetails");
 
   return (
     <>
       <div className="w-full bg-gray-100 mx-auto rounded-md shadow-md px-2 overflow-auto py-1 ">
         <div className="flex justify-between items-center mb-1">
-          <h1 className="text-2xl font-bold text-gray-800">Company Paycode </h1>
+          <h1 className="master-header">Company Paycode </h1>
           <div className="flex gap-2">
             {readOnly && (
               <button
@@ -166,6 +173,7 @@ const TemplateItems = ({
                     required={true}
                     readOnly={readOnly}
                     disabled={childRecord.current > 0}
+                    ref={payref}
                   />
                 </div>
               </div>
@@ -250,6 +258,7 @@ const TemplateItems = ({
                             "payComponentId"
                           )
                         }
+                        onInputChange={(value) => value.toUpperCase()}
                         placeholder="Select Pay Code"
                         value={(payComponent?.data || [])
                           .map((blend) => ({
@@ -275,7 +284,10 @@ const TemplateItems = ({
                           }),
                           singleValue: (base) => ({
                             ...base,
-                            color: readOnly ? "gray" : "black",
+                            color:
+                              readOnly || item.childRecord > 0
+                                ? "gray"
+                                : "black",
                             fontSize: "12px", // optional: adjust font size
                           }),
 
@@ -329,7 +341,9 @@ const TemplateItems = ({
                           )
                         }
                         className={`w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent ${
-                          readOnly ? "text-gray-600" : "text-black"
+                          readOnly || item.childRecord > 0
+                            ? "text-gray-600"
+                            : "text-black"
                         }`}
                         disabled={true}
                       />
@@ -351,7 +365,9 @@ const TemplateItems = ({
                           )
                         }
                         className={`w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent ${
-                          readOnly ? "text-gray-600" : "text-black"
+                          readOnly || item.childRecord > 0
+                            ? "text-gray-600"
+                            : "text-black"
                         }`}
                         disabled={true}
                       />
@@ -408,7 +424,7 @@ const TemplateItems = ({
                       </select>
                     </td>
                     <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
-                      <select
+                      {/* <select
                         disabled={readOnly || item.childRecord > 0}
                         className="text-left w-full text-[12px] bg-transparent focus:outline-none rounded py-1"
                         value={item?.pickFrom}
@@ -423,7 +439,43 @@ const TemplateItems = ({
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             e.preventDefault();
-                            addNewRow();
+                            if (item?.payComponentId) {
+                              addNewRow();
+                            }
+                          }
+                        }}
+                      >
+                        <option>Select</option>
+                        {pickFrom.map((blend) => (
+                          <option value={blend.value} key={blend.value}>
+                            {blend?.show}
+                          </option>
+                        ))}
+                      </select> */}
+                      <select
+                        disabled={readOnly} // only readonly disables
+                        className={`text-left w-full text-[12px] bg-transparent focus:outline-none rounded py-1 
+    ${readOnly || item.childRecord > 0 ? "text-gray-500" : "text-black"}`}
+                        value={item?.pickFrom}
+                        onChange={(e) => {
+                          if (item.childRecord > 0) {
+                            // block editing if child record
+                            e.preventDefault();
+                            return;
+                          }
+                          handleInputChange(e.target.value, index, "pickFrom");
+                        }}
+                        onContextMenu={(e) => {
+                          if (!readOnly) {
+                            handleRightClick(e, index, "pickFrom");
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            if (item?.payComponentId) {
+                              addNewRow();
+                            }
                           }
                         }}
                       >

@@ -11,13 +11,13 @@ select{
 }
 
 * {
-  font-family: 'Segoe UI' !important;
+  font-family: 'Poppins' !important;
 }
 html, body {
-  font-family: "Segoe UI" !important;
+  font-family: "Poppins" !important;
   background-color: #F1F1F0;
   
 }
 .font-segoe {
-  font-family: 'Segoe UI';
+  font-family: 'Poppins';
 }

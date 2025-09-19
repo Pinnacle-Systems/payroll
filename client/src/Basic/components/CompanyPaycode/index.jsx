@@ -110,7 +110,8 @@ const CompanyPaycode = () => {
       const payDetailsWithChild =
         data?.PayDetails?.map((item) => ({
           ...item,
-          childRecord: item._count?.PayStructure || 0, // each PayDetails row child count
+          childRecord:
+            (item._count?.PayStructure || 0) + (item._count?.PFESIEditor || 0), // sum of both
         })) || [];
 
       setPayDetails(payDetailsWithChild);
@@ -198,8 +199,8 @@ const CompanyPaycode = () => {
         if (deldata?.statusCode == 1) {
           Swal.fire({
             icon: "error",
-            title: "Submission error",
-            text: deldata?.data?.message || "Something went wrong!",
+            title: "Data cannot be Deleted",
+            text: deldata?.data?.message || "Child Record Exits",
           });
           setForm(false);
           return;
@@ -322,14 +323,13 @@ const CompanyPaycode = () => {
                 onNew();
               }}
               onNew={onNew}
+              form={form}
               refetch={refetch}
             />
           ) : (
             <>
               <div className="w-full flex bg-white p-1 justify-between  items-center">
-                <h1 className="text-2xl font-bold text-gray-800">
-                  Company Paycode
-                </h1>
+                <h1 className="master-header">Company Paycode</h1>
                 <div className="flex items-center gap-4">
                   <button
                     onClick={() => {

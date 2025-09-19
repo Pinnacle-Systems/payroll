@@ -39,10 +39,10 @@ export default function Form() {
   const [form, setForm] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
- const departmentNameref = useRef(null);
-   const params = getCommonParams();
- 
-   const { branchId,companyId } = params;;
+  const departmentNameref = useRef(null);
+  const params = getCommonParams();
+
+  const { branchId, companyId } = params;
   const { data: allData } = useGetDepartmentQuery({
     params,
     searchParams: searchValue,
@@ -80,7 +80,7 @@ export default function Form() {
     active,
     companyId,
     id,
-    branchId
+    branchId,
   };
 
   const validateData = (data) => {
@@ -89,11 +89,11 @@ export default function Form() {
     }
     return false;
   };
-   useEffect(() => {
-     if (form && !readOnly && departmentNameref.current) {
-       departmentNameref.current.focus();
-     }
-   }, [form, readOnly]);
+  useEffect(() => {
+    if (form && !readOnly && departmentNameref.current) {
+      departmentNameref.current.focus();
+    }
+  }, [form, readOnly]);
   const handleSubmitCustom = async (callback, data, text) => {
     try {
       let returnData = await callback(data).unwrap();
@@ -135,7 +135,7 @@ export default function Form() {
     }
   };
 
- const deleteData = async (id) => {
+  const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
         return;
@@ -271,7 +271,7 @@ export default function Form() {
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
       <div className="w-full flex bg-white p-1 justify-between  items-center">
-        <h1 className="text-2xl font-bold text-gray-800">Department Master</h1>
+        <h1 className="master-header">Department Master</h1>
         <div className="flex items-center">
           <button
             onClick={() => {
@@ -321,7 +321,7 @@ export default function Form() {
           <div className="h-full flex flex-col bg-gray-100">
             <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
               <div className="flex items-center gap-2">
-                <h2 className="text-lg  py-0.5 font-semibold  text-gray-800">
+                <h2 className=" -ml-2   py-0.5 master-header-modal">
                   Department Master
                 </h2>
               </div>
@@ -370,7 +370,7 @@ export default function Form() {
                             required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
-                             ref={departmentNameref}
+                            ref={departmentNameref}
                           />
                         </div>
                         <div className="mb-3 w-20 ml-6">
@@ -382,7 +382,6 @@ export default function Form() {
                             // required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
-                            
                           />
                         </div>
                       </div>

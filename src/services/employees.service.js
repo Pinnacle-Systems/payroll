@@ -117,7 +117,6 @@ async function getEmployeeId(branchId, startTime, endTime) {
       id: "desc",
     },
   });
-  
 
   const code = "EMP";
   const branchObj = await getTableRecordWithId(branchId, "branch");
@@ -129,8 +128,8 @@ async function getEmployeeId(branchId, startTime, endTime) {
     }`;
   }
 
-  console.log(newDocId,'newDocId--');
-  
+  console.log(newDocId, "newDocId--");
+
   return newDocId;
 }
 
@@ -149,18 +148,18 @@ async function get(req) {
     include: {
       department: { select: { name: true } },
       BloodGroup: { select: { bgFamily: true } },
-      shiftTemplate: { select: { name: true } }, 
-      designation: { select: { name: true } }, 
-      presentCity: { select: { name: true } }, 
-      permanentCity: { select: { name: true } }, 
-      presentState: { select: { name: true } }, 
-      permanentState: { select: { name: true } }, 
-      presentCountry: { select: { name: true } }, 
+      shiftTemplate: { select: { name: true } },
+      designation: { select: { name: true } },
+      presentCity: { select: { name: true } },
+      permanentCity: { select: { name: true } },
+      presentState: { select: { name: true } },
+      permanentState: { select: { name: true } },
+      presentCountry: { select: { name: true } },
       permanentCountry: { select: { name: true } },
       EmployeeCategory: true,
       EmployeeSubCategory: true,
-      EmployeeBankDetails: true, 
-      EmployeeEducationdetails: true, 
+      EmployeeBankDetails: true,
+      EmployeeEducationdetails: true,
       EmployeeFamilyDetails: true,
     },
   });
@@ -175,8 +174,6 @@ async function get(req) {
       )
     : "";
 
-    
-    
   return {
     statusCode: 0,
     data: data.map((item) => exclude({ ...item }, ["image"])),
@@ -185,21 +182,14 @@ async function get(req) {
 }
 
 async function getOne(id) {
+  const childRecord = await prisma.leaveOPeningBalance.count({
+    where: { employeeId: parseInt(id) },
+  });
   const data = await xprisma.employee.findUnique({
     where: {
       id: parseInt(id),
     },
     include: {
-      // permCity: {
-      //   select: {
-      //     id: true,
-      //   },
-      // },
-      // localCity: {
-      //   select: {
-      //     id: true,
-      //   },
-      // },
       department: {
         select: {
           id: true,
@@ -222,7 +212,13 @@ async function getOne(id) {
     },
   });
   if (!data) return NoRecordFound("Employee");
-  return { statusCode: 0, data: exclude({ ...data }, ["image"]) };
+  return {
+    statusCode: 0,
+    data: {
+      ...exclude({ ...data }, ["image"]),
+      childRecord, 
+    },
+  };
 }
 
 async function getSearch(req) {
@@ -325,7 +321,6 @@ async function create(req) {
     ? JSON.parse(permanentAddress)
     : {};
 
-
   const data = await prisma.employee.create({
     data: {
       employeeType: employeeType ? employeeType : "",
@@ -338,7 +333,7 @@ async function create(req) {
       disability: disability ? disability : "",
       identificationMark: identificationMark ? identificationMark : "",
       dob: dob ? new Date(dob) : null,
-    
+
       height: height ? height : "",
       weight: weight ? weight : "",
       maritalStatus: maritalStatus ? maritalStatus : "",
@@ -482,7 +477,7 @@ async function update(id, req) {
     disability,
     identificationMark,
     dob,
-    
+
     height,
     weight,
     maritalStatus,
@@ -521,8 +516,6 @@ async function update(id, req) {
     ? JSON.parse(permanentAddress)
     : {};
 
-  
-
   const dataFound = await prisma.employee.findFirst({
     where: {
       id: parseInt(id),
@@ -545,7 +538,7 @@ async function update(id, req) {
       disability: disability ? disability : "",
       identificationMark: identificationMark ? identificationMark : "",
       dob: dob ? new Date(dob) : null,
-     
+
       height: height ? height : "",
       weight: weight ? weight : "",
       maritalStatus: maritalStatus ? maritalStatus : "",

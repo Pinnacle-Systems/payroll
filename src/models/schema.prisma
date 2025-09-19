@@ -375,15 +375,16 @@ model EmployeeEducationDetails {
 }
 
 model EmployeeFamilyDetails {
-  id           Int       @id @default(autoincrement())
-  employee     Employee? @relation(fields: [employeeId], references: [id], onDelete: Cascade)
-  employeeId   Int?
-  name         String?
-  dob          DateTime?
-  age          Int?
-  relationShip String?
-  occupation   String?
-  nominee      String?
+  id             Int          @id @default(autoincrement())
+  employee       Employee?    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  employeeId     Int?
+  name           String?
+  dob            DateTime?
+  age            Int?
+  RelationShip   RelationShip @relation(fields: [relationShipId], references: [id])
+  relationShipId Int
+  occupation String?
+  nominee    String?
 }
 
 model FinYear {
@@ -1575,8 +1576,8 @@ model PayStructure {
   id                    Int                  @id @default(autoincrement())
   CompanyPayStructure   CompanyPayStructure? @relation(fields: [companyPayStructureId], references: [id], onDelete: Cascade)
   companyPayStructureId Int?
-  PayDetails            PayDetails?          @relation(fields: [payDetailsId], references: [id])
-  payDetailsId          Int?
+  PayDetails            PayDetails           @relation(fields: [payDetailsId], references: [id])
+  payDetailsId          Int
   salaryPercentage      Float?
   mark                  Boolean?             @default(false)
   formula               String?
@@ -1611,8 +1612,8 @@ model PFESIEditor {
   company      Company?    @relation(fields: [companyId], references: [id])
   branch       Branch?     @relation(fields: [branchId], references: [id])
   branchId     Int?
-  PayDetails   PayDetails? @relation(fields: [payDetailsId], references: [id])
-  payDetailsId Int?
+  PayDetails   PayDetails  @relation(fields: [payDetailsId], references: [id])
+  payDetailsId Int
   docId        String?
   date         DateTime?
   PfEsiGrid    PfEsiGrid[]
@@ -1628,19 +1629,20 @@ model PfEsiGrid {
 }
 
 model RelationShip {
-  id          Int      @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdBy   User?    @relation("createdBy", fields: [createdById], references: [id])
-  createdById Int?
-  updatedBy   User?    @relation("updatedBy", fields: [updatedById], references: [id])
-  updatedById Int?
-  companyId   Int?
-  company     Company? @relation(fields: [companyId], references: [id])
-  branch      Branch?  @relation(fields: [branchId], references: [id])
-  branchId    Int?
-  name        String?
-  active      Boolean? @default(true)
+  id                    Int                     @id @default(autoincrement())
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  createdBy             User?                   @relation("createdBy", fields: [createdById], references: [id])
+  createdById           Int?
+  updatedBy             User?                   @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById           Int?
+  companyId             Int?
+  company               Company?                @relation(fields: [companyId], references: [id])
+  branch                Branch?                 @relation(fields: [branchId], references: [id])
+  branchId              Int?
+  name                  String?
+  active                Boolean?                @default(true)
+  EmployeeFamilyDetails EmployeeFamilyDetails[]
 }
 
 model Proof {

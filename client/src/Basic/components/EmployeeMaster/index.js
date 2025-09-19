@@ -43,6 +43,7 @@ import { getCommonParams, viewBase64String } from "../../../Utils/helper";
 import SingleImageFileUploadComponent from "../SingleImageUploadComponent";
 import EmployeeLeavingForm from "./EmployeeLeavingForm";
 import { useGetDepartmentQuery } from "../../../redux/services/DepartmentMasterService";
+import { useGetRelationShipQuery } from "../../../redux/services/RelationShipService";
 import { useDispatch } from "react-redux";
 import {
   Check,
@@ -199,6 +200,8 @@ export default function Form() {
   const { data: desigination } = useGetdesignationQuery({ params });
 
   const { data: department } = useGetDepartmentQuery({ params });
+
+  const { data: relationShip } = useGetRelationShipQuery({ params });
   const {
     data: allData,
     isLoading,
@@ -235,6 +238,8 @@ export default function Form() {
 
   const syncFormWithDb = useCallback(
     (data) => {
+      childRecord.current = data?.childRecord ? data?.childRecord : 0;
+
       // Basic Info
       setEmployeeType(data?.employeeType);
       setFirstName(data?.firstName || "");
@@ -347,7 +352,7 @@ export default function Form() {
           name: f?.name || "",
           dob: f?.dob ? moment.utc(f.dob).format("YYYY-MM-DD") : "",
           age: f?.age || "",
-          relationShip: f?.relationShip || "",
+          relationShipId: f?.relationShipId || "",
           occupation: f?.occupation || "",
           nominee: f?.nominee || "",
         }))
@@ -501,16 +506,41 @@ export default function Form() {
       setSearchValue("");
       // setStep(1);
       dispatch({
-        type: `EmployeeCategoryMaster/invalidateTags`,
-        payload: ["Employee Category"],
+        type: `bloodGroup/invalidateTags`,
+        payload: ["bloodGroup"],
+      });
+
+      dispatch({
+        type: `employeeCategoryMaster/invalidateTags`,
+        payload: ["EmployeeCategory"],
       });
       dispatch({
-        type: `DepartmentMaster/invalidateTags`,
+        type: `departmentMaster/invalidateTags`,
         payload: ["Department"],
       });
       dispatch({
-        type: `CityMaster/invalidateTags`,
-        payload: ["City/State Name"],
+        type: `employeeSubCategory/invalidateTags`,
+        payload: ["employeeSubCategory"],
+      });
+      dispatch({
+        type: `designationMaster/invalidateTags`,
+        payload: ["designation"],
+      });
+      dispatch({
+        type: `ShiftTemplateMaster/invalidateTags`,
+        payload: ["ShiftTemplateMaster"],
+      });
+      dispatch({
+        type: `cityMaster/invalidateTags`,
+        payload: ["City"],
+      });
+      dispatch({
+        type: `countryMaster/invalidateTags`,
+        payload: ["Countries"],
+      });
+      dispatch({
+        type: `stateMaster/invalidateTags`,
+        payload: ["State"],
       });
       setForm(false);
       Swal.fire({
@@ -529,10 +559,8 @@ export default function Form() {
       console.log("handle");
     }
   };
-  console.log(employeeCategoryList?.data, "employeeCategoryList?.data");
-  const validateData = (data) => {
-    console.log(data, "data--");
 
+  const validateData = (data) => {
     if (
       data?.employeeType &&
       data?.firstName &&
@@ -627,16 +655,41 @@ export default function Form() {
         await removeData(id);
         setId("");
         dispatch({
-          type: `EmployeeCategoryMaster/invalidateTags`,
+          type: `bloodGroup/invalidateTags`,
+          payload: ["bloodGroup"],
+        });
+
+        dispatch({
+          type: `employeeCategoryMaster/invalidateTags`,
           payload: ["EmployeeCategory"],
         });
         dispatch({
-          type: `DepartmentMaster/invalidateTags`,
+          type: `departmentMaster/invalidateTags`,
           payload: ["Department"],
         });
         dispatch({
+          type: `employeeSubCategory/invalidateTags`,
+          payload: ["employeeSubCategory"],
+        });
+        dispatch({
+          type: `designationMaster/invalidateTags`,
+          payload: ["designation"],
+        });
+        dispatch({
+          type: `ShiftTemplateMaster/invalidateTags`,
+          payload: ["ShiftTemplateMaster"],
+        });
+        dispatch({
           type: `cityMaster/invalidateTags`,
-          payload: ["City/State Name"],
+          payload: ["City"],
+        });
+        dispatch({
+          type: `countryMaster/invalidateTags`,
+          payload: ["Countries"],
+        });
+        dispatch({
+          type: `stateMaster/invalidateTags`,
+          payload: ["State"],
         });
 
         setForm(false);
@@ -785,7 +838,7 @@ export default function Form() {
         name: "",
         dob: null, // better as null
         age: "",
-        relationShip: "",
+        relationShipId: "",
         occupation: "",
         nominee: "",
       },
@@ -878,7 +931,7 @@ export default function Form() {
         name: "",
         dob: "",
         age: "",
-        relationShip: "",
+        relationShipId: "",
         occupation: "",
         nominee: "",
       },
@@ -923,7 +976,7 @@ export default function Form() {
         name: "",
         dob: "",
         age: "",
-        relationShip: "",
+        relationShipId: "",
         occupation: "",
         nominee: "",
       },
@@ -1141,12 +1194,16 @@ export default function Form() {
     value: val?.id,
     label: val?.name,
   }));
+  const RelationShipOptions = relationShip?.data?.map((val) => ({
+    value: val?.id,
+    label: val?.name,
+  }));
 
   return (
     <div onKeyDown={handleKeyDown} className="p-1 ">
       {/* Header Section */}
       <div className="w-full flex bg-white p-1 justify-between  items-center">
-        <h1 className="text-2xl font-bold text-gray-800">Employee Master</h1>
+        <h1 className="master-header">Employee Master</h1>
         <div className="flex items-center gap-4">
           <button
             onClick={() => {
@@ -1210,9 +1267,7 @@ export default function Form() {
           <div className="h-full flex flex-col bg-gray-100">
             <div className="border-b py-2 px-4 mx-3 flex justify-between items-center sticky top-0 z-10 bg-white mt-4">
               <div className="flex items-center gap-2">
-                <h2 className="text-lg font-semibold text-gray-800">
-                  Employee Master
-                </h2>
+                <h2 className=" master-header-modal">Employee Master</h2>
 
                 {regNo && (
                   <span
@@ -1372,7 +1427,7 @@ export default function Form() {
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
                         </div>
-                        <div className="col-span-1">
+                        <div className="w-30">
                           <DateInput
                             ref={input1Ref}
                             name="Date of Birth"
@@ -1421,7 +1476,7 @@ export default function Form() {
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
                         </div>{" "}
-                        <div className="ml-1 w-60">
+                        <div className="ml-1 w-[270px]">
                           <TextInput
                             ref={input1Ref}
                             name="Identification Mark"
@@ -1475,7 +1530,7 @@ export default function Form() {
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           /> */}
-                          <label className="block text-xs  font-bold text-slate-700 mb-1">
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
                             Blood Group
                             <span className="text-red-500">*</span>
                           </label>
@@ -1506,7 +1561,7 @@ export default function Form() {
                         <div className="w-24">
                           <TextInput
                             ref={input1Ref}
-                            name="Height (Cms)"
+                            name="Height (cms)"
                             value={height}
                             setValue={setHeight}
                             // required={true}
@@ -1571,7 +1626,7 @@ export default function Form() {
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           /> */}
-                          <label className="block text-xs  font-bold text-slate-700 mb-1">
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
                             Employee Category
                             <span className="text-red-500">*</span>
                           </label>
@@ -1615,7 +1670,7 @@ export default function Form() {
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           /> */}
-                          <label className="block text-xs  font-bold text-slate-700 mb-1">
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
                             Department
                             <span className="text-red-500">*</span>
                           </label>
@@ -1644,7 +1699,7 @@ export default function Form() {
                           />
                         </div>
 
-                        <div className="w-52">
+                        <div className="w-60">
                           {/* <DropdownInput
                             ref={input1Ref}
                             name="Employee Sub Category"
@@ -1660,7 +1715,7 @@ export default function Form() {
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           /> */}
-                          <label className="block text-xs  font-bold text-slate-700 mb-1">
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
                             Employee Sub Category
                             <span className="text-red-500">*</span>
                           </label>
@@ -1728,7 +1783,7 @@ export default function Form() {
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           /> */}
-                          <label className="block text-xs  font-bold text-slate-700 mb-1">
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
                             Designation
                             <span className="text-red-500">*</span>
                           </label>
@@ -1773,7 +1828,7 @@ export default function Form() {
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           /> */}
-                          <label className="block text-xs  font-bold text-slate-700 mb-1">
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
                             Shift Template
                             <span className="text-red-500">*</span>
                           </label>
@@ -1926,8 +1981,8 @@ export default function Form() {
                           disabled={childRecord.current > 0}
                         />
                       </div>
-                      <div>
-                        <label className="block text-xs font-bold text-slate-700 mb-1">
+                      <div className="w-72">
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">
                           Email <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -2002,7 +2057,7 @@ export default function Form() {
                               }
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             /> */}
-                            <label className="block text-xs  font-bold text-slate-700 mb-1">
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
                               City
                               <span className="text-red-500">*</span>
                             </label>
@@ -2052,7 +2107,7 @@ export default function Form() {
                               disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             /> */}
-                            <label className="block text-xs  font-bold text-slate-700 mb-1">
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
                               State
                               <span className="text-red-500">*</span>
                             </label>
@@ -2101,7 +2156,7 @@ export default function Form() {
                               disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             /> */}
-                            <label className="block text-xs  font-bold text-slate-700 mb-1">
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
                               Country
                               <span className="text-red-500">*</span>
                             </label>
@@ -2219,7 +2274,7 @@ export default function Form() {
                               }
                             /> */}
 
-                            <label className="block text-xs  font-bold text-slate-700 mb-1">
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
                               City
                               <span className="text-red-500">*</span>
                             </label>
@@ -2270,7 +2325,7 @@ export default function Form() {
                                 childRecord.current > 0 || sameAsPresent
                               }
                             /> */}
-                            <label className="block text-xs  font-bold text-slate-700 mb-1">
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
                               State
                               <span className="text-red-500">*</span>
                             </label>
@@ -2323,7 +2378,7 @@ export default function Form() {
                                 childRecord.current > 0 || sameAsPresent
                               }
                             /> */}
-                            <label className="block text-xs  font-bold text-slate-700 mb-1">
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
                               Country
                               <span className="text-red-500">*</span>
                             </label>
@@ -2465,9 +2520,15 @@ export default function Form() {
                                         e.target.value
                                       )
                                     }
-                                    readOnly={readOnly}
+                                    disabled={
+                                      readOnly || childRecord.current > 0
+                                    }
                                     // disabled={childRecord.current > 0}
-                                    className="w-full focus:outline-none uppercase focus:border-none pl-2"
+                                    className={`w-full focus:outline-none  uppercase focus:border-none pl-2 bg-transparent  ${
+                                      readOnly || childRecord.current > 0
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                    }`}
                                   />
                                 </td>
                                 <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
@@ -2482,8 +2543,14 @@ export default function Form() {
                                         e.target.value
                                       )
                                     }
-                                    className="w-full focus:outline-none uppercase focus:border-none pl-3"
-                                    readOnly={readOnly}
+                                    className={`w-full focus:outline-none uppercase focus:border-none pl-3 bg-transparent  ${
+                                      readOnly || childRecord.current > 0
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                    }`}
+                                    disabled={
+                                      readOnly || childRecord.current > 0
+                                    }
                                     // disabled={childRecord.current > 0}
                                   />
                                 </td>
@@ -2499,8 +2566,14 @@ export default function Form() {
                                         e.target.value
                                       )
                                     }
-                                    className="w-full focus:outline-none uppercase focus:border-none text-right pr-3"
-                                    readOnly={readOnly}
+                                    className={`w-full focus:outline-none uppercase focus:border-none text-right pr-3 bg-transparent  ${
+                                      readOnly || childRecord.current > 0
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                    }`}
+                                    disabled={
+                                      readOnly || childRecord.current > 0
+                                    }
                                     // disabled={childRecord.current > 0}
                                   />
                                 </td>
@@ -2516,8 +2589,14 @@ export default function Form() {
                                         e.target.value
                                       )
                                     }
-                                    className="w-full focus:outline-none uppercase focus:border-none text-left pl-2"
-                                    readOnly={readOnly}
+                                    className={`w-full focus:outline-none uppercase focus:border-none text-left pl-2 bg-transparent  ${
+                                      readOnly || childRecord.current > 0
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                    }`}
+                                    disabled={
+                                      readOnly || childRecord.current > 0
+                                    }
                                     // disabled={childRecord.current > 0}
                                   />
                                 </td>
@@ -2625,9 +2704,15 @@ export default function Form() {
                                         e.target.value
                                       )
                                     }
-                                    readOnly={readOnly}
+                                    disabled={
+                                      readOnly || childRecord.current > 0
+                                    }
                                     // disabled={childRecord.current > 0}
-                                    className="w-full pl-2 focus:outline-none uppercase focus:border-none"
+                                    className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${
+                                      readOnly || childRecord.current > 0
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                    }`}
                                   />
                                 </td>
                                 <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
@@ -2642,8 +2727,15 @@ export default function Form() {
                                         e.target.value
                                       )
                                     }
-                                    className="w-full pl-2 focus:outline-none  uppercase focus:border-none"
-                                    readOnly={readOnly}
+                                    className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${
+                                      readOnly || childRecord.current > 0
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                    }`}
+                                    disabled={
+                                      readOnly || childRecord.current > 0
+                                    }
+
                                     // disabled={childRecord.current > 0}
                                   />
                                 </td>
@@ -2659,8 +2751,15 @@ export default function Form() {
                                         e.target.value
                                       )
                                     }
-                                    className="w-full pl-2 focus:outline-none uppercase focus:border-none"
-                                    readOnly={readOnly}
+                                    className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${
+                                      readOnly || childRecord.current > 0
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                    }`}
+                                    disabled={
+                                      readOnly || childRecord.current > 0
+                                    }
+
                                     // disabled={childRecord.current > 0}
                                   />
                                 </td>
@@ -2676,8 +2775,15 @@ export default function Form() {
                                         e.target.value
                                       )
                                     }
-                                    className="w-full pl-2 focus:outline-none uppercase focus:border-none"
-                                    readOnly={readOnly}
+                                    className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${
+                                      readOnly || childRecord.current > 0
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                    }`}
+                                    disabled={
+                                      readOnly || childRecord.current > 0
+                                    }
+
                                     // disabled={childRecord.current > 0}
                                   />
                                 </td>
@@ -2778,7 +2884,7 @@ export default function Form() {
                             {familyDetails.map((item, index) => (
                               <tr
                                 key={index}
-                                className=" border border-gray-300 text-[12px] py-0.5 px-1 text-center"
+                                className="w-full table-row"
                               >
                                 <td className=" text-center px-1">
                                   {index + 1}
@@ -2795,9 +2901,15 @@ export default function Form() {
                                         e.target.value
                                       )
                                     }
-                                    readOnly={readOnly}
+                                    disabled={
+                                      readOnly || childRecord.current > 0
+                                    }
                                     // disabled={childRecord.current > 0}
-                                    className="w-full pl-2 focus:outline-none uppercase focus:border-none"
+                                    className={`w-full pl-1 focus:outline-none uppercase  focus:border-none bg-transparent  ${
+                                      readOnly || childRecord.current > 0
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                    }`}
                                   />
                                 </td>
                                 <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
@@ -2812,8 +2924,14 @@ export default function Form() {
                                         e.target.value
                                       )
                                     }
-                                    className="w-full pl-1 focus:outline-none uppercase  focus:border-none"
-                                    readOnly={readOnly}
+                                    className={` pl-1 w-[110px] focus:outline-none uppercase  focus:border-none bg-transparent  ${
+                                      readOnly || childRecord.current > 0
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                    }`}
+                                    disabled={
+                                      readOnly || childRecord.current > 0
+                                    }
                                     // disabled={childRecord.current > 0}
                                   />
                                 </td>
@@ -2829,26 +2947,95 @@ export default function Form() {
                                         e.target.value
                                       )
                                     }
-                                    className="w-full pr-2 text-right focus:outline-none uppercase  focus:border-none"
-                                    readOnly={readOnly}
+                                    className={`w-full pr-2 text-right focus:outline-none uppercase  focus:border-none bg-transparent ${
+                                      readOnly || childRecord.current > 0
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                    }`}
+                                    disabled={
+                                      readOnly || childRecord.current > 0
+                                    }
                                     // disabled={childRecord.current > 0}
                                   />
                                 </td>
                                 <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                  <input
-                                    // name="IFSC CODE"
-                                    type="text"
-                                    value={item?.relationShip}
-                                    onChange={(e) =>
-                                      handleFamilyDetailsChange(
-                                        index,
-                                        "relationShip",
-                                        e.target.value
-                                      )
+                                  <Select
+                                    options={RelationShipOptions}
+                                    value={
+                                      RelationShipOptions.find(
+                                        (opt) =>
+                                          opt.value === item?.relationShipId
+                                      ) || null
                                     }
-                                    className="w-full pl-2 focus:outline-none uppercase  focus:border-none"
-                                    readOnly={readOnly}
-                                    // disabled={childRecord.current > 0}
+                                   onChange={(selectedOption) =>
+    handleFamilyDetailsChange(index, "relationShipId", selectedOption?.value)
+  }
+                                    placeholder="Select"
+                                    isClearable={false} // same as required
+                                    isDisabled={
+                                      readOnly || childRecord.current > 0
+                                    }
+                                    isSearchable
+                                    menuShouldScrollIntoView={false}
+                                    maxMenuHeight={150} // <-- Reduce height here
+                                    onInputChange={(value) =>
+                                      value.toUpperCase()
+                                    }
+                                     menuPlacement="auto"
+                        menuPosition="fixed"
+                        styles={{
+                          control: (base) => ({
+                            ...base,
+                            border: "none", // remove border
+                            boxShadow: "none", // remove focus ring
+                            backgroundColor: "transparent",
+                            minHeight: "unset",
+                            height: "15px", // match table row height
+                            color: "black",
+                          }),
+                          placeholder: (base) => ({
+                            ...base,
+                            color: "black", // gray placeholder like Tailwind `text-gray-400`
+                          }),
+                          singleValue: (base) => ({
+                            ...base,
+                            color:
+                              readOnly || item.childRecord > 0
+                                ? "gray"
+                                : "black",
+                            fontSize: "12px", // optional: adjust font size
+                          }),
+
+                          dropdownIndicator: (base) => ({
+                            ...base,
+                            padding: 2, // smaller padding
+                            svg: {
+                              width: 14, // icon width
+                              height: 14, // icon height
+                            },
+                            color: "black",
+                          }),
+
+                          indicatorSeparator: () => ({ display: "none" }), // remove line
+                          valueContainer: (base) => ({
+                            ...base,
+                            padding: "0 2px", // tighten padding
+                            color: "black",
+                          }),
+                          input: (base) => ({
+                            ...base,
+                            margin: 0,
+                            padding: 0,
+                            color: "black",
+                          }),
+                          menu: (base) => ({
+                            ...base,
+                            zIndex: 9999, // keep menu on top
+                          }),
+                        }}
+                                    onKeyDown={(e) =>
+                                      handleKeyNext(e, input2Ref)
+                                    }
                                   />
                                 </td>
                                 <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
@@ -2863,8 +3050,14 @@ export default function Form() {
                                         e.target.value
                                       )
                                     }
-                                    className="w-full pl-2 focus:outline-none uppercase  focus:border-none"
-                                    readOnly={readOnly}
+                                    className={`w-full pl-2 focus:outline-none uppercase  focus:border-none bg-transparent ${
+                                      readOnly || childRecord.current > 0
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                    }`}
+                                    disabled={
+                                      readOnly || childRecord.current > 0
+                                    }
                                     // disabled={childRecord.current > 0}
                                   />
                                 </td>
@@ -2880,17 +3073,23 @@ export default function Form() {
                                         e.target.value
                                       )
                                     }
-                                    className="w-full pl-2 focus:outline-none uppercase  focus:border-none"
-                                    readOnly={readOnly}
+                                    className={`w-full pl-2 focus:outline-none uppercase  focus:border-none bg-transparent ${
+                                      readOnly || childRecord.current > 0
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                    }`}
+                                    disabled={
+                                      readOnly || childRecord.current > 0
+                                    }
                                     // disabled={childRecord.current > 0}
                                   />
                                 </td>
-                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                <td className=" border border-gray-300 text-[12px] py-1.5 text-center item-center">
                                   <button
                                     type="button"
                                     title="Delete Row"
                                     onClick={() => deleteFamilyRow(index)}
-                                    className="text-red-600 hover:text-red-800"
+                                    className="text-red-600 hover:text-red-800 text-center"
                                   >
                                     <svg
                                       xmlns="http://www.w3.org/2000/svg"

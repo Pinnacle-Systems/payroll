@@ -9,15 +9,7 @@ import { Provider } from 'react-redux';
 import { Font } from '@react-pdf/renderer'
 import { Toaster } from 'react-hot-toast';
 
-Font.register({
-  family: 'Segoe-UI',
-  src: '/fonts/SegoeUI.ttf', // Regular
-});
 
-Font.register({
-  family: 'Segoe-UI-Bold',
-  src: '/fonts/SegoeUI-Bold.ttf', // Bold
-});
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
