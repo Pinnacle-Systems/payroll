@@ -1,20 +1,14 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import secureLocalStorage from "react-secure-storage";
 
-import { toast } from "react-toastify";
+
 import {
-  TextInput,
-  ToggleButton,
+  
   ReusableTable,
-  TextAreaInput,
-  DropdownInput,
+  
 } from "../../../Inputs";
 
-import { common, commonNew, statusDropdown } from "../../../Utils/DropdownData";
 
-import { useGetCompanyQuery } from "../../../redux/services/CompanyMasterService";
-import Modal from "../../../UiComponents/Modal";
-import { Check, Power } from "lucide-react";
+
 
 import { getCommonParams } from "../../../Utils/helper";
 import {
@@ -26,6 +20,7 @@ import {
 } from "../../../redux/services/ShiftTemplateMaster";
 import { useGetShiftCommonTemplateQuery } from "../../../redux/services/ShiftCommonTemplate.service";
 import { useGetshiftMasterQuery } from "../../../redux/services/ShiftMasterService";
+import { useGetOTMasterQuery } from "../../../redux/services/OTMaster.service";
 import TemplateItems from "./templateItems";
 import Swal from "sweetalert2";
 import { useDispatch } from "react-redux";
@@ -51,8 +46,6 @@ const ShiftTemplateMaster = () => {
   const { branchId, companyId } = params;
 
   const dispatch = useDispatch();
-  const { data: company } = useGetCompanyQuery({ params });
-  const [companyCode, setCompanyCode] = useState(company?.data[0].code);
 
   const { data: allData, refetch } = useGetShiftTemplateMasterQuery({
     params,
@@ -78,12 +71,9 @@ const ShiftTemplateMaster = () => {
     searchParams: searchValue,
   });
 
-  // useEffect(() => {
-  //   if (company?.data?.length > 0) {
-  //     // setCompanyName(company.data[0].name);
-  //     setCompanyCode(company.data[0].code);
-  //   }
-  // }, [company]);
+  const { data :OTData} = useGetOTMasterQuery({params})
+
+  
 
   useEffect(() => {
     if (ShiftTemplateItems?.length >= 1) return;
@@ -91,11 +81,17 @@ const ShiftTemplateMaster = () => {
       let newArray = Array?.from({ length: 1 - prev?.length }, () => {
         return {
           templateId: "",
+          quarterDetails:[
+            {
+              oTId:''
+            }
+          ]
         };
       });
       return [...prev, ...newArray];
     });
   }, [setShiftTemplateItems, ShiftTemplateItems]);
+console.log(ShiftTemplateItems,"ShiftTemplateItems");
 
   const syncFormWithDb = useCallback(
     (data) => {
@@ -314,16 +310,7 @@ const ShiftTemplateMaster = () => {
     setReadOnly(false);
     console.log("Edit");
   };
-  const ACTIVE = (
-    <div className="bg-gradient-to-r from-green-200 to-green-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-green-500 shadow-lg text-white hover:scale-110 transition-transform duration-300">
-      <Power size={10} />
-    </div>
-  );
-  const INACTIVE = (
-    <div className="bg-gradient-to-r from-red-200 to-red-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-red-500 shadow-lg text-white hover:scale-110 transition-transform duration-300">
-      <Power size={10} />
-    </div>
-  );
+  
   const columns = [
     {
       header: "S.No",
@@ -360,8 +347,7 @@ const ShiftTemplateMaster = () => {
             ShiftTemplateItems={ShiftTemplateItems}
             setShiftTemplateItems={setShiftTemplateItems}
             id={id}
-            companyCode={companyCode}
-            setCompanyCode={setCompanyCode}
+            OTData={OTData}
             docId={docId}
             setDate={setDate}
             setshiftId={setshiftId}

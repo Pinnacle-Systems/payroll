@@ -61,6 +61,7 @@ import {
   leaveCode,
   leaveOpeningBalance,
   MachineInOutEntry,
+  OTMaster,
 } from "./src/routes/index.js";
 
 import { socketMain } from "./src/sockets/socket.js";
@@ -155,6 +156,7 @@ app.use('/proofMaster',proof)
 app.use('/leaveCode',leaveCode)
 app.use('/leaveopeningBalance',leaveOpeningBalance)
 app.use('/machineInOutEntry',MachineInOutEntry)
+app.use('/oTMAster',OTMaster)
 
 
 app.get("/retreiveFile/:fileName", (req, res) => {

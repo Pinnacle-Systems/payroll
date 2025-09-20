@@ -10,7 +10,7 @@ import {
   DropdownInput,
 } from "../../../Inputs";
 
-import { common, commonNew, statusDropdown } from "../../../Utils/DropdownData";
+
 
 import { useGetCompanyQuery } from "../../../redux/services/CompanyMasterService";
 import Modal from "../../../UiComponents/Modal";

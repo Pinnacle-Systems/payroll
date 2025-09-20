@@ -1525,10 +1525,10 @@ export const DropdownInput = forwardRef(
           {options?.map((option, index) => (
             <option
               key={index}
-              value={option.value}
+              value={option?.value}
               className="text-xs py-1.5 text-gray-800"
             >
-              {option.show}
+              {option?.show}
             </option>
           ))}
         </select>

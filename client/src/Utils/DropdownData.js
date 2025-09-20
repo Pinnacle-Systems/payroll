@@ -304,6 +304,24 @@ export const machinetype = [
 ];
 
 export const payType = [
-  {show:"MONTH",value:"MONTH"},
-  {show:"WEEK",value:"WEEK"},
-]
+  { show: "MONTH", value: "MONTH" },
+  { show: "WEEK", value: "WEEK" },
+];
+
+export const Days = [
+  { show: "ALL DAYS", value: "ALL DAYS" },
+  { show: "MONDAY", value: "MONDAY" },
+  { show: "TUESDAY", value: "TUESDAY" },
+  { show: "WEDNESDAY", value: "WEDNESDAY" },
+  { show: "THURSDAY", value: "THURSDAY" },
+  { show: "FRIDAY", value: "FRIDAY" },
+  { show: "SATURDAY", value: "SATURDAY" },
+  { show: "SUNDAY", value: "SUNDAY" },
+];
+
+export const Quarter = [
+  {show:"SHIFTCALC" , value:"SHIFTCALC"},
+  {show:"FORMULA" , value:"FORMULA"},
+  {show:"OTCALC" , value:"OTCALC"},
+
+];

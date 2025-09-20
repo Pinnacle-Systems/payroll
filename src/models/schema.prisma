@@ -78,6 +78,7 @@ model Company {
   LeaveCode           LeaveCode[]
   LeaveOPeningBalance LeaveOPeningBalance[]
   MAchineInOutEntry   MachineInOutEntry[]
+  OT                  OT[]
 }
 
 model Subscription {
@@ -139,6 +140,7 @@ model Branch {
   LeaveCode           LeaveCode[]
   LeaveOPeningBalance LeaveOPeningBalance[]
   MAchineInOutEntry   MachineInOutEntry[]
+  OT                  OT[]
 }
 
 model UserOnBranch {
@@ -269,6 +271,8 @@ model User {
   LeaveOPeningBalanceupdatedBy LeaveOPeningBalance[] @relation(name: "updatedBy")
   MAchineInOutEntryCreatedBy   MachineInOutEntry[]   @relation(name: "createdBy")
   MAchineInOutEntryupdatedBy   MachineInOutEntry[]   @relation(name: "updatedBy")
+  OTCreatedBy                  OT[]                  @relation(name: "createdBy")
+  OTupdatedBy                  OT[]                  @relation(name: "updatedBy")
 }
 
 model Employee {
@@ -383,8 +387,8 @@ model EmployeeFamilyDetails {
   age            Int?
   RelationShip   RelationShip @relation(fields: [relationShipId], references: [id])
   relationShipId Int
-  occupation String?
-  nominee    String?
+  occupation     String?
+  nominee        String?
 }
 
 model FinYear {
@@ -1722,4 +1726,26 @@ model MachineInOutGrid {
   currentMachine      String?
   default             String?
   notes               String?
+}
+
+model OT {
+  id          Int         @id @default(autoincrement())
+  Company     Company?    @relation(fields: [companyId], references: [id])
+  companyId   Int?
+  branch      Branch?     @relation(fields: [branchId], references: [id])
+  branchId    Int?
+  createdBy   User?       @relation("createdBy", fields: [createdById], references: [id])
+  createdById Int?
+  updatedBy   User?       @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById Int?
+  date        DateTime?
+  OTDetails   OTDetails[]
+}
+
+model OTDetails {
+  id             Int     @id @default(autoincrement())
+  OT             OT?     @relation(fields: [oTId], references: [id], onDelete: Cascade)
+  oTId           Int?
+  payCode        String?
+  payDescription String?
 }

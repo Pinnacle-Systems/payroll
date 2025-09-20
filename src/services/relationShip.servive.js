@@ -15,7 +15,9 @@ async function get(req) {
 }
 
 async function getOne(id) {
-  const childRecord = 0;
+  const childRecord = await prisma.employeeFamilyDetails.count({
+    where: { relationShipId: parseInt(id) },
+  });
   const data = await prisma.relationShip.findUnique({
     where: {
       id: parseInt(id),
@@ -63,7 +65,7 @@ async function create(body) {
 }
 
 async function update(id, body) {
-  const { name, active, companyId, branchId  } = await body;
+  const { name, active, companyId, branchId } = await body;
   const dataFound = await prisma.relationShip.findUnique({
     where: {
       id: parseInt(id),

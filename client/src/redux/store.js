@@ -39,6 +39,8 @@ import {
   leaveCodeApi,
   leaveopeningBalanceApi,
   MachineInoutApi,
+  OTMAsterAPi,
+  
 
 } from "./services"
 import projectPaymentFormApi from "./services/ProjectPaymentService";
@@ -189,6 +191,8 @@ const commonReducers = {
   [leaveCodeApi.reducerPath] : leaveCodeApi.reducer,
   [leaveopeningBalanceApi.reducerPath] : leaveopeningBalanceApi.reducer,
   [MachineInoutApi.reducerPath] : MachineInoutApi.reducer,
+  [OTMAsterAPi.reducerPath] : OTMAsterAPi.reducer,
+
 
 }
 const commonMiddleware = [countryMasterApi.middleware,
@@ -296,6 +300,7 @@ proofMasterApi.middleware,
 leaveCodeApi.middleware,
 leaveopeningBalanceApi.middleware,
 MachineInoutApi.middleware,
+OTMAsterAPi.middleware,
 ];
 
 

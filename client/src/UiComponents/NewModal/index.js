@@ -1,13 +1,13 @@
 import React from 'react';
 
-const Modal = ({ isOpen, onClose, children, widthClass }) => {
+const NewModal = ({ isOpen, onClose, children, widthClass }) => {
   if (!isOpen) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50 overscroll-y-hidden">
-      <div className={`relative bg-white rounded-lg p-7 ${widthClass}`}>
+      <div className={`relative bg-white rounded-lg p-4 ${widthClass}`}>
         {onClose &&
           <button
-            className="absolute top-0 right-0 m-1 text-gray-600 hover:text-gray-800 hover:bg-red-400 rounded focus:outline-none "
+            className="absolute -top-1   right-0 m-1 text-gray-600 hover:text-gray-800 hover:bg-red-400 rounded focus:outline-none "
             onClick={onClose}
           >
             <svg
@@ -29,5 +29,4 @@ const Modal = ({ isOpen, onClose, children, widthClass }) => {
   );
 };
 
-export default Modal;
-
+export default NewModal;

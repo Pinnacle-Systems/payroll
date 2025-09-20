@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { DateInput, DropdownInput, TextInput } from "../../../Inputs";
 import { Copy, Plus } from "lucide-react";
 import Select from "react-select";
@@ -23,10 +23,17 @@ const TemplateItems = ({
   docId,
   employeeCategoryList,
   childRecord,
-
+form,
   setReadOnly,
   setId,
 }) => {
+
+   const payref = useRef(null);
+  useEffect(() => {
+    if (form && !readOnly && payref.current) {
+      payref.current.focus();
+    }
+  }, [form, readOnly]);
   const [contextMenu, setContextMenu] = useState(null);
   const [activeFormulaRow, setActiveFormulaRow] = useState(null);
   const [modal, setModal] = useState(false);
@@ -191,6 +198,7 @@ const TemplateItems = ({
                     required={true}
                     readOnly={readOnly}
                     disabled={childRecord.current > 0}
+                    ref={payref}
                   />
                 </div>
                 <div className="w-44">

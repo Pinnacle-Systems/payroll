@@ -39,6 +39,7 @@ import {
   LeaveOpeningBalanceMaster,
   MachineInOutMaster,
   BandMaster,
+  OTMaster,
 
  
   
@@ -131,6 +132,7 @@ const ActiveTabList = () => {
     "LEAVE OPENING BALANCE":<LeaveOpeningBalanceMaster/>,
     "MACHINE IN OUT IP ENTRY" :<MachineInOutMaster/>,
     "BAND MASTER" : <BandMaster/>,
+    "OT":<OTMaster/>,
 
 
 

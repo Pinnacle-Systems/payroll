@@ -224,7 +224,7 @@ const ShiftCommonTemplateMaster = () => {
       header: "Common Template Name",
       accessor: (item) => item?.employeeCategory?.name,
       //   cellClass: () => "  text-gray-900",
-      className: " text-gray-900 text-center uppercase w-72",
+      className: " text-gray-900 text-left pl-2 uppercase w-72",
     },
 
     {

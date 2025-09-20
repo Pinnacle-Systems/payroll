@@ -432,7 +432,7 @@ export default function Form() {
                                   }
                                   // disabled={true}
                                 /> */}
-                                <label className="block text-xs  font-bold text-slate-700 mb-1">
+                                <label className="block text-xs  font-semibold text-slate-700 mb-1">
                                   Select State{" "}
                                   <span className="text-red-500">*</span>
                                 </label>

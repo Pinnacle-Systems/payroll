@@ -103,9 +103,7 @@ const TemplateItems = ({
     <>
       <div className="w-full bg-gray-100 mx-auto rounded-md shadow-md px-2 overflow-auto py-1 ">
         <div className="flex justify-between items-center mb-1">
-          <h1 className="master-header">
-            PF and ESI Rate Editor
-          </h1>
+          <h1 className="master-header">PF and ESI Rate Editor</h1>
           <div className="flex gap-2">
             {readOnly && (
               <button
@@ -229,19 +227,22 @@ const TemplateItems = ({
                   const to = parseFloat(item?.toValue) || 0;
                   const perc = parseFloat(item?.percentage) || 0;
                   let calculatedAmount = 0;
-                  if (to > from) {
-                    if (payCodeType === "PF") {
-                      if (to > 0) {
-                        const tempAmount = (to * perc) / 100;
-                        calculatedAmount = to >= 15001 ? 1800 : tempAmount;
-                      }
-                    } else if (payCodeType === "ESI") {
-                      if (to > 0 && to <= 21000) {
-                        calculatedAmount = (to * perc) / 100; 
-                      } else if (to > 21000) {
-                        calculatedAmount = 0;
-                      }
-                    }
+                  // if (to > from) {
+                  //   if (payCodeType === "PF") {
+                  //     if (to > 0) {
+                  //       const tempAmount = (to * perc) / 100;
+                  //       calculatedAmount = to >= 15001 ? 1800 : tempAmount;
+                  //     }
+                  //   } else if (payCodeType === "ESI") {
+                  //     if (to > 0 && to <= 21000) {
+                  //       calculatedAmount = (to * perc) / 100;
+                  //     } else if (to > 21000) {
+                  //       calculatedAmount = 0;
+                  //     }
+                  //   }
+                  // }
+                  if (to > from && to > 0 && perc > 0) {
+                    calculatedAmount = (to * perc) / 100;
                   }
 
                   return (
@@ -365,12 +366,35 @@ const TemplateItems = ({
                           placeHolder="0.00"
                           step="0.01"
                           value={
-                            calculatedAmount ? calculatedAmount.toFixed(2) : ""
+                        
+                            perc > 0
+                              ? calculatedAmount.toFixed(2)
+                              : item?.amount || ""
                           }
+                          onChange={(e) => {
+                      
+                            if (!(perc > 0)) {
+                              handleInputChange(
+                                e.target.value,
+                                index,
+                                "amount"
+                              );
+                            }
+                          }}
+                          onBlur={(e) => {
+                            if (!(perc > 0)) {
+                              const formatted =
+                                e.target.value === ""
+                                  ? ""
+                                  : Number(e.target.value).toFixed(2);
+                              e.target.value = formatted;
+                              handleInputChange(formatted, index, "amount");
+                            }
+                          }}
                           className={`w-full bg-transparent text-right pr-2 focus:outline-none focus:border-transparent ${
                             readOnly ? "text-gray-600" : "text-black"
                           }`}
-                          disabled={readOnly}
+                          disabled={readOnly || !item?.toValue}
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {
                               e.preventDefault();

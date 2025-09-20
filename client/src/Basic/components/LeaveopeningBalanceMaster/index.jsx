@@ -322,7 +322,7 @@ const Designation = () => {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[60%]  h-[60%]"}
+            widthClass={"w-[60%]  h-[50%]"}
             onClose={() => {
               setForm(false);
 

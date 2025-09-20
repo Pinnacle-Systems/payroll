@@ -45,20 +45,9 @@ import EmployeeLeavingForm from "./EmployeeLeavingForm";
 import { useGetDepartmentQuery } from "../../../redux/services/DepartmentMasterService";
 import { useGetRelationShipQuery } from "../../../redux/services/RelationShipService";
 import { useDispatch } from "react-redux";
-import {
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  LayoutGrid,
-  Mail,
-  Plus,
-  Search,
-  Table,
-  X,
-} from "lucide-react";
+import { Check } from "lucide-react";
 import { useGetBloodGroupQuery } from "../../../redux/services/BloodGroupService";
-import Mastertable from "../MasterTable/Mastertable";
-import imageDefault from "../../../assets/default-dp.png";
+
 import { HiPlus } from "react-icons/hi";
 import { useGetdesignationQuery } from "../../../redux/services/DesignationMasterService";
 import { useGetShiftTemplateMasterQuery } from "../../../redux/services/ShiftTemplateMaster";
@@ -66,9 +55,7 @@ import { useGetStateQuery } from "../../../redux/services/StateMasterService";
 import { useGetCountriesQuery } from "../../../redux/services/CountryMasterService";
 import Select from "react-select";
 import Swal from "sweetalert2";
-import { faL } from "@fortawesome/free-solid-svg-icons";
-import { FaQuestionCircle, FaUpload } from "react-icons/fa";
-import { getImageUrlPath } from "../../../Constants";
+
 import { useGetemployeeSubCategoryQuery } from "../../../redux/services/EmployeeSubCategoryservice";
 
 const MODEL = "Employee Master";
@@ -148,14 +135,6 @@ export default function Form() {
   const [familyDetails, setFamilyDetails] = useState([]);
   const [employeeSubCategoryId, setEmployeeSubCategoryId] = useState("");
 
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [imageRemoved, setImageRemoved] = useState(false);
-  // const [readOnly, setReadOnly] = useState(false)
-  // const [id, setId] = useState("");
-
-  // const [mode, setMode] = useState('view')
-  const fileInputRef = useRef(null);
   const [presentAddress, setPresentAddress] = useState({
     address: "",
     cityId: "",
@@ -367,33 +346,9 @@ export default function Form() {
     [id]
   );
 
-  // const cleanData = (obj) => {
-  //   if (Array.isArray(obj)) {
-  //     return obj.map(cleanData); // process each item
-  //   }
-  //   if (!obj || typeof obj !== "object") return obj;
-
-  //   return Object.fromEntries(
-  //     Object.entries(obj).map(([key, value]) => {
-  //       if (typeof value === "string") {
-  //         // Remove surrounding quotes and any extra quotes inside
-  //         let cleaned = value.replace(/^"+|"+$/g, ""); // remove leading/trailing quotes
-  //         cleaned = cleaned.replace(/"+/g, ""); // remove remaining quotes inside
-  //         return [key, cleaned];
-  //       } else if (typeof value === "object" && value !== null) {
-  //         return [key, cleanData(value)]; // recurse
-  //       }
-  //       return [key, value];
-  //     })
-  //   );
-  // };
-
   useEffect(() => {
     if (singleData?.data) {
-      // const cleanedData = cleanData(singleData?.data);
-      // console.log(cleanedData, "cleanedData");
       syncFormWithDb(singleData?.data);
-      // syncFormWithDb(cleanedData);
     }
   }, [singleData, syncFormWithDb]);
 
@@ -542,6 +497,10 @@ export default function Form() {
         type: `stateMaster/invalidateTags`,
         payload: ["State"],
       });
+      dispatch({
+        type: `relationShip/invalidateTags`,
+        payload: ["relationShip"],
+      });
       setForm(false);
       Swal.fire({
         icon: "success",
@@ -652,7 +611,15 @@ export default function Form() {
         return;
       }
       try {
-        await removeData(id);
+      let deldata = await removeData(id).unwrap();
+        if (deldata?.statusCode == 1) {
+          Swal.fire({
+            icon: "error",
+            title: "Child record Exists",
+            text: deldata.data?.message || "Data cannot be deleted!",
+          });
+          return;
+        }
         setId("");
         dispatch({
           type: `bloodGroup/invalidateTags`,
@@ -691,6 +658,10 @@ export default function Form() {
           type: `stateMaster/invalidateTags`,
           payload: ["State"],
         });
+        dispatch({
+          type: `relationShip/invalidateTags`,
+          payload: ["relationShip"],
+        });
 
         setForm(false);
         Swal.fire({
@@ -719,6 +690,9 @@ export default function Form() {
       saveData();
     }
   };
+
+  console.log(readOnly,"readOnly");
+  
   const input1Ref = useRef(null);
   const input2Ref = useRef(null);
   const input3Ref = useRef(null);
@@ -747,7 +721,7 @@ export default function Form() {
     setDisability("");
     setHeight("");
     setWeight("");
-
+    childRecord.current = 0
     setMaritalStatus("");
     setRegNo("");
     setBloodGroupId("");
@@ -862,32 +836,6 @@ export default function Form() {
 
   const [step, setStep] = useState("Basic Details");
   const [errors, setErrors] = useState({});
-
-  const validateStep = () => {
-    let newErrors = {};
-    if (step === 1) {
-      if (!data.employeeCategoryId)
-        newErrors.employeeCategory = "Employee Category is required";
-      if (!data.name) newErrors.name = "Name is required";
-      if (!data.joiningDate) newErrors.joiningDate = "Joining Date is required";
-      if (!data.department) newErrors.department = "Select a department";
-    } else if (step === 2) {
-      if (!data.mobile) newErrors.mobile = "Mobile No is required";
-    } else if (step === 3) {
-      if (!data.dob) newErrors.dob = "Date of Birth is required";
-      if (!data.gender) newErrors.gender = "Gender is required";
-    } else if (step === 4) {
-      if (!data.localAddress)
-        newErrors.localAddress = "Local Address is required";
-      if (!data.localPincode)
-        newErrors.localPincode = "Local Pincode is required";
-      if (!data.localCity) newErrors.localCity = "Local City is required";
-    } else if (step === 6) {
-      if (!data.active) newErrors.active = "Set Status";
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   const handleTabClick = (tabNumber) => {
     // if (tabNumber < step || validateStep()) {
@@ -1046,27 +994,7 @@ export default function Form() {
     console.log("Edit");
     setStep("Basic Details");
   };
-  const handleRemoveImage = () => {
-    setImageFile(null);
-    setImagePreview(null);
-    setImageRemoved(true);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-    console.log(imageFile, "Image file");
-  };
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    if (file && file.size <= 5 * 1024 * 1024) {
-      setImageFile(file);
-      console.log(imageFile, "Imageset");
-      setImageRemoved(false);
 
-      const reader = new FileReader();
-      reader.onloadend = () => setImagePreview(reader.result);
-      reader.readAsDataURL(file);
-    } else {
-      alert("Please select an image under 5MB.");
-    }
-  };
   const columns = [
     {
       header: "S.No",
@@ -1994,7 +1922,11 @@ export default function Form() {
                           readOnly={readOnly}
                           className={`w-full px-2 py-1 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-          transition-all duration-150 shadow-sm`}
+          transition-all duration-150 shadow-sm   ${
+            readOnly || childRecord.current > 0
+              ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+              : "bg-white hover:border-gray-400"
+          }`}
                           disabled={childRecord.current > 0}
                         />
                       </div>
@@ -2882,11 +2814,8 @@ export default function Form() {
                           </thead>
                           <tbody>
                             {familyDetails.map((item, index) => (
-                              <tr
-                                key={index}
-                                className="w-full table-row"
-                              >
-                                <td className=" text-center px-1">
+                              <tr key={index} className="w-full table-row">
+                                <td className="border border-gray-30 text-center px-1">
                                   {index + 1}
                                 </td>
                                 <td className="border border-gray-300 text-[12px] py-1.5 px-1 item-center">
@@ -2967,9 +2896,13 @@ export default function Form() {
                                           opt.value === item?.relationShipId
                                       ) || null
                                     }
-                                   onChange={(selectedOption) =>
-    handleFamilyDetailsChange(index, "relationShipId", selectedOption?.value)
-  }
+                                    onChange={(selectedOption) =>
+                                      handleFamilyDetailsChange(
+                                        index,
+                                        "relationShipId",
+                                        selectedOption?.value
+                                      )
+                                    }
                                     placeholder="Select"
                                     isClearable={false} // same as required
                                     isDisabled={
@@ -2981,58 +2914,60 @@ export default function Form() {
                                     onInputChange={(value) =>
                                       value.toUpperCase()
                                     }
-                                     menuPlacement="auto"
-                        menuPosition="fixed"
-                        styles={{
-                          control: (base) => ({
-                            ...base,
-                            border: "none", // remove border
-                            boxShadow: "none", // remove focus ring
-                            backgroundColor: "transparent",
-                            minHeight: "unset",
-                            height: "15px", // match table row height
-                            color: "black",
-                          }),
-                          placeholder: (base) => ({
-                            ...base,
-                            color: "black", // gray placeholder like Tailwind `text-gray-400`
-                          }),
-                          singleValue: (base) => ({
-                            ...base,
-                            color:
-                              readOnly || item.childRecord > 0
-                                ? "gray"
-                                : "black",
-                            fontSize: "12px", // optional: adjust font size
-                          }),
+                                    menuPlacement="auto"
+                                    menuPosition="fixed"
+                                    styles={{
+                                      control: (base) => ({
+                                        ...base,
+                                        border: "none", // remove border
+                                        boxShadow: "none", // remove focus ring
+                                        backgroundColor: "transparent",
+                                        minHeight: "unset",
+                                        height: "15px", // match table row height
+                                        color: "black",
+                                      }),
+                                      placeholder: (base) => ({
+                                        ...base,
+                                        color: "black", // gray placeholder like Tailwind `text-gray-400`
+                                      }),
+                                      singleValue: (base) => ({
+                                        ...base,
+                                        color:
+                                          readOnly || item.childRecord > 0
+                                            ? "gray"
+                                            : "black",
+                                        fontSize: "12px", // optional: adjust font size
+                                      }),
 
-                          dropdownIndicator: (base) => ({
-                            ...base,
-                            padding: 2, // smaller padding
-                            svg: {
-                              width: 14, // icon width
-                              height: 14, // icon height
-                            },
-                            color: "black",
-                          }),
+                                      dropdownIndicator: (base) => ({
+                                        ...base,
+                                        padding: 2, // smaller padding
+                                        svg: {
+                                          width: 14, // icon width
+                                          height: 14, // icon height
+                                        },
+                                        color: "black",
+                                      }),
 
-                          indicatorSeparator: () => ({ display: "none" }), // remove line
-                          valueContainer: (base) => ({
-                            ...base,
-                            padding: "0 2px", // tighten padding
-                            color: "black",
-                          }),
-                          input: (base) => ({
-                            ...base,
-                            margin: 0,
-                            padding: 0,
-                            color: "black",
-                          }),
-                          menu: (base) => ({
-                            ...base,
-                            zIndex: 9999, // keep menu on top
-                          }),
-                        }}
+                                      indicatorSeparator: () => ({
+                                        display: "none",
+                                      }), // remove line
+                                      valueContainer: (base) => ({
+                                        ...base,
+                                        padding: "0 2px", // tighten padding
+                                        color: "black",
+                                      }),
+                                      input: (base) => ({
+                                        ...base,
+                                        margin: 0,
+                                        padding: 0,
+                                        color: "black",
+                                      }),
+                                      menu: (base) => ({
+                                        ...base,
+                                        zIndex: 9999, // keep menu on top
+                                      }),
+                                    }}
                                     onKeyDown={(e) =>
                                       handleKeyNext(e, input2Ref)
                                     }
