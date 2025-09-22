@@ -40,7 +40,7 @@ const TemplateItems = ({
   const handleCloseContextMenu = () => {
     setContextMenu(null);
   };
-console.log(oTDetails,"oTDetails");
+  console.log(oTDetails, "oTDetails");
 
   const handleInputChange = (value, index, field) => {
     const newBlend = structuredClone(oTDetails);
@@ -167,12 +167,18 @@ console.log(oTDetails,"oTDetails");
                         type="text"
                         value={item?.payCode || ""}
                         className={`w-full bg-transparent pl-2 uppercase focus:outline-none ${
-                          readOnly ? "text-gray-600" : "text-black"
+                          readOnly || item.childRecord > 0
+                            ? "text-gray-600"
+                            : "text-black"
                         }`}
                         onChange={(e) =>
-                          handleInputChange(e.target.value.toUpperCase(), index, "payCode")
+                          handleInputChange(
+                            e.target.value.toUpperCase(),
+                            index,
+                            "payCode"
+                          )
                         }
-                        disabled={readOnly}
+                        disabled={readOnly || item?.childRecord > 0}
                       />
                     </td>
 
@@ -181,15 +187,22 @@ console.log(oTDetails,"oTDetails");
                         type="text"
                         value={item?.payDescription || ""}
                         className={`w-full bg-transparent  uppercase pl-2 focus:outline-none ${
-                          readOnly ? "text-gray-600" : "text-black"
+                          readOnly || item.childRecord > 0
+                            ? "text-gray-600"
+                            : "text-black"
                         }`}
-                        onChange={(e) =>
+                        onChange={(e) => {
+                          if (item.childRecord > 0) {
+                            // block editing if child record
+                            e.preventDefault();
+                            return;
+                          }
                           handleInputChange(
                             e.target.value.toUpperCase(),
                             index,
                             "payDescription"
-                          )
-                        }
+                          );
+                        }}
                         onContextMenu={(e) => {
                           if (!readOnly) {
                             handleRightClick(e, index, "payDescription");

@@ -175,28 +175,69 @@ async function update(id, body) {
         companyId: companyId ? parseInt(companyId) : undefined,
         branchCode: branchCode ? branchCode : "",
 
-        MachineInOutGrid:
-          machineInOutGrid?.length > 0
-            ? {
-                deleteMany: {},
-                create: machineInOutGrid?.map((item) => ({
-                  date: item?.date ? new Date(item?.date) : null,
-                  machineTypeOne: item?.machineTypeOne
-                    ? item?.machineTypeOne
-                    : "",
-                  machineIP: item?.machineIP ? item?.machineIP : "",
-                  machineNo: item?.machineNo ? parseInt(item?.machineNo) : 0,
-                  machineTypeTwo: item?.machineTypeTwo
-                    ? item?.machineTypeTwo
-                    : "",
-                  currentMachine: item?.currentMachine
-                    ? item?.currentMachine
-                    : "",
-                  default: item?.default ? item?.default : "",
-                  notes: item?.notes ? item?.notes : "",
+        // MachineInOutGrid:
+        //   machineInOutGrid?.length > 0
+        //     ? {
+        //         deleteMany: {},
+        //         create: machineInOutGrid?.map((item) => ({
+        //           date: item?.date ? new Date(item?.date) : null,
+        //           machineTypeOne: item?.machineTypeOne
+        //             ? item?.machineTypeOne
+        //             : "",
+        //           machineIP: item?.machineIP ? item?.machineIP : "",
+        //           machineNo: item?.machineNo ? parseInt(item?.machineNo) : 0,
+        //           machineTypeTwo: item?.machineTypeTwo
+        //             ? item?.machineTypeTwo
+        //             : "",
+        //           currentMachine: item?.currentMachine
+        //             ? item?.currentMachine
+        //             : "",
+        //           default: item?.default ? item?.default : "",
+        //           notes: item?.notes ? item?.notes : "",
+        //         })),
+        //       }
+        //     : undefined,
+        MachineInOutGrid: machineInOutGrid?.length
+          ? {
+              // Delete removed rows
+              deleteMany: {
+                id: {
+                  notIn: machineInOutGrid
+                    .filter((item) => item.id)
+                    .map((item) => parseInt(item.id)),
+                },
+              },
+              // Update existing rows
+              update: machineInOutGrid
+                .filter((item) => item.id)
+                .map((item) => ({
+                  where: { id: parseInt(item.id) },
+                  data: {
+                    date: item?.date ? new Date(item.date) : null,
+                    machineTypeOne: item.machineTypeOne || "",
+                    machineIP: item.machineIP || "",
+                    machineNo: item.machineNo ? parseInt(item.machineNo) : 0,
+                    machineTypeTwo: item.machineTypeTwo || "",
+                    currentMachine: item.currentMachine || "",
+                    default: item.default || "",
+                    notes: item.notes || "",
+                  },
                 })),
-              }
-            : undefined,
+              // Create new rows
+              create: machineInOutGrid
+                .filter((item) => !item.id)
+                .map((item) => ({
+                  date: item?.date ? new Date(item.date) : null,
+                  machineTypeOne: item.machineTypeOne || "",
+                  machineIP: item.machineIP || "",
+                  machineNo: item.machineNo ? parseInt(item.machineNo) : 0,
+                  machineTypeTwo: item.machineTypeTwo || "",
+                  currentMachine: item.currentMachine || "",
+                  default: item.default || "",
+                  notes: item.notes || "",
+                })),
+            }
+          : undefined,
       },
     });
     // await updatecompanyPayStructure(tx, payDetails, data);

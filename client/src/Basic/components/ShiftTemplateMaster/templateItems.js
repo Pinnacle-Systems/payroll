@@ -39,6 +39,7 @@ const TemplateItems = ({
   const [activeFormulaRow, setActiveFormulaRow] = useState(null);
 
   const [contextMenu, setContextMenu] = useState(null);
+  const [quarterContextMenu, setQuarterContextMenu] = useState(null);
   const handleRightClick = (event, rowIndex, type) => {
     event.preventDefault();
     setContextMenu({
@@ -46,6 +47,15 @@ const TemplateItems = ({
       mouseY: event.clientY,
       rowId: rowIndex,
       type,
+    });
+  };
+  const handleRightClickQuarter = (e, parentIndex, subIndex) => {
+    setQuarterContextMenu({
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+
+      parentIndex,
+      subIndex,
     });
   };
 
@@ -62,6 +72,7 @@ const TemplateItems = ({
   //     setSelectedRow((prev) => ({ ...prev, [field]: value }));
   //   }
   // };
+
   const handleInputChange = (value, index, field, subIndex) => {
     const newBlend = structuredClone(ShiftTemplateItems);
 
@@ -95,11 +106,90 @@ const TemplateItems = ({
       });
     }
   };
+  const handleOpenQuarterModal = (rowIndex) => {
+    const row = structuredClone(ShiftTemplateItems[rowIndex]);
+
+    // Ensure quarterDetails exists
+    if (!Array.isArray(row.quarterDetails)) {
+      row.quarterDetails = [
+        {
+          day: "",
+          oTId: "",
+          ftMins: "",
+          from: "",
+          to: "",
+          ttMins: "",
+          endTime: "",
+          nextDay: "",
+          checkHrs: "",
+          total: "",
+          pickFrom: "",
+          formula: "",
+        },
+      ];
+    }
+
+    setSelectedIndex(rowIndex);
+    setSelectedRow(row); // sync modal
+    setThirdModal(true);
+  };
 
   const addNewRow = () => {
-    const newRow = { templateId: "" };
+    const newRow = {
+      templateId: "",
+      quarterDetails: [
+        {
+          day: "",
+          oTId: "",
+          ftMins: "",
+          from: "",
+          to: "",
+          ttMins: "",
+          endTime: "",
+          nextDay: "",
+          checkHrs: "",
+          total: "",
+          pickFrom: "",
+          formula: "",
+        },
+      ],
+    };
     setShiftTemplateItems([...ShiftTemplateItems, newRow]);
   };
+  const addNewQuarterRow = (parentIndex) => {
+    const newRow = {
+      day: "",
+      oTDetailsId: "",
+      ftMins: "",
+      from: "",
+      to: "",
+      ttMins: "",
+      endTime: "",
+      nextDay: "",
+      checkHrs: "",
+      total: "",
+      pickFrom: "", 
+      formula: "",
+    };
+
+    setShiftTemplateItems((prev) => {
+      const updated = structuredClone(prev);
+
+      if (!updated[parentIndex].quarterDetails) {
+        updated[parentIndex].quarterDetails = [];
+      }
+
+      updated[parentIndex].quarterDetails.push(newRow);
+
+      // Update the modal’s selectedRow immediately
+      if (parentIndex === selectedIndex) {
+        setSelectedRow(updated[parentIndex]);
+      }
+
+      return updated;
+    });
+  };
+
   const handleDeleteRow = (id) => {
     setShiftTemplateItems((yarnBlend) => {
       if (yarnBlend.length <= 1) {
@@ -115,6 +205,48 @@ const TemplateItems = ({
     });
   };
 
+  // Delete a single quarterDetails row
+  const handleDeleteQuarterRow = (parentIndex, subIndex) => {
+    setShiftTemplateItems((prev) => {
+      const updated = structuredClone(prev);
+
+      if (
+        updated[parentIndex].quarterDetails &&
+        updated[parentIndex].quarterDetails.length > 1
+      ) {
+        updated[parentIndex].quarterDetails.splice(subIndex, 1);
+      }
+
+      // Sync modal if this parent row is open
+      if (parentIndex === selectedIndex) {
+        setSelectedRow(updated[parentIndex]);
+      }
+
+      return updated;
+    });
+  };
+
+  // Delete all quarterDetails except the first (or clear all)
+  const handleDeleteAllQuarterRows = (parentIndex) => {
+    setShiftTemplateItems((prev) => {
+      const updated = structuredClone(prev);
+
+      if (updated[parentIndex].quarterDetails?.length > 1) {
+        // Keep first row or set to empty array
+        updated[parentIndex].quarterDetails = [
+          updated[parentIndex].quarterDetails[0],
+        ];
+      }
+
+      // Sync modal if this parent row is open
+      if (parentIndex === selectedIndex) {
+        setSelectedRow(updated[parentIndex]);
+      }
+
+      return updated;
+    });
+  };
+
   const OTOptions = OTData?.data?.flatMap?.((data) =>
     data?.OTDetails?.map((val) => ({
       value: val?.id,
@@ -122,11 +254,10 @@ const TemplateItems = ({
     }))
   );
 
-  
   const selectedPayCodes = selectedRow?.quarterDetails
-    ?.filter((item) => item.oTId) // only rows where a pay code is selected
+    ?.filter((item) => item?.oTDetailsId) // only rows where a pay code is selected
     .map((item) => {
-      const option = OTOptions.find((opt) => opt.value === item.oTId);
+      const option = OTOptions.find((opt) => opt.value === item.oTDetailsId);
       return option?.label; // or option?.value if you prefer
     })
     .filter(Boolean); // remove undefined/null
@@ -446,6 +577,7 @@ const TemplateItems = ({
                           setSelectedRow(item);
                           setSelectedIndex(index);
                         }}
+                       
                         title="Open"
                       >
                         <svg
@@ -466,11 +598,12 @@ const TemplateItems = ({
                     <td className="text-center border border-gray-300">
                       <button
                         className="text-blue-600 text-center   bg-blue-50 rounded"
-                        onClick={() => {
-                          setThirdModal(true);
-                          setSelectedRow(item);
-                          setSelectedIndex(index);
-                        }}
+                        // onClick={() => {
+                        //   setThirdModal(true);
+                        //   setSelectedRow(item);
+                        //   setSelectedIndex(index);
+                        // }}  
+                        onClick={() => handleOpenQuarterModal(index)}
                         title="Open"
                       >
                         <svg
@@ -1115,14 +1248,15 @@ const TemplateItems = ({
                                         options={OTOptions}
                                         value={
                                           OTOptions?.find(
-                                            (opt) => opt.value === val?.oTId
+                                            (opt) =>
+                                              opt.value === val?.oTDetailsId
                                           ) || null
                                         } // ensure not undefined
                                         onChange={(selected) =>
                                           handleInputChange(
                                             selected?.value || "",
                                             selectedIndex,
-                                            "oTId",
+                                            "oTDetailsId",
                                             subIndex
                                           )
                                         }
@@ -1382,6 +1516,21 @@ const TemplateItems = ({
                                             subIndex
                                           )
                                         }
+                                        onBlur={(e) => {
+                                          const formatted =
+                                            e.target.value === ""
+                                              ? ""
+                                              : Number(e.target.value).toFixed(
+                                                  2
+                                                );
+                                          e.target.value = formatted;
+                                          handleInputChange(
+                                            e.target.value,
+                                            selectedIndex,
+                                            "total",
+                                            subIndex
+                                          );
+                                        }}
                                         className={`w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2 ${
                                           readOnly || childRecord.current > 0
                                             ? "text-gray-600"
@@ -1424,37 +1573,35 @@ const TemplateItems = ({
                                         type="button"
                                         onClick={() => {
                                           if (
-                                            val?.pickFrom?.toLowerCase() ===
-                                            "formula"
+                                            val?.pickFrom
+                                              ?.trim()
+                                              .toLowerCase() === "formula"
                                           ) {
                                             setActiveFormulaRow(subIndex);
                                             setModalFormulaValue(
                                               val?.formula || ""
                                             );
-
                                             setFormulaModal(true);
-                                            console.log(
-                                              "Opening Formula Modal",
-                                              subIndex,
-                                              val?.pickFrom
-                                            );
                                           }
                                         }}
-                                        className={`flex items-center justify-center w-6 h-6 rounded mx-auto 
-    ${
-      val?.pickFrom?.toLowerCase() === "formula"
-        ? "cursor-pointer"
-        : "cursor-not-allowed opacity-50"
-    }`}
+                                        className={`flex items-center justify-center w-6 h-6 rounded mx-auto ${
+                                          val?.pickFrom
+                                            ?.trim()
+                                            .toLowerCase() === "formula"
+                                            ? "cursor-pointer"
+                                            : "cursor-not-allowed opacity-50"
+                                        }`}
                                         title={
-                                          val?.pickFrom?.toLowerCase() ===
-                                          "formula"
+                                          val?.pickFrom
+                                            ?.trim()
+                                            .toLowerCase() === "formula"
                                             ? "Add Formula"
                                             : "Not allowed"
                                         }
                                         disabled={
-                                          val?.pickFrom?.toLowerCase() !==
-                                          "formula"
+                                          val?.pickFrom
+                                            ?.trim()
+                                            .toLowerCase() !== "formula"
                                         }
                                       >
                                         <Plus
@@ -1472,7 +1619,26 @@ const TemplateItems = ({
                           
                           `}
                                         readOnly
+                                        onKeyDown={(e) => {
+                                          if (
+                                            e.key === "Enter" &&
+                                            !readOnly &&
+                                            val?.day
+                                          ) {
+                                            addNewQuarterRow(selectedIndex);
+                                          }
+                                        }}
                                         spellCheck={false}
+                                        onContextMenu={(e) => {
+                                          e.preventDefault();
+                                          if (!readOnly) {
+                                            handleRightClickQuarter(
+                                              e,
+                                              selectedIndex,
+                                              subIndex
+                                            );
+                                          }
+                                        }}
                                       />
                                     </td>
                                   </tr>
@@ -1710,6 +1876,45 @@ const TemplateItems = ({
                 onClick={() => {
                   handleDeleteAllRows();
                   handleCloseContextMenu();
+                }}
+              >
+                Delete All
+              </button>
+            </div>
+          </div>
+        )}
+        {quarterContextMenu && (
+          <div
+            style={{
+              position: "absolute",
+              top: `${quarterContextMenu.mouseY - 50}px`,
+              left: `${quarterContextMenu.mouseX - 30}px`,
+              boxShadow: "0px 0px 5px rgba(0,0,0,0.3)",
+              padding: "8px",
+              borderRadius: "4px",
+              zIndex: 1000,
+            }}
+            className="bg-gray-100"
+            onMouseLeave={() => setQuarterContextMenu(null)}
+          >
+            <div className="flex flex-col gap-1">
+              <button
+                className="text-black text-[12px] text-left rounded px-1"
+                onClick={() => {
+                  handleDeleteQuarterRow(
+                    quarterContextMenu.parentIndex,
+                    quarterContextMenu.subIndex
+                  );
+                  setQuarterContextMenu(null);
+                }}
+              >
+                Delete
+              </button>
+              <button
+                className="text-black text-[12px] text-left rounded px-1"
+                onClick={() => {
+                  handleDeleteAllQuarterRows(quarterContextMenu.parentIndex);
+                  setQuarterContextMenu(null);
                 }}
               >
                 Delete All

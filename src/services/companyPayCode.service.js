@@ -272,21 +272,59 @@ async function update(id, body) {
         date: date ? new Date(date) : null,
         branchId: branchId ? parseInt(branchId) : undefined,
         companyId: companyId ? parseInt(companyId) : undefined,
-        PayDetails:
-          payDetails?.length > 0
-            ? {
-                deleteMany: {},
-                create: payDetails?.map((item) => ({
-                  payComponentId: item?.payComponentId
-                    ? parseInt(item?.payComponentId)
-                    : undefined,
-                  lop: item?.lop ? item?.lop : "",
-                  pf: item?.pf ? item?.pf : "",
-                  esi: item?.esi ? item?.esi : "",
-                  pickFrom: item?.pickFrom ? item?.pickFrom : "",
+        // PayDetails:
+        //   payDetails?.length > 0
+        //     ? {
+        //         deleteMany: {},
+        //         create: payDetails?.map((item) => ({
+        //           payComponentId: item?.payComponentId
+        //             ? parseInt(item?.payComponentId)
+        //             : undefined,
+        //           lop: item?.lop ? item?.lop : "",
+        //           pf: item?.pf ? item?.pf : "",
+        //           esi: item?.esi ? item?.esi : "",
+        //           pickFrom: item?.pickFrom ? item?.pickFrom : "",
+        //         })),
+        //       }
+        //     : undefined,
+        PayDetails: payDetails?.length
+          ? {
+              deleteMany: {
+                id: {
+                  notIn: payDetails
+                    .filter((item) => item.id)
+                    .map((item) => item.id),
+                },
+              },
+              // Update existing rows
+              update: payDetails
+                .filter((item) => item.id) // existing rows have id
+                .map((item) => ({
+                  where: { id: item.id },
+                  data: {
+                    payComponentId: item.payComponentId
+                      ? parseInt(item.payComponentId)
+                      : undefined,
+                    lop: item.lop || "",
+                    pf: item.pf || "",
+                    esi: item.esi || "",
+                    pickFrom: item.pickFrom || "",
+                  },
                 })),
-              }
-            : undefined,
+              // Create new rows
+              create: payDetails
+                .filter((item) => !item.id) // new rows
+                .map((item) => ({
+                  payComponentId: item.payComponentId
+                    ? parseInt(item.payComponentId)
+                    : undefined,
+                  lop: item.lop || "",
+                  pf: item.pf || "",
+                  esi: item.esi || "",
+                  pickFrom: item.pickFrom || "",
+                })),
+            }
+          : undefined,
       },
       // include: {
       //   PayDetails: true,

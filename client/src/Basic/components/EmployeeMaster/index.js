@@ -73,7 +73,7 @@ export default function Form() {
   const [localAddress, setlocalAddress] = useState("");
   const [localCity, setLocalCity] = useState("");
   const [localPincode, setLocalPincode] = useState("");
-  const [mobile, setMobile] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
   const [degree, setDegree] = useState("");
   const [specialization, setSpecialization] = useState("");
   const [salaryPerMonth, setSalaryPerMonth] = useState("");
@@ -84,7 +84,7 @@ export default function Form() {
   const [permAddress, setPermAddress] = useState("");
   const [permCity, setPermCity] = useState("");
   const [permPincode, setPermPincode] = useState("");
-
+  
   const [maritalStatus, setMaritalStatus] = useState("");
   const [consultFee, setConsultFee] = useState("");
   const [accountNo, setAccountNo] = useState("");
@@ -221,6 +221,7 @@ export default function Form() {
 
       // Basic Info
       setEmployeeType(data?.employeeType);
+      setMobileNumber(data?.mobileNumber)
       setFirstName(data?.firstName || "");
       setMiddleName(data?.middleName || "");
       setLastName(data?.lastName || "");
@@ -372,7 +373,7 @@ export default function Form() {
     maritalStatus,
     height,
     weight,
-
+    mobileNumber,
     joiningDate,
     departmentId,
     employeeCategoryId,
@@ -521,6 +522,7 @@ export default function Form() {
 
   const validateData = (data) => {
     if (
+      data?.mobileNumber &&
       data?.employeeType &&
       data?.firstName &&
       data?.dob &&
@@ -611,7 +613,7 @@ export default function Form() {
         return;
       }
       try {
-      let deldata = await removeData(id).unwrap();
+        let deldata = await removeData(id).unwrap();
         if (deldata?.statusCode == 1) {
           Swal.fire({
             icon: "error",
@@ -691,8 +693,8 @@ export default function Form() {
     }
   };
 
-  console.log(readOnly,"readOnly");
-  
+  console.log(readOnly, "readOnly");
+
   const input1Ref = useRef(null);
   const input2Ref = useRef(null);
   const input3Ref = useRef(null);
@@ -709,6 +711,7 @@ export default function Form() {
     setStep("Basic Details");
     // Basic Info
     setEmployeeType("");
+    setMobileNumber('')
     setSearchValue("");
     setFirstName("");
     setMiddleName("");
@@ -721,7 +724,7 @@ export default function Form() {
     setDisability("");
     setHeight("");
     setWeight("");
-    childRecord.current = 0
+    childRecord.current = 0;
     setMaritalStatus("");
     setRegNo("");
     setBloodGroupId("");
@@ -753,7 +756,7 @@ export default function Form() {
     // fixed camelCase
     setLocalCity("");
     setLocalPincode("");
-    setMobile("");
+    setMobileNumber("");
     setPermAddress("");
     setPermCity("");
     setPermPincode("");
@@ -1109,19 +1112,30 @@ export default function Form() {
     value: val?.id,
     label: val?.docId,
   }));
-  const CityOptions = cityList?.data?.map((val) => ({
-    value: val?.id,
-    label: val?.name,
-  }));
-  const StateOptions = stateList?.data?.map((val) => ({
-    value: val?.id,
-    label: val?.name,
-  }));
 
   const CountryOptions = countryList?.data?.map((val) => ({
     value: val?.id,
     label: val?.name,
   }));
+
+ 
+  const CityOptions = cityList?.data?.map((val) => ({
+    value: val?.id,
+    label: val?.name,
+  }));
+
+const getFilteredStates = (countryId) => 
+  stateList?.data
+    .filter((s) => s.countryId === countryId)
+    .map((s) => ({ value: s.id, label: s.name }));
+
+const getFilteredCities = (stateId) =>
+  cityList?.data
+    .filter((c) => c.stateId === stateId)
+    .map((c) => ({ value: c.id, label: c.name }));
+
+
+
   const RelationShipOptions = relationShip?.data?.map((val) => ({
     value: val?.id,
     label: val?.name,
@@ -1319,6 +1333,29 @@ export default function Form() {
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
                         </div>
+                        <div className="w-[140px]">
+                          <TextInput
+                            ref={input1Ref}
+                            name="Mobile Number"
+                            value={mobileNumber}
+                            type='number'
+                            setValue={setMobileNumber}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                        </div>
+                           <div className="w-[180px]">
+                        <TextInput
+                          ref={input1Ref}
+                          name="Adhaar No"
+                          value={aadharNo}
+                          setValue={setAadharNo}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                        /></div>
                         <div className="w-30">
                           <TextInput
                             ref={input1Ref}
@@ -1330,7 +1367,7 @@ export default function Form() {
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
-                        </div>{" "}
+                        </div>
                         <div className="w-30">
                           <TextInput
                             ref={input1Ref}
@@ -1404,18 +1441,7 @@ export default function Form() {
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
                         </div>{" "}
-                        <div className="ml-1 w-[270px]">
-                          <TextInput
-                            ref={input1Ref}
-                            name="Identification Mark"
-                            value={identificationMark}
-                            setValue={setIdentificationMark}
-                            // required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>{" "}
+                      
                         <div className="col-span-1">
                           <DropdownInput
                             ref={input1Ref}
@@ -1429,6 +1455,18 @@ export default function Form() {
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           />
                         </div>
+                          <div className="ml-1 w-[270px]">
+                          <TextInput
+                            ref={input1Ref}
+                            name="Identification Mark"
+                            value={identificationMark}
+                            setValue={setIdentificationMark}
+                            // required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          />
+                        </div>{" "}
                         <div className="w-30">
                           <DropdownInput
                             ref={input1Ref}
@@ -1857,22 +1895,10 @@ export default function Form() {
                           disabled={childRecord.current > 0}
                         />
                       </div>
-                      <div className="col-span-1">
-                        <TextInput
-                          ref={input1Ref}
-                          name="Adhaar No"
-                          value={aadharNo}
-                          setValue={setAadharNo}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                        />
-                        {errors.name && (
-                          <span className="text-red-500 text-xs ml-1">
-                            {errors.name}
-                          </span>
-                        )}
-                      </div>
+              
+                        
+                   
+                     
                       <div>
                         <TextInput
                           name="Pan No"
@@ -1958,119 +1984,7 @@ export default function Form() {
                               </span>
                             )}
                           </div>
-                          <div className="col-span-1 mt-1 mb-2">
-                            <TextInput
-                              name="Village"
-                              value={presentAddress?.village}
-                              setValue={(val) =>
-                                handlePresentChange("village", val)
-                              }
-                              readOnly={readOnly}
-                              disabled={childRecord.current > 0}
-                            />
-                          </div>
-                          <div className="col-span-1 mt-1 mb-2">
-                            {/* <DropdownInput
-                              ref={input1Ref}
-                              name="Choose City"
-                              value={presentAddress?.cityId}
-                              setValue={(val) =>
-                                handlePresentChange("cityId", val)
-                              }
-                              options={dropDownListObject(
-                                cityList?.data,
-                                "name",
-                                "id"
-                              )}
-                              // required={true}
-                              readOnly={readOnly}
-                              disabled={
-                                childRecord.current > 0 ? true : undefined
-                              }
-                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                            /> */}
-                            <label className="block text-xs font-semibold text-slate-700 mb-1">
-                              City
-                              <span className="text-red-500">*</span>
-                            </label>
-                            <Select
-                              options={CityOptions}
-                              value={
-                                CityOptions.find(
-                                  (opt) => opt.value === presentAddress?.cityId
-                                ) || null
-                              }
-                              onChange={(selected) =>
-                                handlePresentChange(
-                                  "cityId",
-                                  selected?.value || ""
-                                )
-                              }
-                              placeholder="Select City"
-                              isClearable={false} // same as required
-                              isDisabled={readOnly || childRecord.current > 0}
-                              isSearchable
-                              menuShouldScrollIntoView={false}
-                              maxMenuHeight={150} // <-- Reduce height here
-                              onInputChange={(value) => value.toUpperCase()}
-                              className="w-full px-1 -ml-1 text-xs rounded-lg
-          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-          transition-all duration-150 shadow-sm"
-                              styles={customSelectStyles}
-                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                            />
-                          </div>
-
-                          <div className="col-span-1 w-[270px] mb-2">
-                            {/* <DropdownInput
-                              ref={input1Ref}
-                              name="Choose State"
-                              value={presentAddress?.stateId}
-                              setValue={(val) =>
-                                handlePresentChange("stateId", val)
-                              }
-                              options={dropDownListObject(
-                                stateList?.data,
-                                "name",
-                                "id"
-                              )}
-                              // required={true}
-                              readOnly={readOnly}
-                              disabled={childRecord.current > 0}
-                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                            /> */}
-                            <label className="block text-xs font-semibold text-slate-700 mb-1">
-                              State
-                              <span className="text-red-500">*</span>
-                            </label>
-                            <Select
-                              options={StateOptions}
-                              value={
-                                StateOptions.find(
-                                  (opt) => opt.value === presentAddress?.stateId
-                                ) || null
-                              }
-                              onChange={(selected) =>
-                                handlePresentChange(
-                                  "stateId",
-                                  selected?.value || ""
-                                )
-                              }
-                              placeholder="Select State"
-                              isClearable={false} // same as required
-                              isDisabled={readOnly || childRecord.current > 0}
-                              isSearchable
-                              menuShouldScrollIntoView={false}
-                              maxMenuHeight={150} // <-- Reduce height here
-                              onInputChange={(value) => value.toUpperCase()}
-                              className="w-full px-1 -ml-1 text-xs rounded-lg
-          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-          transition-all duration-150 shadow-sm"
-                              styles={customSelectStyles}
-                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                            />
-                          </div>
-                          <div className="col-span-1 mb-2">
+                           <div className="col-span-1 mb-2">
                             {/* <DropdownInput
                               ref={input1Ref}
                               name="Choose Country"
@@ -2120,6 +2034,121 @@ export default function Form() {
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
+                            <div className="col-span-1 w-[270px] mb-2">
+                            {/* <DropdownInput
+                              ref={input1Ref}
+                              name="Choose State"
+                              value={presentAddress?.stateId}
+                              setValue={(val) =>
+                                handlePresentChange("stateId", val)
+                              }
+                              options={dropDownListObject(
+                                stateList?.data,
+                                "name",
+                                "id"
+                              )}
+                              // required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            /> */}
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              State
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <Select
+                              options={getFilteredStates(presentAddress?.countryId)}
+                              value={
+                                getFilteredStates(presentAddress?.countryId)?.find(
+                                  (opt) => opt.value === presentAddress?.stateId
+                                ) || null
+                              }
+                              onChange={(selected) =>
+                                handlePresentChange(
+                                  "stateId",
+                                  selected?.value || ""
+                                )
+                              }
+                              placeholder="Select State"
+                              isClearable={false} // same as required
+                              isDisabled={readOnly || childRecord.current > 0}
+                              isSearchable
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className="w-full px-1 -ml-1 text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                              styles={customSelectStyles}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+                          
+                          <div className="col-span-1 mt-1 mb-2">
+                            {/* <DropdownInput
+                              ref={input1Ref}
+                              name="Choose City"
+                              value={presentAddress?.cityId}
+                              setValue={(val) =>
+                                handlePresentChange("cityId", val)
+                              }
+                              options={dropDownListObject(
+                                cityList?.data,
+                                "name",
+                                "id"
+                              )}
+                              // required={true}
+                              readOnly={readOnly}
+                              disabled={
+                                childRecord.current > 0 ? true : undefined
+                              }
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            /> */}
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              City
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <Select
+                              options={getFilteredCities(presentAddress?.stateId) }
+                              value={
+                                getFilteredCities(presentAddress?.stateId)?.find(
+                                  (opt) => opt.value === presentAddress?.cityId
+                                ) || null
+                              }
+                              onChange={(selected) =>
+                                handlePresentChange(
+                                  "cityId",
+                                  selected?.value || ""
+                                )
+                              }
+                              placeholder="Select City"
+                              isClearable={false} // same as required
+                              isDisabled={readOnly || childRecord.current > 0}
+                              isSearchable
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className="w-full px-1 -ml-1 text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                              styles={customSelectStyles}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+                          <div className="col-span-1 mt-1 mb-2">
+                            <TextInput
+                              name="Village"
+                              value={presentAddress?.village}
+                              setValue={(val) =>
+                                handlePresentChange("village", val)
+                              }
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                          </div>
+
+                        
+                         
                           <div className="col-span-1 mt-2 w-32">
                             <TextInput
                               name="Pincode"
@@ -2131,7 +2160,7 @@ export default function Form() {
                               disabled={childRecord.current > 0}
                             />
                           </div>
-                          <div className="col-span-1 w-[255px] mt-2">
+                          {/* <div className="col-span-1 w-[255px] mt-2">
                             <TextInput
                               name="Mobile No"
                               value={presentAddress?.mobile}
@@ -2141,7 +2170,7 @@ export default function Form() {
                               readOnly={readOnly}
                               disabled={childRecord.current > 0}
                             />
-                          </div>
+                          </div> */}
                         </div>
 
                         {/* PERMANENT ADDRESS */}
@@ -2175,125 +2204,7 @@ export default function Form() {
                               }
                             />
                           </div>
-                          <div className="col-span-1 w-[265px] mt-1 mb-2">
-                            <TextInput
-                              name="Village"
-                              value={permanentAddress?.village}
-                              setValue={(val) =>
-                                handlePermanentChange("village", val)
-                              }
-                              readOnly={readOnly}
-                              disabled={
-                                childRecord.current > 0 || sameAsPresent
-                              }
-                            />
-                          </div>
-                          <div className="col-span-1 mt-1 mb-2">
-                            {/* <DropdownInput
-                              name="Choose City"
-                              value={permanentAddress?.cityId}
-                              setValue={(val) =>
-                                handlePermanentChange("cityId", val)
-                              }
-                              options={dropDownListObject(
-                                cityList?.data,
-                                "name",
-                                "id"
-                              )}
-                              readOnly={readOnly}
-                              disabled={
-                                childRecord.current > 0 || sameAsPresent
-                              }
-                            /> */}
-
-                            <label className="block text-xs font-semibold text-slate-700 mb-1">
-                              City
-                              <span className="text-red-500">*</span>
-                            </label>
-                            <Select
-                              options={CityOptions}
-                              value={
-                                CityOptions.find(
-                                  (opt) =>
-                                    opt.value === permanentAddress?.cityId
-                                ) || null
-                              }
-                              onChange={(selected) =>
-                                handlePermanentChange("cityId", selected?.value)
-                              }
-                              placeholder="Select City"
-                              isClearable={false} // same as required
-                              isDisabled={
-                                readOnly ||
-                                childRecord.current > 0 ||
-                                sameAsPresent
-                              }
-                              isSearchable
-                              menuShouldScrollIntoView={false}
-                              maxMenuHeight={150} // <-- Reduce height here
-                              onInputChange={(value) => value.toUpperCase()}
-                              className="w-full px-1 -ml-1 text-xs rounded-lg
-          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-          transition-all duration-150 shadow-sm"
-                              styles={customSelectStyles}
-                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                            />
-                          </div>
-
-                          <div className="col-span-1 mb-2 w-[270px]">
-                            {/* <DropdownInput
-                              name="Choose State"
-                              value={permanentAddress?.stateId}
-                              setValue={(val) =>
-                                handlePermanentChange("stateId", val)
-                              }
-                              options={dropDownListObject(
-                                stateList?.data,
-                                "name",
-                                "id"
-                              )}
-                              readOnly={readOnly}
-                              disabled={
-                                childRecord.current > 0 || sameAsPresent
-                              }
-                            /> */}
-                            <label className="block text-xs font-semibold text-slate-700 mb-1">
-                              State
-                              <span className="text-red-500">*</span>
-                            </label>
-                            <Select
-                              options={StateOptions}
-                              value={
-                                StateOptions.find(
-                                  (opt) =>
-                                    opt.value === permanentAddress?.stateId
-                                ) || null
-                              }
-                              onChange={(selected) =>
-                                handlePermanentChange(
-                                  "stateId",
-                                  selected?.value || ""
-                                )
-                              }
-                              placeholder="Select State"
-                              isClearable={false} // same as required
-                              isDisabled={
-                                readOnly ||
-                                childRecord.current > 0 ||
-                                sameAsPresent
-                              }
-                              isSearchable
-                              menuShouldScrollIntoView={false}
-                              maxMenuHeight={150} // <-- Reduce height here
-                              onInputChange={(value) => value.toUpperCase()}
-                              className="w-full px-1 -ml-1 text-xs rounded-lg
-          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-          transition-all duration-150 shadow-sm"
-                              styles={customSelectStyles}
-                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                            />
-                          </div>
-                          <div className="col-span-1 mb-2">
+                           <div className="col-span-1 mb-2">
                             {/* <DropdownInput
                               name="Choose Country"
                               value={permanentAddress?.countryId}
@@ -2346,6 +2257,126 @@ export default function Form() {
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
+                               <div className="col-span-1 mb-2 w-[270px]">
+                            {/* <DropdownInput
+                              name="Choose State"
+                              value={permanentAddress?.stateId}
+                              setValue={(val) =>
+                                handlePermanentChange("stateId", val)
+                              }
+                              options={dropDownListObject(
+                                stateList?.data,
+                                "name",
+                                "id"
+                              )}
+                              readOnly={readOnly}
+                              disabled={
+                                childRecord.current > 0 || sameAsPresent
+                              }
+                            /> */}
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              State
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <Select
+                              options={getFilteredStates(permanentAddress?.countryId)}
+                              value={
+                                getFilteredStates(permanentAddress?.countryId)?.find(
+                                  (opt) =>
+                                    opt.value === permanentAddress?.stateId
+                                ) || null
+                              }
+                              onChange={(selected) =>
+                                handlePermanentChange(
+                                  "stateId",
+                                  selected?.value || ""
+                                )
+                              }
+                              placeholder="Select State"
+                              isClearable={false} // same as required
+                              isDisabled={
+                                readOnly ||
+                                childRecord.current > 0 ||
+                                sameAsPresent
+                              }
+                              isSearchable
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className="w-full px-1 -ml-1 text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                              styles={customSelectStyles}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+                              {console.log(presentAddress?.stateId, cityList,"fjfhjf")}
+                          <div className="col-span-1 mt-1 mb-2">
+                            {/* <DropdownInput
+                              name="Choose City"
+                              value={permanentAddress?.cityId}
+                              setValue={(val) =>
+                                handlePermanentChange("cityId", val)
+                              }
+                              options={dropDownListObject(
+                                cityList?.data,
+                                "name",
+                                "id"
+                              )}
+                              readOnly={readOnly}
+                              disabled={
+                                childRecord.current > 0 || sameAsPresent
+                              }
+                            /> */}
+
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              City
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <Select
+                              options={getFilteredCities(permanentAddress?.stateId)}
+                              value={
+                                getFilteredCities(permanentAddress?.stateId)?.find(
+                                  (opt) =>
+                                    opt.value === permanentAddress?.cityId
+                                ) || null
+                              }
+                              onChange={(selected) =>
+                                handlePermanentChange("cityId", selected?.value)
+                              }
+                              placeholder="Select City"
+                              isClearable={false} // same as required
+                              isDisabled={
+                                readOnly ||
+                                childRecord.current > 0 ||
+                                sameAsPresent
+                              }
+                              isSearchable
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className="w-full px-1 -ml-1 text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                              styles={customSelectStyles}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+                                    <div className="col-span-1 w-[265px] mt-1 mb-2">
+                            <TextInput
+                              name="Village"
+                              value={permanentAddress?.village}
+                              setValue={(val) =>
+                                handlePermanentChange("village", val)
+                              }
+                              readOnly={readOnly}
+                              disabled={
+                                childRecord.current > 0 || sameAsPresent
+                              }
+                            />
+                          </div>
+                     
+                         
                           <div className="col-span-1  w-32 mt-2">
                             <TextInput
                               name="Pincode"
@@ -2359,7 +2390,7 @@ export default function Form() {
                               }
                             />
                           </div>
-                          <div className="col-span-1 w-[260px] mt-2">
+                          {/* <div className="col-span-1 w-[260px] mt-2">
                             <TextInput
                               name="Mobile No"
                               value={permanentAddress?.mobile}
@@ -2371,7 +2402,7 @@ export default function Form() {
                                 childRecord.current > 0 || sameAsPresent
                               }
                             />
-                          </div>
+                          </div> */}
                         </div>
                       </div>
                     </div>

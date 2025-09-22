@@ -1,15 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-
-
-import {
-  
-  ReusableTable,
-  
-} from "../../../Inputs";
-
-
-
-
+import { ReusableTable } from "../../../Inputs";
 import { getCommonParams } from "../../../Utils/helper";
 import {
   useAddShiftTemplateMasterMutation,
@@ -33,7 +23,6 @@ const ShiftTemplateMaster = () => {
   const [description, setDescription] = useState("");
   const [docId, setDocId] = useState("");
   const [active, setActive] = useState(true);
-  const [errors, setErrors] = useState({});
   const [form, setForm] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
@@ -71,9 +60,7 @@ const ShiftTemplateMaster = () => {
     searchParams: searchValue,
   });
 
-  const { data :OTData} = useGetOTMasterQuery({params})
-
-  
+  const { data: OTData } = useGetOTMasterQuery({ params });
 
   useEffect(() => {
     if (ShiftTemplateItems?.length >= 1) return;
@@ -81,17 +68,29 @@ const ShiftTemplateMaster = () => {
       let newArray = Array?.from({ length: 1 - prev?.length }, () => {
         return {
           templateId: "",
-          quarterDetails:[
+          quarterDetails: [
             {
-              oTId:''
-            }
-          ]
+              oTDetailsId: "",
+              day: "",
+
+              ftMins: "",
+              from: "",
+              to: "",
+              ttMins: "",
+              endTime: "",
+              nextDay: "",
+              checkHrs: "",
+              total: "",
+              pickFrom: "",
+              formula: "",
+            },
+          ],
         };
       });
       return [...prev, ...newArray];
     });
   }, [setShiftTemplateItems, ShiftTemplateItems]);
-console.log(ShiftTemplateItems,"ShiftTemplateItems");
+  console.log(ShiftTemplateItems, "ShiftTemplateItems");
 
   const syncFormWithDb = useCallback(
     (data) => {
@@ -106,7 +105,17 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
         date: val?.date
           ? new Date(val?.date).toISOString().split("T")[0]
           : null,
+        quarterDetails:
+          val?.QuarterDetails?.map((qd) => ({
+            ...qd,
+            // example: convert empty string to null, format times, etc.
+            from: qd?.from || "",
+            to: qd?.to || "",
+          })) || [],
       }));
+
+      console.log(mappedGrid, "mappedGrid ");
+
       setShiftTemplateItems(mappedGrid ? mappedGrid : []);
       setCategoryId(data?.category ? data?.category : "");
       childRecord.current = data?.childRecord ? data?.childRecord : 0;
@@ -168,6 +177,10 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
         type: `ShiftCommonTemplateMaster/invalidateTags`,
         payload: ["ShiftCommonTemplate"],
       });
+      dispatch({
+        type: `oTMAster/invalidateTags`,
+        payload: ["oTMAster"],
+      });
     } catch (error) {
       Swal.fire({
         icon: "error",
@@ -212,6 +225,7 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
       });
       return;
     }
+
     return true;
   };
 
@@ -255,6 +269,18 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
           title: "Deleted Successfully",
           icon: "success",
           timer: 1000,
+        });
+        dispatch({
+          type: `shiftMaster/invalidateTags`,
+          payload: ["shiftMaster"],
+        });
+        dispatch({
+          type: `ShiftCommonTemplateMaster/invalidateTags`,
+          payload: ["ShiftCommonTemplate"],
+        });
+        dispatch({
+          type: `oTMAster/invalidateTags`,
+          payload: ["oTMAster"],
         });
         setForm(false);
       } catch (error) {
@@ -310,7 +336,7 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
     setReadOnly(false);
     console.log("Edit");
   };
-  
+
   const columns = [
     {
       header: "S.No",
@@ -367,9 +393,7 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
         ) : (
           <>
             <div className="w-full flex bg-white p-1 justify-between  items-center">
-              <h1 className="master-header">
-                Shift Template Master
-              </h1>
+              <h1 className="master-header">Shift Template Master</h1>
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => {

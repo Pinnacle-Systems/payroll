@@ -294,22 +294,22 @@ model Employee {
   maritalStatus      String?
   joiningDate        DateTime?
   payCategory        String?
-
-  pf               String?
-  esi              String?
-  salary           String?
-  aadharNo         String?
-  panNo            String?
-  esiNo            String?
-  pfNo             String?
-  uanNo            String?
-  salaryMethod     String?
-  religion         String?
-  idNumber         String?
-  permanentAddress String?
-  permanentVillage String?
-  permanentPincode String?
-  permanentMobile  String?
+  mobileNumber       Int?
+  pf                 String?
+  esi                String?
+  salary             String?
+  aadharNo           String?
+  panNo              String?
+  esiNo              String?
+  pfNo               String?
+  uanNo              String?
+  salaryMethod       String?
+  religion           String?
+  idNumber           String?
+  permanentAddress   String?
+  permanentVillage   String?
+  permanentPincode   String?
+  permanentMobile    String?
 
   presentAddress String?
   presentVillage String?
@@ -445,6 +445,7 @@ model Country {
   createdById           Int?
   updatedBy             User?      @relation("updatedBy", fields: [updatedById], references: [id])
   updatedById           Int?
+  City                  City[]
 }
 
 model State {
@@ -479,6 +480,8 @@ model City {
   doctorPermCity  Employee[]       @relation(name: "presentCityId")
   Party           Party[]
   PartyMasterNew  PartyMasterNew[]
+  country         Country          @relation(fields: [countryId], references: [id])
+  countryId       Int
 
   companyId   Int?
   company     Company? @relation(fields: [companyId], references: [id])
@@ -1433,6 +1436,26 @@ model ShiftTemplateItems {
   otHrs                   String?
   quater                  String?
   date                    DateTime?
+  QuarterDetails          QuarterDetails[]
+}
+
+model QuarterDetails {
+  id                   Int                 @id @default(autoincrement())
+  ShiftTemplateItems   ShiftTemplateItems? @relation(fields: [shiftTemplateItemsId], references: [id], onDelete: Cascade)
+  shiftTemplateItemsId Int?
+  day                  String?
+  OTDetails            OTDetails?          @relation(fields: [oTDetailsId], references: [id])
+  oTDetailsId          Int?
+  ftMins               Int?
+  from                 String?
+  to                   String?
+  ttMins               Int?
+  endTime              Int?
+  nextDay              String?
+  checkHrs             Int?
+  total                Int?
+  pickFrom             String?
+  formula              String?
 }
 
 model PayFrequency {
@@ -1716,7 +1739,7 @@ model MachineInOutEntry {
 
 model MachineInOutGrid {
   id                  Int                @id @default(autoincrement())
-  MachineInOutEntry   MachineInOutEntry? @relation(fields: [machineInOutEntryId], references: [id])
+  MachineInOutEntry   MachineInOutEntry? @relation(fields: [machineInOutEntryId], references: [id], onDelete: Cascade)
   machineInOutEntryId Int?
   date                DateTime?
   machineTypeOne      String?
@@ -1743,9 +1766,10 @@ model OT {
 }
 
 model OTDetails {
-  id             Int     @id @default(autoincrement())
-  OT             OT?     @relation(fields: [oTId], references: [id], onDelete: Cascade)
+  id             Int              @id @default(autoincrement())
+  OT             OT?              @relation(fields: [oTId], references: [id], onDelete: Cascade)
   oTId           Int?
   payCode        String?
   payDescription String?
+  QuarterDetails QuarterDetails[]
 }

@@ -6,13 +6,11 @@ const prisma = new PrismaClient();
 async function get(req) {
   console.log("pay structute get called");
 
-  const { companyId,  } = req.query;
+  const { companyId } = req.query;
 
   const data = await prisma.oT.findMany({
     where: {
       companyId: companyId ? parseInt(companyId) : undefined,
-
-      
     },
     include: {
       OTDetails: true,
@@ -31,7 +29,16 @@ async function getOne(id) {
       id: parseInt(id),
     },
     include: {
-      OTDetails: true,
+      OTDetails: {
+        select: {
+          id: true,
+          payCode: true,
+          payDescription: true,
+          _count: {
+            select: { QuarterDetails: true },
+          },
+        },
+      },
     },
   });
   if (!data) return NoRecordFound("Pay Structure");
@@ -112,18 +119,46 @@ async function update(id, body) {
         branchId: branchId ? parseInt(branchId) : undefined,
         companyId: companyId ? parseInt(companyId) : undefined,
 
-        OTDetails:
-          oTDetails?.length > 0
-            ? {
-                deleteMany: {},
-                create: oTDetails?.map((item) => ({
-                  payCode: item?.payCode ? item?.payCode : "",
-                  payDescription: item?.payDescription
-                    ? item?.payDescription
-                    : "",
+        // OTDetails:
+        //   oTDetails?.length > 0
+        //     ? {
+        //         deleteMany: {},
+        //         create: oTDetails?.map((item) => ({
+        //           payCode: item?.payCode ? item?.payCode : "",
+        //           payDescription: item?.payDescription
+        //             ? item?.payDescription
+        //             : "",
+        //         })),
+        //       }
+        //     : undefined,
+        OTDetails: oTDetails?.length
+          ? {
+              // Update existing rows (only editable ones)
+              deleteMany: {
+                id: {
+                  notIn: oTDetails
+                    .filter((item) => item.id)
+                    .map((item) => item.id),
+                },
+              },
+              update: oTDetails
+                ?.filter((item) => item.id)
+                ?.map((item) => ({
+                  where: { id: parseInt(item.id) },
+                  data: {
+                    payCode: item.payCode || "",
+                    payDescription: item.payDescription || "",
+                  },
                 })),
-              }
-            : undefined,
+              // Create new rows
+              create: oTDetails
+                ?.filter((item) => !item.id)
+                ?.map((item) => ({
+                  payCode: item.payCode || "",
+                  payDescription: item.payDescription || "",
+                })),
+            }
+          : undefined,
       },
     });
   });

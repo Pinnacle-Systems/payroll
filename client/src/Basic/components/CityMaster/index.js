@@ -28,6 +28,8 @@ import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
 import Swal from "sweetalert2";
 import { getCommonParams } from "../../../Utils/helper";
+import { useGetCountriesQuery } from "../../../redux/services/CountryMasterService";
+
 const MODEL = "City Master";
 
 export default function Form() {
@@ -39,6 +41,7 @@ export default function Form() {
   const [code, setCode] = useState("");
   const [active, setActive] = useState(true);
   const [state, setState] = useState("");
+  const [country, setCountry] = useState("");
 
   const [searchValue, setSearchValue] = useState("");
   const [errors, setErrors] = useState({});
@@ -54,6 +57,8 @@ export default function Form() {
     isLoading: isStateLoading,
     isFetching: isStateFetching,
   } = useGetStateQuery({ params });
+  const { data: countriesList } = useGetCountriesQuery({ params });
+
   const {
     data: allData,
     isLoading,
@@ -76,6 +81,7 @@ export default function Form() {
       setCode(data?.code || "");
       setActive(id ? data?.active ?? false : true);
       setState(data?.stateId || "");
+      setCountry(data?.countryId ? data?.countryId : "");
       childRecord.current = data?.childRecord ? data?.childRecord : 0;
     },
     [id]
@@ -90,6 +96,7 @@ export default function Form() {
     code,
     active,
     state,
+    country,
     id,
     branchId,
     companyId,
@@ -100,7 +107,7 @@ export default function Form() {
     }
   }, [form, readOnly]);
   const validateData = (data) => {
-    if (data.name && data.state) {
+    if (data?.name && data?.state) {
       return true;
     }
     return false;
@@ -292,7 +299,20 @@ export default function Form() {
           ?.name
       : "";
   }
-  const options = stateList?.data?.map((val) => ({
+
+  const Countryoptions =
+    countriesList?.data?.map((item) => ({
+      value: item?.id, // actual value
+      label: item?.name, // displayed name
+    })) || [];
+  const selectedCountryOption =
+    Countryoptions.find((opt) => opt.value === country) || null;
+
+    const filteredStates = stateList?.data?.filter(
+  (val) => val.countryId === selectedCountryOption?.value
+) || [];
+
+  const options =  filteredStates?.map((val) => ({
     value: val?.id,
     label: val?.name,
   }));
@@ -331,7 +351,7 @@ export default function Form() {
             <Modal
               isOpen={form}
               form={form}
-              widthClass={"w-[45%] h-[70%]"}
+              widthClass={"w-[50%] h-[70%]"}
               onClose={() => {
                 setForm(false);
                 setErrors({});
@@ -381,59 +401,36 @@ export default function Form() {
                       <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
                         <div className="space-y-4 ">
                           <div className="">
-                            <div className="flex flex-wrap w-full ">
-                              <div className="mb-3 w-60">
-                                <TextInput
-                                  name="City Name"
-                                  type="text"
-                                  value={name}
-                                  setValue={setName}
-                                  required={true}
-                                  readOnly={readOnly}
-                                  disabled={
-                                    childRecord.current > 0 ? true : undefined
+                            <div className="flex flex-wrap w-full gap-x-4 mb-3">
+                              <div className="w-64">
+                                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                                  Country Name
+                                  <span className="text-red-500">*</span>
+                                </label>
+                                <Select
+                                  options={Countryoptions}
+                                  value={selectedCountryOption}
+                                  onChange={(selected) =>
+                                    setCountry(selected?.value || "")
                                   }
-                                  ref={cityNameRef}
+                                  isDisabled={
+                                    readOnly || childRecord.current > 0
+                                  }
+                                  isSearchable
+                                  isClearable={false}
+                                  menuShouldScrollIntoView={false}
+                                  maxMenuHeight={150} // <-- Reduce height here
+                                  onInputChange={(value) => value.toUpperCase()}
+                                  className="w-full px-1 -ml-1  text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                                  placeholder="Select Country"
+                                  styles={customSelectStyles}
                                 />
                               </div>
-                              <div className="mb-3 w-[90px] ml-6">
-                                <TextInput
-                                  name="Code"
-                                  type="text"
-                                  value={code}
-                                  setValue={setCode}
-                                  // required={true}
-                                  readOnly={readOnly}
-                                  disabled={
-                                    childRecord.current > 0 ? true : undefined
-                                  }
-                                />
-                              </div>
-                            </div>
-                            <div className="flex flex-wrap w-full gap-x-4">
-                              <div className="mb-3 w-[250px]">
-                                {/* <DropdownInput
-                                  name="State"
-                                  options={dropDownListObject(
-                                    id
-                                      ? stateList?.data
-                                      : stateList?.data?.filter(
-                                          (item) => item.active
-                                        ),
-                                    "name",
-                                    "id"
-                                  )}
-                                  value={state}
-                                  setValue={setState}
-                                  required={true}
-                                  readOnly={readOnly}
-                                  disabled={
-                                    childRecord.current > 0 ? true : undefined
-                                  }
-                                  // disabled={true}
-                                /> */}
+                              <div className="w-60">
                                 <label className="block text-xs  font-semibold text-slate-700 mb-1">
-                                  Select State{" "}
+                                  State Name{" "}
                                   <span className="text-red-500">*</span>
                                 </label>
                                 <Select
@@ -453,20 +450,38 @@ export default function Form() {
                                   className="w-full px-1 -ml-1  text-xs rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
-                                  placeholder="Select Country"
+                                  placeholder="Select State"
                                   styles={customSelectStyles}
                                 />
                               </div>
-                              <div className="w-30">
+                            </div>
+
+                            <div className="flex flex-wrap w-full gap-x-6 pt-3">
+                              <div className="mb-3 w-[248px]">
                                 <TextInput
-                                  name="Country"
+                                  name="City Name"
                                   type="text"
-                                  value={countryFromState()}
+                                  value={name}
+                                  setValue={setName}
+                                  required={true}
                                   readOnly={readOnly}
                                   disabled={
                                     childRecord.current > 0 ? true : undefined
                                   }
-                                  // disabled={true}
+                                  ref={cityNameRef}
+                                />
+                              </div>
+                              <div className="mb-3 w-[90px] ">
+                                <TextInput
+                                  name="Code"
+                                  type="text"
+                                  value={code}
+                                  setValue={setCode}
+                                  // required={true}
+                                  readOnly={readOnly}
+                                  disabled={
+                                    childRecord.current > 0 ? true : undefined
+                                  }
                                 />
                               </div>
                             </div>

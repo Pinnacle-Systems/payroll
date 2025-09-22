@@ -350,7 +350,7 @@ export default function Form() {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[40%] h-[70%]"}
+            widthClass={"w-[60%] h-[55%]"}
             onClose={() => {
               setForm(false);
               setErrors({});
@@ -399,56 +399,8 @@ export default function Form() {
                   <div className="lg:col-span- space-y-3">
                     <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
                       <div className="space-y-2 ">
-                        <div className="flex">
-                          <div className="mb-3 w-72">
-                            <TextInput
-                              name="State Name"
-                              type="text"
-                              value={name}
-                              setValue={setName}
-                              required={true}
-                              readOnly={readOnly}
-                              disabled={
-                                childRecord.current > 0 
-                              }
-                              ref={stateNameRef}
-                            />
-                          </div>
-                          <div className="mb-3 ms-3 w-20">
-                            <TextInput
-                              name="Code"
-                              type="text"
-                              value={code}
-                              setValue={setCode}
-                              // required={true}
-                              readOnly={readOnly}
-                              disabled={childRecord.current > 0}
-                            />
-                          </div>
-                        </div>
-
-                        <div className="flex ">
+                        <div className="flex gap-x-4">
                           <div className="w-72 mb-3 ">
-                            {/* <DropdownInput
-                              name="Country"
-                              options={dropDownListObject(
-                                id
-                                  ? countriesList?.data
-                                  : countriesList?.data?.filter(
-                                      (item) => item.active
-                                    ),
-                                "name",
-                                "id"
-                              )}
-                              className={`w-[200px]`}
-                              value={country}
-                              setValue={setCountry}
-                              required={true}
-                              readOnly={readOnly}
-                              disabled={
-                                childRecord.current > 0 ? true : undefined
-                              }
-                            /> */}
                             <label className="block text-xs font-semibold text-slate-700 mb-1">
                               Country Name
                               <span className="text-red-500">*</span>
@@ -470,6 +422,30 @@ export default function Form() {
           transition-all duration-150 shadow-sm"
                               placeholder="Select Country"
                               styles={customSelectStyles}
+                            />
+                          </div>
+
+                          <div className="mb-3 w-72">
+                            <TextInput
+                              name="State Name"
+                              type="text"
+                              value={name}
+                              setValue={setName}
+                              required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              ref={stateNameRef}
+                            />
+                          </div>
+                          <div className="mb-3 ms-3 w-20">
+                            <TextInput
+                              name="Code"
+                              type="text"
+                              value={code}
+                              setValue={setCode}
+                              // required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
                             />
                           </div>
                         </div>

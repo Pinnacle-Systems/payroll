@@ -70,7 +70,7 @@ const OTMaster = () => {
       const OTDetailsWithChild =
         data?.OTDetails?.map((item) => ({
           ...item,
-          childRecord: item._count?.PayStructure || 0,
+          childRecord: item._count?.QuarterDetails|| 0,
         })) || [];
 
       setOTDetails(OTDetailsWithChild);

@@ -14,21 +14,9 @@ async function get(req) {
       },
       active: active ? Boolean(active) : undefined,
     },
-    select: {
-      name: true,
-      code: true,
-      active: true,
-      id: true,
-      state: {
-        select: {
-          name: true,
-          country: {
-            select: {
-              name: true,
-            },
-          },
-        },
-      },
+     include: {
+      country: true,
+      state:true
     },
   });
   return { statusCode: 0, data };
@@ -99,7 +87,7 @@ async function getSearch(req) {
 }
 
 async function create(body) {
-  const { name, code, state, branchId,companyId } = await body;
+  const { name, code, state, branchId, companyId, country } = await body;
   const data = await prisma.city.create({
     data: {
       name,
@@ -109,13 +97,14 @@ async function create(body) {
       },
       branch: branchId ? { connect: { id: parseInt(branchId) } } : undefined,
       company: companyId ? { connect: { id: parseInt(companyId) } } : undefined,
+      country: country ? { connect: { id: parseInt(country) } } : undefined,
     },
   });
   return { statusCode: 0, data };
 }
 
 async function update(id, body) {
-  const { name, code, active, state } = await body;
+  const { name, code, active, state ,country} = await body;
   const dataFound = await prisma.city.findUnique({
     where: {
       id: parseInt(id),
@@ -133,6 +122,7 @@ async function update(id, body) {
       state: {
         connect: { id: parseInt(state) },
       },
+      country: country ? { connect: { id: parseInt(country) } } : undefined,
     },
   });
   return { statusCode: 0, data };

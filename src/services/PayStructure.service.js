@@ -39,7 +39,7 @@ async function getNextDocId(
 
 async function get(req) {
   console.log("pay structute get called");
-  
+
   const { companyId, active, branchId, finYearId, searchDocId } = req.query;
 
   console.log(companyId, active, finYearId, "received--");
@@ -275,23 +275,66 @@ async function update(id, body) {
           : undefined,
         category: category ? category : "",
 
-        PayStructure:
-          payStructure?.length > 0
-            ? {
-                deleteMany: {},
-                create: payStructure?.map((item) => ({
-                  payDetailsId: item?.payDetailsId
-                    ? parseInt(item?.payDetailsId)
-                    : undefined,
-                 salaryPercentage: item?.salaryPercentage
-                    ? parseFloat(item?.salaryPercentage)
-                    : null,
-                  formula: item?.formula ? item?.formula : "",
-                  notes: item?.notes ? item?.notes : "",
-                  mark: item?.mark || false,
+        // PayStructure:
+        //   payStructure?.length > 0
+        //     ? {
+        //         deleteMany: {},
+        //         create: payStructure?.map((item) => ({
+        //           payDetailsId: item?.payDetailsId
+        //             ? parseInt(item?.payDetailsId)
+        //             : undefined,
+        //          salaryPercentage: item?.salaryPercentage
+        //             ? parseFloat(item?.salaryPercentage)
+        //             : null,
+        //           formula: item?.formula ? item?.formula : "",
+        //           notes: item?.notes ? item?.notes : "",
+        //           mark: item?.mark || false,
+        //         })),
+        //       }
+        //     : undefined,
+        PayStructure: payStructure?.length
+          ? {
+              deleteMany: {
+                id: {
+                  notIn: payStructure
+                    .filter((item) => item.id)
+                    .map((item) => parseInt(item.id)),
+                },
+              },
+              // Update existing rows (those with an id)
+              update: payStructure
+                ?.filter((item) => item.id)
+                ?.map((item) => ({
+                  where: { id: parseInt(item.id) },
+                  data: {
+                    payDetailsId: item.payDetailsId
+                      ? parseInt(item.payDetailsId)
+                      : undefined,
+                    salaryPercentage: item.salaryPercentage
+                      ? parseFloat(item.salaryPercentage)
+                      : null,
+                    formula: item.formula || "",
+                    notes: item.notes || "",
+                    mark: item.mark || false,
+                  },
                 })),
-              }
-            : undefined,
+
+              // Create new rows (those without an id)
+              create: payStructure
+                .filter((item) => !item.id)
+                .map((item) => ({
+                  payDetailsId: item.payDetailsId
+                    ? parseInt(item.payDetailsId)
+                    : undefined,
+                  salaryPercentage: item.salaryPercentage
+                    ? parseFloat(item.salaryPercentage)
+                    : null,
+                  formula: item.formula || "",
+                  notes: item.notes || "",
+                  mark: item.mark || false,
+                })),
+            }
+          : undefined,
       },
     });
     // await updatecompanyPayStructure(tx, payDetails, data);

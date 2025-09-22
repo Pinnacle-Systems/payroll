@@ -309,7 +309,7 @@ async function create(req) {
     pfNo,
     uanNo,
     email,
-
+mobileNumber,
     presentAddress,
     permanentAddress,
     bankDetails,
@@ -333,7 +333,7 @@ async function create(req) {
       disability: disability ? disability : "",
       identificationMark: identificationMark ? identificationMark : "",
       dob: dob ? new Date(dob) : null,
-
+       mobileNumber : mobileNumber ? parent(mobileNumber) : null,
       height: height ? height : "",
       weight: weight ? weight : "",
       maritalStatus: maritalStatus ? maritalStatus : "",
@@ -477,7 +477,7 @@ async function update(id, req) {
     disability,
     identificationMark,
     dob,
-
+    mobileNumber,
     height,
     weight,
     maritalStatus,
@@ -538,7 +538,7 @@ async function update(id, req) {
       disability: disability ? disability : "",
       identificationMark: identificationMark ? identificationMark : "",
       dob: dob ? new Date(dob) : null,
-
+      mobileNumber : mobileNumber ? parent(mobileNumber) : null,
       height: height ? height : "",
       weight: weight ? weight : "",
       maritalStatus: maritalStatus ? maritalStatus : "",
