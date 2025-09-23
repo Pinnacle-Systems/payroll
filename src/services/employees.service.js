@@ -221,6 +221,9 @@ async function getOne(id) {
   };
 }
 
+
+
+
 async function getSearch(req) {
   const searchKey = req.params.searchKey;
   const { branchId, active } = req.query;
@@ -333,7 +336,7 @@ mobileNumber,
       disability: disability ? disability : "",
       identificationMark: identificationMark ? identificationMark : "",
       dob: dob ? new Date(dob) : null,
-       mobileNumber : mobileNumber ? parent(mobileNumber) : null,
+       mobileNumber : mobileNumber ? mobileNumber : '',
       height: height ? height : "",
       weight: weight ? weight : "",
       maritalStatus: maritalStatus ? maritalStatus : "",
@@ -538,7 +541,7 @@ async function update(id, req) {
       disability: disability ? disability : "",
       identificationMark: identificationMark ? identificationMark : "",
       dob: dob ? new Date(dob) : null,
-      mobileNumber : mobileNumber ? parent(mobileNumber) : null,
+       mobileNumber : mobileNumber ? mobileNumber : '',
       height: height ? height : "",
       weight: weight ? weight : "",
       maritalStatus: maritalStatus ? maritalStatus : "",

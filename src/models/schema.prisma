@@ -294,7 +294,7 @@ model Employee {
   maritalStatus      String?
   joiningDate        DateTime?
   payCategory        String?
-  mobileNumber       Int?
+  mobileNumber       String?
   pf                 String?
   esi                String?
   salary             String?
@@ -1772,4 +1772,19 @@ model OTDetails {
   payCode        String?
   payDescription String?
   QuarterDetails QuarterDetails[]
+}
+
+model PreEmployee {
+  id             Int       @id @default(autoincrement())
+  firstName      String?
+  email          String?   @unique
+  gender         String?
+  dob            DateTime?
+  maritalStatus  String?
+  mobileNumber   String?
+  aadharNo       String?
+  panNo          String?
+  religion       String?
+  presentAddress String?
+  docId          String?
 }

@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { EMPLOYEE_API} from "../../Api";
+import { EMPLOYEE_API } from "../../Api";
 
 const BASE_URL = process.env.REACT_APP_SERVER_URL;
 
@@ -11,15 +11,15 @@ const employeeMasterApi = createApi({
   tagTypes: ["Employee"],
   endpoints: (builder) => ({
     getEmployee: builder.query({
-      query: ({params, searchParams}) => {
-        if(searchParams){
+      query: ({ params, searchParams }) => {
+        if (searchParams) {
           return {
-            url: EMPLOYEE_API +"/search/"+searchParams,
+            url: EMPLOYEE_API + "/search/" + searchParams,
             method: "GET",
             headers: {
               "Content-type": "application/json; charset=UTF-8",
             },
-            params
+            params,
           };
         }
         return {
@@ -28,7 +28,7 @@ const employeeMasterApi = createApi({
           headers: {
             "Content-type": "application/json; charset=UTF-8",
           },
-          params
+          params,
         };
       },
       providesTags: ["Employee"],
@@ -45,6 +45,7 @@ const employeeMasterApi = createApi({
       },
       providesTags: ["Employee"],
     }),
+   
     addEmployee: builder.mutation({
       query: (payload) => ({
         url: EMPLOYEE_API,
@@ -54,7 +55,7 @@ const employeeMasterApi = createApi({
       invalidatesTags: ["Employee"],
     }),
     updateEmployee: builder.mutation({
-      query: ({id, body}) => {
+      query: ({ id, body }) => {
         return {
           url: `${EMPLOYEE_API}/${id}`,
           method: "PUT",
@@ -70,6 +71,7 @@ const employeeMasterApi = createApi({
       }),
       invalidatesTags: ["Employee"],
     }),
+    
   }),
 });
 

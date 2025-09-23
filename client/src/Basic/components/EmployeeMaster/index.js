@@ -57,6 +57,7 @@ import Select from "react-select";
 import Swal from "sweetalert2";
 
 import { useGetemployeeSubCategoryQuery } from "../../../redux/services/EmployeeSubCategoryservice";
+import { useGetEmpQuery } from "../../../redux/services/preEmployee";
 
 const MODEL = "Employee Master";
 export default function Form() {
@@ -84,7 +85,7 @@ export default function Form() {
   const [permAddress, setPermAddress] = useState("");
   const [permCity, setPermCity] = useState("");
   const [permPincode, setPermPincode] = useState("");
-  
+
   const [maritalStatus, setMaritalStatus] = useState("");
   const [consultFee, setConsultFee] = useState("");
   const [accountNo, setAccountNo] = useState("");
@@ -134,6 +135,9 @@ export default function Form() {
   const [educationDetails, setEducationDetails] = useState([]);
   const [familyDetails, setFamilyDetails] = useState([]);
   const [employeeSubCategoryId, setEmployeeSubCategoryId] = useState("");
+  const [mobileMatches, setMobileMatches] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedEmployeeIndex, setSelectedEmployeeIndex] = useState(null);
 
   const [presentAddress, setPresentAddress] = useState({
     address: "",
@@ -181,6 +185,25 @@ export default function Form() {
   const { data: department } = useGetDepartmentQuery({ params });
 
   const { data: relationShip } = useGetRelationShipQuery({ params });
+
+  const { data: preEmployee } = useGetEmpQuery();
+  const handleMobileChange = (value) => {
+    const cleanedValue = value.replace(/\D/g, "").slice(0, 10);
+    setMobileNumber(cleanedValue);
+
+    if (cleanedValue.length >= 3) {
+      // start showing dropdown after 3 digits
+      const matches = preEmployee?.data?.filter((emp) =>
+        emp.mobileNumber?.toString().includes(cleanedValue)
+      );
+      setMobileMatches(matches || []);
+      setShowDropdown(matches?.length > 0);
+    } else {
+      setMobileMatches([]);
+      setShowDropdown(false);
+    }
+  };
+
   const {
     data: allData,
     isLoading,
@@ -191,15 +214,7 @@ export default function Form() {
 
   const { data: shiftTemplate } = useGetShiftTemplateMasterQuery({ params });
 
-  const isCurrentEmployeeDoctor = (employeeCategory) =>
-    employeeCategoryList.data
-      .find((cat) => parseInt(cat.id) === parseInt(employeeCategory))
-      ?.name?.toUpperCase() === "DOCTOR";
-  const {
-    data: singleData,
-    isFetching: isSingleFetching,
-    isLoading: isSingleLoading,
-  } = useGetEmployeeByIdQuery(id, { skip: !id });
+  const { data: singleData } = useGetEmployeeByIdQuery(id, { skip: !id });
 
   const [addData] = useAddEmployeeMutation();
   const [updateData] = useUpdateEmployeeMutation();
@@ -221,7 +236,7 @@ export default function Form() {
 
       // Basic Info
       setEmployeeType(data?.employeeType);
-      setMobileNumber(data?.mobileNumber)
+      setMobileNumber(data?.mobileNumber);
       setFirstName(data?.firstName || "");
       setMiddleName(data?.middleName || "");
       setLastName(data?.lastName || "");
@@ -711,7 +726,7 @@ export default function Form() {
     setStep("Basic Details");
     // Basic Info
     setEmployeeType("");
-    setMobileNumber('')
+    setMobileNumber("");
     setSearchValue("");
     setFirstName("");
     setMiddleName("");
@@ -1118,23 +1133,20 @@ export default function Form() {
     label: val?.name,
   }));
 
- 
   const CityOptions = cityList?.data?.map((val) => ({
     value: val?.id,
     label: val?.name,
   }));
 
-const getFilteredStates = (countryId) => 
-  stateList?.data
-    .filter((s) => s.countryId === countryId)
-    .map((s) => ({ value: s.id, label: s.name }));
+  const getFilteredStates = (countryId) =>
+    stateList?.data
+      .filter((s) => s.countryId === countryId)
+      .map((s) => ({ value: s.id, label: s.name }));
 
-const getFilteredCities = (stateId) =>
-  cityList?.data
-    .filter((c) => c.stateId === stateId)
-    .map((c) => ({ value: c.id, label: c.name }));
-
-
+  const getFilteredCities = (stateId) =>
+    cityList?.data
+      .filter((c) => c.stateId === stateId)
+      .map((c) => ({ value: c.id, label: c.name }));
 
   const RelationShipOptions = relationShip?.data?.map((val) => ({
     value: val?.id,
@@ -1142,22 +1154,23 @@ const getFilteredCities = (stateId) =>
   }));
 
   return (
-    <div onKeyDown={handleKeyDown} className="p-1 ">
-      {/* Header Section */}
-      <div className="w-full flex bg-white p-1 justify-between  items-center">
-        <h1 className="master-header">Employee Master</h1>
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => {
-              setForm(true);
-              onNew();
-              setNewForm(true);
-            }}
-            className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
-          >
-            + Add New Employee
-          </button>
-          {/* <div className="flex items-center gap-2">
+    <>
+      <div onKeyDown={handleKeyDown} className="p-1 ">
+        {/* Header Section */}
+        <div className="w-full flex bg-white p-1 justify-between  items-center">
+          <h1 className="master-header">Employee Master</h1>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => {
+                setForm(true);
+                onNew();
+                setNewForm(true);
+              }}
+              className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+            >
+              + Add New Employee
+            </button>
+            {/* <div className="flex items-center gap-2">
             <button
               onClick={() => setView("table")}
               className={`px-3 py-1 rounded-md text-xs flex items-center gap-1 ${
@@ -1181,92 +1194,92 @@ const getFilteredCities = (stateId) =>
               Cards
             </button>
           </div> */}
+          </div>
         </div>
-      </div>
 
-      <div className="bg-white w-full rounded-xl shadow-sm overflow-hidden mt-3">
-        <ReusableTable
-          columns={columns}
-          data={allData?.data}
-          onView={handleView}
-          onEdit={handleEdit}
-          onDelete={deleteData}
-          itemsPerPage={10}
-        />
-      </div>
+        <div className="bg-white w-full rounded-xl shadow-sm overflow-hidden mt-3">
+          <ReusableTable
+            columns={columns}
+            data={allData?.data}
+            onView={handleView}
+            onEdit={handleEdit}
+            onDelete={deleteData}
+            itemsPerPage={10}
+          />
+        </div>
 
-      {form && (
-        <Modal
-          isOpen={form}
-          form={form}
-          widthClass={"w-[90%]  h-[78%]"}
-          onClose={() => {
-            setForm(false);
-            setErrors({});
-            setId("");
-          }}
-        >
-          <div className="h-full flex flex-col bg-gray-100">
-            <div className="border-b py-2 px-4 mx-3 flex justify-between items-center sticky top-0 z-10 bg-white mt-4">
-              <div className="flex items-center gap-2">
-                <h2 className=" master-header-modal">Employee Master</h2>
+        {form && (
+          <Modal
+            isOpen={form}
+            form={form}
+            widthClass={"w-[90%]  h-[78%]"}
+            onClose={() => {
+              setForm(false);
+              setErrors({});
+              setId("");
+            }}
+          >
+            <div className="h-full flex flex-col bg-gray-100">
+              <div className="border-b py-2 px-4 mx-3 flex justify-between items-center sticky top-0 z-10 bg-white mt-4">
+                <div className="flex items-center gap-2">
+                  <h2 className=" master-header-modal">Employee Master</h2>
 
-                {regNo && (
-                  <span
-                    className={`px-2 py-0.5 text-xs text-bold rounded-full ${
-                      active
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {regNo}
-                  </span>
-                )}
-              </div>
-
-              <div className="flex gap-2">
-                <div>
-                  {readOnly && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setReadOnly(false);
-                      }}
-                      className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
+                  {regNo && (
+                    <span
+                      className={`px-2 py-0.5 text-xs text-bold rounded-full ${
+                        active
+                          ? "bg-green-100 text-green-800"
+                          : "bg-red-100 text-red-800"
+                      }`}
                     >
-                      Edit
-                    </button>
+                      {regNo}
+                    </span>
                   )}
                 </div>
-                <div>
-                  {!readOnly && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setForm(false);
-                        setSearchValue("");
-                        setId(false);
-                      }}
-                      className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
-                    >
-                      Cancel
-                    </button>
-                  )}
-                </div>
+
                 <div className="flex gap-2">
-                  {!readOnly && (
-                    <div className="flex gap-2">
+                  <div>
+                    {readOnly && (
                       <button
                         type="button"
-                        onClick={saveData}
-                        className="px-3 py-1 hover:bg-green-600 hover:text-white rounded text-green-600 
-      border border-green-600 flex items-center gap-1 text-xs"
+                        onClick={() => {
+                          setReadOnly(false);
+                        }}
+                        className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
                       >
-                        <Check size={14} />
-                        {id ? "Update " : "Save "}
+                        Edit
                       </button>
+                    )}
+                  </div>
+                  <div>
+                    {!readOnly && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setForm(false);
+                          setSearchValue("");
+                          setId(false);
+                        }}
+                        className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    {!readOnly && (
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={saveData}
+                          className="px-3 py-1 hover:bg-green-600 hover:text-white rounded text-green-600 
+      border border-green-600 flex items-center gap-1 text-xs"
+                        >
+                          <Check size={14} />
+                          {id ? "Update " : "Save "}
+                        </button>
 
-                      {/* <button
+                        {/* <button
                         type="button"
                         onClick={saveDataandExit}
                         className="px-3 py-1 hover:bg-green-600 hover:text-white rounded text-green-600 
@@ -1275,213 +1288,249 @@ const getFilteredCities = (stateId) =>
                         <Check size={14} />
                         {id ? "Update & Exit" : "Save & Exit"}
                       </button> */}
-                    </div>
-                  )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="flex-1  p-3 ">
-              <div className="flex text-blue-600 text-[14px] gap-x-1">
-                {[
-                  "Basic Details",
-                  "Employment Details",
-                  "Personal Details",
-                  "Contact Details",
-                  "Bank Details",
-                  "Education Details",
-                  "Family Details",
-                ]?.map((tabNumber) => (
-                  <button
-                    key={tabNumber}
-                    onClick={() => handleTabClick(tabNumber)}
-                    className={`px-3 py-1 field-text border-b-2 rounded-t-md transition-colors duration-200
+              <div className="flex-1  p-3 ">
+                <div className="flex text-blue-600 text-[14px] gap-x-1">
+                  {[
+                    "Basic Details",
+                    "Employment Details",
+                    "Personal Details",
+                    "Contact Details",
+                    "Bank Details",
+                    "Education Details",
+                    "Family Details",
+                  ]?.map((tabNumber) => (
+                    <button
+                      key={tabNumber}
+                      onClick={() => handleTabClick(tabNumber)}
+                      className={`px-3 py-1 field-text border-b-2 rounded-t-md transition-colors duration-200
                 ${
                   step === tabNumber
                     ? "border-b-2 border-secondary text-secondary font-semibold bg-white"
                     : "border-b-2 border-transparent text-gray-500 hover:border-secondary hover:text-secondary"
                 }`}
-                  >
-                    {tabNumber}
-                  </button>
-                ))}
-              </div>
+                    >
+                      {tabNumber}
+                    </button>
+                  ))}
+                </div>
 
-              <div className="grid grid-cols-1 gap-2 h-[90vh] mt-2 overflow-y-auto">
-                {step === "Basic Details" && (
-                  <div className=" bg-white p-3 rounded-md border text-[12px] h-[49vh] border-gray-200 ">
-                    <div className="flex gap-x-8">
-                      <SingleImageFileUploadComponent
-                        setWebCam={setCameraOpen}
-                        disabled={readOnly}
-                        image={image}
-                        setImage={setImage}
-                        className="mb-3"
-                      />
+                <div className="grid grid-cols-1 gap-2 h-[90vh] mt-2 overflow-y-auto">
+                  {step === "Basic Details" && (
+                    <div className=" bg-white p-3 rounded-md border text-[12px] h-[49vh] border-gray-200 ">
+                      <div className="flex gap-x-8">
+                        <SingleImageFileUploadComponent
+                          setWebCam={setCameraOpen}
+                          disabled={readOnly}
+                          image={image}
+                          setImage={setImage}
+                          className="mb-3"
+                        />
 
-                      <div className="ml-3 flex flex-wrap gap-4 ">
-                        <div className="w-30">
-                          <DropdownInput
-                            ref={input1Ref}
-                            name="Employee Type"
-                            value={employeeType}
-                            setValue={setEmployeeType}
-                            options={EmployeeType}
-                            required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>
-                        <div className="w-[140px]">
-                          <TextInput
-                            ref={input1Ref}
-                            name="Mobile Number"
-                            value={mobileNumber}
-                            type='number'
-                            setValue={setMobileNumber}
-                            required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>
-                           <div className="w-[180px]">
-                        <TextInput
-                          ref={input1Ref}
-                          name="Adhaar No"
-                          value={aadharNo}
-                          setValue={setAadharNo}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                          onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                        /></div>
-                        <div className="w-30">
-                          <TextInput
-                            ref={input1Ref}
-                            name="First Name"
-                            value={firstName}
-                            setValue={setFirstName}
-                            required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>
-                        <div className="w-30">
-                          <TextInput
-                            ref={input1Ref}
-                            name="Middle Name"
-                            value={middleName}
-                            setValue={setMiddleName}
-                            // required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>{" "}
-                        <div className="w-30">
-                          <TextInput
-                            ref={input1Ref}
-                            name="Last Name"
-                            value={lastName}
-                            setValue={setLastName}
-                            // required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>
-                        <div className="w-30">
-                          <DateInput
-                            ref={input1Ref}
-                            name="Date of Birth"
-                            value={dob}
-                            setValue={setDob}
-                            required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>{" "}
-                        <div className="col-span-1">
-                          <DropdownInput
-                            ref={input1Ref}
-                            name="Gender"
-                            value={gender}
-                            setValue={setGender}
-                            options={genderList}
-                            required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>{" "}
-                        <div className="w-52">
-                          <TextInput
-                            ref={input1Ref}
-                            name="Father Name"
-                            value={fatherName}
-                            setValue={setFatherName}
-                            // required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>{" "}
-                        <div className="w-52">
-                          <TextInput
-                            ref={input1Ref}
-                            name="Mother Name"
-                            value={motherName}
-                            setValue={setMotherName}
-                            // required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>{" "}
-                      
-                        <div className="col-span-1">
-                          <DropdownInput
-                            ref={input1Ref}
-                            name="Marital Status"
-                            value={maritalStatus}
-                            setValue={setMaritalStatus}
-                            // required={true}
-                            options={married}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>
+                        <div className="ml-3 flex flex-wrap gap-4 ">
+                          <div className="w-[140px]">
+                            <TextInput
+                              ref={input1Ref}
+                              name="Mobile Number"
+                              value={mobileNumber}
+                              type="number"
+                              setValue={handleMobileChange}
+                              required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                            {showDropdown && (
+                              <div className=" w-[160px]  absolute z-10 bg-white border border-gray-300 rounded-md overflow-auto mb-10
+                     p-1  shadow-md ">
+                                {mobileMatches.map((emp, index) => (
+                                  <div
+                                    key={index}
+                                    className="px-2 py-1 hover:bg-indigo-100 cursor-pointer"
+                                    onClick={() => {
+                                      // Fill the form fields with selected employee
+                                      setFirstName(emp.firstName);
+                                      setGender(emp.gender);
+                                      setDob(
+                                        emp.dob ? emp.dob.split("T")[0] : ""
+                                      );
+                                      setMaritalStatus(emp.maritalStatus);
+                                      setEmail(emp.email);
+                                      setAadharNo(emp.aadharNo);
+                                      setPanNo(emp.panNo);
+                                      setReligion(emp.religion);
+                                      setPresentAddress({
+                                        address: emp.presentAddress || "",
+                                      });
+                                      setMobileNumber(
+                                        emp.mobileNumber?.toString()
+                                      );
+                                      setShowDropdown(false);
+                                    }}
+                                  >
+                                    {emp.firstName} ({emp.mobileNumber})
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                          <div className="w-30">
+                            <DropdownInput
+                              ref={input1Ref}
+                              name="Employee Type"
+                              value={employeeType}
+                              setValue={setEmployeeType}
+                              options={EmployeeType}
+                              required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+                          
+                          <div className="w-[180px]">
+                            <TextInput
+                              ref={input1Ref}
+                              name="Adhaar No"
+                              value={aadharNo}
+                              setValue={setAadharNo}
+                              type="number"
+                              required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+                          <div className="w-30">
+                            <TextInput
+                              ref={input1Ref}
+                              name="First Name"
+                              value={firstName}
+                              setValue={setFirstName}
+                              required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+                          <div className="w-30">
+                            <TextInput
+                              ref={input1Ref}
+                              name="Middle Name"
+                              value={middleName}
+                              setValue={setMiddleName}
+                              // required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>{" "}
+                          <div className="w-30">
+                            <TextInput
+                              ref={input1Ref}
+                              name="Last Name"
+                              value={lastName}
+                              setValue={setLastName}
+                              // required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+                          <div className="w-30">
+                            <DateInput
+                              ref={input1Ref}
+                              name="Date of Birth"
+                              value={dob}
+                              setValue={setDob}
+                              required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>{" "}
+                          <div className="col-span-1">
+                            <DropdownInput
+                              ref={input1Ref}
+                              name="Gender"
+                              value={gender}
+                              setValue={setGender}
+                              options={genderList}
+                              required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>{" "}
+                          <div className="w-52">
+                            <TextInput
+                              ref={input1Ref}
+                              name="Father Name"
+                              value={fatherName}
+                              setValue={setFatherName}
+                              // required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>{" "}
+                          <div className="w-52">
+                            <TextInput
+                              ref={input1Ref}
+                              name="Mother Name"
+                              value={motherName}
+                              setValue={setMotherName}
+                              // required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>{" "}
+                          <div className="col-span-1">
+                            <DropdownInput
+                              ref={input1Ref}
+                              name="Marital Status"
+                              value={maritalStatus}
+                              setValue={setMaritalStatus}
+                              // required={true}
+                              options={married}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
                           <div className="ml-1 w-[270px]">
-                          <TextInput
-                            ref={input1Ref}
-                            name="Identification Mark"
-                            value={identificationMark}
-                            setValue={setIdentificationMark}
-                            // required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>{" "}
-                        <div className="w-30">
-                          <DropdownInput
-                            ref={input1Ref}
-                            name="Disability"
-                            value={disability}
-                            setValue={setDisability}
-                            required={true}
-                            readOnly={readOnly}
-                            options={common}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>
-                        <div className="w-28">
-                          {/* <DropdownInput
+                            <TextInput
+                              ref={input1Ref}
+                              name="Identification Mark"
+                              value={identificationMark}
+                              setValue={setIdentificationMark}
+                              // required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>{" "}
+                          <div className="w-30">
+                            <DropdownInput
+                              ref={input1Ref}
+                              name="Disability"
+                              value={disability}
+                              setValue={setDisability}
+                              required={true}
+                              readOnly={readOnly}
+                              options={common}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+                          <div className="w-28">
+                            {/* <DropdownInput
                             ref={input1Ref}
                             name=" Blood Group"
                             value={bloodGroupId}
@@ -1496,88 +1545,88 @@ const getFilteredCities = (stateId) =>
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           /> */}
-                          <label className="block text-xs font-semibold text-slate-700 mb-1">
-                            Blood Group
-                            <span className="text-red-500">*</span>
-                          </label>
-                          <Select
-                            options={BloodGroupoptions}
-                            value={
-                              BloodGroupoptions?.find(
-                                (opt) => opt?.value === bloodGroupId
-                              ) || null
-                            }
-                            onChange={(selected) =>
-                              setBloodGroupId(selected?.value || "")
-                            }
-                            placeholder="Select"
-                            isClearable={false} // same as required
-                            isDisabled={readOnly || childRecord.current > 0}
-                            isSearchable
-                            menuShouldScrollIntoView={false}
-                            maxMenuHeight={150} // <-- Reduce height here
-                            onInputChange={(value) => value.toUpperCase()}
-                            className="w-full px-1 -ml-1 text-xs rounded-lg
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              Blood Group
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <Select
+                              options={BloodGroupoptions}
+                              value={
+                                BloodGroupoptions?.find(
+                                  (opt) => opt?.value === bloodGroupId
+                                ) || null
+                              }
+                              onChange={(selected) =>
+                                setBloodGroupId(selected?.value || "")
+                              }
+                              placeholder="Select"
+                              isClearable={false} // same as required
+                              isDisabled={readOnly || childRecord.current > 0}
+                              isSearchable
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className="w-full px-1 -ml-1 text-xs rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
-                            styles={customSelectStyles}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>
-                        <div className="w-24">
-                          <TextInput
-                            ref={input1Ref}
-                            name="Height (cms)"
-                            value={height}
-                            setValue={setHeight}
-                            // required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>
-                        <div className="w-24">
-                          <TextInput
-                            ref={input1Ref}
-                            name="Weight (Kgs)"
-                            value={weight}
-                            setValue={setWeight}
-                            // required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>
-                        <Modal
-                          isOpen={cameraOpen}
-                          onClose={() => setCameraOpen(false)}
-                        >
-                          <LiveWebCam
-                            picture={image}
-                            setPicture={setImage}
+                              styles={customSelectStyles}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+                          <div className="w-24">
+                            <TextInput
+                              ref={input1Ref}
+                              name="Height (cms)"
+                              value={height}
+                              setValue={setHeight}
+                              // required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+                          <div className="w-24">
+                            <TextInput
+                              ref={input1Ref}
+                              name="Weight (Kgs)"
+                              value={weight}
+                              setValue={setWeight}
+                              // required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+                          <Modal
+                            isOpen={cameraOpen}
                             onClose={() => setCameraOpen(false)}
-                          />
-                        </Modal>
+                          >
+                            <LiveWebCam
+                              picture={image}
+                              setPicture={setImage}
+                              onClose={() => setCameraOpen(false)}
+                            />
+                          </Modal>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-                {step === "Employment Details" && (
-                  <div className="flex flex-col  gap-4">
-                    <div className="bg-white p-3 rounded-md border border-gray-200 h-[49vh] ">
-                      <div className="flex flex-wrap gap-4 ml-3">
-                        <div className="">
-                          <DateInput
-                            name="Joining Date"
-                            value={joiningDate}
-                            setValue={setJoiningDate}
-                            required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                          />
-                        </div>
-                        <div className="w-52">
-                          {/* <DropdownInput
+                  )}
+                  {step === "Employment Details" && (
+                    <div className="flex flex-col  gap-4">
+                      <div className="bg-white p-3 rounded-md border border-gray-200 h-[49vh] ">
+                        <div className="flex flex-wrap gap-4 ml-3">
+                          <div className="">
+                            <DateInput
+                              name="Joining Date"
+                              value={joiningDate}
+                              setValue={setJoiningDate}
+                              required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                            />
+                          </div>
+                          <div className="w-52">
+                            {/* <DropdownInput
                             ref={input1Ref}
                             name="Employee Category"
                             value={employeeCategoryId}
@@ -1592,36 +1641,36 @@ const getFilteredCities = (stateId) =>
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           /> */}
-                          <label className="block text-xs font-semibold text-slate-700 mb-1">
-                            Employee Category
-                            <span className="text-red-500">*</span>
-                          </label>
-                          <Select
-                            options={EmployeeOptions}
-                            value={
-                              EmployeeOptions.find(
-                                (opt) => opt.value === employeeCategoryId
-                              ) || null
-                            }
-                            onChange={(selected) =>
-                              setEmployeeCategoryId(selected?.value || "")
-                            }
-                            placeholder="Select Employee Category"
-                            isClearable={false} // same as required
-                            isDisabled={readOnly || childRecord.current > 0}
-                            isSearchable
-                            menuShouldScrollIntoView={false}
-                            maxMenuHeight={150} // <-- Reduce height here
-                            onInputChange={(value) => value.toUpperCase()}
-                            className="w-full px-1 -ml-1 text-xs rounded-lg
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              Employee Category
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <Select
+                              options={EmployeeOptions}
+                              value={
+                                EmployeeOptions.find(
+                                  (opt) => opt.value === employeeCategoryId
+                                ) || null
+                              }
+                              onChange={(selected) =>
+                                setEmployeeCategoryId(selected?.value || "")
+                              }
+                              placeholder="Select Employee Category"
+                              isClearable={false} // same as required
+                              isDisabled={readOnly || childRecord.current > 0}
+                              isSearchable
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className="w-full px-1 -ml-1 text-xs rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
-                            styles={customSelectStyles}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>
-                        <div className="w-52">
-                          {/* <DropdownInput
+                              styles={customSelectStyles}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+                          <div className="w-52">
+                            {/* <DropdownInput
                             ref={input1Ref}
                             name=" Department"
                             value={departmentId}
@@ -1636,37 +1685,37 @@ const getFilteredCities = (stateId) =>
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           /> */}
-                          <label className="block text-xs font-semibold text-slate-700 mb-1">
-                            Department
-                            <span className="text-red-500">*</span>
-                          </label>
-                          <Select
-                            options={DepartmentOptions}
-                            value={
-                              DepartmentOptions.find(
-                                (opt) => opt.value === departmentId
-                              ) || null
-                            }
-                            onChange={(selected) =>
-                              setDepartmentId(selected?.value || "")
-                            }
-                            placeholder="Select Department"
-                            isClearable={false} // same as required
-                            isDisabled={readOnly || childRecord.current > 0}
-                            isSearchable
-                            menuShouldScrollIntoView={false}
-                            maxMenuHeight={150} // <-- Reduce height here
-                            onInputChange={(value) => value.toUpperCase()}
-                            className="w-full px-1 -ml-1 text-xs rounded-lg
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              Department
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <Select
+                              options={DepartmentOptions}
+                              value={
+                                DepartmentOptions.find(
+                                  (opt) => opt.value === departmentId
+                                ) || null
+                              }
+                              onChange={(selected) =>
+                                setDepartmentId(selected?.value || "")
+                              }
+                              placeholder="Select Department"
+                              isClearable={false} // same as required
+                              isDisabled={readOnly || childRecord.current > 0}
+                              isSearchable
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className="w-full px-1 -ml-1 text-xs rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
-                            styles={customSelectStyles}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>
+                              styles={customSelectStyles}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
 
-                        <div className="w-60">
-                          {/* <DropdownInput
+                          <div className="w-60">
+                            {/* <DropdownInput
                             ref={input1Ref}
                             name="Employee Sub Category"
                             value={employeeSubCategoryId}
@@ -1681,60 +1730,60 @@ const getFilteredCities = (stateId) =>
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           /> */}
-                          <label className="block text-xs font-semibold text-slate-700 mb-1">
-                            Employee Sub Category
-                            <span className="text-red-500">*</span>
-                          </label>
-                          <Select
-                            options={EmployeeSubCategoryOptions}
-                            value={
-                              EmployeeSubCategoryOptions.find(
-                                (opt) => opt.value === employeeSubCategoryId
-                              ) || null
-                            }
-                            onChange={(selected) =>
-                              setEmployeeSubCategoryId(selected?.value || "")
-                            }
-                            placeholder="Select Employee Sub Category"
-                            isClearable={false} // same as required
-                            isDisabled={readOnly || childRecord.current > 0}
-                            isSearchable
-                            menuShouldScrollIntoView={false}
-                            maxMenuHeight={150} // <-- Reduce height here
-                            onInputChange={(value) => value.toUpperCase()}
-                            className="w-full px-1 -ml-1 text-xs rounded-lg
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              Employee Sub Category
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <Select
+                              options={EmployeeSubCategoryOptions}
+                              value={
+                                EmployeeSubCategoryOptions.find(
+                                  (opt) => opt.value === employeeSubCategoryId
+                                ) || null
+                              }
+                              onChange={(selected) =>
+                                setEmployeeSubCategoryId(selected?.value || "")
+                              }
+                              placeholder="Select Employee Sub Category"
+                              isClearable={false} // same as required
+                              isDisabled={readOnly || childRecord.current > 0}
+                              isSearchable
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className="w-full px-1 -ml-1 text-xs rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
-                            styles={customSelectStyles}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>
-                        <div className="w-52">
-                          <DropdownInput
-                            name="Pay Category"
-                            value={payCategory}
-                            setValue={setPayCategory}
-                            required={true}
-                            readOnly={readOnly}
-                            options={payType}
-                            disabled={childRecord.current > 0}
-                          />
-                        </div>
-                        <div className="col-span-1">
-                          <TextInput
-                            ref={input1Ref}
-                            name="Id Card Number"
-                            value={idNumber}
-                            setValue={setIdNumber}
-                            // required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>
+                              styles={customSelectStyles}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+                          <div className="w-52">
+                            <DropdownInput
+                              name="Pay Category"
+                              value={payCategory}
+                              setValue={setPayCategory}
+                              required={true}
+                              readOnly={readOnly}
+                              options={payType}
+                              disabled={childRecord.current > 0}
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <TextInput
+                              ref={input1Ref}
+                              name="Id Card Number"
+                              value={idNumber}
+                              setValue={setIdNumber}
+                              // required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
 
-                        <div className="w-52">
-                          {/* <DropdownInput
+                          <div className="w-52">
+                            {/* <DropdownInput
                             ref={input1Ref}
                             name=" Designation"
                             value={desiginationId}
@@ -1749,37 +1798,37 @@ const getFilteredCities = (stateId) =>
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           /> */}
-                          <label className="block text-xs font-semibold text-slate-700 mb-1">
-                            Designation
-                            <span className="text-red-500">*</span>
-                          </label>
-                          <Select
-                            options={DesignaionOptions}
-                            value={
-                              DesignaionOptions.find(
-                                (opt) => opt.value === desiginationId
-                              ) || null
-                            }
-                            onChange={(selected) =>
-                              setDesignationId(selected?.value || "")
-                            }
-                            placeholder="Select Designation"
-                            isClearable={false} // same as required
-                            isDisabled={readOnly || childRecord.current > 0}
-                            isSearchable
-                            menuShouldScrollIntoView={false}
-                            maxMenuHeight={150} // <-- Reduce height here
-                            onInputChange={(value) => value.toUpperCase()}
-                            className="w-full px-1 -ml-1 text-xs rounded-lg
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              Designation
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <Select
+                              options={DesignaionOptions}
+                              value={
+                                DesignaionOptions.find(
+                                  (opt) => opt.value === desiginationId
+                                ) || null
+                              }
+                              onChange={(selected) =>
+                                setDesignationId(selected?.value || "")
+                              }
+                              placeholder="Select Designation"
+                              isClearable={false} // same as required
+                              isDisabled={readOnly || childRecord.current > 0}
+                              isSearchable
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className="w-full px-1 -ml-1 text-xs rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
-                            styles={customSelectStyles}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>
+                              styles={customSelectStyles}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
 
-                        <div className="w-44">
-                          {/* <DropdownInput
+                          <div className="w-44">
+                            {/* <DropdownInput
                             ref={input1Ref}
                             name="Shift Template"
                             value={shiftTemplateId}
@@ -1794,198 +1843,195 @@ const getFilteredCities = (stateId) =>
                             disabled={childRecord.current > 0}
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           /> */}
-                          <label className="block text-xs font-semibold text-slate-700 mb-1">
-                            Shift Template
-                            <span className="text-red-500">*</span>
-                          </label>
-                          <Select
-                            options={ShiftTemplateOptions}
-                            value={
-                              ShiftTemplateOptions.find(
-                                (opt) => opt.value === shiftTemplateId
-                              ) || null
-                            }
-                            onChange={(selected) =>
-                              setShiftTemplateId(selected?.value || "")
-                            }
-                            placeholder="Select Shift Template"
-                            isClearable={false} // same as required
-                            isDisabled={readOnly || childRecord.current > 0}
-                            isSearchable
-                            menuShouldScrollIntoView={false}
-                            maxMenuHeight={150} // <-- Reduce height here
-                            onInputChange={(value) => value.toUpperCase()}
-                            className="w-full px-1 -ml-1 text-xs rounded-lg
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              Shift Template
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <Select
+                              options={ShiftTemplateOptions}
+                              value={
+                                ShiftTemplateOptions.find(
+                                  (opt) => opt.value === shiftTemplateId
+                                ) || null
+                              }
+                              onChange={(selected) =>
+                                setShiftTemplateId(selected?.value || "")
+                              }
+                              placeholder="Select Shift Template"
+                              isClearable={false} // same as required
+                              isDisabled={readOnly || childRecord.current > 0}
+                              isSearchable
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className="w-full px-1 -ml-1 text-xs rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
-                            styles={customSelectStyles}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>
-                        <div className="col-span-1">
-                          <DropdownInput
-                            ref={input1Ref}
-                            name="PF (Y/N)"
-                            value={pf}
-                            setValue={setPf}
-                            // required={true}
-                            options={common}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>
+                              styles={customSelectStyles}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <DropdownInput
+                              ref={input1Ref}
+                              name="PF (Y/N)"
+                              value={pf}
+                              setValue={setPf}
+                              // required={true}
+                              options={common}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
 
-                        <div className="col-span-1">
-                          <DropdownInput
-                            ref={input1Ref}
-                            name="ESI (Y/N)"
-                            value={esi}
-                            setValue={setEsi}
-                            // required={true}
-                            options={common}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>
+                          <div className="col-span-1">
+                            <DropdownInput
+                              ref={input1Ref}
+                              name="ESI (Y/N)"
+                              value={esi}
+                              setValue={setEsi}
+                              // required={true}
+                              options={common}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
 
-                        <div className="w-40">
-                          <TextInput
-                            type="number"
-                            ref={input1Ref}
-                            name="Salary"
-                            value={salary}
-                            setValue={setSalary}
-                            // required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
-                        </div>
-                        <div className="col-span-1">
-                          <DropdownInput
-                            ref={input1Ref}
-                            name="Salary Type"
-                            value={salaryMethod}
-                            setValue={setSalaryMethod}
-                            options={SalaryMethod}
-                            // required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          />
+                          <div className="w-40">
+                            <TextInput
+                              type="number"
+                              ref={input1Ref}
+                              name="Salary"
+                              value={salary}
+                              setValue={setSalary}
+                              // required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <DropdownInput
+                              ref={input1Ref}
+                              name="Salary Type"
+                              value={salaryMethod}
+                              setValue={setSalaryMethod}
+                              options={SalaryMethod}
+                              // required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
-                {step === "Personal Details" && (
-                  <div className="bg-white p-3 rounded-md border border-gray-200 h-[49vh]">
-                    <h3 className="font-medium text-gray-800 mb-2 text-sm">
-                      Personal Details
-                    </h3>
-                    <div className="flex flex-wrap gap-x-6">
-                      <div>
-                        <TextInput
-                          name="Religion"
-                          value={religion}
-                          setValue={setReligion}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                        />
-                      </div>
-              
-                        
-                   
-                     
-                      <div>
-                        <TextInput
-                          name="Pan No"
-                          value={panNo}
-                          setValue={setPanNo}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                        />
-                      </div>
-                      <div>
-                        <TextInput
-                          name="ESI No"
-                          value={esiNo}
-                          setValue={setEsiNo}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                        />
-                      </div>
-                      <div>
-                        <TextInput
-                          name="PF No"
-                          value={pfNo}
-                          setValue={setPfNo}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                        />
-                      </div>
-                      <div>
-                        <TextInput
-                          name="UAN No (PF)"
-                          value={uanNo}
-                          setValue={setUanNo}
-                          readOnly={readOnly}
-                          disabled={childRecord.current > 0}
-                        />
-                      </div>
-                      <div className="w-72">
-                        <label className="block text-xs font-semibold text-slate-700 mb-1">
-                          Email <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          name="email"
-                          value={email}
-                          onChange={(e) => {
-                            setEmail(e.target.value);
-                          }}
-                          readOnly={readOnly}
-                          className={`w-full px-2 py-1 text-xs border border-gray-300 rounded-lg
+                  )}
+                  {step === "Personal Details" && (
+                    <div className="bg-white p-3 rounded-md border border-gray-200 h-[49vh]">
+                      <h3 className="font-medium text-gray-800 mb-2 text-sm">
+                        Personal Details
+                      </h3>
+                      <div className="flex flex-wrap gap-x-6">
+                        <div>
+                          <TextInput
+                            name="Religion"
+                            value={religion}
+                            setValue={setReligion}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                          />
+                        </div>
+
+                        <div>
+                          <TextInput
+                            name="Pan No"
+                            value={panNo}
+                            setValue={setPanNo}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                          />
+                        </div>
+                        <div>
+                          <TextInput
+                            name="ESI No"
+                            value={esiNo}
+                            setValue={setEsiNo}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                          />
+                        </div>
+                        <div>
+                          <TextInput
+                            name="PF No"
+                            value={pfNo}
+                            setValue={setPfNo}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                          />
+                        </div>
+                        <div>
+                          <TextInput
+                            name="UAN No (PF)"
+                            value={uanNo}
+                            setValue={setUanNo}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                          />
+                        </div>
+                        <div className="w-72">
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            Email <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            name="email"
+                            value={email}
+                            onChange={(e) => {
+                              setEmail(e.target.value);
+                            }}
+                            readOnly={readOnly}
+                            className={`w-full px-2 py-1 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm   ${
             readOnly || childRecord.current > 0
               ? "bg-gray-100 text-gray-500 cursor-not-allowed"
               : "bg-white hover:border-gray-400"
           }`}
-                          disabled={childRecord.current > 0}
-                        />
+                            disabled={childRecord.current > 0}
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-                {step === "Contact Details" && (
-                  <div className="flex flex-col  gap-4   h-[45vh]">
-                    <div className="bg-white p-3 rounded-md border border-gray-200 ">
-                      <div className="grid grid-cols-2 gap-2 justify-between ">
-                        <div className="grid grid-cols-2 gap-x-3 border-r border-gray-300  pr-3">
-                          <h3 className="font-medium text-gray-800  text-sm">
-                            PRESENT ADDRESS
-                          </h3>
-                          <div className="col-span-2 mt-1">
-                            <TextArea
-                              inputClass="h-12"
-                              name="Address"
-                              value={presentAddress?.address}
-                              setValue={(val) =>
-                                handlePresentChange("address", val)
-                              }
-                              readOnly={readOnly}
-                              disabled={childRecord.current > 0}
-                            />
-                            {errors.address && (
-                              <span className="text-red-500 text-xs ml-1">
-                                {errors.address}
-                              </span>
-                            )}
-                          </div>
-                           <div className="col-span-1 mb-2">
-                            {/* <DropdownInput
+                  )}
+                  {step === "Contact Details" && (
+                    <div className="flex flex-col  gap-4   h-[45vh]">
+                      <div className="bg-white p-3 rounded-md border border-gray-200 ">
+                        <div className="grid grid-cols-2 gap-2 justify-between ">
+                          <div className="grid grid-cols-2 gap-x-3 border-r border-gray-300  pr-3">
+                            <h3 className="font-medium text-gray-800  text-sm">
+                              PRESENT ADDRESS
+                            </h3>
+                            <div className="col-span-2 mt-1">
+                              <TextArea
+                                inputClass="h-12"
+                                name="Address"
+                                value={presentAddress?.address}
+                                setValue={(val) =>
+                                  handlePresentChange("address", val)
+                                }
+                                readOnly={readOnly}
+                                disabled={childRecord.current > 0}
+                              />
+                              {errors.address && (
+                                <span className="text-red-500 text-xs ml-1">
+                                  {errors.address}
+                                </span>
+                              )}
+                            </div>
+                            <div className="col-span-1 mb-2">
+                              {/* <DropdownInput
                               ref={input1Ref}
                               name="Choose Country"
                               value={presentAddress?.countryId}
@@ -2002,40 +2048,40 @@ const getFilteredCities = (stateId) =>
                               disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             /> */}
-                            <label className="block text-xs font-semibold text-slate-700 mb-1">
-                              Country
-                              <span className="text-red-500">*</span>
-                            </label>
-                            <Select
-                              options={CountryOptions}
-                              value={
-                                CountryOptions.find(
-                                  (opt) =>
-                                    opt.value === presentAddress?.countryId
-                                ) || null
-                              }
-                              onChange={(selected) =>
-                                handlePresentChange(
-                                  "countryId",
-                                  selected?.value || ""
-                                )
-                              }
-                              placeholder="Select Country"
-                              isClearable={false} // same as required
-                              isDisabled={readOnly || childRecord.current > 0}
-                              isSearchable
-                              menuShouldScrollIntoView={false}
-                              maxMenuHeight={150} // <-- Reduce height here
-                              onInputChange={(value) => value.toUpperCase()}
-                              className="w-full px-1 -ml-1 text-xs rounded-lg
+                              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                                Country
+                                <span className="text-red-500">*</span>
+                              </label>
+                              <Select
+                                options={CountryOptions}
+                                value={
+                                  CountryOptions.find(
+                                    (opt) =>
+                                      opt.value === presentAddress?.countryId
+                                  ) || null
+                                }
+                                onChange={(selected) =>
+                                  handlePresentChange(
+                                    "countryId",
+                                    selected?.value || ""
+                                  )
+                                }
+                                placeholder="Select Country"
+                                isClearable={false} // same as required
+                                isDisabled={readOnly || childRecord.current > 0}
+                                isSearchable
+                                menuShouldScrollIntoView={false}
+                                maxMenuHeight={150} // <-- Reduce height here
+                                onInputChange={(value) => value.toUpperCase()}
+                                className="w-full px-1 -ml-1 text-xs rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
-                              styles={customSelectStyles}
-                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                            />
-                          </div>
+                                styles={customSelectStyles}
+                                onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                              />
+                            </div>
                             <div className="col-span-1 w-[270px] mb-2">
-                            {/* <DropdownInput
+                              {/* <DropdownInput
                               ref={input1Ref}
                               name="Choose State"
                               value={presentAddress?.stateId}
@@ -2052,40 +2098,45 @@ const getFilteredCities = (stateId) =>
                               disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             /> */}
-                            <label className="block text-xs font-semibold text-slate-700 mb-1">
-                              State
-                              <span className="text-red-500">*</span>
-                            </label>
-                            <Select
-                              options={getFilteredStates(presentAddress?.countryId)}
-                              value={
-                                getFilteredStates(presentAddress?.countryId)?.find(
-                                  (opt) => opt.value === presentAddress?.stateId
-                                ) || null
-                              }
-                              onChange={(selected) =>
-                                handlePresentChange(
-                                  "stateId",
-                                  selected?.value || ""
-                                )
-                              }
-                              placeholder="Select State"
-                              isClearable={false} // same as required
-                              isDisabled={readOnly || childRecord.current > 0}
-                              isSearchable
-                              menuShouldScrollIntoView={false}
-                              maxMenuHeight={150} // <-- Reduce height here
-                              onInputChange={(value) => value.toUpperCase()}
-                              className="w-full px-1 -ml-1 text-xs rounded-lg
+                              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                                State
+                                <span className="text-red-500">*</span>
+                              </label>
+                              <Select
+                                options={getFilteredStates(
+                                  presentAddress?.countryId
+                                )}
+                                value={
+                                  getFilteredStates(
+                                    presentAddress?.countryId
+                                  )?.find(
+                                    (opt) =>
+                                      opt.value === presentAddress?.stateId
+                                  ) || null
+                                }
+                                onChange={(selected) =>
+                                  handlePresentChange(
+                                    "stateId",
+                                    selected?.value || ""
+                                  )
+                                }
+                                placeholder="Select State"
+                                isClearable={false} // same as required
+                                isDisabled={readOnly || childRecord.current > 0}
+                                isSearchable
+                                menuShouldScrollIntoView={false}
+                                maxMenuHeight={150} // <-- Reduce height here
+                                onInputChange={(value) => value.toUpperCase()}
+                                className="w-full px-1 -ml-1 text-xs rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
-                              styles={customSelectStyles}
-                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                            />
-                          </div>
-                          
-                          <div className="col-span-1 mt-1 mb-2">
-                            {/* <DropdownInput
+                                styles={customSelectStyles}
+                                onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                              />
+                            </div>
+
+                            <div className="col-span-1 mt-1 mb-2">
+                              {/* <DropdownInput
                               ref={input1Ref}
                               name="Choose City"
                               value={presentAddress?.cityId}
@@ -2104,63 +2155,66 @@ const getFilteredCities = (stateId) =>
                               }
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             /> */}
-                            <label className="block text-xs font-semibold text-slate-700 mb-1">
-                              City
-                              <span className="text-red-500">*</span>
-                            </label>
-                            <Select
-                              options={getFilteredCities(presentAddress?.stateId) }
-                              value={
-                                getFilteredCities(presentAddress?.stateId)?.find(
-                                  (opt) => opt.value === presentAddress?.cityId
-                                ) || null
-                              }
-                              onChange={(selected) =>
-                                handlePresentChange(
-                                  "cityId",
-                                  selected?.value || ""
-                                )
-                              }
-                              placeholder="Select City"
-                              isClearable={false} // same as required
-                              isDisabled={readOnly || childRecord.current > 0}
-                              isSearchable
-                              menuShouldScrollIntoView={false}
-                              maxMenuHeight={150} // <-- Reduce height here
-                              onInputChange={(value) => value.toUpperCase()}
-                              className="w-full px-1 -ml-1 text-xs rounded-lg
+                              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                                City
+                                <span className="text-red-500">*</span>
+                              </label>
+                              <Select
+                                options={getFilteredCities(
+                                  presentAddress?.stateId
+                                )}
+                                value={
+                                  getFilteredCities(
+                                    presentAddress?.stateId
+                                  )?.find(
+                                    (opt) =>
+                                      opt.value === presentAddress?.cityId
+                                  ) || null
+                                }
+                                onChange={(selected) =>
+                                  handlePresentChange(
+                                    "cityId",
+                                    selected?.value || ""
+                                  )
+                                }
+                                placeholder="Select City"
+                                isClearable={false} // same as required
+                                isDisabled={readOnly || childRecord.current > 0}
+                                isSearchable
+                                menuShouldScrollIntoView={false}
+                                maxMenuHeight={150} // <-- Reduce height here
+                                onInputChange={(value) => value.toUpperCase()}
+                                className="w-full px-1 -ml-1 text-xs rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
-                              styles={customSelectStyles}
-                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                            />
-                          </div>
-                          <div className="col-span-1 mt-1 mb-2">
-                            <TextInput
-                              name="Village"
-                              value={presentAddress?.village}
-                              setValue={(val) =>
-                                handlePresentChange("village", val)
-                              }
-                              readOnly={readOnly}
-                              disabled={childRecord.current > 0}
-                            />
-                          </div>
+                                styles={customSelectStyles}
+                                onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                              />
+                            </div>
+                            <div className="col-span-1 mt-1 mb-2">
+                              <TextInput
+                                name="Village"
+                                value={presentAddress?.village}
+                                setValue={(val) =>
+                                  handlePresentChange("village", val)
+                                }
+                                readOnly={readOnly}
+                                disabled={childRecord.current > 0}
+                              />
+                            </div>
 
-                        
-                         
-                          <div className="col-span-1 mt-2 w-32">
-                            <TextInput
-                              name="Pincode"
-                              value={presentAddress?.pincode}
-                              setValue={(val) =>
-                                handlePresentChange("pincode", val)
-                              }
-                              readOnly={readOnly}
-                              disabled={childRecord.current > 0}
-                            />
-                          </div>
-                          {/* <div className="col-span-1 w-[255px] mt-2">
+                            <div className="col-span-1 mt-2 w-32">
+                              <TextInput
+                                name="Pincode"
+                                value={presentAddress?.pincode}
+                                setValue={(val) =>
+                                  handlePresentChange("pincode", val)
+                                }
+                                readOnly={readOnly}
+                                disabled={childRecord.current > 0}
+                              />
+                            </div>
+                            {/* <div className="col-span-1 w-[255px] mt-2">
                             <TextInput
                               name="Mobile No"
                               value={presentAddress?.mobile}
@@ -2171,41 +2225,41 @@ const getFilteredCities = (stateId) =>
                               disabled={childRecord.current > 0}
                             />
                           </div> */}
-                        </div>
+                          </div>
 
-                        {/* PERMANENT ADDRESS */}
-                        <div className="grid grid-cols-2 gap-x-3   pr-3">
-                          <div className="col-span-2 flex items-center gap-x-3">
-                            <h3 className="font-medium text-gray-800 text-sm">
-                              PERMANENT ADDRESS
-                            </h3>
-                            <label className="flex items-center gap-x-1 text-xs text-gray-600">
-                              <input
-                                type="checkbox"
-                                checked={sameAsPresent}
-                                onChange={handleCheckboxChange}
-                                disabled={readOnly}
+                          {/* PERMANENT ADDRESS */}
+                          <div className="grid grid-cols-2 gap-x-3   pr-3">
+                            <div className="col-span-2 flex items-center gap-x-3">
+                              <h3 className="font-medium text-gray-800 text-sm">
+                                PERMANENT ADDRESS
+                              </h3>
+                              <label className="flex items-center gap-x-1 text-xs text-gray-600">
+                                <input
+                                  type="checkbox"
+                                  checked={sameAsPresent}
+                                  onChange={handleCheckboxChange}
+                                  disabled={readOnly}
+                                />
+                                Same as Present
+                              </label>
+                            </div>
+
+                            <div className="col-span-2 mt-1">
+                              <TextArea
+                                inputClass="h-12"
+                                name="Address"
+                                value={permanentAddress?.address}
+                                setValue={(val) =>
+                                  handlePermanentChange("address", val)
+                                }
+                                readOnly={readOnly}
+                                disabled={
+                                  childRecord.current > 0 || sameAsPresent
+                                }
                               />
-                              Same as Present
-                            </label>
-                          </div>
-
-                          <div className="col-span-2 mt-1">
-                            <TextArea
-                              inputClass="h-12"
-                              name="Address"
-                              value={permanentAddress?.address}
-                              setValue={(val) =>
-                                handlePermanentChange("address", val)
-                              }
-                              readOnly={readOnly}
-                              disabled={
-                                childRecord.current > 0 || sameAsPresent
-                              }
-                            />
-                          </div>
-                           <div className="col-span-1 mb-2">
-                            {/* <DropdownInput
+                            </div>
+                            <div className="col-span-1 mb-2">
+                              {/* <DropdownInput
                               name="Choose Country"
                               value={permanentAddress?.countryId}
                               setValue={(val) =>
@@ -2221,44 +2275,44 @@ const getFilteredCities = (stateId) =>
                                 childRecord.current > 0 || sameAsPresent
                               }
                             /> */}
-                            <label className="block text-xs font-semibold text-slate-700 mb-1">
-                              Country
-                              <span className="text-red-500">*</span>
-                            </label>
-                            <Select
-                              options={CountryOptions}
-                              value={
-                                CountryOptions.find(
-                                  (opt) =>
-                                    opt.value === permanentAddress?.countryId
-                                ) || null
-                              }
-                              onChange={(selected) =>
-                                handlePermanentChange(
-                                  "countryId",
-                                  selected?.value || ""
-                                )
-                              }
-                              placeholder="Select Country"
-                              isClearable={false} // same as required
-                              isDisabled={
-                                readOnly ||
-                                childRecord.current > 0 ||
-                                sameAsPresent
-                              }
-                              isSearchable
-                              menuShouldScrollIntoView={false}
-                              maxMenuHeight={150} // <-- Reduce height here
-                              onInputChange={(value) => value.toUpperCase()}
-                              className="w-full px-1 -ml-1 text-xs rounded-lg
+                              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                                Country
+                                <span className="text-red-500">*</span>
+                              </label>
+                              <Select
+                                options={CountryOptions}
+                                value={
+                                  CountryOptions.find(
+                                    (opt) =>
+                                      opt.value === permanentAddress?.countryId
+                                  ) || null
+                                }
+                                onChange={(selected) =>
+                                  handlePermanentChange(
+                                    "countryId",
+                                    selected?.value || ""
+                                  )
+                                }
+                                placeholder="Select Country"
+                                isClearable={false} // same as required
+                                isDisabled={
+                                  readOnly ||
+                                  childRecord.current > 0 ||
+                                  sameAsPresent
+                                }
+                                isSearchable
+                                menuShouldScrollIntoView={false}
+                                maxMenuHeight={150} // <-- Reduce height here
+                                onInputChange={(value) => value.toUpperCase()}
+                                className="w-full px-1 -ml-1 text-xs rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
-                              styles={customSelectStyles}
-                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                            />
-                          </div>
-                               <div className="col-span-1 mb-2 w-[270px]">
-                            {/* <DropdownInput
+                                styles={customSelectStyles}
+                                onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                              />
+                            </div>
+                            <div className="col-span-1 mb-2 w-[270px]">
+                              {/* <DropdownInput
                               name="Choose State"
                               value={permanentAddress?.stateId}
                               setValue={(val) =>
@@ -2274,45 +2328,53 @@ const getFilteredCities = (stateId) =>
                                 childRecord.current > 0 || sameAsPresent
                               }
                             /> */}
-                            <label className="block text-xs font-semibold text-slate-700 mb-1">
-                              State
-                              <span className="text-red-500">*</span>
-                            </label>
-                            <Select
-                              options={getFilteredStates(permanentAddress?.countryId)}
-                              value={
-                                getFilteredStates(permanentAddress?.countryId)?.find(
-                                  (opt) =>
-                                    opt.value === permanentAddress?.stateId
-                                ) || null
-                              }
-                              onChange={(selected) =>
-                                handlePermanentChange(
-                                  "stateId",
-                                  selected?.value || ""
-                                )
-                              }
-                              placeholder="Select State"
-                              isClearable={false} // same as required
-                              isDisabled={
-                                readOnly ||
-                                childRecord.current > 0 ||
-                                sameAsPresent
-                              }
-                              isSearchable
-                              menuShouldScrollIntoView={false}
-                              maxMenuHeight={150} // <-- Reduce height here
-                              onInputChange={(value) => value.toUpperCase()}
-                              className="w-full px-1 -ml-1 text-xs rounded-lg
+                              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                                State
+                                <span className="text-red-500">*</span>
+                              </label>
+                              <Select
+                                options={getFilteredStates(
+                                  permanentAddress?.countryId
+                                )}
+                                value={
+                                  getFilteredStates(
+                                    permanentAddress?.countryId
+                                  )?.find(
+                                    (opt) =>
+                                      opt.value === permanentAddress?.stateId
+                                  ) || null
+                                }
+                                onChange={(selected) =>
+                                  handlePermanentChange(
+                                    "stateId",
+                                    selected?.value || ""
+                                  )
+                                }
+                                placeholder="Select State"
+                                isClearable={false} // same as required
+                                isDisabled={
+                                  readOnly ||
+                                  childRecord.current > 0 ||
+                                  sameAsPresent
+                                }
+                                isSearchable
+                                menuShouldScrollIntoView={false}
+                                maxMenuHeight={150} // <-- Reduce height here
+                                onInputChange={(value) => value.toUpperCase()}
+                                className="w-full px-1 -ml-1 text-xs rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
-                              styles={customSelectStyles}
-                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                            />
-                          </div>
-                              {console.log(presentAddress?.stateId, cityList,"fjfhjf")}
-                          <div className="col-span-1 mt-1 mb-2">
-                            {/* <DropdownInput
+                                styles={customSelectStyles}
+                                onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                              />
+                            </div>
+                            {console.log(
+                              presentAddress?.stateId,
+                              cityList,
+                              "fjfhjf"
+                            )}
+                            <div className="col-span-1 mt-1 mb-2">
+                              {/* <DropdownInput
                               name="Choose City"
                               value={permanentAddress?.cityId}
                               setValue={(val) =>
@@ -2329,68 +2391,74 @@ const getFilteredCities = (stateId) =>
                               }
                             /> */}
 
-                            <label className="block text-xs font-semibold text-slate-700 mb-1">
-                              City
-                              <span className="text-red-500">*</span>
-                            </label>
-                            <Select
-                              options={getFilteredCities(permanentAddress?.stateId)}
-                              value={
-                                getFilteredCities(permanentAddress?.stateId)?.find(
-                                  (opt) =>
-                                    opt.value === permanentAddress?.cityId
-                                ) || null
-                              }
-                              onChange={(selected) =>
-                                handlePermanentChange("cityId", selected?.value)
-                              }
-                              placeholder="Select City"
-                              isClearable={false} // same as required
-                              isDisabled={
-                                readOnly ||
-                                childRecord.current > 0 ||
-                                sameAsPresent
-                              }
-                              isSearchable
-                              menuShouldScrollIntoView={false}
-                              maxMenuHeight={150} // <-- Reduce height here
-                              onInputChange={(value) => value.toUpperCase()}
-                              className="w-full px-1 -ml-1 text-xs rounded-lg
+                              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                                City
+                                <span className="text-red-500">*</span>
+                              </label>
+                              <Select
+                                options={getFilteredCities(
+                                  permanentAddress?.stateId
+                                )}
+                                value={
+                                  getFilteredCities(
+                                    permanentAddress?.stateId
+                                  )?.find(
+                                    (opt) =>
+                                      opt.value === permanentAddress?.cityId
+                                  ) || null
+                                }
+                                onChange={(selected) =>
+                                  handlePermanentChange(
+                                    "cityId",
+                                    selected?.value
+                                  )
+                                }
+                                placeholder="Select City"
+                                isClearable={false} // same as required
+                                isDisabled={
+                                  readOnly ||
+                                  childRecord.current > 0 ||
+                                  sameAsPresent
+                                }
+                                isSearchable
+                                menuShouldScrollIntoView={false}
+                                maxMenuHeight={150} // <-- Reduce height here
+                                onInputChange={(value) => value.toUpperCase()}
+                                className="w-full px-1 -ml-1 text-xs rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
-                              styles={customSelectStyles}
-                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                            />
-                          </div>
-                                    <div className="col-span-1 w-[265px] mt-1 mb-2">
-                            <TextInput
-                              name="Village"
-                              value={permanentAddress?.village}
-                              setValue={(val) =>
-                                handlePermanentChange("village", val)
-                              }
-                              readOnly={readOnly}
-                              disabled={
-                                childRecord.current > 0 || sameAsPresent
-                              }
-                            />
-                          </div>
-                     
-                         
-                          <div className="col-span-1  w-32 mt-2">
-                            <TextInput
-                              name="Pincode"
-                              value={permanentAddress?.pincode}
-                              setValue={(val) =>
-                                handlePermanentChange("pincode", val)
-                              }
-                              readOnly={readOnly}
-                              disabled={
-                                childRecord.current > 0 || sameAsPresent
-                              }
-                            />
-                          </div>
-                          {/* <div className="col-span-1 w-[260px] mt-2">
+                                styles={customSelectStyles}
+                                onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                              />
+                            </div>
+                            <div className="col-span-1 w-[265px] mt-1 mb-2">
+                              <TextInput
+                                name="Village"
+                                value={permanentAddress?.village}
+                                setValue={(val) =>
+                                  handlePermanentChange("village", val)
+                                }
+                                readOnly={readOnly}
+                                disabled={
+                                  childRecord.current > 0 || sameAsPresent
+                                }
+                              />
+                            </div>
+
+                            <div className="col-span-1  w-32 mt-2">
+                              <TextInput
+                                name="Pincode"
+                                value={permanentAddress?.pincode}
+                                setValue={(val) =>
+                                  handlePermanentChange("pincode", val)
+                                }
+                                readOnly={readOnly}
+                                disabled={
+                                  childRecord.current > 0 || sameAsPresent
+                                }
+                              />
+                            </div>
+                            {/* <div className="col-span-1 w-[260px] mt-2">
                             <TextInput
                               name="Mobile No"
                               value={permanentAddress?.mobile}
@@ -2403,702 +2471,767 @@ const getFilteredCities = (stateId) =>
                               }
                             />
                           </div> */}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                )}
-                {step === "Bank Details" && (
-                  <div className="flex flex-col gap-4 ">
-                    <div className="bg-white h-[49vh] p-3 rounded-md border border-gray-200 ">
-                      <div className="flex justify-between items-center mb-3">
-                        <h3 className="font-medium text-gray-800 text-sm">
-                          Bank Details
-                        </h3>
-                        <button
-                          onClick={() => addNewRow()}
-                          disabled={readOnly}
-                          className="hover:bg-green-600 text-green-600 hover:text-white border border-green-600 px-2 py-1 rounded-md flex items-center text-xs"
+                  )}
+                  {step === "Bank Details" && (
+                    <div className="flex flex-col gap-4 ">
+                      <div className="bg-white h-[49vh] p-3 rounded-md border border-gray-200 ">
+                        <div className="flex justify-between items-center mb-3">
+                          <h3 className="font-medium text-gray-800 text-sm">
+                            Bank Details
+                          </h3>
+                          <button
+                            onClick={() => addNewRow()}
+                            disabled={readOnly}
+                            className="hover:bg-green-600 text-green-600 hover:text-white border border-green-600 px-2 py-1 rounded-md flex items-center text-xs"
+                          >
+                            <HiPlus className="w-3 h-3 mr-1" />
+                            Add Item
+                          </button>
+                        </div>
+                        <div
+                          className={`w-full   p-2 overflow-auto bg-white max-h-[200px]`}
                         >
-                          <HiPlus className="w-3 h-3 mr-1" />
-                          Add Item
-                        </button>
-                      </div>
-                      <div
-                        className={`w-full   p-2 overflow-auto bg-white max-h-[200px]`}
-                      >
-                        <table className="w-full border-collapse table-fixed  ">
-                          <thead className="bg-gray-200 text-gray-800">
-                            <tr>
-                              <th
-                                className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
-                              >
-                                S.No
-                              </th>
-                              <th
-                                className={` px-4 py-2 text-center font-medium text-[13px] `}
-                              >
-                                Bank Name
-                              </th>
-                              <th
-                                className={` px-4 py-2 text-center font-medium text-[13px] `}
-                              >
-                                Branch Name
-                              </th>
-                              <th
-                                className={` px-4 py-2 text-center font-medium text-[13px] `}
-                              >
-                                Account Number
-                              </th>
-                              <th
-                                className={` px-4 py-2 text-center font-medium text-[13px] `}
-                              >
-                                IFSC Code
-                              </th>
-                              <th
-                                className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
-                              >
-                                Action
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {bankDetails.map((item, index) => (
-                              <tr
-                                key={index}
-                                className=" border border-gray-300 text-[12px] py-0.5 px-1 text-center"
-                              >
-                                <td className=" text-center px-1">
-                                  {index + 1}
-                                </td>
-                                <td className="border border-gray-300 text-[12px] py-1.5 px-1 item-center">
-                                  <input
-                                    // name="Bank Name"
-                                    type="text"
-                                    value={item?.bankName}
-                                    onChange={(e) =>
-                                      handleBankDetailsChange(
-                                        index,
-                                        "bankName",
-                                        e.target.value
-                                      )
-                                    }
-                                    disabled={
-                                      readOnly || childRecord.current > 0
-                                    }
-                                    // disabled={childRecord.current > 0}
-                                    className={`w-full focus:outline-none  uppercase focus:border-none pl-2 bg-transparent  ${
-                                      readOnly || childRecord.current > 0
-                                        ? "text-gray-600"
-                                        : "text-black"
-                                    }`}
-                                  />
-                                </td>
-                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                  <input
-                                    // name="Branch Name"
-                                    type="text"
-                                    value={item?.branchName}
-                                    onChange={(e) =>
-                                      handleBankDetailsChange(
-                                        index,
-                                        "branchName",
-                                        e.target.value
-                                      )
-                                    }
-                                    className={`w-full focus:outline-none uppercase focus:border-none pl-3 bg-transparent  ${
-                                      readOnly || childRecord.current > 0
-                                        ? "text-gray-600"
-                                        : "text-black"
-                                    }`}
-                                    disabled={
-                                      readOnly || childRecord.current > 0
-                                    }
-                                    // disabled={childRecord.current > 0}
-                                  />
-                                </td>
-                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                  <input
-                                    // name="Account Number"
-                                    type="number"
-                                    value={item?.accountNumber}
-                                    onChange={(e) =>
-                                      handleBankDetailsChange(
-                                        index,
-                                        "accountNumber",
-                                        e.target.value
-                                      )
-                                    }
-                                    className={`w-full focus:outline-none uppercase focus:border-none text-right pr-3 bg-transparent  ${
-                                      readOnly || childRecord.current > 0
-                                        ? "text-gray-600"
-                                        : "text-black"
-                                    }`}
-                                    disabled={
-                                      readOnly || childRecord.current > 0
-                                    }
-                                    // disabled={childRecord.current > 0}
-                                  />
-                                </td>
-                                <td className=" border border-gray-300 text-[12px] py-1.5 items-center">
-                                  <input
-                                    // name="IFSC CODE"
-                                    type="text"
-                                    value={item?.ifscCode}
-                                    onChange={(e) =>
-                                      handleBankDetailsChange(
-                                        index,
-                                        "ifscCode",
-                                        e.target.value
-                                      )
-                                    }
-                                    className={`w-full focus:outline-none uppercase focus:border-none text-left pl-2 bg-transparent  ${
-                                      readOnly || childRecord.current > 0
-                                        ? "text-gray-600"
-                                        : "text-black"
-                                    }`}
-                                    disabled={
-                                      readOnly || childRecord.current > 0
-                                    }
-                                    // disabled={childRecord.current > 0}
-                                  />
-                                </td>
-                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                  <button
-                                    type="button"
-                                    title="Delete Row"
-                                    onClick={() => deleteRow(index)}
-                                    className="text-red-600 hover:text-red-800"
-                                  >
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      className="h-4 w-4 inline-block"
-                                      viewBox="0 0 20 20"
-                                      fill="currentColor"
-                                    >
-                                      <path
-                                        fillRule="evenodd"
-                                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                        clipRule="evenodd"
-                                      />
-                                    </svg>
-                                  </button>
-                                </td>
+                          <table className="w-full border-collapse table-fixed  ">
+                            <thead className="bg-gray-200 text-gray-800">
+                              <tr>
+                                <th
+                                  className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  S.No
+                                </th>
+                                <th
+                                  className={` px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  Bank Name
+                                </th>
+                                <th
+                                  className={` px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  Branch Name
+                                </th>
+                                <th
+                                  className={` px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  Account Number
+                                </th>
+                                <th
+                                  className={` px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  IFSC Code
+                                </th>
+                                <th
+                                  className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  Action
+                                </th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody>
+                              {bankDetails.map((item, index) => (
+                                <tr
+                                  key={index}
+                                  className=" border border-gray-300 text-[12px] py-0.5 px-1 text-center"
+                                >
+                                  <td className=" text-center px-1">
+                                    {index + 1}
+                                  </td>
+                                  <td className="border border-gray-300 text-[12px] py-1.5 px-1 item-center">
+                                    <input
+                                      // name="Bank Name"
+                                      type="text"
+                                      value={item?.bankName}
+                                      onChange={(e) =>
+                                        handleBankDetailsChange(
+                                          index,
+                                          "bankName",
+                                          e.target.value
+                                        )
+                                      }
+                                      disabled={
+                                        readOnly || childRecord.current > 0
+                                      }
+                                      // disabled={childRecord.current > 0}
+                                      className={`w-full focus:outline-none  uppercase focus:border-none pl-2 bg-transparent  ${
+                                        readOnly || childRecord.current > 0
+                                          ? "text-gray-600"
+                                          : "text-black"
+                                      }`}
+                                    />
+                                  </td>
+                                  <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                    <input
+                                      // name="Branch Name"
+                                      type="text"
+                                      value={item?.branchName}
+                                      onChange={(e) =>
+                                        handleBankDetailsChange(
+                                          index,
+                                          "branchName",
+                                          e.target.value
+                                        )
+                                      }
+                                      className={`w-full focus:outline-none uppercase focus:border-none pl-3 bg-transparent  ${
+                                        readOnly || childRecord.current > 0
+                                          ? "text-gray-600"
+                                          : "text-black"
+                                      }`}
+                                      disabled={
+                                        readOnly || childRecord.current > 0
+                                      }
+                                      // disabled={childRecord.current > 0}
+                                    />
+                                  </td>
+                                  <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                    <input
+                                      // name="Account Number"
+                                      type="number"
+                                      value={item?.accountNumber}
+                                      onChange={(e) =>
+                                        handleBankDetailsChange(
+                                          index,
+                                          "accountNumber",
+                                          e.target.value
+                                        )
+                                      }
+                                      className={`w-full focus:outline-none uppercase focus:border-none text-right pr-3 bg-transparent  ${
+                                        readOnly || childRecord.current > 0
+                                          ? "text-gray-600"
+                                          : "text-black"
+                                      }`}
+                                      disabled={
+                                        readOnly || childRecord.current > 0
+                                      }
+                                      // disabled={childRecord.current > 0}
+                                    />
+                                  </td>
+                                  <td className=" border border-gray-300 text-[12px] py-1.5 items-center">
+                                    <input
+                                      // name="IFSC CODE"
+                                      type="text"
+                                      value={item?.ifscCode}
+                                      onChange={(e) =>
+                                        handleBankDetailsChange(
+                                          index,
+                                          "ifscCode",
+                                          e.target.value
+                                        )
+                                      }
+                                      className={`w-full focus:outline-none uppercase focus:border-none text-left pl-2 bg-transparent  ${
+                                        readOnly || childRecord.current > 0
+                                          ? "text-gray-600"
+                                          : "text-black"
+                                      }`}
+                                      disabled={
+                                        readOnly || childRecord.current > 0
+                                      }
+                                      // disabled={childRecord.current > 0}
+                                    />
+                                  </td>
+                                  <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                    <button
+                                      type="button"
+                                      title="Delete Row"
+                                      onClick={() => deleteRow(index)}
+                                      className="text-red-600 hover:text-red-800"
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-4 w-4 inline-block"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                      >
+                                        <path
+                                          fillRule="evenodd"
+                                          d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                          clipRule="evenodd"
+                                        />
+                                      </svg>
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-                {step === "Education Details" && (
-                  <div className="flex flex-col gap-4 ">
-                    <div className="bg-white p-3 rounded-md border border-gray-200 h-[49vh]">
-                      <div className="flex justify-between items-center mb-3">
-                        <h3 className="font-medium text-gray-800 text-sm">
-                          Education Details
-                        </h3>
-                        <button
-                          onClick={() => addEducationNewRow()}
-                          disabled={readOnly}
-                          className="hover:bg-green-600 text-green-600 hover:text-white border border-green-600 px-2 py-1 rounded-md flex items-center text-xs"
+                  )}
+                  {step === "Education Details" && (
+                    <div className="flex flex-col gap-4 ">
+                      <div className="bg-white p-3 rounded-md border border-gray-200 h-[49vh]">
+                        <div className="flex justify-between items-center mb-3">
+                          <h3 className="font-medium text-gray-800 text-sm">
+                            Education Details
+                          </h3>
+                          <button
+                            onClick={() => addEducationNewRow()}
+                            disabled={readOnly}
+                            className="hover:bg-green-600 text-green-600 hover:text-white border border-green-600 px-2 py-1 rounded-md flex items-center text-xs"
+                          >
+                            <HiPlus className="w-3 h-3 mr-1" />
+                            Add Item
+                          </button>
+                        </div>
+                        <div
+                          className={`w-full   p-2 overflow-auto bg-white max-h-[200px]`}
                         >
-                          <HiPlus className="w-3 h-3 mr-1" />
-                          Add Item
-                        </button>
-                      </div>
-                      <div
-                        className={`w-full   p-2 overflow-auto bg-white max-h-[200px]`}
-                      >
-                        <table className="w-full border-collapse table-fixed ">
-                          <thead className="bg-gray-200 text-gray-800">
-                            <tr>
-                              <th
-                                className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
-                              >
-                                S.No
-                              </th>
-                              <th
-                                className={`w-44 px-4 py-2 text-center font-medium text-[13px] `}
-                              >
-                                Course / Degree
-                              </th>
-                              <th
-                                className={` px-4 py-2 text-center font-medium text-[13px] `}
-                              >
-                                Board / University
-                              </th>
-                              <th
-                                className={` px-4 py-2 text-center font-medium text-[13px] `}
-                              >
-                                Institution
-                              </th>
-                              <th
-                                className={`w-52 px-4 py-2 text-center font-medium text-[13px] `}
-                              >
-                                Year & Month of Passing
-                              </th>
-                              <th
-                                className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
-                              >
-                                Action
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {educationDetails.map((item, index) => (
-                              <tr
-                                key={index}
-                                className=" border border-gray-300 text-[11px] py-1.5 px-1 text-center"
-                              >
-                                <td className=" text-center px-1">
-                                  {index + 1}
-                                </td>
-                                <td className="border border-gray-300 text-[12px] py-1.5 px-1 item-center">
-                                  <input
-                                    // name="Bank Name"
-                                    type="text"
-                                    value={item?.courseName}
-                                    onChange={(e) =>
-                                      handleEDucationDetailsChange(
-                                        index,
-                                        "courseName",
-                                        e.target.value
-                                      )
-                                    }
-                                    disabled={
-                                      readOnly || childRecord.current > 0
-                                    }
-                                    // disabled={childRecord.current > 0}
-                                    className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${
-                                      readOnly || childRecord.current > 0
-                                        ? "text-gray-600"
-                                        : "text-black"
-                                    }`}
-                                  />
-                                </td>
-                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                  <input
-                                    // name="Branch Name"
-                                    type="text"
-                                    value={item?.universityName}
-                                    onChange={(e) =>
-                                      handleEDucationDetailsChange(
-                                        index,
-                                        "universityName",
-                                        e.target.value
-                                      )
-                                    }
-                                    className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${
-                                      readOnly || childRecord.current > 0
-                                        ? "text-gray-600"
-                                        : "text-black"
-                                    }`}
-                                    disabled={
-                                      readOnly || childRecord.current > 0
-                                    }
-
-                                    // disabled={childRecord.current > 0}
-                                  />
-                                </td>
-                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                  <input
-                                    // name="Account Number"
-                                    type="text"
-                                    value={item?.institutionName}
-                                    onChange={(e) =>
-                                      handleEDucationDetailsChange(
-                                        index,
-                                        "institutionName",
-                                        e.target.value
-                                      )
-                                    }
-                                    className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${
-                                      readOnly || childRecord.current > 0
-                                        ? "text-gray-600"
-                                        : "text-black"
-                                    }`}
-                                    disabled={
-                                      readOnly || childRecord.current > 0
-                                    }
-
-                                    // disabled={childRecord.current > 0}
-                                  />
-                                </td>
-                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                  <input
-                                    // name="IFSC CODE"
-                                    type="text"
-                                    value={item?.yearOfPass}
-                                    onChange={(e) =>
-                                      handleEDucationDetailsChange(
-                                        index,
-                                        "yearOfPass",
-                                        e.target.value
-                                      )
-                                    }
-                                    className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${
-                                      readOnly || childRecord.current > 0
-                                        ? "text-gray-600"
-                                        : "text-black"
-                                    }`}
-                                    disabled={
-                                      readOnly || childRecord.current > 0
-                                    }
-
-                                    // disabled={childRecord.current > 0}
-                                  />
-                                </td>
-                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                  <button
-                                    type="button"
-                                    title="Delete Row"
-                                    onClick={() => deleteEducationRow(index)}
-                                    className="text-red-600 hover:text-red-800"
-                                  >
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      className="h-4 w-4 inline-block"
-                                      viewBox="0 0 20 20"
-                                      fill="currentColor"
-                                    >
-                                      <path
-                                        fillRule="evenodd"
-                                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                        clipRule="evenodd"
-                                      />
-                                    </svg>
-                                  </button>
-                                </td>
+                          <table className="w-full border-collapse table-fixed ">
+                            <thead className="bg-gray-200 text-gray-800">
+                              <tr>
+                                <th
+                                  className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  S.No
+                                </th>
+                                <th
+                                  className={`w-44 px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  Course / Degree
+                                </th>
+                                <th
+                                  className={` px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  Board / University
+                                </th>
+                                <th
+                                  className={` px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  Institution
+                                </th>
+                                <th
+                                  className={`w-52 px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  Year & Month of Passing
+                                </th>
+                                <th
+                                  className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  Action
+                                </th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody>
+                              {educationDetails.map((item, index) => (
+                                <tr
+                                  key={index}
+                                  className=" border border-gray-300 text-[11px] py-1.5 px-1 text-center"
+                                >
+                                  <td className=" text-center px-1">
+                                    {index + 1}
+                                  </td>
+                                  <td className="border border-gray-300 text-[12px] py-1.5 px-1 item-center">
+                                    <input
+                                      // name="Bank Name"
+                                      type="text"
+                                      value={item?.courseName}
+                                      onChange={(e) =>
+                                        handleEDucationDetailsChange(
+                                          index,
+                                          "courseName",
+                                          e.target.value
+                                        )
+                                      }
+                                      disabled={
+                                        readOnly || childRecord.current > 0
+                                      }
+                                      // disabled={childRecord.current > 0}
+                                      className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${
+                                        readOnly || childRecord.current > 0
+                                          ? "text-gray-600"
+                                          : "text-black"
+                                      }`}
+                                    />
+                                  </td>
+                                  <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                    <input
+                                      // name="Branch Name"
+                                      type="text"
+                                      value={item?.universityName}
+                                      onChange={(e) =>
+                                        handleEDucationDetailsChange(
+                                          index,
+                                          "universityName",
+                                          e.target.value
+                                        )
+                                      }
+                                      className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${
+                                        readOnly || childRecord.current > 0
+                                          ? "text-gray-600"
+                                          : "text-black"
+                                      }`}
+                                      disabled={
+                                        readOnly || childRecord.current > 0
+                                      }
+
+                                      // disabled={childRecord.current > 0}
+                                    />
+                                  </td>
+                                  <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                    <input
+                                      // name="Account Number"
+                                      type="text"
+                                      value={item?.institutionName}
+                                      onChange={(e) =>
+                                        handleEDucationDetailsChange(
+                                          index,
+                                          "institutionName",
+                                          e.target.value
+                                        )
+                                      }
+                                      className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${
+                                        readOnly || childRecord.current > 0
+                                          ? "text-gray-600"
+                                          : "text-black"
+                                      }`}
+                                      disabled={
+                                        readOnly || childRecord.current > 0
+                                      }
+
+                                      // disabled={childRecord.current > 0}
+                                    />
+                                  </td>
+                                  <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                    <input
+                                      // name="IFSC CODE"
+                                      type="text"
+                                      value={item?.yearOfPass}
+                                      onChange={(e) =>
+                                        handleEDucationDetailsChange(
+                                          index,
+                                          "yearOfPass",
+                                          e.target.value
+                                        )
+                                      }
+                                      className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${
+                                        readOnly || childRecord.current > 0
+                                          ? "text-gray-600"
+                                          : "text-black"
+                                      }`}
+                                      disabled={
+                                        readOnly || childRecord.current > 0
+                                      }
+
+                                      // disabled={childRecord.current > 0}
+                                    />
+                                  </td>
+                                  <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                    <button
+                                      type="button"
+                                      title="Delete Row"
+                                      onClick={() => deleteEducationRow(index)}
+                                      className="text-red-600 hover:text-red-800"
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-4 w-4 inline-block"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                      >
+                                        <path
+                                          fillRule="evenodd"
+                                          d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                          clipRule="evenodd"
+                                        />
+                                      </svg>
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
-                {step === "Family Details" && (
-                  <div className="flex flex-col gap-4 ">
-                    <div className="bg-white p-3 rounded-md border border-gray-200 h-[49vh]">
-                      <div className="flex justify-between items-center mb-3">
-                        <h3 className="font-medium text-gray-800 text-sm">
-                          Family Details
-                        </h3>
-                        <button
-                          onClick={() => addFamilyNewRow()}
-                          disabled={readOnly}
-                          className="hover:bg-green-600 text-green-600 hover:text-white border border-green-600 px-2 py-1 rounded-md flex items-center text-xs"
+                  )}
+                  {step === "Family Details" && (
+                    <div className="flex flex-col gap-4 ">
+                      <div className="bg-white p-3 rounded-md border border-gray-200 h-[49vh]">
+                        <div className="flex justify-between items-center mb-3">
+                          <h3 className="font-medium text-gray-800 text-sm">
+                            Family Details
+                          </h3>
+                          <button
+                            onClick={() => addFamilyNewRow()}
+                            disabled={readOnly}
+                            className="hover:bg-green-600 text-green-600 hover:text-white border border-green-600 px-2 py-1 rounded-md flex items-center text-xs"
+                          >
+                            <HiPlus className="w-3 h-3 mr-1" />
+                            Add Item
+                          </button>
+                        </div>
+                        <div
+                          className={`w-full   p-2 overflow-auto bg-white max-h-[200px]`}
                         >
-                          <HiPlus className="w-3 h-3 mr-1" />
-                          Add Item
-                        </button>
-                      </div>
-                      <div
-                        className={`w-full   p-2 overflow-auto bg-white max-h-[200px]`}
-                      >
-                        <table className="w-full border-collapse table-fixed ">
-                          <thead className="bg-gray-200 text-gray-800">
-                            <tr>
-                              <th
-                                className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
-                              >
-                                S.No
-                              </th>
-                              <th
-                                className={`w-44 px-4 py-2 text-center font-medium text-[13px] `}
-                              >
-                                Name
-                              </th>
-                              <th
-                                className={`w-24 px-4 py-2 text-center font-medium text-[13px] `}
-                              >
-                                Date of Birth
-                              </th>
-                              <th
-                                className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
-                              >
-                                Age
-                              </th>
-                              <th
-                                className={`w-32 px-4 py-2 text-center font-medium text-[13px] `}
-                              >
-                                RelationShip
-                              </th>
-                              <th
-                                className={`w-52 px-4 py-2 text-center font-medium text-[13px] `}
-                              >
-                                Occupation
-                              </th>
-                              <th
-                                className={`w-24 px-4 py-2 text-center font-medium text-[13px] `}
-                              >
-                                Nominee
-                              </th>
-                              <th
-                                className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
-                              >
-                                Action
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {familyDetails.map((item, index) => (
-                              <tr key={index} className="w-full table-row">
-                                <td className="border border-gray-30 text-center px-1">
-                                  {index + 1}
-                                </td>
-                                <td className="border border-gray-300 text-[12px] py-1.5 px-1 item-center">
-                                  <input
-                                    // name="Bank Name"
-                                    type="text"
-                                    value={item?.name}
-                                    onChange={(e) =>
-                                      handleFamilyDetailsChange(
-                                        index,
-                                        "name",
-                                        e.target.value
-                                      )
-                                    }
-                                    disabled={
-                                      readOnly || childRecord.current > 0
-                                    }
-                                    // disabled={childRecord.current > 0}
-                                    className={`w-full pl-1 focus:outline-none uppercase  focus:border-none bg-transparent  ${
-                                      readOnly || childRecord.current > 0
-                                        ? "text-gray-600"
-                                        : "text-black"
-                                    }`}
-                                  />
-                                </td>
-                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                  <input
-                                    // name="Branch Name"
-                                    type="date"
-                                    value={item?.dob}
-                                    onChange={(e) =>
-                                      handleFamilyDetailsChange(
-                                        index,
-                                        "dob",
-                                        e.target.value
-                                      )
-                                    }
-                                    className={` pl-1 w-[110px] focus:outline-none uppercase  focus:border-none bg-transparent  ${
-                                      readOnly || childRecord.current > 0
-                                        ? "text-gray-600"
-                                        : "text-black"
-                                    }`}
-                                    disabled={
-                                      readOnly || childRecord.current > 0
-                                    }
-                                    // disabled={childRecord.current > 0}
-                                  />
-                                </td>
-                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                  <input
-                                    // name="Account Number"
-                                    type="number"
-                                    value={item?.age}
-                                    onChange={(e) =>
-                                      handleFamilyDetailsChange(
-                                        index,
-                                        "age",
-                                        e.target.value
-                                      )
-                                    }
-                                    className={`w-full pr-2 text-right focus:outline-none uppercase  focus:border-none bg-transparent ${
-                                      readOnly || childRecord.current > 0
-                                        ? "text-gray-600"
-                                        : "text-black"
-                                    }`}
-                                    disabled={
-                                      readOnly || childRecord.current > 0
-                                    }
-                                    // disabled={childRecord.current > 0}
-                                  />
-                                </td>
-                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                  <Select
-                                    options={RelationShipOptions}
-                                    value={
-                                      RelationShipOptions.find(
-                                        (opt) =>
-                                          opt.value === item?.relationShipId
-                                      ) || null
-                                    }
-                                    onChange={(selectedOption) =>
-                                      handleFamilyDetailsChange(
-                                        index,
-                                        "relationShipId",
-                                        selectedOption?.value
-                                      )
-                                    }
-                                    placeholder="Select"
-                                    isClearable={false} // same as required
-                                    isDisabled={
-                                      readOnly || childRecord.current > 0
-                                    }
-                                    isSearchable
-                                    menuShouldScrollIntoView={false}
-                                    maxMenuHeight={150} // <-- Reduce height here
-                                    onInputChange={(value) =>
-                                      value.toUpperCase()
-                                    }
-                                    menuPlacement="auto"
-                                    menuPosition="fixed"
-                                    styles={{
-                                      control: (base) => ({
-                                        ...base,
-                                        border: "none", // remove border
-                                        boxShadow: "none", // remove focus ring
-                                        backgroundColor: "transparent",
-                                        minHeight: "unset",
-                                        height: "15px", // match table row height
-                                        color: "black",
-                                      }),
-                                      placeholder: (base) => ({
-                                        ...base,
-                                        color: "black", // gray placeholder like Tailwind `text-gray-400`
-                                      }),
-                                      singleValue: (base) => ({
-                                        ...base,
-                                        color:
-                                          readOnly || item.childRecord > 0
-                                            ? "gray"
-                                            : "black",
-                                        fontSize: "12px", // optional: adjust font size
-                                      }),
-
-                                      dropdownIndicator: (base) => ({
-                                        ...base,
-                                        padding: 2, // smaller padding
-                                        svg: {
-                                          width: 14, // icon width
-                                          height: 14, // icon height
-                                        },
-                                        color: "black",
-                                      }),
-
-                                      indicatorSeparator: () => ({
-                                        display: "none",
-                                      }), // remove line
-                                      valueContainer: (base) => ({
-                                        ...base,
-                                        padding: "0 2px", // tighten padding
-                                        color: "black",
-                                      }),
-                                      input: (base) => ({
-                                        ...base,
-                                        margin: 0,
-                                        padding: 0,
-                                        color: "black",
-                                      }),
-                                      menu: (base) => ({
-                                        ...base,
-                                        zIndex: 9999, // keep menu on top
-                                      }),
-                                    }}
-                                    onKeyDown={(e) =>
-                                      handleKeyNext(e, input2Ref)
-                                    }
-                                  />
-                                </td>
-                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                  <input
-                                    // name="IFSC CODE"
-                                    type="text"
-                                    value={item?.occupation}
-                                    onChange={(e) =>
-                                      handleFamilyDetailsChange(
-                                        index,
-                                        "occupation",
-                                        e.target.value
-                                      )
-                                    }
-                                    className={`w-full pl-2 focus:outline-none uppercase  focus:border-none bg-transparent ${
-                                      readOnly || childRecord.current > 0
-                                        ? "text-gray-600"
-                                        : "text-black"
-                                    }`}
-                                    disabled={
-                                      readOnly || childRecord.current > 0
-                                    }
-                                    // disabled={childRecord.current > 0}
-                                  />
-                                </td>
-                                <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
-                                  <input
-                                    // name="IFSC CODE"
-                                    type="text"
-                                    value={item?.nominee}
-                                    onChange={(e) =>
-                                      handleFamilyDetailsChange(
-                                        index,
-                                        "nominee",
-                                        e.target.value
-                                      )
-                                    }
-                                    className={`w-full pl-2 focus:outline-none uppercase  focus:border-none bg-transparent ${
-                                      readOnly || childRecord.current > 0
-                                        ? "text-gray-600"
-                                        : "text-black"
-                                    }`}
-                                    disabled={
-                                      readOnly || childRecord.current > 0
-                                    }
-                                    // disabled={childRecord.current > 0}
-                                  />
-                                </td>
-                                <td className=" border border-gray-300 text-[12px] py-1.5 text-center item-center">
-                                  <button
-                                    type="button"
-                                    title="Delete Row"
-                                    onClick={() => deleteFamilyRow(index)}
-                                    className="text-red-600 hover:text-red-800 text-center"
-                                  >
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      className="h-4 w-4 inline-block"
-                                      viewBox="0 0 20 20"
-                                      fill="currentColor"
-                                    >
-                                      <path
-                                        fillRule="evenodd"
-                                        d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                        clipRule="evenodd"
-                                      />
-                                    </svg>
-                                  </button>
-                                </td>
+                          <table className="w-full border-collapse table-fixed ">
+                            <thead className="bg-gray-200 text-gray-800">
+                              <tr>
+                                <th
+                                  className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  S.No
+                                </th>
+                                <th
+                                  className={`w-44 px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  Name
+                                </th>
+                                <th
+                                  className={`w-24 px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  Date of Birth
+                                </th>
+                                <th
+                                  className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  Age
+                                </th>
+                                <th
+                                  className={`w-32 px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  RelationShip
+                                </th>
+                                <th
+                                  className={`w-52 px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  Occupation
+                                </th>
+                                <th
+                                  className={`w-24 px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  Nominee
+                                </th>
+                                <th
+                                  className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  Action
+                                </th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody>
+                              {familyDetails.map((item, index) => (
+                                <tr key={index} className="w-full table-row">
+                                  <td className="border border-gray-30 text-center px-1">
+                                    {index + 1}
+                                  </td>
+                                  <td className="border border-gray-300 text-[12px] py-1.5 px-1 item-center">
+                                    <input
+                                      // name="Bank Name"
+                                      type="text"
+                                      value={item?.name}
+                                      onChange={(e) =>
+                                        handleFamilyDetailsChange(
+                                          index,
+                                          "name",
+                                          e.target.value
+                                        )
+                                      }
+                                      disabled={
+                                        readOnly || childRecord.current > 0
+                                      }
+                                      // disabled={childRecord.current > 0}
+                                      className={`w-full pl-1 focus:outline-none uppercase  focus:border-none bg-transparent  ${
+                                        readOnly || childRecord.current > 0
+                                          ? "text-gray-600"
+                                          : "text-black"
+                                      }`}
+                                    />
+                                  </td>
+                                  <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                    <input
+                                      // name="Branch Name"
+                                      type="date"
+                                      value={item?.dob}
+                                      onChange={(e) =>
+                                        handleFamilyDetailsChange(
+                                          index,
+                                          "dob",
+                                          e.target.value
+                                        )
+                                      }
+                                      className={` pl-1 w-[110px] focus:outline-none uppercase  focus:border-none bg-transparent  ${
+                                        readOnly || childRecord.current > 0
+                                          ? "text-gray-600"
+                                          : "text-black"
+                                      }`}
+                                      disabled={
+                                        readOnly || childRecord.current > 0
+                                      }
+                                      // disabled={childRecord.current > 0}
+                                    />
+                                  </td>
+                                  <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                    <input
+                                      // name="Account Number"
+                                      type="number"
+                                      value={item?.age}
+                                      onChange={(e) =>
+                                        handleFamilyDetailsChange(
+                                          index,
+                                          "age",
+                                          e.target.value
+                                        )
+                                      }
+                                      className={`w-full pr-2 text-right focus:outline-none uppercase  focus:border-none bg-transparent ${
+                                        readOnly || childRecord.current > 0
+                                          ? "text-gray-600"
+                                          : "text-black"
+                                      }`}
+                                      disabled={
+                                        readOnly || childRecord.current > 0
+                                      }
+                                      // disabled={childRecord.current > 0}
+                                    />
+                                  </td>
+                                  <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                    <Select
+                                      options={RelationShipOptions}
+                                      value={
+                                        RelationShipOptions.find(
+                                          (opt) =>
+                                            opt.value === item?.relationShipId
+                                        ) || null
+                                      }
+                                      onChange={(selectedOption) =>
+                                        handleFamilyDetailsChange(
+                                          index,
+                                          "relationShipId",
+                                          selectedOption?.value
+                                        )
+                                      }
+                                      placeholder="Select"
+                                      isClearable={false} // same as required
+                                      isDisabled={
+                                        readOnly || childRecord.current > 0
+                                      }
+                                      isSearchable
+                                      menuShouldScrollIntoView={false}
+                                      maxMenuHeight={150} // <-- Reduce height here
+                                      onInputChange={(value) =>
+                                        value.toUpperCase()
+                                      }
+                                      menuPlacement="auto"
+                                      menuPosition="fixed"
+                                      styles={{
+                                        control: (base) => ({
+                                          ...base,
+                                          border: "none", // remove border
+                                          boxShadow: "none", // remove focus ring
+                                          backgroundColor: "transparent",
+                                          minHeight: "unset",
+                                          height: "15px", // match table row height
+                                          color: "black",
+                                        }),
+                                        placeholder: (base) => ({
+                                          ...base,
+                                          color: "black", // gray placeholder like Tailwind `text-gray-400`
+                                        }),
+                                        singleValue: (base) => ({
+                                          ...base,
+                                          color:
+                                            readOnly || item.childRecord > 0
+                                              ? "gray"
+                                              : "black",
+                                          fontSize: "12px", // optional: adjust font size
+                                        }),
+
+                                        dropdownIndicator: (base) => ({
+                                          ...base,
+                                          padding: 2, // smaller padding
+                                          svg: {
+                                            width: 14, // icon width
+                                            height: 14, // icon height
+                                          },
+                                          color: "black",
+                                        }),
+
+                                        indicatorSeparator: () => ({
+                                          display: "none",
+                                        }), // remove line
+                                        valueContainer: (base) => ({
+                                          ...base,
+                                          padding: "0 2px", // tighten padding
+                                          color: "black",
+                                        }),
+                                        input: (base) => ({
+                                          ...base,
+                                          margin: 0,
+                                          padding: 0,
+                                          color: "black",
+                                        }),
+                                        menu: (base) => ({
+                                          ...base,
+                                          zIndex: 9999, // keep menu on top
+                                        }),
+                                      }}
+                                      onKeyDown={(e) =>
+                                        handleKeyNext(e, input2Ref)
+                                      }
+                                    />
+                                  </td>
+                                  <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                    <input
+                                      // name="IFSC CODE"
+                                      type="text"
+                                      value={item?.occupation}
+                                      onChange={(e) =>
+                                        handleFamilyDetailsChange(
+                                          index,
+                                          "occupation",
+                                          e.target.value
+                                        )
+                                      }
+                                      className={`w-full pl-2 focus:outline-none uppercase  focus:border-none bg-transparent ${
+                                        readOnly || childRecord.current > 0
+                                          ? "text-gray-600"
+                                          : "text-black"
+                                      }`}
+                                      disabled={
+                                        readOnly || childRecord.current > 0
+                                      }
+                                      // disabled={childRecord.current > 0}
+                                    />
+                                  </td>
+                                  <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                    <input
+                                      // name="IFSC CODE"
+                                      type="text"
+                                      value={item?.nominee}
+                                      onChange={(e) =>
+                                        handleFamilyDetailsChange(
+                                          index,
+                                          "nominee",
+                                          e.target.value
+                                        )
+                                      }
+                                      className={`w-full pl-2 focus:outline-none uppercase  focus:border-none bg-transparent ${
+                                        readOnly || childRecord.current > 0
+                                          ? "text-gray-600"
+                                          : "text-black"
+                                      }`}
+                                      disabled={
+                                        readOnly || childRecord.current > 0
+                                      }
+                                      // disabled={childRecord.current > 0}
+                                    />
+                                  </td>
+                                  <td className=" border border-gray-300 text-[12px] py-1.5 text-center item-center">
+                                    <button
+                                      type="button"
+                                      title="Delete Row"
+                                      onClick={() => deleteFamilyRow(index)}
+                                      className="text-red-600 hover:text-red-800 text-center"
+                                    >
+                                      <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-4 w-4 inline-block"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                      >
+                                        <path
+                                          fillRule="evenodd"
+                                          d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                          clipRule="evenodd"
+                                        />
+                                      </svg>
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
+            {/* {showMobileModal && (
+          <Modal
+          isOpen={showMobileModal}
+          form={showMobileModal}
+          widthClass={"w-[40%]  h-[40%]"}
+          onClose={() => {
+            setShowMobileModal(false);
+           
+          }}
+        >
+             
+        <div className=" flex items-center justify-center  bg-opacity-50 sticky top-0 z-999">
+          <div className="bg-white p-4 rounded-lg w-96 z-900">
+            <h2 className="text-lg font-bold mb-2">Select Employee</h2>
+            <div className="max-h-64 overflow-y-auto">
+              {mobileMatches.map((emp, index) => (
+                <div key={index} className="flex items-center gap-2 mb-2">
+                  <input
+                    type="radio"
+                    name="selectedEmployee"
+                    value={index}
+                    checked={selectedEmployeeIndex === index}
+                    onChange={() => setSelectedEmployeeIndex(index)}
+                  />
+                  <span>
+                    {emp.firstName} ({emp.mobileNumber})
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={() => setShowMobileModal(false)}
+                className="px-4 py-2 bg-gray-300 rounded"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  if (selectedEmployeeIndex !== null) {
+                    const emp = mobileMatches[selectedEmployeeIndex];
+                    setFirstName(emp.firstName);
+                    setGender(emp.gender);
+                    setDob(emp.dob ? emp.dob.split("T")[0] : "");
+                    setMaritalStatus(emp.maritalStatus);
+                    setEmail(emp.email);
+                    setAadharNo(emp.aadharNo);
+                    setPanNo(emp.panNo);
+                    setReligion(emp.religion);
+                    setPresentAddress({ address: emp.presentAddress || "" });
+                    setMobileNumber(emp.mobileNumber?.toString());
+                    setShowMobileModal(false);
+                  }
+                }}
+                className="px-4 py-2 bg-blue-600 text-white rounded"
+              >
+                Fill
+              </button>
+            </div>
           </div>
-
-          <Modal isOpen={leavingForm} onClose={() => setLeavingForm(false)}>
-            <EmployeeLeavingForm
-              leavingReason={leavingReason}
-              setLeavingReason={setLeavingReason}
-              leavingDate={leavingDate}
-              setLeavingDate={setLeavingDate}
-              canRejoin={canRejoin}
-              setCanRejoin={setCanRejoin}
-              rejoinReason={rejoinReason}
-              setRejoinReason={setRejoinReason}
-              onSubmit={submitLeavingForm}
-              onClose={() => setLeavingForm(false)}
-            />
-          </Modal>
+        </div>
+      
         </Modal>
-      )}
-    </div>
+      )} */}
+
+            <Modal isOpen={leavingForm} onClose={() => setLeavingForm(false)}>
+              <EmployeeLeavingForm
+                leavingReason={leavingReason}
+                setLeavingReason={setLeavingReason}
+                leavingDate={leavingDate}
+                setLeavingDate={setLeavingDate}
+                canRejoin={canRejoin}
+                setCanRejoin={setCanRejoin}
+                rejoinReason={rejoinReason}
+                setRejoinReason={setRejoinReason}
+                onSubmit={submitLeavingForm}
+                onClose={() => setLeavingForm(false)}
+              />
+            </Modal>
+          </Modal>
+        )}
+      </div>
+    </>
   );
 }

@@ -243,6 +243,7 @@ export const FilterParty = [
 export const married = [
   { show: "Married", value: "Married" },
   { show: "Single", value: "Single" },
+  { show: "Divorced", value: "Divorced" },
 ];
 
 export const earningsTypes = [

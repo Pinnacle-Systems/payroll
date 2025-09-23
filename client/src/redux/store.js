@@ -40,6 +40,7 @@ import {
   leaveopeningBalanceApi,
   MachineInoutApi,
   OTMAsterAPi,
+  preEmployeeApi,
   
 
 } from "./services"
@@ -192,6 +193,7 @@ const commonReducers = {
   [leaveopeningBalanceApi.reducerPath] : leaveopeningBalanceApi.reducer,
   [MachineInoutApi.reducerPath] : MachineInoutApi.reducer,
   [OTMAsterAPi.reducerPath] : OTMAsterAPi.reducer,
+  [preEmployeeApi.reducerPath] : preEmployeeApi.reducer,
 
 
 }
@@ -301,6 +303,7 @@ leaveCodeApi.middleware,
 leaveopeningBalanceApi.middleware,
 MachineInoutApi.middleware,
 OTMAsterAPi.middleware,
+preEmployeeApi.middleware,
 ];
 
 

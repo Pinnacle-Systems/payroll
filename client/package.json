@@ -46,6 +46,7 @@
     "react-data-to-export": "^1.0.0",
     "react-dom": "^18.2.0",
     "react-dropdown-select": "^4.11.2",
+    "react-hook-form": "^7.63.0",
     "react-hot-toast": "^2.5.2",
     "react-html-table-to-excel": "^2.0.0",
     "react-icon": "^1.0.0",

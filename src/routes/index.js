@@ -55,3 +55,4 @@ export { default as leaveCode } from "./leaveCode.route.js";
 export { default as leaveOpeningBalance } from "./leaveOpeningbalance.route.js";
 export { default as MachineInOutEntry } from "./machineInoutEntry.route.js";
 export { default as OTMaster } from "./OT.route.js";
+export {default as preEmployee} from './preEmployee.route.js'

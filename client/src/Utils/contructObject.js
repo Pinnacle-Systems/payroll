@@ -1,6 +1,7 @@
 import { getYearShortCode } from "./helper"
 
 export const dropDownListObject = (data, showKey, valueKey) => {
+    if (!Array.isArray(data)) return [];
     const outputData = []
 
     for (let i of data) {
@@ -13,9 +14,10 @@ export const dropDownListObject = (data, showKey, valueKey) => {
 }
 
 export const dropDownFinYear = (data) => {
+    if (!Array.isArray(data)) return [];
     const outputData = [];
     for (let i of data) {
-        outputData.push({ show: getYearShortCode(i["from"], i["to"]), value: i["id"] })
+        outputData?.push({ show: getYearShortCode(i["from"], i["to"]), value: i["id"] })
     }
     return outputData
 }

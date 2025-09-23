@@ -62,6 +62,7 @@ import {
   leaveOpeningBalance,
   MachineInOutEntry,
   OTMaster,
+  preEmployee,
 } from "./src/routes/index.js";
 
 import { socketMain } from "./src/sockets/socket.js";
@@ -157,6 +158,7 @@ app.use('/leaveCode',leaveCode)
 app.use('/leaveopeningBalance',leaveOpeningBalance)
 app.use('/machineInOutEntry',MachineInOutEntry)
 app.use('/oTMAster',OTMaster)
+app.use('/preEmployeeRegistration',preEmployee)
 
 
 app.get("/retreiveFile/:fileName", (req, res) => {
