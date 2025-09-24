@@ -79,6 +79,7 @@ model Company {
   LeaveOPeningBalance LeaveOPeningBalance[]
   MAchineInOutEntry   MachineInOutEntry[]
   OT                  OT[]
+  EmployeeResign      EmployeeResign[]
 }
 
 model Subscription {
@@ -141,6 +142,7 @@ model Branch {
   LeaveOPeningBalance LeaveOPeningBalance[]
   MAchineInOutEntry   MachineInOutEntry[]
   OT                  OT[]
+  EmployeeResign      EmployeeResign[]
 }
 
 model UserOnBranch {
@@ -273,6 +275,8 @@ model User {
   MAchineInOutEntryupdatedBy   MachineInOutEntry[]   @relation(name: "updatedBy")
   OTCreatedBy                  OT[]                  @relation(name: "createdBy")
   OTupdatedBy                  OT[]                  @relation(name: "updatedBy")
+  EmployeeResignCreatedBy      EmployeeResign[]      @relation(name: "createdBy")
+  EmployeeResignupdatedBy      EmployeeResign[]      @relation(name: "updatedBy")
 }
 
 model Employee {
@@ -298,7 +302,7 @@ model Employee {
   pf                 String?
   esi                String?
   salary             String?
-  aadharNo           String?
+  aadharNo           String?   @unique
   panNo              String?
   esiNo              String?
   pfNo               String?
@@ -356,6 +360,10 @@ model Employee {
   Company               Company?              @relation(fields: [companyId], references: [id])
   companyId             Int?
   LeaveOPeningBalance   LeaveOPeningBalance[]
+  EmployeeResign        EmployeeResign[]
+  lastWorkingDate       DateTime?
+  leaveReason           String?
+  active                Boolean?              @default(true)
 }
 
 model EmployeeBankDetails {
@@ -1787,4 +1795,24 @@ model PreEmployee {
   religion       String?
   presentAddress String?
   docId          String?
+}
+
+model EmployeeResign {
+  id              Int       @id @default(autoincrement())
+  Company         Company?  @relation(fields: [companyId], references: [id])
+  companyId       Int?
+  branch          Branch?   @relation(fields: [branchId], references: [id])
+  branchId        Int?
+  createdBy       User?     @relation("createdBy", fields: [createdById], references: [id])
+  createdById     Int?
+  updatedBy       User?     @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById     Int?
+  docId           String?
+  date            DateTime?
+  Employee        Employee  @relation(fields: [employeeId], references: [id])
+  employeeId      Int
+  lastWorkingDate DateTime?
+  leaveReason     String?
+  remarks         String?
+  joinAgain       String?
 }

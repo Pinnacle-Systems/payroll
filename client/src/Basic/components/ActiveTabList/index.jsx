@@ -40,6 +40,7 @@ import {
   MachineInOutMaster,
   BandMaster,
   OTMaster,
+  EmployeeResignation,
 
  
   
@@ -133,6 +134,7 @@ const ActiveTabList = () => {
     "MACHINE IN OUT IP ENTRY" :<MachineInOutMaster/>,
     "BAND MASTER" : <BandMaster/>,
     "OT":<OTMaster/>,
+    "EMPLOYEE RESIGNATION":<EmployeeResignation/>,
 
 
 

@@ -73,39 +73,85 @@ const TemplateItems = ({
   //   }
   // };
 
+  // const handleInputChange = (value, index, field, subIndex) => {
+  //   const newBlend = structuredClone(ShiftTemplateItems);
+
+  //   if (typeof subIndex === "number") {
+  //     //  update only subgrid
+  //     if (!Array.isArray(newBlend[index].quarterDetails)) {
+  //       newBlend[index].quarterDetails = [];
+  //     }
+  //     if (!newBlend[index].quarterDetails[subIndex]) {
+  //       newBlend[index].quarterDetails[subIndex] = {};
+  //     }
+  //     newBlend[index].quarterDetails[subIndex][field] = value;
+  //   } else {
+  //     //  update only main grid
+  //     newBlend[index][field] = value;
+  //   }
+
+  //   setShiftTemplateItems(newBlend);
+
+  //   if (index === selectedIndex) {
+  //     setSelectedRow((prev) => {
+  //       if (typeof subIndex === "number") {
+  //         return {
+  //           ...prev,
+  //           quarterDetails: prev.quarterDetails.map((q, i) =>
+  //             i === subIndex ? { ...q, [field]: value } : q
+  //           ),
+  //         };
+  //       }
+  //       return { ...prev, [field]: value };
+  //     });
+  //   }
+  // };
   const handleInputChange = (value, index, field, subIndex) => {
-    const newBlend = structuredClone(ShiftTemplateItems);
+  setShiftTemplateItems((prev) => {
+    // Clone the previous state first
+    const newBlend = structuredClone(prev);
 
     if (typeof subIndex === "number") {
-      //  update only subgrid
+      // Ensure subgrid exists
       if (!Array.isArray(newBlend[index].quarterDetails)) {
         newBlend[index].quarterDetails = [];
       }
       if (!newBlend[index].quarterDetails[subIndex]) {
         newBlend[index].quarterDetails[subIndex] = {};
       }
+
+      // Update only the changed field
       newBlend[index].quarterDetails[subIndex][field] = value;
     } else {
-      //  update only main grid
+      // Update only main grid
       newBlend[index][field] = value;
     }
 
-    setShiftTemplateItems(newBlend);
+    return newBlend;
+  });
 
-    if (index === selectedIndex) {
-      setSelectedRow((prev) => {
-        if (typeof subIndex === "number") {
-          return {
-            ...prev,
-            quarterDetails: prev.quarterDetails.map((q, i) =>
-              i === subIndex ? { ...q, [field]: value } : q
-            ),
-          };
+  // Update selected row if necessary
+  if (index === selectedIndex) {
+    setSelectedRow((prev) => {
+      const updatedRow = structuredClone(prev);
+
+      if (typeof subIndex === "number") {
+        if (!Array.isArray(updatedRow.quarterDetails)) {
+          updatedRow.quarterDetails = [];
         }
-        return { ...prev, [field]: value };
-      });
-    }
-  };
+        updatedRow.quarterDetails[subIndex] = {
+          ...updatedRow.quarterDetails[subIndex],
+          [field]: value,
+        };
+      } else {
+        updatedRow[field] = value;
+      }
+
+      return updatedRow;
+    });
+  }
+};
+
   const handleOpenQuarterModal = (rowIndex) => {
     const row = structuredClone(ShiftTemplateItems[rowIndex]);
 

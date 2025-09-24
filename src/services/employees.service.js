@@ -128,7 +128,6 @@ async function getEmployeeId(branchId, startTime, endTime) {
     }`;
   }
 
-  console.log(newDocId, "newDocId--");
 
   return newDocId;
 }
@@ -190,12 +189,7 @@ async function getOne(id) {
       id: parseInt(id),
     },
     include: {
-      department: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
+      department: {select: {id: true,name: true,},},
       EmployeeCategory: true,
       shiftTemplate: { select: { name: true } }, // optional
       designation: { select: { name: true } }, // optional

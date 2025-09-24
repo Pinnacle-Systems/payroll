@@ -111,3 +111,4 @@ export const LEAVE_OPENING_BALANCE_API =   'leaveopeningBalance'
 export const MACHINE_IN_OUT_ENTRY_API = 'machineInOutEntry'
 export const OT_MASTER  = 'oTMAster'
 export const EMP_API =  "preEmployeeRegistration"
+export const EMP_RESIGN = 'employeeResign'

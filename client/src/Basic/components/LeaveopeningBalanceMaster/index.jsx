@@ -400,8 +400,8 @@ const Designation = () => {
                             <Select
                               options={EmployeeOptions}
                               value={
-                                EmployeeOptions.find(
-                                  (opt) => opt.value === employeeId
+                                EmployeeOptions?.find(
+                                  (opt) => opt?.value === employeeId
                                 ) || null
                               }
                               onChange={(selected) => {

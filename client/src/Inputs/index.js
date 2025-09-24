@@ -1756,7 +1756,7 @@ export const DateInput = forwardRef(
     return (
       <div className="flex flex-col gap-1 w-full">
         {name && (
-          <label className="bblock text-xs font-semibold text-slate-700 ">
+          <label className="block text-xs font-semibold text-slate-700 ">
             {required ? (
               <RequiredLabel name={inputHead ?? name} />
             ) : (

@@ -45,7 +45,7 @@ import EmployeeLeavingForm from "./EmployeeLeavingForm";
 import { useGetDepartmentQuery } from "../../../redux/services/DepartmentMasterService";
 import { useGetRelationShipQuery } from "../../../redux/services/RelationShipService";
 import { useDispatch } from "react-redux";
-import { Check } from "lucide-react";
+import { Check, Power } from "lucide-react";
 import { useGetBloodGroupQuery } from "../../../redux/services/BloodGroupService";
 
 import { HiPlus } from "react-icons/hi";
@@ -55,11 +55,10 @@ import { useGetStateQuery } from "../../../redux/services/StateMasterService";
 import { useGetCountriesQuery } from "../../../redux/services/CountryMasterService";
 import Select from "react-select";
 import Swal from "sweetalert2";
-
+import { useGetEmployeeResignQuery } from "../../../redux/services/EmployeeResignService";
 import { useGetemployeeSubCategoryQuery } from "../../../redux/services/EmployeeSubCategoryservice";
 import { useGetEmpQuery } from "../../../redux/services/preEmployee";
 
-const MODEL = "Employee Master";
 export default function Form() {
   const [view, setView] = useState("table");
   const [form, setForm] = useState(false);
@@ -136,9 +135,10 @@ export default function Form() {
   const [familyDetails, setFamilyDetails] = useState([]);
   const [employeeSubCategoryId, setEmployeeSubCategoryId] = useState("");
   const [mobileMatches, setMobileMatches] = useState([]);
+  const [aadharMatch, setAadharMatch] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedEmployeeIndex, setSelectedEmployeeIndex] = useState(null);
-
+const [cannotRejoin, setCannotRejoin] = useState(false);
   const [presentAddress, setPresentAddress] = useState({
     address: "",
     cityId: "",
@@ -187,6 +187,8 @@ export default function Form() {
   const { data: relationShip } = useGetRelationShipQuery({ params });
 
   const { data: preEmployee } = useGetEmpQuery();
+  const { data: ResignedEmployee } = useGetEmployeeResignQuery({ params });
+
   const handleMobileChange = (value) => {
     const cleanedValue = value.replace(/\D/g, "").slice(0, 10);
     setMobileNumber(cleanedValue);
@@ -201,6 +203,45 @@ export default function Form() {
     } else {
       setMobileMatches([]);
       setShowDropdown(false);
+    }
+  };
+
+  const handleAadharChange = (value) => {
+    // Keep only digits, max 12
+    const cleanedValue = value?.slice(0, 12);
+    console.log(cleanedValue, "cleanedValue");
+
+    setAadharNo(cleanedValue);
+
+    if (cleanedValue.length >= 12) {
+      const matches = ResignedEmployee?.data?.filter((val) =>
+        val?.Employee?.aadharNo.startsWith(cleanedValue)
+      );
+
+      setAadharMatch(matches || []);
+      if (matches && matches.length > 0) {
+        
+        const rejectedEmployee = ResignedEmployee?.data?.find(
+          (emp) =>
+            emp?.Employee?.aadharNo?.startsWith(cleanedValue) &&
+            emp?.joinAgain?.toLowerCase() === "no"
+        );
+
+        if (rejectedEmployee) {
+          alert(
+            "⚠️ This employee has already resigned and is not allowed to rejoin."
+          );
+          // Disable all inputs
+          setReadOnly(true);
+          setCannotRejoin(true); 
+        } else {
+          alert("⚠️ This employee has already resigned.");
+          setReadOnly(false);
+          setCannotRejoin(false);
+        }
+      }
+    } else {
+      setAadharMatch([]);
     }
   };
 
@@ -712,7 +753,7 @@ export default function Form() {
 
   const input1Ref = useRef(null);
   const input2Ref = useRef(null);
-  const input3Ref = useRef(null);
+
   const handleKeyNext = (e, nextRef) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -722,6 +763,7 @@ export default function Form() {
   const onNew = () => {
     setId("");
     setReadOnly(false);
+    setCannotRejoin(false)
     setForm(true);
     setStep("Basic Details");
     // Basic Info
@@ -1012,7 +1054,16 @@ export default function Form() {
     console.log("Edit");
     setStep("Basic Details");
   };
-
+  const ACTIVE = (
+    <div className="bg-gradient-to-r from-green-200 to-green-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-green-500 shadow-lg text-white hover:scale-110 transition-transform duration-300">
+      <Power size={10} />
+    </div>
+  );
+  const INACTIVE = (
+    <div className="bg-gradient-to-r from-red-200 to-red-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-red-500 shadow-lg text-white hover:scale-110 transition-transform duration-300">
+      <Power size={10} />
+    </div>
+  );
   const columns = [
     {
       header: "S.No",
@@ -1046,23 +1097,17 @@ export default function Form() {
     },
     {
       header: "Mobile",
-      accessor: (item) => item?.permanentMobile,
+      accessor: (item) => item?.mobileNumber,
       //   cellClass: () => " text-gray-900",
-      className: "text-gray-900 pr-2 text-right uppercase w-36",
-    },
-    {
-      header: "Email",
-      accessor: (item) => item?.email,
-      //   cellClass: () => " text-gray-900",
-      className: "text-gray-900 text-center uppercase w-80",
+      className: "text-gray-900 pr-2 text-center uppercase w-36",
     },
 
-    // {
-    //   header: "",
-    //   accessor: (item) => "",
-    //     cellClass: () => "font-medium text-gray-900",
-    //   className: "font-medium text-gray-900 uppercase w-[15%]",
-    // },
+    {
+      header: "STATUS",
+      accessor: (item) => (item.active ? ACTIVE : INACTIVE),
+      //   cellClass: () => "font-medium text-gray-900",
+      className: " text-gray-900 font-sans text-center uppercase w-16",
+    },
   ];
   const handleCheckboxChange = (e) => {
     const checked = e.target.checked;
@@ -1242,10 +1287,12 @@ export default function Form() {
                     {readOnly && (
                       <button
                         type="button"
-                        onClick={() => {
-                          setReadOnly(false);
-                        }}
-                        className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
+                          onClick={() => {
+      if (!cannotRejoin) setReadOnly(false); // only allow edit if rejoin is allowed
+    }}
+                           className={`px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded ${
+      cannotRejoin ? "opacity-50 cursor-not-allowed" : ""
+    }`}
                       >
                         Edit
                       </button>
@@ -1346,8 +1393,10 @@ export default function Form() {
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                             {showDropdown && (
-                              <div className=" w-[160px]  absolute z-10 bg-white border border-gray-300 rounded-md overflow-auto mb-10
-                     p-1  shadow-md ">
+                              <div
+                                className=" w-[160px]  absolute z-10 bg-white border border-gray-300 rounded-md overflow-auto mb-10
+                     p-1  shadow-md "
+                              >
                                 {mobileMatches.map((emp, index) => (
                                   <div
                                     key={index}
@@ -1379,6 +1428,19 @@ export default function Form() {
                               </div>
                             )}
                           </div>
+                          <div className="w-[180px]">
+                            <TextInput
+                              ref={input1Ref}
+                              name="Adhaar No"
+                              value={aadharNo}
+                              setValue={handleAadharChange}
+                              type="number"
+                              required={true}
+                              readOnly={readOnly}
+                              disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
                           <div className="w-30">
                             <DropdownInput
                               ref={input1Ref}
@@ -1386,20 +1448,6 @@ export default function Form() {
                               value={employeeType}
                               setValue={setEmployeeType}
                               options={EmployeeType}
-                              required={true}
-                              readOnly={readOnly}
-                              disabled={childRecord.current > 0}
-                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                            />
-                          </div>
-                          
-                          <div className="w-[180px]">
-                            <TextInput
-                              ref={input1Ref}
-                              name="Adhaar No"
-                              value={aadharNo}
-                              setValue={setAadharNo}
-                              type="number"
                               required={true}
                               readOnly={readOnly}
                               disabled={childRecord.current > 0}
