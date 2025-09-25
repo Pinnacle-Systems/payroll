@@ -28,6 +28,7 @@ const TemplateItems = ({
   childRecord,
   setReadOnly,
   setId,
+  today
 }) => {
   const [modal, setModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
@@ -107,50 +108,50 @@ const TemplateItems = ({
   //   }
   // };
   const handleInputChange = (value, index, field, subIndex) => {
-  setShiftTemplateItems((prev) => {
-    // Clone the previous state first
-    const newBlend = structuredClone(prev);
-
-    if (typeof subIndex === "number") {
-      // Ensure subgrid exists
-      if (!Array.isArray(newBlend[index].quarterDetails)) {
-        newBlend[index].quarterDetails = [];
-      }
-      if (!newBlend[index].quarterDetails[subIndex]) {
-        newBlend[index].quarterDetails[subIndex] = {};
-      }
-
-      // Update only the changed field
-      newBlend[index].quarterDetails[subIndex][field] = value;
-    } else {
-      // Update only main grid
-      newBlend[index][field] = value;
-    }
-
-    return newBlend;
-  });
-
-  // Update selected row if necessary
-  if (index === selectedIndex) {
-    setSelectedRow((prev) => {
-      const updatedRow = structuredClone(prev);
+    setShiftTemplateItems((prev) => {
+      // Clone the previous state first
+      const newBlend = structuredClone(prev);
 
       if (typeof subIndex === "number") {
-        if (!Array.isArray(updatedRow.quarterDetails)) {
-          updatedRow.quarterDetails = [];
+        // Ensure subgrid exists
+        if (!Array.isArray(newBlend[index].quarterDetails)) {
+          newBlend[index].quarterDetails = [];
         }
-        updatedRow.quarterDetails[subIndex] = {
-          ...updatedRow.quarterDetails[subIndex],
-          [field]: value,
-        };
+        if (!newBlend[index].quarterDetails[subIndex]) {
+          newBlend[index].quarterDetails[subIndex] = {};
+        }
+
+        // Update only the changed field
+        newBlend[index].quarterDetails[subIndex][field] = value;
       } else {
-        updatedRow[field] = value;
+        // Update only main grid
+        newBlend[index][field] = value;
       }
 
-      return updatedRow;
+      return newBlend;
     });
-  }
-};
+
+    // Update selected row if necessary
+    if (index === selectedIndex) {
+      setSelectedRow((prev) => {
+        const updatedRow = structuredClone(prev);
+
+        if (typeof subIndex === "number") {
+          if (!Array.isArray(updatedRow.quarterDetails)) {
+            updatedRow.quarterDetails = [];
+          }
+          updatedRow.quarterDetails[subIndex] = {
+            ...updatedRow.quarterDetails[subIndex],
+            [field]: value,
+          };
+        } else {
+          updatedRow[field] = value;
+        }
+
+        return updatedRow;
+      });
+    }
+  };
 
   const handleOpenQuarterModal = (rowIndex) => {
     const row = structuredClone(ShiftTemplateItems[rowIndex]);
@@ -214,7 +215,7 @@ const TemplateItems = ({
       nextDay: "",
       checkHrs: "",
       total: "",
-      pickFrom: "", 
+      pickFrom: "",
       formula: "",
     };
 
@@ -307,8 +308,7 @@ const TemplateItems = ({
       return option?.label; // or option?.value if you prefer
     })
     .filter(Boolean); // remove undefined/null
-
-  console.log(OTOptions, "OTOptions");
+console.log(ShiftTemplateItems,"ShiftTemplateItems");
 
   return (
     <>
@@ -354,16 +354,9 @@ const TemplateItems = ({
             <div className="border border-slate-200 p-2 bg-white rounded-md shadow-sm col-span-1">
               <h2 className="font-medium text-slate-700 mb-2">Basic Details</h2>
               <div className="grid grid-cols-6 gap-4">
-                {/* <TextInput
-                  name="Company Code"
-                  type="text"
-                  value={companyCode}
-                  setValue={setCompanyCode}
-                  required={true}
-                  // readOnly={readOnly}
-                                         disabled={readOnly || childRecord.current > 0 }
+              
 
-                /> */}
+             
                 <div className="">
                   <TextInput
                     name="Doc Id"
@@ -375,7 +368,6 @@ const TemplateItems = ({
                     disabled={childRecord.current > 0}
                   />
                 </div>
-                {console.log(docId, "docIdreceived")}
 
                 <div className="">
                   <DropdownInput
@@ -478,7 +470,7 @@ const TemplateItems = ({
                         type="date"
                         value={
                           item?.date
-                            ? new Date(item.date).toISOString().split("T")[0]
+                            ? new Date(item?.date).toISOString().split("T")[0]
                             : ""
                         }
                         onChange={(e) =>
@@ -494,7 +486,6 @@ const TemplateItems = ({
                     </td>
                     <td className=" border border-gray-300 text-[12px] py-0.5 item-center">
                       <select
-                        // onKeyDown={e => { if (e.key === "Delete") { handleInputChange("", index, "accessoryGroupId") } }}
                         disabled={readOnly || childRecord.current > 0}
                         className="text-left w-full focus:outline-none rounded py-1 bg-transparent"
                         value={item.templateId}
@@ -508,9 +499,9 @@ const TemplateItems = ({
                           : ShitCommonData?.data.filter(
                               (item) => item.active
                             ) || []
-                        ).map((blend) => (
+                        )?.map((blend) => (
                           <option value={blend.id} key={blend.id}>
-                            {blend.employeeCategory?.name}
+                            {blend?.name}
                           </option>
                         ))}
                       </select>
@@ -540,36 +531,40 @@ const TemplateItems = ({
                       <input
                         type="text"
                         value={
+                          item?.shiftFrom ||
                           shiftData?.data?.find((i) => i.id == item?.shiftId)
-                            ?.from
+                            ?.from ||
+                          ""
                         }
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "shiftFrom")
                         }
-                        className={`w-full bg-transparent text-center  focus:outline-none focus:border-transparent ${
+                        className={`w-full bg-transparent text-left pl-1  focus:outline-none focus:border-transparent ${
                           readOnly || childRecord.current > 0
                             ? "text-gray-600"
                             : "text-black"
                         }`}
-                        readOnly
+                        disabled={readOnly || childRecord.current > 0}
                       />
                     </td>
                     <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
                       <input
                         type="text"
                         value={
+                          item.shiftTo ||
                           shiftData?.data?.find((i) => i.id == item?.shiftId)
-                            ?.to
+                            ?.to ||
+                          ""
                         }
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "shiftTo")
                         }
-                        className={`w-full bg-transparent text-center  focus:outline-none focus:border-transparent ${
+                        className={`w-full bg-transparent text-left pl-1  focus:outline-none focus:border-transparent ${
                           readOnly || childRecord.current > 0
                             ? "text-gray-600"
                             : "text-black"
                         }`}
-                        readOnly
+                        disabled={readOnly || childRecord.current > 0}
                       />
                     </td>
                     {/* In Next Day */}
@@ -623,7 +618,6 @@ const TemplateItems = ({
                           setSelectedRow(item);
                           setSelectedIndex(index);
                         }}
-                       
                         title="Open"
                       >
                         <svg
@@ -648,7 +642,7 @@ const TemplateItems = ({
                         //   setThirdModal(true);
                         //   setSelectedRow(item);
                         //   setSelectedIndex(index);
-                        // }}  
+                        // }}
                         onClick={() => handleOpenQuarterModal(index)}
                         title="Open"
                       >

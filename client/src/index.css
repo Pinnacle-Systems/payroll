@@ -77,7 +77,109 @@ label {
 .Select.is-open {
   z-index: 1 !important;
 }
+/* Popup background white */
+.swal-popup-custom {
+  width: 600px !important;
+  max-width: 90% !important;
+  padding: 1.5rem !important;
+  background-color: #ffffff; /* white background */
+  color: #000000; /* default black text */
+}
 
+/* Title styling */
+.swal-title-custom {
+  font-size: 16px;
+  font-weight: bold;
+  color: #000000; /* black title text */
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+/* HTML container text */
+.swal-html-container {
+  color: #000000; /* black text */
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+/* Reason textarea inside Swal */
+.swal-reason-textarea-white {
+  width: 100%;
+  min-height: 120px;
+  max-height: 200px;
+  background-color: #ffffff; /* white background */
+  color: #000000; /* black text */
+  border: 1px solid #d1d5db; /* light gray border */
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  resize: none;
+  overflow-y: auto;
+  margin: 0.5rem 0;
+  font-size: 14px;
+  margin-left: 5px;
+}
+
+/* Buttons remain unchanged */
+.swal2-confirm-custom {
+  background-color: green !important;
+  color: #fff !important;
+  border: none !important;
+  padding: 4px 20px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.swal-cancel-btn-custom {
+  background-color: red;
+  color: #fff;
+  padding: 4px 20px;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-left: 10px;
+
+  cursor: pointer;
+}
+
+.swal-reason {
+  background-color: white;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  white-space: pre-wrap;
+  max-height: 120px;
+  overflow-y: auto;
+  margin-bottom: 1rem;
+  font-size: 14px;
+  color: black;
+  text-align: left;
+}
+.swal-p-reason {
+  background-color: white;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  white-space: pre-wrap;
+  text-align: left;
+  /* margin-bottom: 3px; */
+  font-size: 14px;
+  color: black;
+}
+.swal-text {
+  font-size: 14px;
+}
+.swal-reason-textarea {
+  width: 100%;
+  min-height: 120px; /* increase height */
+  max-height: 200px; /* max height with scroll */
+  background-color: #1f2937;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  resize: none;
+  overflow-y: auto;
+  font-size: 1rem;
+  margin: 0.5rem 0;
+}
 .Select-menu {
   position: fixed !important;
   width: 440px !important;

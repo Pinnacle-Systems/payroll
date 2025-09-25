@@ -1,6 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 import { NoRecordFound } from "../configs/Responses.js";
-import { getDateFromDateTime, getYearShortCode, getYearShortCodeForFinYear } from "../utils/helper.js";
+import {
+  getDateFromDateTime,
+  getYearShortCode,
+  getYearShortCodeForFinYear,
+} from "../utils/helper.js";
 
 import { getTableRecordWithId } from "../utils/helperQueries.js";
 import { getFinYearStartTimeEndTime } from "../utils/finYearHelper.js";
@@ -26,14 +30,13 @@ async function getNextDocId(branchId, shortCode, startTime, endTime, docId) {
   )}/EMP/RES/1`;
 
   if (lastObject) {
-    newDocId = `${branchObj.branchCode}${getYearShortCode(new Date())}/EMP/RES/${
-      parseInt(lastObject.docId.split("/").at(-1)) + 1
-    }`;
+    newDocId = `${branchObj.branchCode}${getYearShortCode(
+      new Date()
+    )}/EMP/RES/${parseInt(lastObject.docId.split("/").at(-1)) + 1}`;
   }
 
   return newDocId;
 }
-
 
 async function get(req) {
   const { companyId, active, branchId, finYearId, serachDocNo } = req.query;
@@ -66,8 +69,7 @@ async function get(req) {
         },
       },
     },
-        orderBy: { id: "desc" },
-
+    orderBy: { id: "desc" },
   });
 
   return { statusCode: 0, data, nextDocId: newDocId };
@@ -144,22 +146,36 @@ async function create(body) {
     branchId,
     shortCode,
     finYearDate?.startTime,
-    finYearDate?.endTime,
-    
+    finYearDate?.endTime
   );
-  const data = await prisma.employeeResign.create({
-    data: {
-      branchId: branchId ? parseInt(branchId) : undefined,
-      companyId: companyId ? parseInt(companyId) : undefined,
-      employeeId: employeeId ? parseInt(employeeId) : undefined,
-      docId: docId,
-      date: date ? new Date(date) : null,
-      lastWorkingDate: lastWorkingDate ? new Date(lastWorkingDate) : null,
-      joinAgain: joinAgain ? joinAgain : "",
-      leaveReason: leaveReason ? leaveReason : "",
-      remarks: remarks ? remarks : "",
-    },
+
+  let data;
+
+  await prisma.$transaction(async (tx) => {
+    data = await tx.employeeResign.create({
+      data: {
+        branchId: branchId ? parseInt(branchId) : undefined,
+        companyId: companyId ? parseInt(companyId) : undefined,
+        employeeId: employeeId ? parseInt(employeeId) : undefined,
+        docId: docId,
+        date: date ? new Date(date) : null,
+        lastWorkingDate: lastWorkingDate ? new Date(lastWorkingDate) : null,
+        joinAgain: joinAgain ? joinAgain : "",
+        leaveReason: leaveReason ? leaveReason : "",
+        remarks: remarks ? remarks : "",
+      },
+    });
+
+    await tx.employee.update({
+      where: { id: parseInt(employeeId) },
+      data: {
+        active: false,
+        lastWorkingDate: lastWorkingDate ? new Date(lastWorkingDate) : null,
+        leaveReason: leaveReason ? leaveReason : "",
+      },
+    });
   });
+
   return { statusCode: 0, data };
 }
 
@@ -180,20 +196,47 @@ async function update(id, body) {
     },
   });
   if (!dataFound) return NoRecordFound("employeeResign");
-  const data = await prisma.employeeResign.update({
-    where: {
-      id: parseInt(id),
-    },
-    data: {
-       employeeId: employeeId ? parseInt(employeeId) : undefined,
-      
-      date: date ? new Date(date) : null,
-      lastWorkingDate: lastWorkingDate ? new Date(lastWorkingDate) : null,
-      joinAgain: joinAgain ? joinAgain : "",
-      leaveReason: leaveReason ? leaveReason : "",
-      remarks: remarks ? remarks : "",
-    },
-  });
+  
+  let data;
+
+  await prisma.$transaction(async (tx) => {
+    data = await tx.employeeResign.update({
+      where:{
+        id:parseInt(id)
+      },
+      data: {
+        
+        employeeId: employeeId ? parseInt(employeeId) : undefined,
+        date: date ? new Date(date) : null,
+        lastWorkingDate: lastWorkingDate ? new Date(lastWorkingDate) : null,
+        joinAgain: joinAgain ? joinAgain : "",
+        leaveReason: leaveReason ? leaveReason : "",
+        remarks: remarks ? remarks : "",
+      },
+    }); 
+
+    await tx.employee.update({
+      where: { id: parseInt(employeeId) },
+      data: {
+        lastWorkingDate: lastWorkingDate ? new Date(lastWorkingDate) : null,
+        leaveReason: leaveReason ? leaveReason : "",
+      },
+    });
+  })
+  // const data = await prisma.employeeResign.update({
+  //   where: {
+  //     id: parseInt(id),
+  //   },
+  //   data: {
+  //     employeeId: employeeId ? parseInt(employeeId) : undefined,
+
+  //     date: date ? new Date(date) : null,
+  //     lastWorkingDate: lastWorkingDate ? new Date(lastWorkingDate) : null,
+  //     joinAgain: joinAgain ? joinAgain : "",
+  //     leaveReason: leaveReason ? leaveReason : "",
+  //     remarks: remarks ? remarks : "",
+  //   },
+  // });
   return { statusCode: 0, data };
 }
 

@@ -80,12 +80,13 @@ async function getSearch(req) {
 }
 
 async function create(body) {
-  const { name, code, gstNo, country, branchId, companyId } = await body;
+  const { name, code, gstNo, country, branchId, companyId,active } = await body;
   const data = await prisma.state.create({
     data: {
       name,
       code,
       gstNo,
+      active,
       country: {
         connect: { id: parseInt(country) },
       },

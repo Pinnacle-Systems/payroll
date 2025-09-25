@@ -1,28 +1,9 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
-import secureLocalStorage from "react-secure-storage";
-import { useGetDepartmentQuery } from "../../../redux/services/DepartmentMasterService";
-import FormHeader from "../FormHeader";
-import FormReport from "../FormReportTemplate";
-import { toast } from "react-toastify";
-import {
-  TextInput,
-  CheckBox,
-  ToggleButton,
-  ReusableTable,
-  TextAreaInput,
-} from "../../../Inputs";
-import ReportTemplate from "../ReportTemplate";
-import Mastertable from "../MasterTable/Mastertable";
-import MastersForm from "../MastersForm/MastersForm";
-import { statusDropdown } from "../../../Utils/DropdownData";
-import {
-  useAdddesignMutation,
-  useGetdesignByIdQuery,
-  useGetdesignQuery,
-  useUpdatedesignMutation,
-} from "../../../redux/uniformService/DesignMasterServices";
 
-import { useGetCompanyQuery } from "../../../redux/services/CompanyMasterService";
+import { TextInput, ToggleButton, ReusableTable } from "../../../Inputs";
+
+import { statusDropdown } from "../../../Utils/DropdownData";
+
 import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
 import {
@@ -34,7 +15,6 @@ import {
 } from "../../../redux/services/ShiftMasterService";
 import { getCommonParams } from "../../../Utils/helper";
 import Swal from "sweetalert2";
-import { useDispatch } from "react-redux";
 
 const ShiftMaster = () => {
   const [readOnly, setReadOnly] = useState(false);
@@ -51,19 +31,11 @@ const ShiftMaster = () => {
   const shiftRef = useRef(null);
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
-  const MODEL = "DESIGNATION";
-  console.log(form, "form");
-  const dispatch = useDispatch();
 
   const params = getCommonParams();
 
+  const { branchId, companyId } = params;
 
-
-  const { branchId,companyId } = params;
-
-  const { data: company } = useGetCompanyQuery({ params });
-  const [companyName, setCompanyName] = useState(company?.data[0]?.name);
-  const [companyCode, setCompanyCode] = useState(company?.data[0]?.code);
   const {
     data: allData,
     isLoading,
@@ -75,12 +47,6 @@ const ShiftMaster = () => {
     isLoading: isSingleLoading,
   } = useGetshiftMasterByIdQuery(id, { skip: !id });
 
-  // useEffect(() => {
-  //   if (company?.data?.length > 0) {
-  //     setCompanyName(company.data[0].name);
-  //     setCompanyCode(company.data[0].code);
-  //   }
-  // }, [company]);
   useEffect(() => {
     if (form && !readOnly && shiftRef.current) {
       shiftRef.current.focus();
@@ -101,9 +67,8 @@ const ShiftMaster = () => {
       setTo(data?.to || "");
       childRecord.current = data?.childRecord ? data?.childRecord : 0;
     },
-    [id, company]
+    [id]
   );
-  console.log(docId, "doc");
 
   useEffect(() => {
     syncFormWithDb(singleData?.data);
@@ -122,10 +87,30 @@ const ShiftMaster = () => {
   };
 
   const validateData = (data) => {
-    if (data?.name && data?.to && data?.from) {
-      return true;
+    if (!data?.name) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Please fill all required fields...!",
+      });
+      return false;
     }
-    return false;
+    const isDuplicate = allData?.data?.some(
+      (item) => item?.name === data?.name && item?.id !== data?.id
+    );
+
+    console.log(isDuplicate, "isDuplicate");
+
+    if (isDuplicate) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Duplicate Value Found... !",
+      });
+      return false;
+    }
+
+    return true;
   };
 
   const handleSubmitCustom = async (callback, data, text) => {
@@ -154,11 +139,6 @@ const ShiftMaster = () => {
 
   const saveData = () => {
     if (!validateData(data)) {
-      Swal.fire({
-        icon: "error",
-        title: "Submission error",
-        text: "Please fill all required fields...!",
-      });
       return;
     }
 
@@ -219,20 +199,16 @@ const ShiftMaster = () => {
     setFrom("");
     setTo("");
     setSearchValue("");
-    setCompanyName(company.data[0].name);
-    setCompanyCode(company.data[0].code);
   };
   const handleView = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(true);
-    console.log("view");
   };
   const handleEdit = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(false);
-    console.log("Edit");
   };
   const getNextDocId = useCallback(() => {
     if (id) return;
@@ -273,16 +249,12 @@ const ShiftMaster = () => {
       className: "text-gray-900 text-center uppercase w-16",
     },
   ];
-  function onDataClick(id) {
-    setId(id);
-    setForm(true);
-  }
 
   return (
     <div>
       <div onKeyDown={handleKeyDown} className="p-1">
         <div className="w-full flex bg-white p-1 justify-between  items-center">
-          <h1 className="master-header">Shift Master</h1>
+          <h1 className="master-header">Template Master</h1>
           <div className="flex items-center gap-4">
             <button
               onClick={() => {
@@ -291,7 +263,7 @@ const ShiftMaster = () => {
               }}
               className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
             >
-              + Add New Shift Template
+              + Add New Template
             </button>
           </div>
         </div>
@@ -321,7 +293,7 @@ const ShiftMaster = () => {
               <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center gap-2">
                   <h2 className=" -ml-2   py-0.5 master-header-modal">
-                    Shift Master
+                    Template Master
                   </h2>
                 </div>
                 <div className="flex gap-2">
@@ -372,7 +344,7 @@ const ShiftMaster = () => {
 
                           <div className="w-42">
                             <TextInput
-                              name="Shift Code"
+                              name="Template Code"
                               type="text"
                               value={docId}
                               // setValue={setDocId}
@@ -385,7 +357,7 @@ const ShiftMaster = () => {
                           </div>
 
                           <TextInput
-                            name="Shift Name"
+                            name="Template Name"
                             type="text"
                             value={name}
                             setValue={setName}
@@ -402,7 +374,7 @@ const ShiftMaster = () => {
                               type="text"
                               value={from}
                               setValue={setFrom}
-                              required={true}
+                              // required={true}
                               readOnly={readOnly}
                               disabled={
                                 childRecord.current > 0 ? true : undefined
@@ -415,7 +387,7 @@ const ShiftMaster = () => {
                               type="text"
                               value={to}
                               setValue={setTo}
-                              required={true}
+                              // required={true}
                               readOnly={readOnly}
                               disabled={
                                 childRecord.current > 0 ? true : undefined

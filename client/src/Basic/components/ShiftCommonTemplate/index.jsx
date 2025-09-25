@@ -5,11 +5,11 @@ import {
   ToggleButton,
   ReusableTable,
   customSelectStyles,
+  TextArea,
 } from "../../../Inputs";
 import Select from "react-select";
 import { statusDropdown } from "../../../Utils/DropdownData";
 
-import { useGetCompanyQuery } from "../../../redux/services/CompanyMasterService";
 import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
 
@@ -22,7 +22,6 @@ import {
   useUpdateShiftCommonTemplateMutation,
 } from "../../../redux/services/ShiftCommonTemplate.service";
 
-import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCategoryMasterService";
 import Swal from "sweetalert2";
 
 const ShiftCommonTemplateMaster = () => {
@@ -31,11 +30,14 @@ const ShiftCommonTemplateMaster = () => {
 
   const [docId, setDocId] = useState("");
   const [active, setActive] = useState(true);
+  const [name, setName] = useState("");
+  const [notes, setNotes] = useState("");
+
   const [errors, setErrors] = useState({});
   const [form, setForm] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
-  const [employeeCategoryId, setEmployeeCategoryId] = useState("");
+  // const [employeeCategoryId, setEmployeeCategoryId] = useState("");
   const params = getCommonParams();
 
   const { branchId, companyId } = params;
@@ -50,15 +52,6 @@ const ShiftCommonTemplateMaster = () => {
     isLoading: isSingleLoading,
   } = useGetShiftCommonTemplateByIdQuery(id, { skip: !id });
 
-  const { data: employeeCategory } = useGetEmployeeCategoryQuery({ params });
-
-  // useEffect(() => {
-  //   if (company?.data?.length > 0) {
-  //     setCompanyName(company.data[0].name);
-  //     setCompanyCode(company.data[0].code);
-  //   }
-  // }, [company]);
-
   const [addData] = useAddShiftCommonTemplateMutation();
   const [updateData] = useUpdateShiftCommonTemplateMutation();
   const [removeData] = useDeleteShiftCommonTemplateMutation();
@@ -66,8 +59,8 @@ const ShiftCommonTemplateMaster = () => {
   const syncFormWithDb = useCallback(
     (data) => {
       setDocId(data?.docId || "");
-
-      setEmployeeCategoryId(data?.employeeCategoryId || "");
+      setName(data?.name || "");
+      setNotes(data?.notes || "");
       setActive(id ? data?.active ?? false : true);
       childRecord.current = data?.childRecord ? data?.childRecord : 0;
     },
@@ -78,11 +71,10 @@ const ShiftCommonTemplateMaster = () => {
     syncFormWithDb(singleData?.data);
   }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
 
-  console.log(singleData?.data, "singleData?.data");
-
   const data = {
     docId,
-    employeeCategoryId,
+    name,
+    notes,
     active,
     companyId,
     id,
@@ -90,10 +82,30 @@ const ShiftCommonTemplateMaster = () => {
   };
 
   const validateData = (data) => {
-    if (data.employeeCategoryId) {
-      return true;
+    if (!data?.name) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Please fill all required fields...!",
+      });
+      return false;
     }
-    return false;
+    const isDuplicate = allData?.data?.some(
+      (item) => item?.name === data?.name && item?.id !== data?.id
+    );
+
+    console.log(isDuplicate, "isDuplicate");
+
+    if (isDuplicate) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Duplicate Value Found... !",
+      });
+      return false;
+    }
+
+    return true;
   };
 
   const handleSubmitCustom = async (callback, data, text) => {
@@ -122,11 +134,6 @@ const ShiftCommonTemplateMaster = () => {
 
   const saveData = () => {
     if (!validateData(data)) {
-      Swal.fire({
-        icon: "error",
-        title: "Submission error",
-        text: "Please fill all required fields...!",
-      });
       return;
     }
 
@@ -186,6 +193,8 @@ const ShiftCommonTemplateMaster = () => {
 
   const onNew = () => {
     setId("");
+    setName("");
+    setNotes("");
     setReadOnly(false);
     setForm(true);
     setActive(true);
@@ -195,13 +204,11 @@ const ShiftCommonTemplateMaster = () => {
     setId(id);
     setForm(true);
     setReadOnly(true);
-    console.log("view");
   };
   const handleEdit = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(false);
-    console.log("Edit");
   };
   const ACTIVE = (
     <div className="bg-gradient-to-r from-green-200 to-green-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-green-500 shadow-lg text-white hover:scale-110 transition-transform duration-300">
@@ -222,7 +229,7 @@ const ShiftCommonTemplateMaster = () => {
 
     {
       header: "Common Template Name",
-      accessor: (item) => item?.employeeCategory?.name,
+      accessor: (item) => item?.name,
       //   cellClass: () => "  text-gray-900",
       className: " text-gray-900 text-left pl-2 uppercase w-72",
     },
@@ -234,18 +241,16 @@ const ShiftCommonTemplateMaster = () => {
       className: " text-gray-900 text-center uppercase w-36",
     },
   ];
-  const EmployeeOptions = employeeCategory?.data?.map((val) => ({
-    value: val?.id,
-    label: val?.name,
-  }));
+  // const EmployeeOptions = employeeCategory?.data?.map((val) => ({
+  //   value: val?.id,
+  //   label: val?.name,
+  // }));
 
   return (
     <div>
       <div onKeyDown={handleKeyDown} className="p-1 ">
         <div className="w-full flex bg-white p-1 justify-between  items-center">
-          <h1 className="master-header">
-            Shift Common Template Master
-          </h1>
+          <h1 className="master-header">Shift Common Template Master</h1>
           <div className="flex items-center gap-4">
             <button
               onClick={() => {
@@ -273,12 +278,11 @@ const ShiftCommonTemplateMaster = () => {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[45%]  h-[55%]"}
+            widthClass={"w-[45%]  h-[60%]"}
             onClose={() => {
               setForm(false);
               setErrors({});
               setId("");
-              setEmployeeCategoryId("");
             }}
           >
             <div className="h-full flex flex-col bg-gray-100">
@@ -326,7 +330,7 @@ const ShiftCommonTemplateMaster = () => {
                         <div className="flex gap-x-6">
                           <div className="w-42">
                             <TextInput
-                              name="Shift Common Template Code"
+                              name="Common Template Code"
                               type="text"
                               value={docId}
                               // setValue={setDocId}
@@ -338,7 +342,7 @@ const ShiftCommonTemplateMaster = () => {
                             />
                           </div>
 
-                          <div className="w-52">
+                          {/* <div className="w-52">
                             <label className="block text-xs font-semibold text-slate-700 mb-1">
                               Employee Category
                               <span className="text-red-500">*</span>
@@ -365,9 +369,33 @@ const ShiftCommonTemplateMaster = () => {
           transition-all duration-150 shadow-sm"
                               styles={customSelectStyles}
                             />
+                          </div> */}
+
+                          <div className="w-52">
+                            <TextInput
+                              name="Common Template Name"
+                              type="text"
+                              value={name}
+                              setValue={setName}
+                              required={true}
+                              readOnly={readOnly}
+                              disabled={
+                                childRecord.current > 0 ? true : undefined
+                              }
+                            />
                           </div>
                         </div>
-
+                        <div className="w-72 ">
+                          <TextArea
+                            name="Template Description"
+                            type="text"
+                            value={notes}
+                            setValue={setNotes}
+                            // required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                          />
+                        </div>
                         <div className="mt-5">
                           <ToggleButton
                             name="Status"

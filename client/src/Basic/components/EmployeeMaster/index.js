@@ -62,6 +62,8 @@ import { useGetEmpQuery } from "../../../redux/services/preEmployee";
 export default function Form() {
   const [view, setView] = useState("table");
   const [form, setForm] = useState(false);
+  const stateNameRef = useRef(null);
+
   const [cameraOpen, setCameraOpen] = useState(false);
   const [openTable, setOpenTable] = useState(false);
   const [readOnly, setReadOnly] = useState(false);
@@ -138,7 +140,8 @@ export default function Form() {
   const [aadharMatch, setAadharMatch] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selectedEmployeeIndex, setSelectedEmployeeIndex] = useState(null);
-const [cannotRejoin, setCannotRejoin] = useState(false);
+
+  const [cannotRejoin, setCannotRejoin] = useState(false);
   const [presentAddress, setPresentAddress] = useState({
     address: "",
     cityId: "",
@@ -193,7 +196,7 @@ const [cannotRejoin, setCannotRejoin] = useState(false);
     const cleanedValue = value.replace(/\D/g, "").slice(0, 10);
     setMobileNumber(cleanedValue);
 
-    if (cleanedValue.length >= 3) {
+    if (cleanedValue.length >= 9) {
       // start showing dropdown after 3 digits
       const matches = preEmployee?.data?.filter((emp) =>
         emp.mobileNumber?.toString().includes(cleanedValue)
@@ -205,11 +208,14 @@ const [cannotRejoin, setCannotRejoin] = useState(false);
       setShowDropdown(false);
     }
   };
-
+  useEffect(() => {
+    if (form && !readOnly && stateNameRef.current) {
+      stateNameRef.current.focus();
+    }
+  }, [form, readOnly]);
   const handleAadharChange = (value) => {
     // Keep only digits, max 12
     const cleanedValue = value?.slice(0, 12);
-    console.log(cleanedValue, "cleanedValue");
 
     setAadharNo(cleanedValue);
 
@@ -218,24 +224,76 @@ const [cannotRejoin, setCannotRejoin] = useState(false);
         val?.Employee?.aadharNo.startsWith(cleanedValue)
       );
 
+      console.log(matches, "matches");
+
       setAadharMatch(matches || []);
       if (matches && matches.length > 0) {
-        
         const rejectedEmployee = ResignedEmployee?.data?.find(
           (emp) =>
             emp?.Employee?.aadharNo?.startsWith(cleanedValue) &&
             emp?.joinAgain?.toLowerCase() === "no"
         );
+        console.log(rejectedEmployee, "rejectedEmployee");
 
         if (rejectedEmployee) {
-          alert(
-            "⚠️ This employee has already resigned and is not allowed to rejoin."
-          );
-          // Disable all inputs
-          setReadOnly(true);
-          setCannotRejoin(true); 
+          const lastWorkingDate = rejectedEmployee.lastWorkingDate
+            ? new Date(rejectedEmployee.lastWorkingDate)
+                .toISOString()
+                .slice(0, 10)
+            : "Not available";
+          Swal.fire({
+          
+            html: `
+              <h2 class="swal-title-custom">⚠️ Employee Restricted</h2>
+      <p class="swal-reason">This employee has already worked and resigned. Not allowed to rejoin.</p>
+            <p class="swal-reason"><b>Last Working Date:</b> ${lastWorkingDate}</p>
+            <p class="swal-p-reason">Reason for Leaving : </p>
+         <textarea class="swal-reason-textarea-white" readonly>${
+      rejectedEmployee?.leaveReason || "No reason specified"
+    }</textarea>
+
+       <p class="swal-text">Do you still want to allow this employee to join?</p>
+    `,
+            showCancelButton: true,
+            confirmButtonText: "Yes, allow",
+            cancelButtonText: "No, cancel",
+            customClass: {
+               popup: "swal-popup-custom",
+    title: "swal-title-custom",
+    htmlContainer: "swal-html-container",
+    confirmButton: "swal2-confirm-custom",
+    cancelButton: "swal-cancel-btn-custom",
+    icon: "swal-icon-custom"
+            },
+            buttonsStyling: false,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // User chose to allow the employee to join
+              setReadOnly(false);
+              setCannotRejoin(false);
+            } else {
+              // User chose not to allow
+              setReadOnly(true);
+              setCannotRejoin(true);
+            }
+          });
         } else {
-          alert("⚠️ This employee has already resigned.");
+          Swal.fire({
+            
+            html: `
+      <p class="swal-reason">This employee already worked and resigned.</p>
+       <p class="swal-p-reason">Reason for Leaving : </p>
+      <textarea class="swal-reason-textarea-white" readonly>${matches[0]?.leaveReason || "No reason specified"}</textarea>
+<p class="swal-reason"><b>Last Working Date: </b>${matches[0]?.date?.split("T")[0] || ""}</p>
+
+    `,
+            confirmButtonText: "OK",
+            customClass: {
+              confirmButton: "swal2-confirm-custom",
+            },
+            buttonsStyling: false,
+          });
+
           setReadOnly(false);
           setCannotRejoin(false);
         }
@@ -291,6 +349,7 @@ const [cannotRejoin, setCannotRejoin] = useState(false);
       setHeight(data?.height || "");
       setWeight(data?.weight || "");
       setBloodGroupId(data?.bloodGroupId);
+      setActive(id ? data?.active ?? false : true);
 
       // IDs & Numbers
       setPanNo(data?.panNo || "");
@@ -442,7 +501,7 @@ const [cannotRejoin, setCannotRejoin] = useState(false);
     esi,
     salary,
     salaryMethod,
-
+    active,
     religion,
     aadharNo,
     panNo,
@@ -763,7 +822,7 @@ const [cannotRejoin, setCannotRejoin] = useState(false);
   const onNew = () => {
     setId("");
     setReadOnly(false);
-    setCannotRejoin(false)
+    setCannotRejoin(false);
     setForm(true);
     setStep("Basic Details");
     // Basic Info
@@ -786,6 +845,7 @@ const [cannotRejoin, setCannotRejoin] = useState(false);
     setRegNo("");
     setBloodGroupId("");
     setImage(null);
+    setActive(true);
     // Employment Info
     setShiftTemplateId("");
     setEmployeeSubCategoryId("");
@@ -1287,12 +1347,12 @@ const [cannotRejoin, setCannotRejoin] = useState(false);
                     {readOnly && (
                       <button
                         type="button"
-                          onClick={() => {
-      if (!cannotRejoin) setReadOnly(false); // only allow edit if rejoin is allowed
-    }}
-                           className={`px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded ${
-      cannotRejoin ? "opacity-50 cursor-not-allowed" : ""
-    }`}
+                        onClick={() => {
+                          if (!cannotRejoin) setReadOnly(false); // only allow edit if rejoin is allowed
+                        }}
+                        className={`px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded ${
+                          cannotRejoin ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
                       >
                         Edit
                       </button>
@@ -1380,9 +1440,8 @@ const [cannotRejoin, setCannotRejoin] = useState(false);
                         />
 
                         <div className="ml-3 flex flex-wrap gap-4 ">
-                          <div className="w-[140px]">
+                          <div className="w-[140px] ">
                             <TextInput
-                              ref={input1Ref}
                               name="Mobile Number"
                               value={mobileNumber}
                               type="number"
@@ -1391,6 +1450,7 @@ const [cannotRejoin, setCannotRejoin] = useState(false);
                               readOnly={readOnly}
                               disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                              ref={stateNameRef}
                             />
                             {showDropdown && (
                               <div
@@ -1643,6 +1703,19 @@ const [cannotRejoin, setCannotRejoin] = useState(false);
                               readOnly={readOnly}
                               disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+                          <div className="ml-5">
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              Status
+                            </label>
+                            <ToggleButton
+                              name="Status"
+                              options={statusDropdown}
+                              value={active}
+                              setActive={setActive}
+                              required={true}
+                              readOnly={readOnly}
                             />
                           </div>
                           <Modal

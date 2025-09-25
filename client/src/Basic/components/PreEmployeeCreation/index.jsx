@@ -214,7 +214,7 @@ const EmployeeForm = () => {
       : [];
 
   const handlePhoneSearch = (value) => {
-    const cleanedValue = value.replace(/\D/g, "").slice(0, 10);
+    const cleanedValue = value.slice(0, 10);
     setSearchPhone(cleanedValue);
     if (cleanedValue.length !== 10) {
       setEmployeeId("");

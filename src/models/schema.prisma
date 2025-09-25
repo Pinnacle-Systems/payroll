@@ -426,7 +426,6 @@ model EmployeeCategory {
   active              Boolean               @default(true)
   defaultCategory     Boolean               @default(false)
   Employee            Employee[]
-  ShiftCommonTemplate ShiftCommonTemplate[]
   EmployeSubCategory  EmployeSubCategory[]
   CompanyPayStructure CompanyPayStructure[]
   createdBy           User?                 @relation("createdBy", fields: [createdById], references: [id])
@@ -1381,10 +1380,10 @@ model ShiftCommonTemplate {
   company             Company?             @relation(fields: [companyId], references: [id])
   branch              Branch?              @relation(fields: [branchId], references: [id])
   branchId            Int?
-  employeeCategory    EmployeeCategory     @relation(fields: [employeeCategoryId], references: [id])
-  employeeCategoryId  Int
   docId               String?
   active              Boolean?             @default(true)
+  name                String?
+  notes               String?
   shiftCommonTemplate ShiftTemplateItems[]
 }
 
@@ -1424,6 +1423,8 @@ model ShiftTemplateItems {
   templateId              Int
   shift                   Shift               @relation(fields: [shiftId], references: [id])
   shiftId                 Int
+  shiftFrom               String?
+  shiftTo                 String?
   inNextDay               String?
   toleranceInBeforeStart  String?
   startTime               String?

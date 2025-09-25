@@ -128,7 +128,6 @@ async function getEmployeeId(branchId, startTime, endTime) {
     }`;
   }
 
-
   return newDocId;
 }
 
@@ -189,7 +188,7 @@ async function getOne(id) {
       id: parseInt(id),
     },
     include: {
-      department: {select: {id: true,name: true,},},
+      department: { select: { id: true, name: true } },
       EmployeeCategory: true,
       shiftTemplate: { select: { name: true } }, // optional
       designation: { select: { name: true } }, // optional
@@ -210,13 +209,10 @@ async function getOne(id) {
     statusCode: 0,
     data: {
       ...exclude({ ...data }, ["image"]),
-      childRecord, 
+      childRecord,
     },
   };
 }
-
-
-
 
 async function getSearch(req) {
   const searchKey = req.params.searchKey;
@@ -280,7 +276,7 @@ async function create(req) {
     disability,
     identificationMark,
     dob,
-
+    active,
     height,
     weight,
     maritalStatus,
@@ -306,7 +302,7 @@ async function create(req) {
     pfNo,
     uanNo,
     email,
-mobileNumber,
+    mobileNumber,
     presentAddress,
     permanentAddress,
     bankDetails,
@@ -330,7 +326,7 @@ mobileNumber,
       disability: disability ? disability : "",
       identificationMark: identificationMark ? identificationMark : "",
       dob: dob ? new Date(dob) : null,
-       mobileNumber : mobileNumber ? mobileNumber : '',
+      mobileNumber: mobileNumber ? mobileNumber : "",
       height: height ? height : "",
       weight: weight ? weight : "",
       maritalStatus: maritalStatus ? maritalStatus : "",
@@ -339,6 +335,7 @@ mobileNumber,
       idNumber: idNumber ? idNumber : "",
       pf: pf ? pf : "",
       esi: esi ? esi : "",
+      active: active === "true" ? true : false,
       salary: salary ? salary : "",
       salaryMethod: salaryMethod ? salaryMethod : "",
       religion: religion ? religion : "",
@@ -449,7 +446,9 @@ mobileNumber,
                 name: f.name ? f.name : "",
                 dob: f.dob ? new Date(f.dob) : null,
                 age: f.age ? parseInt(f.age) : null,
-                relationShipId : f.relationShipId ? parseInt(f.relationShipId) : undefined,
+                relationShipId: f.relationShipId
+                  ? parseInt(f.relationShipId)
+                  : undefined,
                 occupation: f.occupation ? f.occupation : "",
                 nominee: f.nominee ? f.nominee : "",
               })),
@@ -479,7 +478,7 @@ async function update(id, req) {
     weight,
     maritalStatus,
     bloodGroupId,
-
+    active,
     joiningDate,
     departmentId,
     employeeCategoryId,
@@ -535,7 +534,7 @@ async function update(id, req) {
       disability: disability ? disability : "",
       identificationMark: identificationMark ? identificationMark : "",
       dob: dob ? new Date(dob) : null,
-       mobileNumber : mobileNumber ? mobileNumber : '',
+      mobileNumber: mobileNumber ? mobileNumber : "",
       height: height ? height : "",
       weight: weight ? weight : "",
       maritalStatus: maritalStatus ? maritalStatus : "",
@@ -553,6 +552,7 @@ async function update(id, req) {
       pfNo: pfNo ? pfNo : "",
       email: email ? email : "",
       uanNo: uanNo ? uanNo : "",
+      active: active === "true" ? true : false,
       image: image ? image.buffer : removeImage ? null : undefined,
       BloodGroup: bloodGroupId
         ? { connect: { id: parseInt(bloodGroupId) } }
@@ -658,7 +658,9 @@ async function update(id, req) {
                 dob: f.dob ? new Date(f.dob) : null,
                 age: f.age ? parseInt(f.age) || null : null,
                 // relationShip: f.relationShip || "",
-                relationShipId : f.relationShipId ? parseInt(f.relationShipId) : undefined,
+                relationShipId: f.relationShipId
+                  ? parseInt(f.relationShipId)
+                  : undefined,
                 occupation: f.occupation || "",
                 nominee: f.nominee || "",
               })),

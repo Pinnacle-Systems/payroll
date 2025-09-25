@@ -16,6 +16,7 @@ import Swal from "sweetalert2";
 import { useDispatch } from "react-redux";
 
 const ShiftTemplateMaster = () => {
+  const today = Date()
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
 
@@ -90,7 +91,6 @@ const ShiftTemplateMaster = () => {
       return [...prev, ...newArray];
     });
   }, [setShiftTemplateItems, ShiftTemplateItems]);
-  console.log(ShiftTemplateItems, "ShiftTemplateItems");
 
   const syncFormWithDb = useCallback(
     (data) => {
@@ -108,13 +108,11 @@ const ShiftTemplateMaster = () => {
         quarterDetails:
           val?.QuarterDetails?.map((qd) => ({
             ...qd,
-            // example: convert empty string to null, format times, etc.
             from: qd?.from || "",
             to: qd?.to || "",
           })) || [],
       }));
 
-      console.log(mappedGrid, "mappedGrid ");
 
       setShiftTemplateItems(mappedGrid ? mappedGrid : []);
       setCategoryId(data?.category ? data?.category : "");
@@ -140,17 +138,8 @@ const ShiftTemplateMaster = () => {
     categoryId,
   };
 
-  // const validateData = (data) => {
-  //     if (!data?.categoryId) {
-  //         toast.error("Category is required...!");
-  //         return false;
-  //     }
-
-  //     return true;
-  // };
-  useEffect(() => {
-    console.log("allData", allData);
-  }, [allData]);
+ 
+ 
 
   const handleSubmitCustom = async (callback, data, text) => {
     try {
@@ -201,7 +190,6 @@ const ShiftTemplateMaster = () => {
       return false;
     }
     if (ShiftTemplateItems.length === 0) {
-      // toast.info("ShiftTemplateItems  should have atleast One Item...!!!");
       Swal.fire({
         icon: "error",
         title: "Submission error",
@@ -230,12 +218,7 @@ const ShiftTemplateMaster = () => {
   };
 
   const saveData = () => {
-    // if (!validateData(data)) {
-    //     toast.error("Please fill all required fields...!", {
-    //         position: "top-center",
-    //     });
-    //     return;
-    // }
+   
     if (!validateData(data)) {
       return;
     }
@@ -302,7 +285,6 @@ const ShiftTemplateMaster = () => {
     }
   };
 
-  console.log(allData, "alldata");
 
   const getNextDocId = useCallback(() => {
     if (id) return;
@@ -312,14 +294,11 @@ const ShiftTemplateMaster = () => {
   }, [allData, id]);
 
   useEffect(getNextDocId, [getNextDocId]);
-  console.log(allData, "alldata");
   const onNew = () => {
-    console.log("Hitr");
     setId("");
 
     setReadOnly(false);
     setSearchValue("");
-    // setCompanyCode(company?.data[0]?.code);
     setShiftTemplateItems([]);
     setCategoryId("");
     refetch();
@@ -328,13 +307,13 @@ const ShiftTemplateMaster = () => {
     setId(id);
     setForm(true);
     setReadOnly(true);
-    console.log("view");
+  
   };
   const handleEdit = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(false);
-    console.log("Edit");
+    
   };
 
   const columns = [
@@ -389,6 +368,7 @@ const ShiftTemplateMaster = () => {
             }}
             onNew={onNew}
             refetch={refetch}
+            today={today}
           />
         ) : (
           <>

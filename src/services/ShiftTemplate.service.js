@@ -32,7 +32,6 @@ async function getNextDocId(
   if (lastObject) {
     newDocId = `${code}/${parseInt(lastObject?.docId?.split("/").at(-1)) + 1}`;
   }
-  console.log(newDocId, "newDocId");
 
   return newDocId;
 }
@@ -40,7 +39,6 @@ async function getNextDocId(
 async function get(req) {
   const { companyId, active, branchId, finYearId, searchDocId } = req.query;
 
-  console.log(companyId, finYearId, "received--");
 
   const data = await prisma.shiftTemplate.findMany({
     where: {
@@ -62,7 +60,6 @@ async function get(req) {
     orderBy: { id: "desc" },
   });
 
-  console.log(data, "datasending");
   let finYearDate = await getFinYearStartTimeEndTime(finYearId);
   const shortCode = finYearDate
     ? getYearShortCodeForFinYear(
@@ -333,6 +330,9 @@ async function updateShiftTemplateItems(tx, ShiftTemplateItems, data) {
           shiftTemplateId: data?.id ? data?.id : undefined,
           templateId: item?.templateId ? parseInt(item.templateId) : undefined,
           shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
+          shiftFrom: item?.shiftFrom ? item?.shiftFrom : "",
+          shiftTo: item?.shiftTo ? item?.shiftTo : "",
+
           inNextDay: item?.inNextDay ? item.inNextDay : undefined,
           toleranceInBeforeStart: item?.toleranceInBeforeStart
             ? item.toleranceInBeforeStart
@@ -400,6 +400,8 @@ async function update(id, body) {
                     ? parseInt(item.templateId)
                     : undefined,
                   shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
+                  shiftFrom: item?.shiftFrom ? item?.shiftFrom : "",
+                  shiftTo: item?.shiftTo ? item?.shiftTo : "",
                   inNextDay: item?.inNextDay ? item.inNextDay : undefined,
                   toleranceInBeforeStart: item?.toleranceInBeforeStart
                     ? item.toleranceInBeforeStart

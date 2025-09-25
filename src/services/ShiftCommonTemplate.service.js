@@ -15,16 +15,7 @@ async function getNextDocId(
   endTime,
   isTaxBill
 ) {
-  console.log(
-    "argumnts : ",
-    branchId,
-    shortCode,
-    startTime,
-    endTime,
-    isTaxBill
-  );
-
-  let lastObject = await prisma.ShiftCommonTemplate.findFirst({
+  let lastObject = await prisma.shiftCommonTemplate.findFirst({
     where: {
       branchId: parseInt(branchId),
     },
@@ -42,17 +33,16 @@ async function getNextDocId(
   // let newDocId = `${branchObj.branchCode}/${shortCode}/${code}/1`;
   let newDocId = `${branchObj.branchCode}/${code}/1`;
   if (lastObject) {
-    newDocId = `${branchObj.branchCode}/${code}/${parseInt(lastObject.docId.split("/").at(-1)) + 1}`;
+    newDocId = `${branchObj.branchCode}/${code}/${
+      parseInt(lastObject.docId.split("/").at(-1)) + 1
+    }`;
   }
-console.log(newDocId ,"newDocId");
 
   return newDocId;
 }
 
 async function get(req) {
   const { companyId, active, branchId, finYearId, searchDocId } = req.query;
-
-  console.log(companyId, active, finYearId, "received");
 
   const data = await prisma.shiftCommonTemplate.findMany({
     where: {
@@ -64,18 +54,9 @@ async function get(req) {
           }
         : undefined,
     },
-    include: {
-      employeeCategory: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-    },
+   
   });
   let finYearDate = await getFinYearStartTimeEndTime(finYearId);
-
-  console.log(finYearDate, "finyear--");
 
   const shortCode = finYearDate
     ? getYearShortCodeForFinYear(
@@ -97,19 +78,14 @@ async function get(req) {
 }
 
 async function getOne(id) {
-  const childRecord = await prisma.shiftTemplateItems.count({ where: { templateId: parseInt(id) } });
+  const childRecord = await prisma.shiftTemplateItems.count({
+    where: { templateId: parseInt(id) },
+  });
   const data = await prisma.shiftCommonTemplate.findUnique({
     where: {
       id: parseInt(id),
     },
-    include: {
-      employeeCategory: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-    },
+   
   });
   if (!data) return NoRecordFound("ShiftCommonTemplate");
   return { statusCode: 0, data: { ...data, ...{ childRecord } } };
@@ -140,21 +116,22 @@ async function getSearch(req) {
 }
 
 async function create(body) {
-  const { branchId, companyId, active, docId, employeeCategoryId } = await body;
+  const { branchId, companyId, active, docId, name, notes } = await body;
   const data = await prisma.shiftCommonTemplate.create({
     data: {
       companyId: parseInt(companyId),
       active,
       branchId: parseInt(branchId),
-      employeeCategoryId: parseInt(employeeCategoryId),
       docId,
+      name,
+      notes,
     },
   });
   return { statusCode: 0, data };
 }
 
 async function update(id, body) {
-  const { branchId, companyId, active, docId, employeeCategoryId } = await body;
+  const { active, name, notes } = await body;
   const dataFound = await prisma.shiftCommonTemplate.findUnique({
     where: {
       id: parseInt(id),
@@ -167,10 +144,9 @@ async function update(id, body) {
     },
     data: {
       active,
-      companyId: parseInt(companyId),
-      branchId: parseInt(branchId),
-      employeeCategoryId: parseInt(employeeCategoryId),
-      docId,
+
+      name,
+      notes,
     },
   });
   return { statusCode: 0, data };
