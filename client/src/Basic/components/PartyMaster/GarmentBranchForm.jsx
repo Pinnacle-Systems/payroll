@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { XMarkIcon, MapPinIcon, BuildingStorefrontIcon, PhoneIcon, EnvelopeIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
+// import { XMarkIcon, MapPinIcon, BuildingStorefrontIcon, PhoneIcon, EnvelopeIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
 
 const GarmentBranchForm = ({ onClose }) => {
     const [formData, setFormData] = useState({
@@ -34,7 +34,7 @@ const GarmentBranchForm = ({ onClose }) => {
                 <div className="flex justify-between bg-white items-center my-2 rounded-md mx-3 px-4 py-1">
                     <h3 className="text-gray-800 font-semibold text-sm">Add New Branch</h3>
                     <button onClick={onClose} className="text-white hover:text-indigo-200">
-                        <XMarkIcon className="h-5 w-5" />
+                        {/* <XMarkIcon className="h-5 w-5" /> */}
                     </button>
                 </div>
 
@@ -42,7 +42,7 @@ const GarmentBranchForm = ({ onClose }) => {
                     <div className="space-y-2">
                         <label className="block text-xs font-medium text-gray-700">Branch Name*</label>
                         <div className="relative">
-                            <BuildingStorefrontIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            {/* <BuildingStorefrontIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" /> */}
                             <input
                                 type="text"
                                 name="branchName"
@@ -58,7 +58,7 @@ const GarmentBranchForm = ({ onClose }) => {
                     <div className="space-y-2">
                         <label className="block text-xs font-medium text-gray-700">Full Address*</label>
                         <div className="relative">
-                            <MapPinIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            {/* <MapPinIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" /> */}
                             <textarea
                                 name="address"
                                 value={formData.address}
@@ -75,7 +75,7 @@ const GarmentBranchForm = ({ onClose }) => {
                         <div className="space-y-2">
                             <label className="block text-xs font-medium text-gray-700">Contact Number*</label>
                             <div className="relative">
-                                <PhoneIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                {/* <PhoneIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" /> */}
                                 <input
                                     type="tel"
                                     name="contactNumber"
@@ -91,7 +91,7 @@ const GarmentBranchForm = ({ onClose }) => {
                         <div className="space-y-2">
                             <label className="block text-xs font-medium text-gray-700">Email</label>
                             <div className="relative">
-                                <EnvelopeIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                {/* <EnvelopeIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" /> */}
                                 <input
                                     type="email"
                                     name="email"
@@ -108,7 +108,7 @@ const GarmentBranchForm = ({ onClose }) => {
                         <div className="space-y-2">
                             <label className="block text-xs font-medium text-gray-700">Website</label>
                             <div className="relative">
-                                <GlobeAltIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                                {/* <GlobeAltIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" /> */}
                                 <input
                                     type="url"
                                     name="website"

@@ -121,18 +121,22 @@ label {
 
 /* Buttons remain unchanged */
 .swal2-confirm-custom {
-  background-color: green !important;
-  color: #fff !important;
-  border: none !important;
+  border: 1px solid green;
+  color: green !important;
+  outline: none;
   padding: 4px 20px;
   border-radius: 5px;
   font-size: 14px;
   cursor: pointer;
 }
-
+.swal2-confirm-custom:hover {
+  background-color: green;
+  color: white !important;
+}
 .swal-cancel-btn-custom {
-  background-color: red;
-  color: #fff;
+  border: 1px solid red;
+
+  color: red;
   padding: 4px 20px;
   border-radius: 5px;
   font-size: 14px;
@@ -140,7 +144,10 @@ label {
 
   cursor: pointer;
 }
-
+.swal-cancel-btn-custom:hover {
+  background-color: red;
+  color: white !important;
+}
 .swal-reason {
   background-color: white;
   padding: 0.5rem;
@@ -148,7 +155,7 @@ label {
   white-space: pre-wrap;
   max-height: 120px;
   overflow-y: auto;
-  margin-bottom: 1rem;
+  /* margin-bottom: 6px; */
   font-size: 14px;
   color: black;
   text-align: left;

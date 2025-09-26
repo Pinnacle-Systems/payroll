@@ -196,33 +196,32 @@ async function update(id, body) {
     },
   });
   if (!dataFound) return NoRecordFound("employeeResign");
-  
+
   let data;
 
   await prisma.$transaction(async (tx) => {
     data = await tx.employeeResign.update({
-      where:{
-        id:parseInt(id)
+      where: {
+        id: parseInt(id),
       },
       data: {
-        
-        employeeId: employeeId ? parseInt(employeeId) : undefined,
+        // employeeId: employeeId ? parseInt(employeeId) : undefined,
         date: date ? new Date(date) : null,
-        lastWorkingDate: lastWorkingDate ? new Date(lastWorkingDate) : null,
-        joinAgain: joinAgain ? joinAgain : "",
-        leaveReason: leaveReason ? leaveReason : "",
-        remarks: remarks ? remarks : "",
-      },
-    }); 
-
-    await tx.employee.update({
-      where: { id: parseInt(employeeId) },
-      data: {
-        lastWorkingDate: lastWorkingDate ? new Date(lastWorkingDate) : null,
-        leaveReason: leaveReason ? leaveReason : "",
+        // lastWorkingDate: lastWorkingDate ? new Date(lastWorkingDate) : null,
+        // joinAgain: joinAgain ? joinAgain : "",
+        // leaveReason: leaveReason ? leaveReason : "",
+        // remarks: remarks ? remarks : "",
       },
     });
-  })
+
+    // await tx.employee.update({
+    //   where: { id: parseInt(employeeId) },
+    //   data: {
+    //     lastWorkingDate: lastWorkingDate ? new Date(lastWorkingDate) : null,
+    //     leaveReason: leaveReason ? leaveReason : "",
+    //   },
+    // });
+  });
   // const data = await prisma.employeeResign.update({
   //   where: {
   //     id: parseInt(id),
@@ -240,7 +239,29 @@ async function update(id, body) {
   return { statusCode: 0, data };
 }
 
+const afterDelete = async (id) => {
+  await prisma.$transaction(async (tx) => {
+    const empData = await tx.employeeResign.findUnique({
+      where: { id: parseInt(id) },
+      select: { employeeId: true },
+    });
+
+    if (!empData) {
+      throw new Error("Employee not found");
+    }
+    await tx.employee.update({
+      where: { id: empData.employeeId },
+      data: {
+        active: true,
+        lastWorkingDate: null,
+        leaveReason: "",
+      },
+    });
+  });
+};
+
 async function remove(id) {
+  await afterDelete(id);
   const data = await prisma.employeeResign.delete({
     where: {
       id: parseInt(id),

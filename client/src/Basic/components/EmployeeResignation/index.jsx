@@ -17,7 +17,7 @@ import {
 } from "../../../redux/services/EmployeeResignService";
 
 import Swal from "sweetalert2";
-import { getCommonParams } from "../../../Utils/helper";
+import { findFromList, getCommonParams } from "../../../Utils/helper";
 
 import { useGetEmployeeQuery } from "../../../redux/services/EmployeeMasterService";
 import Select from "react-select";
@@ -38,10 +38,8 @@ const Form = () => {
   const [leaveReason, setLeaveReason] = useState("");
   const [remarks, setRemarks] = useState("");
   const [joinAgain, setJoinAgain] = useState("");
-  const [designation, setDesignation] = useState(""); 
+  const [designation, setDesignation] = useState("");
   const [docId, setDocId] = useState("New");
-  console.log(docId, "docId");
-
   const [date, setDate] = useState(moment.utc(today).format("YYYY-MM-DD"));
 
   const [department, setDepartment] = useState("");
@@ -59,7 +57,7 @@ const Form = () => {
     }
   }, [form, readOnly]);
 
-  const { branchId, companyId,finYearId } = params;
+  const { branchId, companyId, finYearId } = params;
   const designationRef = useRef(null);
 
   const { data: allData } = useGetEmployeeResignQuery({
@@ -83,7 +81,7 @@ const Form = () => {
     (data) => {
       setEmployeeId(data?.employeeId);
       setEmployeeName(data?.Employee?.firstName);
-      setDocId(data?.docId || 'New');
+      setDocId(data?.docId || "New");
       setDate(
         data?.date ? new Date(data?.date).toISOString().split("T")[0] : null
       );
@@ -295,9 +293,9 @@ const Form = () => {
       className: " text-gray-900 text-left pl-2 uppercase w-48",
     },
   ];
-  console.log(employee?.data, "employee?.data?");
+  console.log(employee?.data, "employee");
 
-  const EmployeeOptions = employee?.data?.map((val) => ({
+  const AllEmployeeOptions = employee?.data?.map((val) => ({
     value: val?.id,
     label: val?.idNumber,
     firstName: val?.firstName,
@@ -307,6 +305,20 @@ const Form = () => {
     aadharNo: val?.aadharNo,
     mobileNumber: val?.mobileNumber,
   }));
+
+  const EmployeeOptions =
+    employee?.data
+      ?.filter((item) => item?.active === true)
+      ?.map((val) => ({
+        value: val?.id,
+        label: val?.idNumber,
+        firstName: val?.firstName,
+        joiningDate: val?.joiningDate,
+        designation: val?.designation,
+        department: val?.department,
+        aadharNo: val?.aadharNo,
+        mobileNumber: val?.mobileNumber,
+      })) || [];
 
   return (
     <div>
@@ -381,15 +393,17 @@ const Form = () => {
                           inputClass={"pt-1"}
                         />
                       </div>
-                      <div className="mb-3 w-40 ">
-                        <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      {id ? (
+                        <>
+                          <div className="mb-3 w-40 ">
+                            {/* <label className="block text-xs font-semibold text-slate-700 mb-1">
                           ID Number
                           <span className="text-red-500">*</span>
                         </label>
                         <Select
-                          options={EmployeeOptions}
+                          options={AllEmployeeOptions}
                           value={
-                            EmployeeOptions?.find(
+                            AllEmployeeOptions?.find(
                               (opt) => opt?.value === employeeId
                             ) || null
                           }
@@ -415,8 +429,64 @@ const Form = () => {
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
                           styles={customSelectStyles}
-                        />
-                      </div>
+                        /> */}
+                            <TextInput
+                          
+                              value={findFromList(
+                                singleData?.data?.employeeId,
+                                employee?.data,
+                                "idNumber"
+                              )}
+                              type="text"
+                              name="ID Number"
+                                                        readOnly={readOnly}
+
+                            />
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="mb-3 w-40 ">
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              ID Number
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <Select
+                              options={EmployeeOptions}
+                              value={
+                                EmployeeOptions?.find(
+                                  (opt) => opt?.value === employeeId
+                                ) || null
+                              }
+                              onChange={(selected) => {
+                                setEmployeeId(selected?.value || "");
+                                setEmployeeName(selected?.firstName || "");
+                                setJoinedDate(
+                                  selected?.joiningDate?.slice(0, 10) || ""
+                                );
+                                setDesignation(
+                                  selected?.designation?.name || ""
+                                );
+                                setDepartment(selected?.department?.name);
+                                setAdadharNo(selected?.aadharNo || "");
+                                setMobileNumber(selected?.mobileNumber || "");
+                              }}
+                              placeholder="Select Id Number"
+                              isClearable={false} // same as required
+                              isDisabled={readOnly || childRecord.current > 0}
+                              isSearchable
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className="w-full px-1 -ml-1 text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                              styles={customSelectStyles}
+                            />
+                          </div>
+                        </>
+                      )}
+
                       <TextInput
                         name="Employee Name"
                         type="text"
@@ -466,15 +536,16 @@ const Form = () => {
                         />
                       </div>
                       <div className="w-52">
-                      <TextInput
-                        name="Designation"
-                        type="text"
-                        value={designation}
-                        // setValue={setDesignation}
-                        // required={true}
-                        readOnly={readOnly}
-                        disabled={childRecord.current > 0}
-                      /></div>
+                        <TextInput
+                          name="Designation"
+                          type="text"
+                          value={designation}
+                          // setValue={setDesignation}
+                          // required={true}
+                          readOnly={readOnly}
+                          disabled={childRecord.current > 0}
+                        />
+                      </div>
                       <div className="w-28">
                         <DateInput
                           name="Last Working Day"
@@ -482,7 +553,7 @@ const Form = () => {
                           value={lastWorkingDate}
                           setValue={setLastWorkingDate}
                           required={true}
-                          readOnly={readOnly}
+                          readOnly={readOnly || id}
                           disabled={childRecord.current > 0}
                           inputClass={"pt-1"}
                         />
@@ -493,12 +564,12 @@ const Form = () => {
                           <span className="text-red-500">*</span>
                         </label>
                         <select
-                          disabled={readOnly || childRecord.current > 0}
+                          disabled={readOnly || childRecord.current > 0 || id}
                           className={`w-[100px] px-1 py-0.5 text-xs text-[12px] h-[30px] border border-gray-300 rounded-lg
     focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
     transition-all duration-150 shadow-sm
     ${
-      readOnly || childRecord.current > 0
+      readOnly || childRecord.current > 0 || id
         ? "bg-gray-100 text-gray-500 cursor-not-allowed"
         : "bg-white text-gray-900 hover:border-gray-400"
     }
@@ -521,7 +592,7 @@ const Form = () => {
                           name="Reason for Leaving"
                           type="text"
                           readOnly={readOnly}
-                          disabled={childRecord.current > 0}
+                          disabled={id || childRecord.current > 0}
                           value={leaveReason}
                           setValue={setLeaveReason}
                           required={true}
@@ -532,7 +603,7 @@ const Form = () => {
                           name="Remarks"
                           type="text"
                           readOnly={readOnly}
-                          disabled={childRecord.current > 0}
+                          disabled={id || childRecord.current > 0}
                           value={remarks}
                           setValue={setRemarks}
                         />

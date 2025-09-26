@@ -2077,8 +2077,19 @@ export const ToggleButton = ({
               disabled={disabled}
               required
             />
-            <div className="w-12 h-6 bg-gray-300 rounded-full peer-checked:bg-green-500 peer transition duration-300"></div>
-            <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full peer-checked:translate-x-6 transition-transform duration-300 shadow-sm"></div>
+            {/* <div className="w-12 h-6 bg-gray-300 rounded-full peer-checked:bg-green-500 peer transition duration-300"></div>
+            <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full peer-checked:translate-x-6 transition-transform duration-300 shadow-sm"></div> */}
+              <div
+            className={`w-12 h-6 rounded-full transition duration-300 
+              ${isToggled ? "bg-green-500" : "bg-red-500"}`}
+          ></div>
+
+          {/* slider knob */}
+          <div
+            className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full 
+              transition-transform duration-300 shadow-sm
+              ${isToggled ? "translate-x-6" : "translate-x-0"}`}
+          ></div>
           </label>
 
           <span className="ml-2 block text-xs font-bold text-gray-600">

@@ -320,24 +320,24 @@ model Employee {
   presentPincode String?
   presentMobile  String?
 
-  shiftTemplate      ShiftTemplate @relation(fields: [shiftTemplateId], references: [id])
-  shiftTemplateId    Int
-  department         Department    @relation(fields: [departmentId], references: [id])
-  departmentId       Int
-  designation        Designation   @relation(fields: [designationId], references: [id])
-  designationId      Int
-  permanentCity      City          @relation("permanentCityId", fields: [permanentCityId], references: [id])
-  permanentCityId    Int
-  presentCity        City          @relation("presentCityId", fields: [presentCityId], references: [id])
-  presentCityId      Int
-  presentCountry     Country       @relation("PresentCountryId", fields: [presentCountryId], references: [id])
-  presentCountryId   Int
-  permanentCountry   Country       @relation("PermanentCountryId", fields: [permanentCountryId], references: [id])
-  permanentCountryId Int
-  presentState       State         @relation("PresentStateId", fields: [presentStateId], references: [id])
-  presentStateId     Int
-  permanentState     State         @relation("PermanentStateId", fields: [permanentStateId], references: [id])
-  permanentStateId   Int
+  shiftCommonTemplate   ShiftCommonTemplate @relation(fields: [shiftCommonTemplateId], references: [id])
+  shiftCommonTemplateId Int
+  department            Department          @relation(fields: [departmentId], references: [id])
+  departmentId          Int
+  designation           Designation         @relation(fields: [designationId], references: [id])
+  designationId         Int
+  permanentCity         City                @relation("permanentCityId", fields: [permanentCityId], references: [id])
+  permanentCityId       Int
+  presentCity           City                @relation("presentCityId", fields: [presentCityId], references: [id])
+  presentCityId         Int
+  presentCountry        Country             @relation("PresentCountryId", fields: [presentCountryId], references: [id])
+  presentCountryId      Int
+  permanentCountry      Country             @relation("PermanentCountryId", fields: [permanentCountryId], references: [id])
+  permanentCountryId    Int
+  presentState          State               @relation("PresentStateId", fields: [presentStateId], references: [id])
+  presentStateId        Int
+  permanentState        State               @relation("PermanentStateId", fields: [permanentStateId], references: [id])
+  permanentStateId      Int
 
   Branch                   Branch?                    @relation(fields: [branchId], references: [id])
   branchId                 Int?
@@ -359,6 +359,8 @@ model Employee {
   image                 Bytes?                @db.LongBlob
   Company               Company?              @relation(fields: [companyId], references: [id])
   companyId             Int?
+  finYear               FinYear?              @relation(fields: [finYearId], references: [id])
+  finYearId             Int?
   LeaveOPeningBalance   LeaveOPeningBalance[]
   EmployeeResign        EmployeeResign[]
   lastWorkingDate       DateTime?
@@ -415,6 +417,7 @@ model FinYear {
   updatedBy           User?                 @relation("updatedBy", fields: [updatedById], references: [id])
   updatedById         Int?
   LeaveOPeningBalance LeaveOPeningBalance[]
+  Employee            Employee[]
 }
 
 model EmployeeCategory {
@@ -1385,6 +1388,7 @@ model ShiftCommonTemplate {
   name                String?
   notes               String?
   shiftCommonTemplate ShiftTemplateItems[]
+  Employee            Employee[]
 }
 
 model ShiftTemplate {
@@ -1405,7 +1409,6 @@ model ShiftTemplate {
   category           String?
   date               DateTime?
   ShiftTemplateItems ShiftTemplateItems[]
-  Employee           Employee[]
 }
 
 model ShiftTemplateItems {

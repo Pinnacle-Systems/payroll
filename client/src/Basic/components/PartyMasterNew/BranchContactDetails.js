@@ -21,7 +21,7 @@ import { toast } from "react-toastify";
 import { HiPencil, HiPlus, HiTrash } from 'react-icons/hi';
 import { Check, Eye, Plus } from 'lucide-react';
 // import { useGetbranchTypeQuery } from '../../../redux/uniformService/BranchTypeMaster';
-import { XMarkIcon, MapPinIcon, BuildingStorefrontIcon, PhoneIcon, EnvelopeIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
+
 import { FaPlus } from 'react-icons/fa';
 // import { useAddPartyBranchContactMutation, useDeletePartyBranchContactMutation, useGetPartyBranchContactByIdQuery, useUpdatePartyBranchContactMutation } from '../../../redux/services/PartyBranchContactMasterService';
 import Swal from 'sweetalert2';

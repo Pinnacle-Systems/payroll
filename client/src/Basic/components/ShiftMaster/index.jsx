@@ -254,7 +254,7 @@ const ShiftMaster = () => {
     <div>
       <div onKeyDown={handleKeyDown} className="p-1">
         <div className="w-full flex bg-white p-1 justify-between  items-center">
-          <h1 className="master-header">Template Master</h1>
+          <h1 className="master-header">Shift Master</h1>
           <div className="flex items-center gap-4">
             <button
               onClick={() => {
@@ -263,7 +263,7 @@ const ShiftMaster = () => {
               }}
               className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
             >
-              + Add New Template
+              + Add New Shift
             </button>
           </div>
         </div>
@@ -293,7 +293,7 @@ const ShiftMaster = () => {
               <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center gap-2">
                   <h2 className=" -ml-2   py-0.5 master-header-modal">
-                    Template Master
+                    Shift Master
                   </h2>
                 </div>
                 <div className="flex gap-2">
@@ -344,7 +344,7 @@ const ShiftMaster = () => {
 
                           <div className="w-42">
                             <TextInput
-                              name="Template Code"
+                              name="Shift Code"
                               type="text"
                               value={docId}
                               // setValue={setDocId}
@@ -357,7 +357,7 @@ const ShiftMaster = () => {
                           </div>
 
                           <TextInput
-                            name="Template Name"
+                            name="Shift Name"
                             type="text"
                             value={name}
                             setValue={setName}

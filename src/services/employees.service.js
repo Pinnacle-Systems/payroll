@@ -146,7 +146,7 @@ async function get(req) {
     include: {
       department: { select: { name: true } },
       BloodGroup: { select: { bgFamily: true } },
-      shiftTemplate: { select: { name: true } },
+      shiftCommonTemplate: { select: { name: true } },
       designation: { select: { name: true } },
       presentCity: { select: { name: true } },
       permanentCity: { select: { name: true } },
@@ -190,7 +190,7 @@ async function getOne(id) {
     include: {
       department: { select: { id: true, name: true } },
       EmployeeCategory: true,
-      shiftTemplate: { select: { name: true } }, // optional
+      shiftCommonTemplate: { select: { name: true } }, // optional
       designation: { select: { name: true } }, // optional
       presentCity: { select: { name: true } }, // optional
       permanentCity: { select: { name: true } }, // optional
@@ -266,6 +266,7 @@ async function create(req) {
   const {
     branchId,
     companyId,
+    finYearId,
     employeeType,
     middleName,
     firstName,
@@ -289,7 +290,7 @@ async function create(req) {
     payCategory,
     idNumber,
     desiginationId,
-    shiftTemplateId,
+    shiftCommonTemplateId,
     pf,
     esi,
     salary,
@@ -375,12 +376,15 @@ async function create(req) {
 
       Branch: branchId ? { connect: { id: parseInt(branchId) } } : undefined,
       Company: companyId ? { connect: { id: parseInt(companyId) } } : undefined,
+      finYear:finYearId ? {connect:{id:parseInt(finYearId)}} : undefined,
 
       BloodGroup: bloodGroupId
         ? { connect: { id: parseInt(bloodGroupId) } }
         : undefined,
-      shiftTemplate: shiftTemplateId
-        ? { connect: { id: parseInt(shiftTemplateId) } }
+
+       
+      shiftCommonTemplate: shiftCommonTemplateId
+        ? { connect: { id: parseInt(shiftCommonTemplateId) } }
         : undefined,
       designation: desiginationId
         ? { connect: { id: parseInt(desiginationId) } }
@@ -418,7 +422,7 @@ async function create(req) {
       EmployeeBankDetails:
         bankDetails && JSON.parse(bankDetails).length > 0
           ? {
-              create: JSON.parse(bankDetails).map((b) => ({
+              create: JSON.parse(bankDetails)?.map((b) => ({
                 bankName: b.bankName ? b.bankName : "",
                 branchName: b.branchName ? b.branchName : "",
                 accountNumber: b.accountNumber ? b.accountNumber : "",
@@ -430,7 +434,7 @@ async function create(req) {
       EmployeeEducationdetails:
         educationDetails && JSON.parse(educationDetails).length > 0
           ? {
-              create: JSON.parse(educationDetails).map((e) => ({
+              create: JSON.parse(educationDetails)?.map((e) => ({
                 courseName: e.courseName ? e.courseName : "",
                 universityName: e.universityName ? e.universityName : "",
                 institutionName: e.institutionName ? e.institutionName : "",
@@ -442,7 +446,7 @@ async function create(req) {
       EmployeeFamilyDetails:
         familyDetails && JSON.parse(familyDetails).length > 0
           ? {
-              create: JSON.parse(familyDetails).map((f) => ({
+              create: JSON.parse(familyDetails)?.map((f) => ({
                 name: f.name ? f.name : "",
                 dob: f.dob ? new Date(f.dob) : null,
                 age: f.age ? parseInt(f.age) : null,
@@ -485,7 +489,7 @@ async function update(id, req) {
     payCategory,
     idNumber,
     desiginationId,
-    shiftTemplateId,
+    shiftCommonTemplateId,
     pf,
     esi,
     salary,
@@ -585,8 +589,8 @@ async function update(id, req) {
 
       Branch: branchId ? { connect: { id: parseInt(branchId) } } : undefined,
       // shiftTemplateId: shiftTemplateId ? parseInt(shiftTemplateId) : null,
-      shiftTemplate: shiftTemplateId
-        ? { connect: { id: parseInt(shiftTemplateId) } }
+      shiftCommonTemplate: shiftCommonTemplateId
+        ? { connect: { id: parseInt(shiftCommonTemplateId) } }
         : undefined,
       designation: desiginationId
         ? { connect: { id: parseInt(desiginationId) } }
@@ -625,7 +629,7 @@ async function update(id, req) {
         bankDetails && JSON.parse(bankDetails).length > 0
           ? {
               deleteMany: {},
-              create: JSON.parse(bankDetails).map((b) => ({
+              create: JSON.parse(bankDetails)?.map((b) => ({
                 bankName: b.bankName || "",
                 branchName: b.branchName || "",
                 accountNumber: b.accountNumber || "",
@@ -639,7 +643,7 @@ async function update(id, req) {
         educationDetails && JSON.parse(educationDetails).length > 0
           ? {
               deleteMany: {},
-              create: JSON.parse(educationDetails).map((e) => ({
+              create: JSON.parse(educationDetails)?.map((e) => ({
                 courseName: e.courseName || "",
                 universityName: e.universityName || "",
                 institutionName: e.institutionName || "",
@@ -653,7 +657,7 @@ async function update(id, req) {
         familyDetails && JSON.parse(familyDetails).length > 0
           ? {
               deleteMany: {},
-              create: JSON.parse(familyDetails).map((f) => ({
+              create: JSON.parse(familyDetails)?.map((f) => ({
                 name: f.name || "",
                 dob: f.dob ? new Date(f.dob) : null,
                 age: f.age ? parseInt(f.age) || null : null,

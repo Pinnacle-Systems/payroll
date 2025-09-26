@@ -1409,7 +1409,7 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
                                             subIndex
                                           )
                                         }
-                                        className={`w-full bg-transparent uppercase   focus:outline-none focus:border-transparent text-center  ${
+                                        className={`w-full bg-transparent uppercase text-right pr-2  focus:outline-none focus:border-transparent   ${
                                           readOnly || childRecord.current > 0
                                             ? "text-gray-600"
                                             : "text-black"
@@ -1433,7 +1433,7 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
                                             subIndex
                                           )
                                         }
-                                        className={`w-full bg-transparent uppercase   focus:outline-none focus:border-transparent text-center  ${
+                                        className={`w-full bg-transparent uppercase text-right pr-2  focus:outline-none focus:border-transparent   ${
                                           readOnly || childRecord.current > 0
                                             ? "text-gray-600"
                                             : "text-black"

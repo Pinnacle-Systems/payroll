@@ -388,7 +388,7 @@ const TemplateItems = ({
                                     e.target.value
                                   )
                                 }
-                                className={`pl-1 bg-transparent w-[110px] focus:outline-none focus:border-transparent ${
+                                className={`pl-1 bg-transparent w-[110px] text-[11px] focus:outline-none focus:border-transparent ${
                                   readOnly || childRecord.current > 0
                                     ? "text-gray-600"
                                     : "text-black"
@@ -408,7 +408,7 @@ const TemplateItems = ({
                                     e.target.value
                                   )
                                 }
-                                className={`pl-1 bg-transparent  w-[110px] focus:outline-none focus:border-transparent ${
+                                className={`pl-1 bg-transparent  w-[110px] text-[11px] focus:outline-none focus:border-transparent ${
                                   readOnly || childRecord.current > 0
                                     ? "text-gray-600"
                                     : "text-black"
@@ -428,7 +428,7 @@ const TemplateItems = ({
                                     e.target.value
                                   )
                                 }
-                                className={`pl-1 bg-transparent w-[110px]  focus:outline-none focus:border-transparent ${
+                                className={`pl-1 bg-transparent w-[110px] text-[11px] focus:outline-none focus:border-transparent ${
                                   readOnly || childRecord.current > 0
                                     ? "text-gray-600"
                                     : "text-black"

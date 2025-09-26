@@ -16,22 +16,15 @@ import {
   TextArea,
   DateInput,
   ReusableTable,
-  DisabledInput,
   ToggleButton,
   customSelectStyles,
 } from "../../../Inputs";
 
-import {
-  dropDownListObject,
-  dropDownListMergedObject,
-} from "../../../Utils/contructObject";
 import Modal from "../../../UiComponents/Modal";
 import {
   statusDropdown,
   employeeType as EmployeeType,
   genderList,
-  maritalStatusList,
-  bloodList,
   common,
   SalaryMethod,
   married,
@@ -50,7 +43,6 @@ import { useGetBloodGroupQuery } from "../../../redux/services/BloodGroupService
 
 import { HiPlus } from "react-icons/hi";
 import { useGetdesignationQuery } from "../../../redux/services/DesignationMasterService";
-import { useGetShiftTemplateMasterQuery } from "../../../redux/services/ShiftTemplateMaster";
 import { useGetStateQuery } from "../../../redux/services/StateMasterService";
 import { useGetCountriesQuery } from "../../../redux/services/CountryMasterService";
 import Select from "react-select";
@@ -58,56 +50,32 @@ import Swal from "sweetalert2";
 import { useGetEmployeeResignQuery } from "../../../redux/services/EmployeeResignService";
 import { useGetemployeeSubCategoryQuery } from "../../../redux/services/EmployeeSubCategoryservice";
 import { useGetEmpQuery } from "../../../redux/services/preEmployee";
+import { useGetShiftCommonTemplateQuery } from "../../../redux/services/ShiftCommonTemplate.service";
 
 export default function Form() {
-  const [view, setView] = useState("table");
   const [form, setForm] = useState(false);
   const stateNameRef = useRef(null);
 
   const [cameraOpen, setCameraOpen] = useState(false);
-  const [openTable, setOpenTable] = useState(false);
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
   const [panNo, setPanNo] = useState("");
   const [firstName, setFirstName] = useState("");
   const [dob, setDob] = useState("");
-  const [chamberNo, setChamberNo] = useState("");
-  const [localAddress, setlocalAddress] = useState("");
-  const [localCity, setLocalCity] = useState("");
-  const [localPincode, setLocalPincode] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
-  const [degree, setDegree] = useState("");
-  const [specialization, setSpecialization] = useState("");
-  const [salaryPerMonth, setSalaryPerMonth] = useState("");
-  const [commissionCharges, setCommissionCharges] = useState("");
   const [gender, setGender] = useState("");
   const [regNo, setRegNo] = useState("");
   const [joiningDate, setJoiningDate] = useState("");
-  const [permAddress, setPermAddress] = useState("");
-  const [permCity, setPermCity] = useState("");
-  const [permPincode, setPermPincode] = useState("");
-
   const [maritalStatus, setMaritalStatus] = useState("");
-  const [consultFee, setConsultFee] = useState("");
-  const [accountNo, setAccountNo] = useState("");
-  const [ifscNo, setIfscNo] = useState("");
-  const [branchName, setBranchName] = useState("");
-  const [bloodGroup, setBloodGroup] = useState("");
   const [bloodGroupId, setBloodGroupId] = useState("");
-  // const [department, setDepartment] = useState("");
   const [employeeCategoryId, setEmployeeCategoryId] = useState("");
-  const [permanent, setPermanent] = useState("");
   const [active, setActive] = useState(true);
-  const [branchPrefixCategory, setBranchPrefixCategory] = useState("");
   const [leavingForm, setLeavingForm] = useState(false);
   const [leavingDate, setLeavingDate] = useState("");
   const [leavingReason, setLeavingReason] = useState("");
   const [canRejoin, setCanRejoin] = useState("");
   const [rejoinReason, setRejoinReason] = useState("");
-  const [searchValue, setSearchValue] = useState("");
   const [image, setImage] = useState(null);
-  const [newForm, setNewForm] = useState(false);
-
   const [employeeType, setEmployeeType] = useState("");
   const [middleName, setMiddleName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -121,7 +89,7 @@ export default function Form() {
   const [payCategory, setPayCategory] = useState("");
   const [idNumber, setIdNumber] = useState("");
   const [desiginationId, setDesignationId] = useState("");
-  const [shiftTemplateId, setShiftTemplateId] = useState("");
+  const [shiftCommonTemplateId, setShiftCommonTemplateId] = useState("");
   const [salaryMethod, setSalaryMethod] = useState("");
   const [pf, setPf] = useState("");
   const [religion, setReligion] = useState("");
@@ -139,9 +107,48 @@ export default function Form() {
   const [mobileMatches, setMobileMatches] = useState([]);
   const [aadharMatch, setAadharMatch] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [selectedEmployeeIndex, setSelectedEmployeeIndex] = useState(null);
 
   const [cannotRejoin, setCannotRejoin] = useState(false);
+  const [lastWorkingDate, setLastWorkingDate] = useState(null);
+  const [leaveReason, setLeaveReason] = useState("");
+    const [contextMenu, setContextMenu] = useState(null);
+    const [educationContext,setEducationContext] = useState(null)
+    const [familyContext,setFamilyContext] = useState(null)
+
+
+    const handleRightClick = (event, rowIndex, type) => {
+    event.preventDefault();
+    setContextMenu({
+      mouseX: event.clientX,
+      mouseY: event.clientY,
+      rowId: rowIndex,
+      type,
+    });
+  };
+    const handleRightEducationClick = (event, rowIndex, type) => {
+    event.preventDefault();
+    setEducationContext({
+      mouseX: event.clientX,
+      mouseY: event.clientY,
+      rowId: rowIndex,
+      type,
+    });
+  };
+    const handleRightFamilyClick = (event, rowIndex, type) => {
+    event.preventDefault();
+    setFamilyContext({
+      mouseX: event.clientX,
+      mouseY: event.clientY,
+      rowId: rowIndex,
+      type,
+    });
+  };
+
+  const handleCloseContextMenu = () => {
+    setContextMenu(null);
+    setEducationContext(null)
+    setFamilyContext(null)
+  };
   const [presentAddress, setPresentAddress] = useState({
     address: "",
     cityId: "",
@@ -162,13 +169,12 @@ export default function Form() {
     mobile: "",
   });
   const [sameAsPresent, setSameAsPresent] = useState(false);
-  // const [esi, setEsi] = useState("")
 
   const childRecord = useRef(0);
   const dispatch = useDispatch();
   const params = getCommonParams();
 
-  const { branchId, companyId } = params;
+  const { branchId, companyId, finYearId } = params;
 
   const { data: bloodGroupList } = useGetBloodGroupQuery({ params });
   const { data: cityList } = useGetCityQuery({ params });
@@ -184,6 +190,10 @@ export default function Form() {
     params,
   });
   const { data: desigination } = useGetdesignationQuery({ params });
+
+  const { data: shiftCommonTemplate } = useGetShiftCommonTemplateQuery({
+    params,
+  });
 
   const { data: department } = useGetDepartmentQuery({ params });
 
@@ -242,15 +252,16 @@ export default function Form() {
                 .slice(0, 10)
             : "Not available";
           Swal.fire({
-          
+            // icon: "error",
+
             html: `
               <h2 class="swal-title-custom">⚠️ Employee Restricted</h2>
       <p class="swal-reason">This employee has already worked and resigned. Not allowed to rejoin.</p>
             <p class="swal-reason"><b>Last Working Date:</b> ${lastWorkingDate}</p>
             <p class="swal-p-reason">Reason for Leaving : </p>
          <textarea class="swal-reason-textarea-white" readonly>${
-      rejectedEmployee?.leaveReason || "No reason specified"
-    }</textarea>
+           rejectedEmployee?.leaveReason || "No reason specified"
+         }</textarea>
 
        <p class="swal-text">Do you still want to allow this employee to join?</p>
     `,
@@ -258,12 +269,12 @@ export default function Form() {
             confirmButtonText: "Yes, allow",
             cancelButtonText: "No, cancel",
             customClass: {
-               popup: "swal-popup-custom",
-    title: "swal-title-custom",
-    htmlContainer: "swal-html-container",
-    confirmButton: "swal2-confirm-custom",
-    cancelButton: "swal-cancel-btn-custom",
-    icon: "swal-icon-custom"
+              popup: "swal-popup-custom",
+              title: "swal-title-custom",
+              htmlContainer: "swal-html-container",
+              confirmButton: "swal2-confirm-custom",
+              cancelButton: "swal-cancel-btn-custom",
+              icon: "swal-icon-custom",
             },
             buttonsStyling: false,
           }).then((result) => {
@@ -279,12 +290,16 @@ export default function Form() {
           });
         } else {
           Swal.fire({
-            
             html: `
-      <p class="swal-reason">This employee already worked and resigned.</p>
+      <p class="swal-reason">⚠️ This employee already worked and resigned.</p>
+      <p class="swal-reason"><b>Last Working Date: </b>${
+        matches[0]?.date?.split("T")[0] || ""
+      }</p>
+
        <p class="swal-p-reason">Reason for Leaving : </p>
-      <textarea class="swal-reason-textarea-white" readonly>${matches[0]?.leaveReason || "No reason specified"}</textarea>
-<p class="swal-reason"><b>Last Working Date: </b>${matches[0]?.date?.split("T")[0] || ""}</p>
+      <textarea class="swal-reason-textarea-white" readonly>${
+        matches[0]?.leaveReason || "No reason specified"
+      }</textarea>
 
     `,
             confirmButtonText: "OK",
@@ -310,8 +325,6 @@ export default function Form() {
   } = useGetEmployeeQuery({ params });
 
   console.log(allData, "allData");
-
-  const { data: shiftTemplate } = useGetShiftTemplateMasterQuery({ params });
 
   const { data: singleData } = useGetEmployeeByIdQuery(id, { skip: !id });
 
@@ -365,7 +378,7 @@ export default function Form() {
 
       // Employment Info
       setDepartmentId(data?.departmentId || "");
-      setShiftTemplateId(data?.shiftTemplateId || "");
+      setShiftCommonTemplateId(data?.shiftCommonTemplateId || "");
       setEmployeeSubCategoryId(data?.employeeSubCategoryId || "");
       setEmployeeCategoryId(data?.employeeCategoryId || "");
       setPayCategory(data?.payCategory || "");
@@ -388,7 +401,12 @@ export default function Form() {
       setCanRejoin(data?.canRejoin || false);
       setRejoinReason(data?.rejoinReason || "");
       setActive(data?.active !== undefined ? data?.active : true);
-
+      setLastWorkingDate(
+        data?.lastWorkingDate
+          ? moment.utc(data?.lastWorkingDate).format("YYYY-MM-DD")
+          : ""
+      );
+      setLeaveReason(data?.leaveReason || "");
       // Contact Info (Present)
       // For Present Address
       setPresentAddress((prev) => ({
@@ -473,6 +491,7 @@ export default function Form() {
   const data = {
     branchId,
     companyId,
+    finYearId,
     employeeType,
     firstName,
     middleName,
@@ -496,7 +515,7 @@ export default function Form() {
     payCategory,
     idNumber,
     desiginationId,
-    shiftTemplateId,
+    shiftCommonTemplateId,
     pf,
     esi,
     salary,
@@ -574,7 +593,6 @@ export default function Form() {
       }
       setId(returnData?.data?.id);
 
-      setSearchValue("");
       // setStep(1);
       dispatch({
         type: `bloodGroup/invalidateTags`,
@@ -631,7 +649,6 @@ export default function Form() {
         title: "Submission Failed",
         text: error.data?.message || "Something went wrong!",
       });
-      console.log("handle");
     }
   };
 
@@ -648,7 +665,7 @@ export default function Form() {
       data?.departmentId &&
       data?.employeeCategoryId &&
       data?.desiginationId &&
-      data?.shiftTemplateId &&
+      data?.shiftCommonTemplateId &&
       data?.email &&
       data?.presentAddress.cityId &&
       data?.permanentAddress.cityId &&
@@ -663,7 +680,6 @@ export default function Form() {
 
     return false;
   };
-  console.log(image, "setted");
 
   const saveData = async () => {
     // Front-end validation
@@ -699,27 +715,7 @@ export default function Form() {
 
     setId("");
     setForm(false);
-    setSearchValue("");
     // setStep(1);
-  };
-
-  const saveDataandExit = async (exitAfterSave = false) => {
-    if (!validateData(data)) {
-      Swal.fire({
-        icon: "error",
-        title: "Submission error",
-        text: "Please fill all required fields...!",
-      });
-      return;
-    }
-
-    if (id) {
-      await handleSubmitCustom(updateData, data, "Updated");
-    } else {
-      await handleSubmitCustom(addData, data, "Added");
-    }
-    setId("");
-    setForm(false);
   };
 
   const deleteData = async (id) => {
@@ -787,7 +783,6 @@ export default function Form() {
           timer: 1500,
           showConfirmButton: false,
         });
-        setSearchValue("");
         setStep(1);
       } catch (error) {
         Swal.fire({
@@ -808,8 +803,6 @@ export default function Form() {
     }
   };
 
-  console.log(readOnly, "readOnly");
-
   const input1Ref = useRef(null);
   const input2Ref = useRef(null);
 
@@ -828,7 +821,6 @@ export default function Form() {
     // Basic Info
     setEmployeeType("");
     setMobileNumber("");
-    setSearchValue("");
     setFirstName("");
     setMiddleName("");
     setLastName("");
@@ -847,14 +839,13 @@ export default function Form() {
     setImage(null);
     setActive(true);
     // Employment Info
-    setShiftTemplateId("");
+    setShiftCommonTemplateId("");
     setEmployeeSubCategoryId("");
     setPf("");
     setEsi("");
     setSalary("");
     setSalaryMethod("");
-    setSalaryPerMonth("");
-    setCommissionCharges("");
+
     setDepartmentId("");
     setEmployeeCategoryId("");
     setActive(true);
@@ -868,15 +859,13 @@ export default function Form() {
 
     setPayCategory("");
     setIdNumber("");
-
+    setLastWorkingDate("");
+    setLeaveReason("");
     // Contact Info
     // fixed camelCase
-    setLocalCity("");
-    setLocalPincode("");
+
     setMobileNumber("");
-    setPermAddress("");
-    setPermCity("");
-    setPermPincode("");
+
     setPresentAddress({
       address: "",
       cityId: "",
@@ -940,7 +929,6 @@ export default function Form() {
 
     // Misc
     setImage(null);
-    setConsultFee("");
   };
 
   const submitLeavingForm = () => {
@@ -964,8 +952,6 @@ export default function Form() {
     setStep(tabNumber);
     // }
   };
-
-  console.log(familyDetails, "familyDetails");
 
   useEffect(() => {
     if (bankDetails?.length >= 1) return;
@@ -1007,7 +993,6 @@ export default function Form() {
   }, []);
 
   function addNewRow() {
-    if (readOnly) return toast.info("Turn on Edit Mode...!!!");
     setBankDetails((prev) => [
       ...prev,
 
@@ -1021,7 +1006,6 @@ export default function Form() {
     ]);
   }
   function addEducationNewRow() {
-    if (readOnly) return toast.info("Turn on Edit Mode...!!!");
     setEducationDetails((prev) => [
       ...prev,
 
@@ -1035,7 +1019,6 @@ export default function Form() {
     ]);
   }
   function addFamilyNewRow() {
-    if (readOnly) return toast.info("Turn on Edit Mode...!!!");
     setFamilyDetails((prev) => [
       ...prev,
 
@@ -1068,50 +1051,100 @@ export default function Form() {
   }
 
   function deleteRow(rowIndex) {
-    if (readOnly) return toast.error("Turn on Edit Mode...");
 
     setBankDetails((prev) => {
-      const updated = structuredClone(prev); // or [...prev] if deep clone is not needed
+      const updated = structuredClone(prev);
+        if (updated.length > 1) {
       updated.splice(rowIndex, 1);
+    }
+    else {
+      for (let key in updated[0]) {
+        updated[0][key] = "";
+      }
+    }
       return updated;
     });
-
-    console.log("bankDetails updated after delete");
   }
+function deleteAllRow() {
+  setBankDetails(() => [
+    {
+      accountNumber: "",
+      bankName: "",
+      ifscCode: "",
+      branchName: "",
+    },
+  ]);
+}
   function deleteEducationRow(rowIndex) {
-    if (readOnly) return toast.error("Turn on Edit Mode...");
+    
 
     setEducationDetails((prev) => {
-      const updated = structuredClone(prev); // or [...prev] if deep clone is not needed
+      const updated = structuredClone(prev); 
+          if (updated.length > 1) {
       updated.splice(rowIndex, 1);
+    }else {
+      for (let key in updated[0]) {
+        updated[0][key] = "";
+      }
+    }
       return updated;
     });
 
-    console.log("EducationDetails updated after delete");
+  }
+
+  function deleteAllEducationRow(){
+    setEducationDetails(() => [
+      {
+      courseName:'',
+      universityName:'',
+      institutionName:'',
+      yearOfPass:''
+
+      }
+    ])
   }
   function deleteFamilyRow(rowIndex) {
-    if (readOnly) return toast.error("Turn on Edit Mode...");
 
     setFamilyDetails((prev) => {
       const updated = structuredClone(prev);
+       if (updated.length > 1) {
       updated.splice(rowIndex, 1);
+    }else {
+      for (let key in updated[0]) {
+        updated[0][key] = "";
+      }
+    }
       return updated;
     });
 
     console.log("FamilyDetails updated after delete");
   }
+
+  function deleteAllFamilyRow(){
+    setFamilyDetails(() =>[
+      {
+        name:'',
+        dob:'',
+        age:'',
+        relationShipId:'',
+        occupation:'',
+        nominee:''
+      }
+    ])
+  }
+
   const handleView = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(true);
-    console.log("view");
+   
     setStep("Basic Details");
   };
   const handleEdit = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(false);
-    console.log("Edit");
+    
     setStep("Basic Details");
   };
   const ACTIVE = (
@@ -1228,9 +1261,9 @@ export default function Form() {
     value: val?.id,
     label: val?.name,
   }));
-  const ShiftTemplateOptions = shiftTemplate?.data?.map((val) => ({
+  const ShiftCommonTemplateOptions = shiftCommonTemplate?.data?.map((val) => ({
     value: val?.id,
-    label: val?.docId,
+    label: val?.name,
   }));
 
   const CountryOptions = countryList?.data?.map((val) => ({
@@ -1269,7 +1302,6 @@ export default function Form() {
               onClick={() => {
                 setForm(true);
                 onNew();
-                setNewForm(true);
               }}
               className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
             >
@@ -1327,7 +1359,7 @@ export default function Form() {
             <div className="h-full flex flex-col bg-gray-100">
               <div className="border-b py-2 px-4 mx-3 flex justify-between items-center sticky top-0 z-10 bg-white mt-4">
                 <div className="flex items-center gap-2">
-                  <h2 className=" master-header-modal">Employee Master</h2>
+                  <h2 className="-ml-2 master-header-modal">Employee Master</h2>
 
                   {regNo && (
                     <span
@@ -1364,7 +1396,6 @@ export default function Form() {
                         type="button"
                         onClick={() => {
                           setForm(false);
-                          setSearchValue("");
                           setId(false);
                         }}
                         className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
@@ -1385,16 +1416,6 @@ export default function Form() {
                           <Check size={14} />
                           {id ? "Update " : "Save "}
                         </button>
-
-                        {/* <button
-                        type="button"
-                        onClick={saveDataandExit}
-                        className="px-3 py-1 hover:bg-green-600 hover:text-white rounded text-green-600 
-      border border-green-600 flex items-center gap-1 text-xs"
-                      >
-                        <Check size={14} />
-                        {id ? "Update & Exit" : "Save & Exit"}
-                      </button> */}
                       </div>
                     )}
                   </div>
@@ -1448,9 +1469,10 @@ export default function Form() {
                               setValue={handleMobileChange}
                               required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                               ref={stateNameRef}
+                              // className='bg-yellow-100'
                             />
                             {showDropdown && (
                               <div
@@ -1497,8 +1519,10 @@ export default function Form() {
                               type="number"
                               required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                              // className='bg-yellow-100'
+
                             />
                           </div>
                           <div className="w-30">
@@ -1510,7 +1534,7 @@ export default function Form() {
                               options={EmployeeType}
                               required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
@@ -1522,7 +1546,7 @@ export default function Form() {
                               setValue={setFirstName}
                               required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
@@ -1534,7 +1558,7 @@ export default function Form() {
                               setValue={setMiddleName}
                               // required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>{" "}
@@ -1546,7 +1570,7 @@ export default function Form() {
                               setValue={setLastName}
                               // required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
@@ -1558,7 +1582,7 @@ export default function Form() {
                               setValue={setDob}
                               required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>{" "}
@@ -1571,7 +1595,7 @@ export default function Form() {
                               options={genderList}
                               required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>{" "}
@@ -1583,7 +1607,7 @@ export default function Form() {
                               setValue={setFatherName}
                               // required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>{" "}
@@ -1595,7 +1619,7 @@ export default function Form() {
                               setValue={setMotherName}
                               // required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>{" "}
@@ -1608,7 +1632,7 @@ export default function Form() {
                               // required={true}
                               options={married}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
@@ -1620,7 +1644,7 @@ export default function Form() {
                               setValue={setIdentificationMark}
                               // required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>{" "}
@@ -1633,7 +1657,7 @@ export default function Form() {
                               required={true}
                               readOnly={readOnly}
                               options={common}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
@@ -1669,7 +1693,7 @@ export default function Form() {
                               }
                               placeholder="Select"
                               isClearable={false} // same as required
-                              isDisabled={readOnly || childRecord.current > 0}
+                              isDisabled={readOnly}
                               isSearchable
                               menuShouldScrollIntoView={false}
                               maxMenuHeight={150} // <-- Reduce height here
@@ -1689,7 +1713,7 @@ export default function Form() {
                               setValue={setHeight}
                               // required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
@@ -1701,11 +1725,39 @@ export default function Form() {
                               setValue={setWeight}
                               // required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
-                          <div className="ml-5">
+                          <div className="w-30">
+                            <DateInput
+                              type="date"
+                              ref={input1Ref}
+                              name="Last Working Date"
+                              value={lastWorkingDate}
+                              setValue={setLastWorkingDate}
+                              // required={true}
+                              readOnly={true}
+                              // disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+                          <div className="w-72 ml-3">
+                            <label className="block text-xs font-semibold text-slate-700 pb-1">Leave Reason</label>
+                            <textarea
+                              type="text"
+                              name="Leave Reason"
+                              value={leaveReason}
+                              className="w-full px-1.5  py-1 h-6 text-xs border border-gray-300 rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm "
+                              onChange={setLeaveReason }
+                            
+                              disabled={true}
+                              // disabled={childRecord.current > 0}
+                            ></textarea>
+                          </div>
+                          <div className="ml-3">
                             <label className="block text-xs font-semibold text-slate-700 mb-1">
                               Status
                             </label>
@@ -1716,7 +1768,9 @@ export default function Form() {
                               setActive={setActive}
                               required={true}
                               readOnly={readOnly}
+                              // disabled={childRecord.current > 0}
                             />
+                            {/* <TextArea/> */}
                           </div>
                           <Modal
                             isOpen={cameraOpen}
@@ -1743,7 +1797,7 @@ export default function Form() {
                               setValue={setJoiningDate}
                               required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                             />
                           </div>
                           <div className="w-52">
@@ -1778,7 +1832,7 @@ export default function Form() {
                               }
                               placeholder="Select Employee Category"
                               isClearable={false} // same as required
-                              isDisabled={readOnly || childRecord.current > 0}
+                              isDisabled={readOnly}
                               isSearchable
                               menuShouldScrollIntoView={false}
                               maxMenuHeight={150} // <-- Reduce height here
@@ -1822,7 +1876,7 @@ export default function Form() {
                               }
                               placeholder="Select Department"
                               isClearable={false} // same as required
-                              isDisabled={readOnly || childRecord.current > 0}
+                              isDisabled={readOnly}
                               isSearchable
                               menuShouldScrollIntoView={false}
                               maxMenuHeight={150} // <-- Reduce height here
@@ -1867,7 +1921,7 @@ export default function Form() {
                               }
                               placeholder="Select Employee Sub Category"
                               isClearable={false} // same as required
-                              isDisabled={readOnly || childRecord.current > 0}
+                              isDisabled={readOnly}
                               isSearchable
                               menuShouldScrollIntoView={false}
                               maxMenuHeight={150} // <-- Reduce height here
@@ -1887,7 +1941,7 @@ export default function Form() {
                               required={true}
                               readOnly={readOnly}
                               options={payType}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                             />
                           </div>
                           <div className="col-span-1">
@@ -1898,7 +1952,7 @@ export default function Form() {
                               setValue={setIdNumber}
                               // required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
@@ -1935,7 +1989,7 @@ export default function Form() {
                               }
                               placeholder="Select Designation"
                               isClearable={false} // same as required
-                              isDisabled={readOnly || childRecord.current > 0}
+                              isDisabled={readOnly}
                               isSearchable
                               menuShouldScrollIntoView={false}
                               maxMenuHeight={150} // <-- Reduce height here
@@ -1952,8 +2006,8 @@ export default function Form() {
                             {/* <DropdownInput
                             ref={input1Ref}
                             name="Shift Template"
-                            value={shiftTemplateId}
-                            setValue={setShiftTemplateId}
+                            value={shiftCommonTemplateId}
+                            setValue={setShiftCommonTemplateId}
                             options={dropDownListObject(
                               shiftTemplate?.data,
                               "docId",
@@ -1965,22 +2019,22 @@ export default function Form() {
                             onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                           /> */}
                             <label className="block text-xs font-semibold text-slate-700 mb-1">
-                              Shift Template
+                              Shift Common Template
                               <span className="text-red-500">*</span>
                             </label>
                             <Select
-                              options={ShiftTemplateOptions}
+                              options={ShiftCommonTemplateOptions}
                               value={
-                                ShiftTemplateOptions.find(
-                                  (opt) => opt.value === shiftTemplateId
+                                ShiftCommonTemplateOptions?.find(
+                                  (opt) => opt.value === shiftCommonTemplateId
                                 ) || null
                               }
                               onChange={(selected) =>
-                                setShiftTemplateId(selected?.value || "")
+                                setShiftCommonTemplateId(selected?.value || "")
                               }
                               placeholder="Select Shift Template"
                               isClearable={false} // same as required
-                              isDisabled={readOnly || childRecord.current > 0}
+                              isDisabled={readOnly}
                               isSearchable
                               menuShouldScrollIntoView={false}
                               maxMenuHeight={150} // <-- Reduce height here
@@ -2001,7 +2055,7 @@ export default function Form() {
                               // required={true}
                               options={common}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
@@ -2015,7 +2069,7 @@ export default function Form() {
                               // required={true}
                               options={common}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
@@ -2029,7 +2083,7 @@ export default function Form() {
                               setValue={setSalary}
                               // required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
@@ -2042,7 +2096,7 @@ export default function Form() {
                               options={SalaryMethod}
                               // required={true}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
@@ -2062,7 +2116,7 @@ export default function Form() {
                             value={religion}
                             setValue={setReligion}
                             readOnly={readOnly}
-                            disabled={childRecord.current > 0}
+                            // disabled={childRecord.current > 0}
                           />
                         </div>
 
@@ -2072,7 +2126,7 @@ export default function Form() {
                             value={panNo}
                             setValue={setPanNo}
                             readOnly={readOnly}
-                            disabled={childRecord.current > 0}
+                            // disabled={childRecord.current > 0}
                           />
                         </div>
                         <div>
@@ -2081,7 +2135,7 @@ export default function Form() {
                             value={esiNo}
                             setValue={setEsiNo}
                             readOnly={readOnly}
-                            disabled={childRecord.current > 0}
+                            // disabled={childRecord.current > 0}
                           />
                         </div>
                         <div>
@@ -2090,7 +2144,7 @@ export default function Form() {
                             value={pfNo}
                             setValue={setPfNo}
                             readOnly={readOnly}
-                            disabled={childRecord.current > 0}
+                            // disabled={childRecord.current > 0}
                           />
                         </div>
                         <div>
@@ -2099,7 +2153,7 @@ export default function Form() {
                             value={uanNo}
                             setValue={setUanNo}
                             readOnly={readOnly}
-                            disabled={childRecord.current > 0}
+                            // disabled={childRecord.current > 0}
                           />
                         </div>
                         <div className="w-72">
@@ -2120,7 +2174,7 @@ export default function Form() {
               ? "bg-gray-100 text-gray-500 cursor-not-allowed"
               : "bg-white hover:border-gray-400"
           }`}
-                            disabled={childRecord.current > 0}
+                            // disabled={childRecord.current > 0}
                           />
                         </div>
                       </div>
@@ -2143,7 +2197,7 @@ export default function Form() {
                                   handlePresentChange("address", val)
                                 }
                                 readOnly={readOnly}
-                                disabled={childRecord.current > 0}
+                                // disabled={childRecord.current > 0}
                               />
                               {errors.address && (
                                 <span className="text-red-500 text-xs ml-1">
@@ -2189,7 +2243,7 @@ export default function Form() {
                                 }
                                 placeholder="Select Country"
                                 isClearable={false} // same as required
-                                isDisabled={readOnly || childRecord.current > 0}
+                                isDisabled={readOnly}
                                 isSearchable
                                 menuShouldScrollIntoView={false}
                                 maxMenuHeight={150} // <-- Reduce height here
@@ -2243,7 +2297,7 @@ export default function Form() {
                                 }
                                 placeholder="Select State"
                                 isClearable={false} // same as required
-                                isDisabled={readOnly || childRecord.current > 0}
+                                isDisabled={readOnly}
                                 isSearchable
                                 menuShouldScrollIntoView={false}
                                 maxMenuHeight={150} // <-- Reduce height here
@@ -2300,7 +2354,7 @@ export default function Form() {
                                 }
                                 placeholder="Select City"
                                 isClearable={false} // same as required
-                                isDisabled={readOnly || childRecord.current > 0}
+                                isDisabled={readOnly}
                                 isSearchable
                                 menuShouldScrollIntoView={false}
                                 maxMenuHeight={150} // <-- Reduce height here
@@ -2320,7 +2374,7 @@ export default function Form() {
                                   handlePresentChange("village", val)
                                 }
                                 readOnly={readOnly}
-                                disabled={childRecord.current > 0}
+                                // disabled={childRecord.current > 0}
                               />
                             </div>
 
@@ -2332,7 +2386,7 @@ export default function Form() {
                                   handlePresentChange("pincode", val)
                                 }
                                 readOnly={readOnly}
-                                disabled={childRecord.current > 0}
+                                // disabled={childRecord.current > 0}
                               />
                             </div>
                             {/* <div className="col-span-1 w-[255px] mt-2">
@@ -2374,9 +2428,7 @@ export default function Form() {
                                   handlePermanentChange("address", val)
                                 }
                                 readOnly={readOnly}
-                                disabled={
-                                  childRecord.current > 0 || sameAsPresent
-                                }
+                                disabled={sameAsPresent}
                               />
                             </div>
                             <div className="col-span-1 mb-2">
@@ -2416,11 +2468,7 @@ export default function Form() {
                                 }
                                 placeholder="Select Country"
                                 isClearable={false} // same as required
-                                isDisabled={
-                                  readOnly ||
-                                  childRecord.current > 0 ||
-                                  sameAsPresent
-                                }
+                                isDisabled={readOnly || sameAsPresent}
                                 isSearchable
                                 menuShouldScrollIntoView={false}
                                 maxMenuHeight={150} // <-- Reduce height here
@@ -2473,11 +2521,7 @@ export default function Form() {
                                 }
                                 placeholder="Select State"
                                 isClearable={false} // same as required
-                                isDisabled={
-                                  readOnly ||
-                                  childRecord.current > 0 ||
-                                  sameAsPresent
-                                }
+                                isDisabled={readOnly || sameAsPresent}
                                 isSearchable
                                 menuShouldScrollIntoView={false}
                                 maxMenuHeight={150} // <-- Reduce height here
@@ -2536,11 +2580,7 @@ export default function Form() {
                                 }
                                 placeholder="Select City"
                                 isClearable={false} // same as required
-                                isDisabled={
-                                  readOnly ||
-                                  childRecord.current > 0 ||
-                                  sameAsPresent
-                                }
+                                isDisabled={readOnly || sameAsPresent}
                                 isSearchable
                                 menuShouldScrollIntoView={false}
                                 maxMenuHeight={150} // <-- Reduce height here
@@ -2560,9 +2600,7 @@ export default function Form() {
                                   handlePermanentChange("village", val)
                                 }
                                 readOnly={readOnly}
-                                disabled={
-                                  childRecord.current > 0 || sameAsPresent
-                                }
+                                disabled={sameAsPresent}
                               />
                             </div>
 
@@ -2574,9 +2612,7 @@ export default function Form() {
                                   handlePermanentChange("pincode", val)
                                 }
                                 readOnly={readOnly}
-                                disabled={
-                                  childRecord.current > 0 || sameAsPresent
-                                }
+                                disabled={sameAsPresent}
                               />
                             </div>
                             {/* <div className="col-span-1 w-[260px] mt-2">
@@ -2604,14 +2640,14 @@ export default function Form() {
                           <h3 className="font-medium text-gray-800 text-sm">
                             Bank Details
                           </h3>
-                          <button
+                          {/* <button
                             onClick={() => addNewRow()}
                             disabled={readOnly}
                             className="hover:bg-green-600 text-green-600 hover:text-white border border-green-600 px-2 py-1 rounded-md flex items-center text-xs"
                           >
                             <HiPlus className="w-3 h-3 mr-1" />
                             Add Item
-                          </button>
+                          </button> */}
                         </div>
                         <div
                           className={`w-full   p-2 overflow-auto bg-white max-h-[200px]`}
@@ -2644,11 +2680,11 @@ export default function Form() {
                                 >
                                   IFSC Code
                                 </th>
-                                <th
+                                {/* <th
                                   className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
                                 >
                                   Action
-                                </th>
+                                </th> */}
                               </tr>
                             </thead>
                             <tbody>
@@ -2672,12 +2708,10 @@ export default function Form() {
                                           e.target.value
                                         )
                                       }
-                                      disabled={
-                                        readOnly || childRecord.current > 0
-                                      }
+                                      disabled={readOnly}
                                       // disabled={childRecord.current > 0}
                                       className={`w-full focus:outline-none  uppercase focus:border-none pl-2 bg-transparent  ${
-                                        readOnly || childRecord.current > 0
+                                        readOnly
                                           ? "text-gray-600"
                                           : "text-black"
                                       }`}
@@ -2696,13 +2730,11 @@ export default function Form() {
                                         )
                                       }
                                       className={`w-full focus:outline-none uppercase focus:border-none pl-3 bg-transparent  ${
-                                        readOnly || childRecord.current > 0
+                                        readOnly
                                           ? "text-gray-600"
                                           : "text-black"
                                       }`}
-                                      disabled={
-                                        readOnly || childRecord.current > 0
-                                      }
+                                      disabled={readOnly}
                                       // disabled={childRecord.current > 0}
                                     />
                                   </td>
@@ -2719,13 +2751,11 @@ export default function Form() {
                                         )
                                       }
                                       className={`w-full focus:outline-none uppercase focus:border-none text-right pr-3 bg-transparent  ${
-                                        readOnly || childRecord.current > 0
+                                        readOnly
                                           ? "text-gray-600"
                                           : "text-black"
                                       }`}
-                                      disabled={
-                                        readOnly || childRecord.current > 0
-                                      }
+                                      disabled={readOnly}
                                       // disabled={childRecord.current > 0}
                                     />
                                   </td>
@@ -2742,17 +2772,30 @@ export default function Form() {
                                         )
                                       }
                                       className={`w-full focus:outline-none uppercase focus:border-none text-left pl-2 bg-transparent  ${
-                                        readOnly || childRecord.current > 0
+                                        readOnly
                                           ? "text-gray-600"
                                           : "text-black"
                                       }`}
-                                      disabled={
-                                        readOnly || childRecord.current > 0
-                                      }
+                                      onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                          e.preventDefault();
+
+                                          if (item?.bankName) {
+                                            addNewRow();
+                                          }
+                                        }
+                                      }}
+                                                 onContextMenu={(e) => {
+                                if (!readOnly) {
+                                  handleRightClick(e, index, "notes");
+                                }
+                              }}
+                                  
+                                      disabled={readOnly}
                                       // disabled={childRecord.current > 0}
                                     />
                                   </td>
-                                  <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                  {/* <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
                                     <button
                                       type="button"
                                       title="Delete Row"
@@ -2772,7 +2815,7 @@ export default function Form() {
                                         />
                                       </svg>
                                     </button>
-                                  </td>
+                                  </td> */}
                                 </tr>
                               ))}
                             </tbody>
@@ -2788,14 +2831,14 @@ export default function Form() {
                           <h3 className="font-medium text-gray-800 text-sm">
                             Education Details
                           </h3>
-                          <button
+                          {/* <button
                             onClick={() => addEducationNewRow()}
                             disabled={readOnly}
                             className="hover:bg-green-600 text-green-600 hover:text-white border border-green-600 px-2 py-1 rounded-md flex items-center text-xs"
                           >
                             <HiPlus className="w-3 h-3 mr-1" />
                             Add Item
-                          </button>
+                          </button> */}
                         </div>
                         <div
                           className={`w-full   p-2 overflow-auto bg-white max-h-[200px]`}
@@ -2828,11 +2871,11 @@ export default function Form() {
                                 >
                                   Year & Month of Passing
                                 </th>
-                                <th
+                                {/* <th
                                   className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
                                 >
                                   Action
-                                </th>
+                                </th> */}
                               </tr>
                             </thead>
                             <tbody>
@@ -2856,12 +2899,10 @@ export default function Form() {
                                           e.target.value
                                         )
                                       }
-                                      disabled={
-                                        readOnly || childRecord.current > 0
-                                      }
+                                      disabled={readOnly}
                                       // disabled={childRecord.current > 0}
                                       className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${
-                                        readOnly || childRecord.current > 0
+                                        readOnly
                                           ? "text-gray-600"
                                           : "text-black"
                                       }`}
@@ -2880,13 +2921,11 @@ export default function Form() {
                                         )
                                       }
                                       className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${
-                                        readOnly || childRecord.current > 0
+                                        readOnly
                                           ? "text-gray-600"
                                           : "text-black"
                                       }`}
-                                      disabled={
-                                        readOnly || childRecord.current > 0
-                                      }
+                                      disabled={readOnly}
 
                                       // disabled={childRecord.current > 0}
                                     />
@@ -2904,13 +2943,11 @@ export default function Form() {
                                         )
                                       }
                                       className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${
-                                        readOnly || childRecord.current > 0
+                                        readOnly
                                           ? "text-gray-600"
                                           : "text-black"
                                       }`}
-                                      disabled={
-                                        readOnly || childRecord.current > 0
-                                      }
+                                      disabled={readOnly}
 
                                       // disabled={childRecord.current > 0}
                                     />
@@ -2928,18 +2965,30 @@ export default function Form() {
                                         )
                                       }
                                       className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${
-                                        readOnly || childRecord.current > 0
+                                        readOnly
                                           ? "text-gray-600"
                                           : "text-black"
                                       }`}
-                                      disabled={
-                                        readOnly || childRecord.current > 0
-                                      }
+                                      disabled={readOnly}
+                                              onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                          e.preventDefault();
+
+                                          if (item?.courseName) {
+                                            addEducationNewRow();
+                                          }
+                                        }
+                                      }}
+                                                 onContextMenu={(e) => {
+                                if (!readOnly) {
+                                  handleRightEducationClick(e, index, "yearOfPass");
+                                }
+                              }}
 
                                       // disabled={childRecord.current > 0}
                                     />
                                   </td>
-                                  <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
+                                  {/* <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
                                     <button
                                       type="button"
                                       title="Delete Row"
@@ -2959,7 +3008,7 @@ export default function Form() {
                                         />
                                       </svg>
                                     </button>
-                                  </td>
+                                  </td> */}
                                 </tr>
                               ))}
                             </tbody>
@@ -2975,14 +3024,14 @@ export default function Form() {
                           <h3 className="font-medium text-gray-800 text-sm">
                             Family Details
                           </h3>
-                          <button
+                          {/* <button
                             onClick={() => addFamilyNewRow()}
                             disabled={readOnly}
                             className="hover:bg-green-600 text-green-600 hover:text-white border border-green-600 px-2 py-1 rounded-md flex items-center text-xs"
                           >
                             <HiPlus className="w-3 h-3 mr-1" />
                             Add Item
-                          </button>
+                          </button> */}
                         </div>
                         <div
                           className={`w-full   p-2 overflow-auto bg-white max-h-[200px]`}
@@ -3025,11 +3074,11 @@ export default function Form() {
                                 >
                                   Nominee
                                 </th>
-                                <th
+                                {/* <th
                                   className={`w-16 px-4 py-2 text-center font-medium text-[13px] `}
                                 >
                                   Action
-                                </th>
+                                </th> */}
                               </tr>
                             </thead>
                             <tbody>
@@ -3050,12 +3099,10 @@ export default function Form() {
                                           e.target.value
                                         )
                                       }
-                                      disabled={
-                                        readOnly || childRecord.current > 0
-                                      }
+                                      disabled={readOnly}
                                       // disabled={childRecord.current > 0}
                                       className={`w-full pl-1 focus:outline-none uppercase  focus:border-none bg-transparent  ${
-                                        readOnly || childRecord.current > 0
+                                        readOnly
                                           ? "text-gray-600"
                                           : "text-black"
                                       }`}
@@ -3074,13 +3121,11 @@ export default function Form() {
                                         )
                                       }
                                       className={` pl-1 w-[110px] focus:outline-none uppercase  focus:border-none bg-transparent  ${
-                                        readOnly || childRecord.current > 0
+                                        readOnly
                                           ? "text-gray-600"
                                           : "text-black"
                                       }`}
-                                      disabled={
-                                        readOnly || childRecord.current > 0
-                                      }
+                                      disabled={readOnly}
                                       // disabled={childRecord.current > 0}
                                     />
                                   </td>
@@ -3097,13 +3142,11 @@ export default function Form() {
                                         )
                                       }
                                       className={`w-full pr-2 text-right focus:outline-none uppercase  focus:border-none bg-transparent ${
-                                        readOnly || childRecord.current > 0
+                                        readOnly
                                           ? "text-gray-600"
                                           : "text-black"
                                       }`}
-                                      disabled={
-                                        readOnly || childRecord.current > 0
-                                      }
+                                      disabled={readOnly}
                                       // disabled={childRecord.current > 0}
                                     />
                                   </td>
@@ -3125,9 +3168,7 @@ export default function Form() {
                                       }
                                       placeholder="Select"
                                       isClearable={false} // same as required
-                                      isDisabled={
-                                        readOnly || childRecord.current > 0
-                                      }
+                                      isDisabled={readOnly}
                                       isSearchable
                                       menuShouldScrollIntoView={false}
                                       maxMenuHeight={150} // <-- Reduce height here
@@ -3206,13 +3247,11 @@ export default function Form() {
                                         )
                                       }
                                       className={`w-full pl-2 focus:outline-none uppercase  focus:border-none bg-transparent ${
-                                        readOnly || childRecord.current > 0
+                                        readOnly
                                           ? "text-gray-600"
                                           : "text-black"
                                       }`}
-                                      disabled={
-                                        readOnly || childRecord.current > 0
-                                      }
+                                      disabled={readOnly}
                                       // disabled={childRecord.current > 0}
                                     />
                                   </td>
@@ -3228,18 +3267,30 @@ export default function Form() {
                                           e.target.value
                                         )
                                       }
-                                      className={`w-full pl-2 focus:outline-none uppercase  focus:border-none bg-transparent ${
-                                        readOnly || childRecord.current > 0
+                                 className={`w-full pl-2 focus:outline-none uppercase  focus:border-none bg-transparent ${
+                                        readOnly
                                           ? "text-gray-600"
                                           : "text-black"
                                       }`}
-                                      disabled={
-                                        readOnly || childRecord.current > 0
-                                      }
+                                      disabled={readOnly}
+                                                 onKeyDown={(e) => {
+                                        if (e.key === "Enter") {
+                                          e.preventDefault();
+
+                                          if (item?.name) {
+                                            addFamilyNewRow();
+                                          }
+                                        }
+                                      }}
+                                                 onContextMenu={(e) => {
+                                if (!readOnly) {
+                                  handleRightFamilyClick(e, index, "nominee");
+                                }
+                              }}
                                       // disabled={childRecord.current > 0}
                                     />
                                   </td>
-                                  <td className=" border border-gray-300 text-[12px] py-1.5 text-center item-center">
+                                  {/* <td className=" border border-gray-300 text-[12px] py-1.5 text-center item-center">
                                     <button
                                       type="button"
                                       title="Delete Row"
@@ -3259,7 +3310,7 @@ export default function Form() {
                                         />
                                       </svg>
                                     </button>
-                                  </td>
+                                  </td> */}
                                 </tr>
                               ))}
                             </tbody>
@@ -3335,7 +3386,120 @@ export default function Form() {
       
         </Modal>
       )} */}
+            {contextMenu && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: `${contextMenu.mouseY - 80}px`,
+                  left: `${contextMenu.mouseX + 20}px`,
 
+                  // background: "gray",
+                  boxShadow: "0px 0px 5px rgba(0,0,0,0.3)",
+                  padding: "8px",
+                  borderRadius: "4px",
+                  zIndex: 1000,
+                }}
+                className="bg-gray-100"
+                onMouseLeave={handleCloseContextMenu} // Close when the mouse leaves
+              >
+                <div className="flex flex-col gap-1">
+                  <button
+                    className=" text-black text-[12px] text-left rounded px-1"
+                    onClick={() => {
+                      deleteRow(contextMenu.rowId);
+                      handleCloseContextMenu();
+                    }}
+                  >
+                    Delete{" "}
+                  </button>
+                  <button
+                    className=" text-black text-[12px] text-left rounded px-1"
+                    onClick={() => {
+                      deleteAllRow();
+                      handleCloseContextMenu();
+                    }}
+                  >
+                    Delete All
+                  </button>
+                </div>
+              </div>
+            )}
+            {educationContext && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: `${educationContext.mouseY - 80}px`,
+                  left: `${educationContext.mouseX + 20}px`,
+
+                  // background: "gray",
+                  boxShadow: "0px 0px 5px rgba(0,0,0,0.3)",
+                  padding: "8px",
+                  borderRadius: "4px",
+                  zIndex: 1000,
+                }}
+                className="bg-gray-100"
+                onMouseLeave={handleCloseContextMenu} // Close when the mouse leaves
+              >
+                <div className="flex flex-col gap-1">
+                  <button
+                    className=" text-black text-[12px] text-left rounded px-1"
+                    onClick={() => {
+                      deleteEducationRow(educationContext.rowId);
+                      handleCloseContextMenu();
+                    }}
+                  >
+                    Delete{" "}
+                  </button>
+                  <button
+                    className=" text-black text-[12px] text-left rounded px-1"
+                    onClick={() => {
+                      deleteAllEducationRow();
+                      handleCloseContextMenu();
+                    }}
+                  >
+                    Delete All
+                  </button>
+                </div>
+              </div>
+            )}
+            {familyContext && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: `${familyContext.mouseY - 80}px`,
+                  left: `${familyContext.mouseX + 20}px`,
+
+                  // background: "gray",
+                  boxShadow: "0px 0px 5px rgba(0,0,0,0.3)",
+                  padding: "8px",
+                  borderRadius: "4px",
+                  zIndex: 1000,
+                }}
+                className="bg-gray-100"
+                onMouseLeave={handleCloseContextMenu} // Close when the mouse leaves
+              >
+                <div className="flex flex-col gap-1">
+                  <button
+                    className=" text-black text-[12px] text-left rounded px-1"
+                    onClick={() => {
+                      deleteFamilyRow(familyContext.rowId);
+                      handleCloseContextMenu();
+                    }}
+                  >
+                    Delete{" "}
+                  </button>
+                  <button
+                    className=" text-black text-[12px] text-left rounded px-1"
+                    onClick={() => {
+                      deleteAllFamilyRow();
+                      handleCloseContextMenu();
+                    }}
+                  >
+                    Delete All
+                  </button>
+                </div>
+              </div>
+            )}
             <Modal isOpen={leavingForm} onClose={() => setLeavingForm(false)}>
               <EmployeeLeavingForm
                 leavingReason={leavingReason}

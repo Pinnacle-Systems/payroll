@@ -42,6 +42,8 @@ import bloodGroupImage from './images/bloodGroup.jpg'
 import relationship from './images/relationship.png'
 import proof from './images/proof.jpg'
 import shift from './images/shift.svg'
+import empSubCategory from './images/empSubCategory.png'
+import empResign from './images/empResign.webp'
 const SidebarComponent = ({
   logo,
   groups,
@@ -253,6 +255,24 @@ const SidebarComponent = ({
         <img
           src={shift}
           alt="SHIFT MASTER"
+          className="w-[23px]  flex justify-center items-center bg-white border-2 border-white rounded shadow"
+        />
+      </span>
+    ),
+    "EMPLOYEE SUB CATEGORY": (
+      <span className="w-[23px]  flex justify-center items-center bg-white border-2 border-white rounded shadow">
+        <img
+          src={empSubCategory}
+          alt="EMPLOYEE SUB CATEGORY"
+          className="w-[23px]  flex justify-center items-center bg-white border-2 border-white rounded shadow"
+        />
+      </span>
+    ),
+    "EMPLOYEE RESIGNATION": (
+      <span className="w-[23px]  flex justify-center items-center bg-white border-2 border-white rounded shadow">
+        <img
+          src={empResign}
+          alt="EMPLOYEE RESIGNATION"
           className="w-[23px]  flex justify-center items-center bg-white border-2 border-white rounded shadow"
         />
       </span>

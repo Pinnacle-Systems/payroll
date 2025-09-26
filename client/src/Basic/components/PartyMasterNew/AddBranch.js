@@ -21,7 +21,7 @@ import { toast } from "react-toastify";
 import { HiPencil, HiPlus, HiTrash } from 'react-icons/hi';
 import { Check, DatabaseBackup, Eye, Paperclip } from 'lucide-react';
 // import { useGetbranchTypeQuery } from '../../../redux/uniformService/BranchTypeMaster';
-import { XMarkIcon, MapPinIcon, BuildingStorefrontIcon, PhoneIcon, EnvelopeIcon, GlobeAltIcon } from '@heroicons/react/24/outline';
+
 import { FaInfoCircle, FaPlus } from 'react-icons/fa';
 import { dropDownListMergedObject } from '../../../Utils/contructObject';
 import { statusDropdown } from '../../../Utils/DropdownData';

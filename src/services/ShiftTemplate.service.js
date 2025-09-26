@@ -80,9 +80,7 @@ async function get(req) {
 }
 
 async function getOne(id) {
-  const childRecord = await prisma.employee.count({
-    where: { shiftTemplateId: parseInt(id) },
-  });
+
 
   const data = await prisma.shiftTemplate.findUnique({
     where: {
@@ -97,7 +95,7 @@ async function getOne(id) {
     },
   });
   if (!data) return NoRecordFound("ShiftTemplate");
-  return { statusCode: 0, data: { ...data, ...{ childRecord } } };
+  return { statusCode: 0, data};
 }
 
 async function getSearch(req) {
