@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCategoryMasterService";
 import { getCommonParams } from "../../../Utils/helper";
-import { useGetCompanyQuery } from "../../../redux/services/CompanyMasterService";
 import {
   useAddemployeeSubCategoryMutation,
   useDeleteemployeeSubCategoryMutation,
@@ -37,9 +36,7 @@ const EmployeeSubCategory = () => {
 
   const { branchId, companyId } = params;
 
-  const { data: company } = useGetCompanyQuery({ params });
-  const [companyName, setCompanyName] = useState(company?.data[0].name);
-  const [companyCode, setCompanyCode] = useState(company?.data[0].code);
+ 
   const { data: allData } = useGetemployeeSubCategoryQuery({
     params,
     searchParams: searchValue,
@@ -79,12 +76,38 @@ const EmployeeSubCategory = () => {
     branchId,
   };
 
-  const validateData = (data) => {
-    if (data?.gradeName && data?.employeeCategoryId) {
+  // const validateData = (data) => {
+  //   if (data?.gradeName && data?.employeeCategoryId) {
+  //     return true;
+  //   }
+  //   return false;
+  // };
+   const validateData = (data) => {
+      if (!data?.employeeCategoryId &&  !data?.gradeName ) {
+        Swal.fire({
+          icon: "error",
+          title: "Submission error",
+          text: "Please fill all required fields...!",
+        });
+        return false;
+      }
+      const isDuplicate = allData?.data?.some(
+        (item) => item?.gradeName  === data?.gradeName &&  item?.employeeCategoryId === data?.employeeCategoryId && item?.id !== data?.id
+      );
+  
+      console.log(isDuplicate, "isDuplicate");
+  
+      if (isDuplicate) {
+        Swal.fire({
+          icon: "error",
+          title: "Submission error",
+          text: "Duplicate Value Found... !",
+        });
+        return false;
+      }
+  
       return true;
     }
-    return false;
-  };
   useEffect(() => {
     if (form && !readOnly && employeeRef.current) {
       employeeRef.current.focus();
@@ -117,11 +140,7 @@ const EmployeeSubCategory = () => {
 
   const saveData = () => {
     if (!validateData(data)) {
-      Swal.fire({
-        icon: "error",
-        title: "Submission error",
-        text: "Please fill all required fields...!",
-      });
+   
       return;
     }
 
@@ -181,20 +200,19 @@ const EmployeeSubCategory = () => {
     setActive(true);
     setForm(true);
     setSearchValue("");
-    setCompanyName(company.data[0].name);
-    setCompanyCode(company.data[0].code);
+    
   };
   const handleView = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(true);
-    console.log("view");
+    
   };
   const handleEdit = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(false);
-    console.log("Edit");
+
   };
   const ACTIVE = (
     <div className="bg-gradient-to-r from-green-200 to-green-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-green-500 shadow-lg text-white hover:scale-110 transition-transform duration-300">

@@ -211,21 +211,20 @@ export default function Form() {
       header: "Category Name",
       accessor: (item) => item?.name,
       //   cellClass: () => "  text-gray-900",
-      className: " text-gray-900 text-center uppercase w-72",
+      className: " text-gray-900 text-left pl-2 uppercase w-72",
     },
 
     {
       header: "Status",
       accessor: (item) => (item.active ? ACTIVE : INACTIVE),
       //   cellClass: () => " text-gray-900",
-      className: " text-gray-900 text-center uppercase w-36",
+      className: " text-gray-900 text-left pl-2 uppercase w-36",
     },
   ];
   const handleView = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(true);
-    console.log("view");
   };
   const handleEdit = (id) => {
     setId(id);

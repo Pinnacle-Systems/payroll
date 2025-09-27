@@ -41,6 +41,7 @@ import {
   BandMaster,
   OTMaster,
   EmployeeResignation,
+  AttendanceGeneration,
 
  
   
@@ -135,6 +136,7 @@ const ActiveTabList = () => {
     "BAND MASTER" : <BandMaster/>,
     "OT":<OTMaster/>,
     "EMPLOYEE RESIGNATION":<EmployeeResignation/>,
+    "ATTENDENCE GENERATION" :<AttendanceGeneration/>,
 
 
 

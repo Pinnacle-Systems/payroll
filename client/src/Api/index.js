@@ -112,3 +112,4 @@ export const MACHINE_IN_OUT_ENTRY_API = 'machineInOutEntry'
 export const OT_MASTER  = 'oTMAster'
 export const EMP_API =  "preEmployeeRegistration"
 export const EMP_RESIGN = 'employeeResign'
+export const ATTENDENCE_REPORT = 'attendenceReport'

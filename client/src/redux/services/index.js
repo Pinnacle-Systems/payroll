@@ -62,3 +62,4 @@ export { default as MachineInoutApi } from "./MachineInOutService.js";
 export { default as OTMAsterAPi } from "./OTMaster.service.js";
 export {default as preEmployeeApi} from './preEmployee'
 export {default as employeeResign} from './EmployeeResignService.js'
+export {default as attendenceReportApi} from './AttendanceReportService.js'

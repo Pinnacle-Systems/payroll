@@ -57,3 +57,4 @@ export { default as MachineInOutEntry } from "./machineInoutEntry.route.js";
 export { default as OTMaster } from "./OT.route.js";
 export {default as preEmployee} from './preEmployee.route.js'
 export {default as employeeResign} from  './employeeResign.route.js'
+export {default as AttendanceReport} from './AttendaneReport.route.js'

@@ -326,3 +326,9 @@ export const Quarter = [
   {show:"OTCALC" , value:"OTCALC"},
 
 ];
+
+
+export const GroupBy = [
+  {show:"Department" ,value:"department"},
+  {show:"Designation" ,value:"designation"}
+]

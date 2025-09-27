@@ -1257,6 +1257,13 @@ function deleteAllRow() {
       label: val?.gradeName,
     })
   );
+
+  const getFilteredFilteredEmployeeSubCategory = (employeeCategoryId) => 
+    employeeSubCategoryList?.data?.filter((cat) =>cat.employeeCategoryId === employeeCategoryId).map?.((val) => ({
+      value: val?.id,
+      label: val?.gradeName,
+    }))
+
   const DesignaionOptions = desigination?.data?.map((val) => ({
     value: val?.id,
     label: val?.name,
@@ -1748,7 +1755,7 @@ function deleteAllRow() {
                               type="text"
                               name="Leave Reason"
                               value={leaveReason}
-                              className="w-full px-1.5  py-1 h-6 text-xs border border-gray-300 rounded-lg
+                              className="w-full px-1.5  py-1 h-6 text-xs border border-gray-300 rounded-lg bg-gray-100 text-gray-500
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm "
                               onChange={setLeaveReason }
@@ -1830,7 +1837,51 @@ function deleteAllRow() {
                               onChange={(selected) =>
                                 setEmployeeCategoryId(selected?.value || "")
                               }
-                              placeholder="Select Employee Category"
+                              placeholder="Select"
+                              isClearable={false} // same as required
+                              isDisabled={readOnly}
+                              isSearchable
+                              menuShouldScrollIntoView={false}
+                              maxMenuHeight={150} // <-- Reduce height here
+                              onInputChange={(value) => value.toUpperCase()}
+                              className="w-full px-1 -ml-1 text-xs rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm"
+                              styles={customSelectStyles}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+                             <div className="w-60">
+                            {/* <DropdownInput
+                            ref={input1Ref}
+                            name="Employee Sub Category"
+                            value={employeeSubCategoryId}
+                            setValue={setEmployeeSubCategoryId}
+                            options={dropDownListObject(
+                              employeeSubCategoryList?.data,
+                              "gradeName",
+                              "id"
+                            )}
+                            required={true}
+                            readOnly={readOnly}
+                            disabled={childRecord.current > 0}
+                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                          /> */}
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              Employee Sub Category
+                              <span className="text-red-500">*</span>
+                            </label>
+                            <Select
+                              options={getFilteredFilteredEmployeeSubCategory(employeeCategoryId)}
+                              value={
+                                getFilteredFilteredEmployeeSubCategory(employeeCategoryId)?.find(
+                                  (opt) => opt.value === employeeSubCategoryId
+                                ) || null
+                              }
+                              onChange={(selected) =>
+                                setEmployeeSubCategoryId(selected?.value || "")
+                              }
+                              placeholder="Select"
                               isClearable={false} // same as required
                               isDisabled={readOnly}
                               isSearchable
@@ -1874,7 +1925,7 @@ function deleteAllRow() {
                               onChange={(selected) =>
                                 setDepartmentId(selected?.value || "")
                               }
-                              placeholder="Select Department"
+                              placeholder="Select"
                               isClearable={false} // same as required
                               isDisabled={readOnly}
                               isSearchable
@@ -1889,75 +1940,7 @@ function deleteAllRow() {
                             />
                           </div>
 
-                          <div className="w-60">
-                            {/* <DropdownInput
-                            ref={input1Ref}
-                            name="Employee Sub Category"
-                            value={employeeSubCategoryId}
-                            setValue={setEmployeeSubCategoryId}
-                            options={dropDownListObject(
-                              employeeSubCategoryList?.data,
-                              "gradeName",
-                              "id"
-                            )}
-                            required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                            onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                          /> */}
-                            <label className="block text-xs font-semibold text-slate-700 mb-1">
-                              Employee Sub Category
-                              <span className="text-red-500">*</span>
-                            </label>
-                            <Select
-                              options={EmployeeSubCategoryOptions}
-                              value={
-                                EmployeeSubCategoryOptions.find(
-                                  (opt) => opt.value === employeeSubCategoryId
-                                ) || null
-                              }
-                              onChange={(selected) =>
-                                setEmployeeSubCategoryId(selected?.value || "")
-                              }
-                              placeholder="Select Employee Sub Category"
-                              isClearable={false} // same as required
-                              isDisabled={readOnly}
-                              isSearchable
-                              menuShouldScrollIntoView={false}
-                              maxMenuHeight={150} // <-- Reduce height here
-                              onInputChange={(value) => value.toUpperCase()}
-                              className="w-full px-1 -ml-1 text-xs rounded-lg
-          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-          transition-all duration-150 shadow-sm"
-                              styles={customSelectStyles}
-                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                            />
-                          </div>
-                          <div className="w-52">
-                            <DropdownInput
-                              name="Pay Category"
-                              value={payCategory}
-                              setValue={setPayCategory}
-                              required={true}
-                              readOnly={readOnly}
-                              options={payType}
-                              // disabled={childRecord.current > 0}
-                            />
-                          </div>
-                          <div className="col-span-1">
-                            <TextInput
-                              ref={input1Ref}
-                              name="Id Card Number"
-                              value={idNumber}
-                              setValue={setIdNumber}
-                              // required={true}
-                              readOnly={readOnly}
-                              // disabled={childRecord.current > 0}
-                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                            />
-                          </div>
-
-                          <div className="w-52">
+                        <div className="w-52">
                             {/* <DropdownInput
                             ref={input1Ref}
                             name=" Designation"
@@ -1987,7 +1970,7 @@ function deleteAllRow() {
                               onChange={(selected) =>
                                 setDesignationId(selected?.value || "")
                               }
-                              placeholder="Select Designation"
+                              placeholder="Select"
                               isClearable={false} // same as required
                               isDisabled={readOnly}
                               isSearchable
@@ -2001,6 +1984,21 @@ function deleteAllRow() {
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
+                        
+                          <div className="col-span-1">
+                            <TextInput
+                              ref={input1Ref}
+                              name="Id Card Number"
+                              value={idNumber}
+                              setValue={setIdNumber}
+                              // required={true}
+                              readOnly={readOnly}
+                              // disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+
+                         
 
                           <div className="w-44">
                             {/* <DropdownInput
@@ -2032,7 +2030,7 @@ function deleteAllRow() {
                               onChange={(selected) =>
                                 setShiftCommonTemplateId(selected?.value || "")
                               }
-                              placeholder="Select Shift Template"
+                              placeholder="Select"
                               isClearable={false} // same as required
                               isDisabled={readOnly}
                               isSearchable
@@ -2046,7 +2044,18 @@ function deleteAllRow() {
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
-                          <div className="col-span-1">
+                            <div className="w-52">
+                            <DropdownInput
+                              name="Pay Category"
+                              value={payCategory}
+                              setValue={setPayCategory}
+                              required={true}
+                              readOnly={readOnly}
+                              options={payType}
+                              // disabled={childRecord.current > 0}
+                            />
+                          </div>
+                          {/* <div className="col-span-1">
                             <DropdownInput
                               ref={input1Ref}
                               name="PF (Y/N)"
@@ -2058,9 +2067,66 @@ function deleteAllRow() {
                               // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
-                          </div>
-
+                          </div> */}
                           <div className="col-span-1">
+  <label className="block text-xs font-semibold text-slate-700 mb-1">
+    PF (Y/N)
+  </label>
+  <select
+    ref={input1Ref}
+    value={pf}
+    onChange={(e) => setPf(e.target.value)}
+    onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+    disabled={readOnly} // use disabled instead of readOnly
+             className={`w-full px-1 py-0.5 text-xs text-[12px] border border-gray-300 rounded-lg
+    focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+    transition-all duration-150 shadow-sm
+    ${
+      readOnly
+        ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+        : "bg-white text-gray-900 hover:border-gray-400"
+    }
+   `}
+  >
+    <option value="">Select</option>
+    {common?.map((opt, idx) => (
+      <option key={idx} value={opt.value}>
+        {opt.show}
+      </option>
+    ))}
+  </select>
+</div>
+                          <div className="col-span-1">
+  <label className="block text-xs font-semibold text-slate-700 mb-1">
+   ESI (Y/N)
+  </label>
+  <select
+    ref={input1Ref}
+    value={esi}
+    onChange={(e) => setEsi(e.target.value)}
+    onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+    disabled={readOnly} // use disabled instead of readOnly
+             className={`w-full px-1 py-0.5 text-xs text-[12px] border border-gray-300 rounded-lg
+    focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+    transition-all duration-150 shadow-sm
+    ${
+      readOnly
+        ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+        : "bg-white text-gray-900 hover:border-gray-400"
+    }
+   `}
+  >
+    <option value="">Select</option>
+    {common?.map((opt, idx) => (
+      <option key={idx} value={opt.value}>
+        {opt.show}
+      </option>
+    ))}
+  </select>
+</div>
+
+
+                          {/* <div className="col-span-1">
                             <DropdownInput
                               ref={input1Ref}
                               name="ESI (Y/N)"
@@ -2072,9 +2138,9 @@ function deleteAllRow() {
                               // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
-                          </div>
+                          </div> */}
 
-                          <div className="w-40">
+                          <div className="w-28">
                             <TextInput
                               type="number"
                               ref={input1Ref}
