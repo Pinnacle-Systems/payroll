@@ -11,8 +11,11 @@ const WEB_PORT = process.env.WEB_PORT || 3000; // Web UI
 const app = express();
 const httpServer = createServer(app);
 app.use(cors({
-  origin: "http://localhost:3001", // allow your React app
+  origin: "*", // frontend origin
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
+
 app.use(express.json());
 const ESSL_DEVICE_IP = "192.168.1.50";
 const ESSL_DEVICE_PORT = 4370;
@@ -29,7 +32,7 @@ const ESSL_DEVICE_PORT = 4370;
 
 async function fetchPunches(date = null) {
   
-  const zk = new ZKLib(ESSL_DEVICE_IP, ESSL_DEVICE_PORT, 60000); 
+  const zk = new ZKLib(ESSL_DEVICE_IP, ESSL_DEVICE_PORT, 30000); 
   try {
     console.log("Connecting to device...");
     await zk.createSocket();
@@ -94,6 +97,8 @@ async function safeFetchPunches(date = null) {
 }
 
 app.get("/api/punches", async (req, res) => {
+    console.log("api Called");
+    
   const date = req.query.date;
   const punches = await safeFetchPunches(date);
   res.json({ success: true, data: punches });
