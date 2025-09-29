@@ -90,7 +90,8 @@ async function get(searchParams) {
           department:true,
           designation: true,
           shiftCommonTemplate:true,
-          idNumber:true
+          idNumber:true,
+          EmployeeCategory:true,
         },
       },
     },

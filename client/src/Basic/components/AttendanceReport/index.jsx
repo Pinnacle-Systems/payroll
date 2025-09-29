@@ -57,39 +57,50 @@ const Form = () => {
       className: " text-gray-900 text-left pl-2 uppercase w-36",
     },
     {
+      header: "EMP Category",
+      accessor: (item) => item?.Employee?.EmployeeCategory?.name,
+      //   cellClass: () => " text-gray-900",
+      className: " text-gray-900 text-left pl-2 uppercase w-40",
+    },
+    {
       header: "Department",
       accessor: (item) => item?.Employee?.department?.name,
-      className: " text-gray-900 text-left pl-2 uppercase w-36",
+      className: " text-gray-900 text-left pl-2 uppercase w-40",
     },
     {
       header: "Designation",
       accessor: (item) => item?.Employee?.designation?.name,
-      className: " text-gray-900 text-left pl-2 uppercase w-36",
+      className: " text-gray-900 text-left pl-2 uppercase w-40",
     },
+    // {
+    //   header: "Shift",
+    //   accessor: (item) => item?.Employee?.shiftCommonTemplate?.name,
+    //   className: " text-gray-900 text-left pl-2 uppercase w-40",
+    // },
 
     {
       header: "In Date",
       accessor: (item) =>
         item.inDate ? new Date(item.inDate).toLocaleDateString() : "-",
-      className: " text-gray-900 text-left pl-2 uppercase w-36",
+      className: " text-gray-900 text-left pl-2 uppercase w-30",
     },
     {
       header: "In Time",
       accessor: (item) =>
         item.inTime ? new Date(item.inTime).toLocaleTimeString() : "-",
-      className: " text-gray-900 text-left pl-2 uppercase w-36",
+      className: " text-gray-900 text-left pl-2 uppercase w-30",
     },
     {
       header: "Out Date",
       accessor: (item) =>
         item.outDate ? new Date(item.outDate).toLocaleDateString() : "-",
-      className: " text-gray-900 text-left pl-2 uppercase w-36",
+      className: " text-gray-900 text-left pl-2 uppercase w-30",
     },
     {
       header: "Out Time",
       accessor: (item) =>
         item.outTime ? new Date(item.outTime).toLocaleTimeString() : "-",
-      className: " text-gray-900 text-left pl-2 uppercase w-36",
+      className: " text-gray-900 text-left pl-2 uppercase w-30",
     },
   ];
   const EmployeeOptions = employeeCategory?.data?.map((val) => ({

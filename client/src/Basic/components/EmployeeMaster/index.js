@@ -41,7 +41,6 @@ import { useDispatch } from "react-redux";
 import { Check, Power } from "lucide-react";
 import { useGetBloodGroupQuery } from "../../../redux/services/BloodGroupService";
 
-import { HiPlus } from "react-icons/hi";
 import { useGetdesignationQuery } from "../../../redux/services/DesignationMasterService";
 import { useGetStateQuery } from "../../../redux/services/StateMasterService";
 import { useGetCountriesQuery } from "../../../redux/services/CountryMasterService";
@@ -111,12 +110,11 @@ export default function Form() {
   const [cannotRejoin, setCannotRejoin] = useState(false);
   const [lastWorkingDate, setLastWorkingDate] = useState(null);
   const [leaveReason, setLeaveReason] = useState("");
-    const [contextMenu, setContextMenu] = useState(null);
-    const [educationContext,setEducationContext] = useState(null)
-    const [familyContext,setFamilyContext] = useState(null)
+  const [contextMenu, setContextMenu] = useState(null);
+  const [educationContext, setEducationContext] = useState(null);
+  const [familyContext, setFamilyContext] = useState(null);
 
-
-    const handleRightClick = (event, rowIndex, type) => {
+  const handleRightClick = (event, rowIndex, type) => {
     event.preventDefault();
     setContextMenu({
       mouseX: event.clientX,
@@ -125,7 +123,7 @@ export default function Form() {
       type,
     });
   };
-    const handleRightEducationClick = (event, rowIndex, type) => {
+  const handleRightEducationClick = (event, rowIndex, type) => {
     event.preventDefault();
     setEducationContext({
       mouseX: event.clientX,
@@ -134,7 +132,7 @@ export default function Form() {
       type,
     });
   };
-    const handleRightFamilyClick = (event, rowIndex, type) => {
+  const handleRightFamilyClick = (event, rowIndex, type) => {
     event.preventDefault();
     setFamilyContext({
       mouseX: event.clientX,
@@ -146,8 +144,8 @@ export default function Form() {
 
   const handleCloseContextMenu = () => {
     setContextMenu(null);
-    setEducationContext(null)
-    setFamilyContext(null)
+    setEducationContext(null);
+    setFamilyContext(null);
   };
   const [presentAddress, setPresentAddress] = useState({
     address: "",
@@ -446,7 +444,7 @@ export default function Form() {
           branchName: b?.branchName || "",
           accountNumber: b?.accountNumber || "",
           ifscCode: b?.ifscCode || "",
-        }))
+        })) || []
       );
 
       setEducationDetails(
@@ -456,7 +454,7 @@ export default function Form() {
           universityName: e?.universityName || "",
           institutionName: e?.institutionName || "",
           yearOfPass: e?.yearOfPass || "",
-        }))
+        })) || []
       );
 
       setFamilyDetails(
@@ -468,7 +466,7 @@ export default function Form() {
           relationShipId: f?.relationShipId || "",
           occupation: f?.occupation || "",
           nominee: f?.nominee || "",
-        }))
+        })) || []
       );
 
       // Save selected employee ID
@@ -953,8 +951,46 @@ export default function Form() {
     // }
   };
 
+  // useEffect(() => {
+  //   if (bankDetails?.length >= 1) return;
+  //   setBankDetails([
+  //     {
+  //       Sno: "",
+  //       bankName: "",
+  //       branchName: "",
+  //       acountNumber: "",
+  //       ifscCode: "",
+  //     },
+  //   ]);
+  // }, []);
+  // useEffect(() => {
+  //   if (educationDetails?.length >= 1) return;
+  //   setEducationDetails([
+  //     {
+  //       Sno: "",
+  //       courseName: "",
+  //       universityName: "",
+  //       institutionName: "",
+  //       yearOfPass: "",
+  //     },
+  //   ]);
+  // }, []);
+  // useEffect(() => {
+  //   if (familyDetails?.length >= 1) return;
+  //   setFamilyDetails([
+  //     {
+  //       Sno: "",
+  //       name: "",
+  //       dob: "",
+  //       age: "",
+  //       relationShipId: "",
+  //       occupation: "",
+  //       nominee: "",
+  //     },
+  //   ]);
+  // }, []);
   useEffect(() => {
-    if (bankDetails?.length >= 1) return;
+  if ( bankDetails.length === 0) {
     setBankDetails([
       {
         Sno: "",
@@ -964,9 +1000,11 @@ export default function Form() {
         ifscCode: "",
       },
     ]);
-  }, []);
-  useEffect(() => {
-    if (educationDetails?.length >= 1) return;
+  }
+}, [bankDetails]);
+
+useEffect(() => {
+  if ( educationDetails.length === 0) {
     setEducationDetails([
       {
         Sno: "",
@@ -976,9 +1014,10 @@ export default function Form() {
         yearOfPass: "",
       },
     ]);
-  }, []);
-  useEffect(() => {
-    if (familyDetails?.length >= 1) return;
+  }
+}, [educationDetails]);
+useEffect(() => {
+  if ( familyDetails.length === 0) {
     setFamilyDetails([
       {
         Sno: "",
@@ -990,8 +1029,8 @@ export default function Form() {
         nominee: "",
       },
     ]);
-  }, []);
-
+  }
+}, [familyDetails]);
   function addNewRow() {
     setBankDetails((prev) => [
       ...prev,
@@ -1051,100 +1090,93 @@ export default function Form() {
   }
 
   function deleteRow(rowIndex) {
-
     setBankDetails((prev) => {
       const updated = structuredClone(prev);
-        if (updated.length > 1) {
-      updated.splice(rowIndex, 1);
-    }
-    else {
-      for (let key in updated[0]) {
-        updated[0][key] = "";
+      if (updated.length > 1) {
+        updated.splice(rowIndex, 1);
+      } else {
+        for (let key in updated[0]) {
+          updated[0][key] = "";
+        }
       }
-    }
       return updated;
     });
   }
-function deleteAllRow() {
-  setBankDetails(() => [
-    {
-      accountNumber: "",
-      bankName: "",
-      ifscCode: "",
-      branchName: "",
-    },
-  ]);
-}
+  function deleteAllRow() {
+    setBankDetails(() => [
+      {
+        accountNumber: "",
+        bankName: "",
+        ifscCode: "",
+        branchName: "",
+      },
+    ]);
+  }
   function deleteEducationRow(rowIndex) {
-    
-
     setEducationDetails((prev) => {
-      const updated = structuredClone(prev); 
-          if (updated.length > 1) {
-      updated.splice(rowIndex, 1);
-    }else {
-      for (let key in updated[0]) {
-        updated[0][key] = "";
+      const updated = structuredClone(prev);
+      if (updated.length > 1) {
+        updated.splice(rowIndex, 1);
+      } else {
+        for (let key in updated[0]) {
+          updated[0][key] = "";
+        }
       }
-    }
       return updated;
     });
-
   }
 
-  function deleteAllEducationRow(){
+  function deleteAllEducationRow() {
     setEducationDetails(() => [
       {
-      courseName:'',
-      universityName:'',
-      institutionName:'',
-      yearOfPass:''
-
-      }
-    ])
+        courseName: "",
+        universityName: "",
+        institutionName: "",
+        yearOfPass: "",
+      },
+    ]);
   }
   function deleteFamilyRow(rowIndex) {
-
     setFamilyDetails((prev) => {
       const updated = structuredClone(prev);
-       if (updated.length > 1) {
-      updated.splice(rowIndex, 1);
-    }else {
-      for (let key in updated[0]) {
-        updated[0][key] = "";
+      if (updated.length > 1) {
+        updated.splice(rowIndex, 1);
+      } else {
+        for (let key in updated[0]) {
+          updated[0][key] = "";
+        }
       }
-    }
       return updated;
     });
 
     console.log("FamilyDetails updated after delete");
   }
 
-  function deleteAllFamilyRow(){
-    setFamilyDetails(() =>[
+  function deleteAllFamilyRow() {
+    setFamilyDetails(() => [
       {
-        name:'',
-        dob:'',
-        age:'',
-        relationShipId:'',
-        occupation:'',
-        nominee:''
-      }
-    ])
+        name: "",
+        dob: "",
+        age: "",
+        relationShipId: "",
+        occupation: "",
+        nominee: "",
+      },
+    ]);
   }
 
   const handleView = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(true);
-   
+
     setStep("Basic Details");
   };
   const handleEdit = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(false);
-    
+
     setStep("Basic Details");
   };
   const ACTIVE = (
@@ -1258,11 +1290,13 @@ function deleteAllRow() {
     })
   );
 
-  const getFilteredFilteredEmployeeSubCategory = (employeeCategoryId) => 
-    employeeSubCategoryList?.data?.filter((cat) =>cat.employeeCategoryId === employeeCategoryId).map?.((val) => ({
-      value: val?.id,
-      label: val?.gradeName,
-    }))
+  const getFilteredFilteredEmployeeSubCategory = (employeeCategoryId) =>
+    employeeSubCategoryList?.data
+      ?.filter((cat) => cat.employeeCategoryId === employeeCategoryId)
+      .map?.((val) => ({
+        value: val?.id,
+        label: val?.gradeName,
+      }));
 
   const DesignaionOptions = desigination?.data?.map((val) => ({
     value: val?.id,
@@ -1529,7 +1563,6 @@ function deleteAllRow() {
                               // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                               // className='bg-yellow-100'
-
                             />
                           </div>
                           <div className="w-30">
@@ -1750,7 +1783,9 @@ function deleteAllRow() {
                             />
                           </div>
                           <div className="w-72 ml-3">
-                            <label className="block text-xs font-semibold text-slate-700 pb-1">Leave Reason</label>
+                            <label className="block text-xs font-semibold text-slate-700 pb-1">
+                              Leave Reason
+                            </label>
                             <textarea
                               type="text"
                               name="Leave Reason"
@@ -1758,8 +1793,7 @@ function deleteAllRow() {
                               className="w-full px-1.5  py-1 h-6 text-xs border border-gray-300 rounded-lg bg-gray-100 text-gray-500
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm "
-                              onChange={setLeaveReason }
-                            
+                              onChange={setLeaveReason}
                               disabled={true}
                               // disabled={childRecord.current > 0}
                             ></textarea>
@@ -1851,7 +1885,7 @@ function deleteAllRow() {
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
-                             <div className="w-60">
+                          <div className="w-60">
                             {/* <DropdownInput
                             ref={input1Ref}
                             name="Employee Sub Category"
@@ -1872,9 +1906,13 @@ function deleteAllRow() {
                               <span className="text-red-500">*</span>
                             </label>
                             <Select
-                              options={getFilteredFilteredEmployeeSubCategory(employeeCategoryId)}
+                              options={getFilteredFilteredEmployeeSubCategory(
+                                employeeCategoryId
+                              )}
                               value={
-                                getFilteredFilteredEmployeeSubCategory(employeeCategoryId)?.find(
+                                getFilteredFilteredEmployeeSubCategory(
+                                  employeeCategoryId
+                                )?.find(
                                   (opt) => opt.value === employeeSubCategoryId
                                 ) || null
                               }
@@ -1940,7 +1978,7 @@ function deleteAllRow() {
                             />
                           </div>
 
-                        <div className="w-52">
+                          <div className="w-52">
                             {/* <DropdownInput
                             ref={input1Ref}
                             name=" Designation"
@@ -1984,7 +2022,7 @@ function deleteAllRow() {
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
-                        
+
                           <div className="col-span-1">
                             <TextInput
                               ref={input1Ref}
@@ -1997,8 +2035,6 @@ function deleteAllRow() {
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
-
-                         
 
                           <div className="w-44">
                             {/* <DropdownInput
@@ -2044,7 +2080,7 @@ function deleteAllRow() {
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                             />
                           </div>
-                            <div className="w-52">
+                          <div className="w-52">
                             <DropdownInput
                               name="Pay Category"
                               value={payCategory}
@@ -2069,16 +2105,16 @@ function deleteAllRow() {
                             />
                           </div> */}
                           <div className="col-span-1">
-  <label className="block text-xs font-semibold text-slate-700 mb-1">
-    PF (Y/N)
-  </label>
-  <select
-    ref={input1Ref}
-    value={pf}
-    onChange={(e) => setPf(e.target.value)}
-    onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-    disabled={readOnly} // use disabled instead of readOnly
-             className={`w-full px-1 py-0.5 text-xs text-[12px] border border-gray-300 rounded-lg
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              PF (Y/N)
+                            </label>
+                            <select
+                              ref={input1Ref}
+                              value={pf}
+                              onChange={(e) => setPf(e.target.value)}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                              disabled={readOnly} // use disabled instead of readOnly
+                              className={`w-full px-1 py-0.5 text-xs text-[12px] border border-gray-300 rounded-lg
     focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
     transition-all duration-150 shadow-sm
     ${
@@ -2087,26 +2123,26 @@ function deleteAllRow() {
         : "bg-white text-gray-900 hover:border-gray-400"
     }
    `}
-  >
-    <option value="">Select</option>
-    {common?.map((opt, idx) => (
-      <option key={idx} value={opt.value}>
-        {opt.show}
-      </option>
-    ))}
-  </select>
-</div>
+                            >
+                              <option value="">Select</option>
+                              {common?.map((opt, idx) => (
+                                <option key={idx} value={opt.value}>
+                                  {opt.show}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
                           <div className="col-span-1">
-  <label className="block text-xs font-semibold text-slate-700 mb-1">
-   ESI (Y/N)
-  </label>
-  <select
-    ref={input1Ref}
-    value={esi}
-    onChange={(e) => setEsi(e.target.value)}
-    onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-    disabled={readOnly} // use disabled instead of readOnly
-             className={`w-full px-1 py-0.5 text-xs text-[12px] border border-gray-300 rounded-lg
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              ESI (Y/N)
+                            </label>
+                            <select
+                              ref={input1Ref}
+                              value={esi}
+                              onChange={(e) => setEsi(e.target.value)}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                              disabled={readOnly} // use disabled instead of readOnly
+                              className={`w-full px-1 py-0.5 text-xs text-[12px] border border-gray-300 rounded-lg
     focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
     transition-all duration-150 shadow-sm
     ${
@@ -2115,16 +2151,15 @@ function deleteAllRow() {
         : "bg-white text-gray-900 hover:border-gray-400"
     }
    `}
-  >
-    <option value="">Select</option>
-    {common?.map((opt, idx) => (
-      <option key={idx} value={opt.value}>
-        {opt.show}
-      </option>
-    ))}
-  </select>
-</div>
-
+                            >
+                              <option value="">Select</option>
+                              {common?.map((opt, idx) => (
+                                <option key={idx} value={opt.value}>
+                                  {opt.show}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
 
                           {/* <div className="col-span-1">
                             <DropdownInput
@@ -2851,12 +2886,11 @@ function deleteAllRow() {
                                           }
                                         }
                                       }}
-                                                 onContextMenu={(e) => {
-                                if (!readOnly) {
-                                  handleRightClick(e, index, "notes");
-                                }
-                              }}
-                                  
+                                      onContextMenu={(e) => {
+                                        if (!readOnly) {
+                                          handleRightClick(e, index, "notes");
+                                        }
+                                      }}
                                       disabled={readOnly}
                                       // disabled={childRecord.current > 0}
                                     />
@@ -3036,7 +3070,7 @@ function deleteAllRow() {
                                           : "text-black"
                                       }`}
                                       disabled={readOnly}
-                                              onKeyDown={(e) => {
+                                      onKeyDown={(e) => {
                                         if (e.key === "Enter") {
                                           e.preventDefault();
 
@@ -3045,11 +3079,15 @@ function deleteAllRow() {
                                           }
                                         }
                                       }}
-                                                 onContextMenu={(e) => {
-                                if (!readOnly) {
-                                  handleRightEducationClick(e, index, "yearOfPass");
-                                }
-                              }}
+                                      onContextMenu={(e) => {
+                                        if (!readOnly) {
+                                          handleRightEducationClick(
+                                            e,
+                                            index,
+                                            "yearOfPass"
+                                          );
+                                        }
+                                      }}
 
                                       // disabled={childRecord.current > 0}
                                     />
@@ -3333,13 +3371,13 @@ function deleteAllRow() {
                                           e.target.value
                                         )
                                       }
-                                 className={`w-full pl-2 focus:outline-none uppercase  focus:border-none bg-transparent ${
+                                      className={`w-full pl-2 focus:outline-none uppercase  focus:border-none bg-transparent ${
                                         readOnly
                                           ? "text-gray-600"
                                           : "text-black"
                                       }`}
                                       disabled={readOnly}
-                                                 onKeyDown={(e) => {
+                                      onKeyDown={(e) => {
                                         if (e.key === "Enter") {
                                           e.preventDefault();
 
@@ -3348,11 +3386,15 @@ function deleteAllRow() {
                                           }
                                         }
                                       }}
-                                                 onContextMenu={(e) => {
-                                if (!readOnly) {
-                                  handleRightFamilyClick(e, index, "nominee");
-                                }
-                              }}
+                                      onContextMenu={(e) => {
+                                        if (!readOnly) {
+                                          handleRightFamilyClick(
+                                            e,
+                                            index,
+                                            "nominee"
+                                          );
+                                        }
+                                      }}
                                       // disabled={childRecord.current > 0}
                                     />
                                   </td>
@@ -3388,70 +3430,7 @@ function deleteAllRow() {
                 </div>
               </div>
             </div>
-            {/* {showMobileModal && (
-          <Modal
-          isOpen={showMobileModal}
-          form={showMobileModal}
-          widthClass={"w-[40%]  h-[40%]"}
-          onClose={() => {
-            setShowMobileModal(false);
            
-          }}
-        >
-             
-        <div className=" flex items-center justify-center  bg-opacity-50 sticky top-0 z-999">
-          <div className="bg-white p-4 rounded-lg w-96 z-900">
-            <h2 className="text-lg font-bold mb-2">Select Employee</h2>
-            <div className="max-h-64 overflow-y-auto">
-              {mobileMatches.map((emp, index) => (
-                <div key={index} className="flex items-center gap-2 mb-2">
-                  <input
-                    type="radio"
-                    name="selectedEmployee"
-                    value={index}
-                    checked={selectedEmployeeIndex === index}
-                    onChange={() => setSelectedEmployeeIndex(index)}
-                  />
-                  <span>
-                    {emp.firstName} ({emp.mobileNumber})
-                  </span>
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={() => setShowMobileModal(false)}
-                className="px-4 py-2 bg-gray-300 rounded"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => {
-                  if (selectedEmployeeIndex !== null) {
-                    const emp = mobileMatches[selectedEmployeeIndex];
-                    setFirstName(emp.firstName);
-                    setGender(emp.gender);
-                    setDob(emp.dob ? emp.dob.split("T")[0] : "");
-                    setMaritalStatus(emp.maritalStatus);
-                    setEmail(emp.email);
-                    setAadharNo(emp.aadharNo);
-                    setPanNo(emp.panNo);
-                    setReligion(emp.religion);
-                    setPresentAddress({ address: emp.presentAddress || "" });
-                    setMobileNumber(emp.mobileNumber?.toString());
-                    setShowMobileModal(false);
-                  }
-                }}
-                className="px-4 py-2 bg-blue-600 text-white rounded"
-              >
-                Fill
-              </button>
-            </div>
-          </div>
-        </div>
-      
-        </Modal>
-      )} */}
             {contextMenu && (
               <div
                 style={{

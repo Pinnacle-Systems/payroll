@@ -67,6 +67,7 @@ import PartyDetailModal from "../../../Uniform/Components/styleesheet/partyMaste
 import ShiftCommonTemplateMaster from "../ShiftCommonTemplate";
 import ShiftMaster from "../ShiftMaster";
 import ShiftTemplateMaster from "../ShiftTemplateMaster";
+import Attendance from "../AttendenceMachineFetch";
 
 const ActiveTabList = () => {
   const openTabs = useSelector((state) => state.openTabs);
@@ -137,6 +138,7 @@ const ActiveTabList = () => {
     "OT":<OTMaster/>,
     "EMPLOYEE RESIGNATION":<EmployeeResignation/>,
     "ATTENDENCE GENERATION" :<AttendanceGeneration/>,
+    "PUNCH DATA":<Attendance/>
 
 
 
