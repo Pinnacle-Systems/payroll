@@ -5,15 +5,16 @@ import moment from "moment";
 const Attendance = () => {
   const [punches, setPunches] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [date, setDate] = useState(moment().format("YYYY-MM-DD")); // default today
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   const fetchPunches = async () => {
     setLoading(true);
     try {
       const res = await axios.get(
-        `http://localhost:3000/api/punches?date=${moment(date).format(
+        `http://localhost:3000/api/punches?fromDate=${moment(fromDate).format(
           "DD-MM-YYYY"
-        )}`
+        )}&toDate=${moment(toDate).format("DD-MM-YYYY")}`
       );
       setPunches(res.data.data);
     } catch (err) {
@@ -23,9 +24,9 @@ const Attendance = () => {
     setLoading(false);
   };
 
-  useEffect(() => {
-    fetchPunches();
-  }, [date]);
+  // useEffect(() => {
+  //   fetchPunches();
+  // }, [fromDate, toDate]);
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
@@ -33,11 +34,20 @@ const Attendance = () => {
 
       <div className="flex flex-wrap items-center gap-4 mb-6">
         <label className="flex flex-col">
-          <span className="text-gray-700 mb-1 font-medium">Select Date:</span>
+          <span className="text-gray-700 mb-1 font-medium">From Date:</span>
           <input
             type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
+            className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </label>
+        <label className="flex flex-col">
+          <span className="text-gray-700 mb-1 font-medium">To Date:</span>
+          <input
+            type="date"
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
             className="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </label>
@@ -62,7 +72,7 @@ const Attendance = () => {
                 <th className="px-4 py-2 text-left">Name</th>
                 <th className="px-4 py-2 text-left">Date</th>
                 <th className="px-4 py-2 text-left">Time</th>
-                <th className="px-4 py-2 text-left">Punch Type</th>
+                {/* <th className="px-4 py-2 text-left">Punch Type</th> */}
               </tr>
             </thead>
             <tbody>
