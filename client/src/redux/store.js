@@ -43,6 +43,7 @@ import {
   preEmployeeApi,
   employeeResign,
   attendenceReportApi,
+  attendenceGenerationApi,
   
 
 } from "./services"
@@ -198,6 +199,7 @@ const commonReducers = {
   [preEmployeeApi.reducerPath] : preEmployeeApi.reducer,
   [employeeResign.reducerPath] : employeeResign.reducer,
   [attendenceReportApi.reducerPath] : attendenceReportApi.reducer,
+  [attendenceGenerationApi.reducerPath] : attendenceGenerationApi.reducer,
 
 
 }
@@ -310,6 +312,7 @@ OTMAsterAPi.middleware,
 preEmployeeApi.middleware,
 employeeResign.middleware,
 attendenceReportApi.middleware,
+attendenceGenerationApi.middleware,
 ];
 
 

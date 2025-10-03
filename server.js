@@ -65,6 +65,7 @@ import {
   preEmployee,
   employeeResign,
   AttendanceReport,
+  AttendenceGeneration,
 } from "./src/routes/index.js";
 
 import { socketMain } from "./src/sockets/socket.js";
@@ -163,6 +164,7 @@ app.use('/oTMAster',OTMaster)
 app.use('/preEmployeeRegistration',preEmployee)
 app.use('/employeeResign',employeeResign)
 app.use('/attendenceReport',AttendanceReport)
+app.use('/attendenceGeneration',AttendenceGeneration)
 
 app.get("/retreiveFile/:fileName", (req, res) => {
   const { fileName } = req.params;

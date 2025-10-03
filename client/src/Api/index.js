@@ -113,3 +113,4 @@ export const OT_MASTER  = 'oTMAster'
 export const EMP_API =  "preEmployeeRegistration"
 export const EMP_RESIGN = 'employeeResign'
 export const ATTENDENCE_REPORT = 'attendenceReport'
+export const ATTENDENCE_GENERATION = '/attendenceGeneration'
