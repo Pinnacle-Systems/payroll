@@ -111,30 +111,59 @@ const Form = () => {
     {
       header: "In Date",
       accessor: (item) =>
-        item.inTime
-          ?  moment.utc(item.inTime).format("YYYY-MM-DD")
-          : "-",
+        item.inTime ? moment.utc(item.inTime).format("YYYY-MM-DD") : "-",
+      className: " text-gray-900   text-center",
     },
     {
       header: "In Time",
       accessor: (item) =>
-        item.inTime
-          ? moment.utc(item.inTime).format("HH:mm:ss")
-          : "-",
+        item.inTime ? moment.utc(item.inTime).format("HH:mm:ss") : "-",
+      className: " text-gray-900 w-8  text-center",
     },
+    {
+      header: "Morning Break Out",
+      accessor: (item) =>
+        item.firstBreakOut
+          ? moment.utc(item.firstBreakOut).format("HH:mm:ss")
+          : "-",
+      className: " text-gray-900 w-32 text-center",
+    },
+    {
+      header: "Morning Break In",
+      accessor: (item) =>
+        item.firstBreakIn
+          ? moment.utc(item.firstBreakIn).format("HH:mm:ss")
+          : "-",
+      className: " text-gray-900  text-center",
+    },
+    {
+      header: "Evening Break Out",
+      accessor: (item) =>
+        item.eveningBreakOut
+          ? moment.utc(item.eveningBreakOut).format("HH:mm:ss")
+          : "-",
+      className: " text-gray-900  text-center",
+    },
+    {
+      header: "Evening Break In",
+      accessor: (item) =>
+        item.eveningBreakIn
+          ? moment.utc(item.eveningBreakIn).format("HH:mm:ss")
+          : "-",
+      className: " text-gray-900  text-center",
+    },
+
     {
       header: "Out Date",
       accessor: (item) =>
-        item.outTime
-          ?  moment.utc(item.outTime).format("YYYY-MM-DD")
-          : "-",
+        item.outTime ? moment.utc(item.outTime).format("YYYY-MM-DD") : "-",
+      className: " text-gray-900  text-center",
     },
     {
       header: "Out Time",
       accessor: (item) =>
-        item.outTime
-          ? moment.utc(item.outTime).format("HH:mm:ss")
-          : "-",
+        item.outTime ? moment.utc(item.outTime).format("HH:mm:ss") : "-",
+      className: " text-gray-900  text-center",
     },
   ];
   const EmployeeOptions = employeeCategory?.data?.map((val) => ({

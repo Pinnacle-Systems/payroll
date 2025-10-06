@@ -41,20 +41,45 @@ async function get(searchParams) {
   const { date } = searchParams;
   if (!date) throw new Error("date is required");
 
+  // const rawData = await prisma.$queryRaw`
+  //   SELECT
+  //     uid,
+  //     DATE_FORMAT(MIN(timestamp), '%Y-%m-%d %H:%i:%s') AS inTime,
+  //     DATE_FORMAT(MAX(timestamp), '%Y-%m-%d %H:%i:%s') AS outTime
+  //   FROM PunchData
+  //   WHERE DATE(timestamp) = ${date}
+  //   GROUP BY uid
+  //   ORDER BY uid
+  // `;
   const rawData = await prisma.$queryRaw`
-    SELECT
-      uid,
-      DATE_FORMAT(MIN(timestamp), '%Y-%m-%d %H:%i:%s') AS inTime,
-      DATE_FORMAT(MAX(timestamp), '%Y-%m-%d %H:%i:%s') AS outTime
-    FROM PunchData
-    WHERE DATE(timestamp) = ${date}
-    GROUP BY uid
-    ORDER BY uid
-  `;
+  SELECT uid,
+         MIN(CASE WHEN rn = 1 THEN ts END) AS inTime,
+         MIN(CASE WHEN rn = 2 THEN ts END) AS firstBreakOut,
+         MIN(CASE WHEN rn = 3 THEN ts END) AS firstBreakIn,
+         MAX(CASE WHEN rn = cnt THEN ts END) AS outTime,
+         MAX(CASE WHEN rn = cnt-1 THEN ts END) AS eveningBreakIn,
+         MAX(CASE WHEN rn = cnt-2 THEN ts END) AS eveningBreakOut
+  FROM (
+      SELECT 
+          uid,
+          timestamp AS ts,
+          ROW_NUMBER() OVER (PARTITION BY uid ORDER BY timestamp) AS rn,
+          COUNT(*) OVER (PARTITION BY uid) AS cnt
+      FROM PunchData
+      WHERE DATE(timestamp) = ${date}
+  ) t
+  GROUP BY uid
+  ORDER BY uid
+`;
 
   const data = rawData.map((row) => ({
     uid: row.uid,
-    inTime: row.inTime,   // MySQL DATETIME format
+    inTime: row.inTime, // MySQL DATETIME format
+    firstBreakOut: row.firstBreakOut, // 2nd punch
+    firstBreakIn: row.firstBreakIn, // 3rd punch
+
+    eveningBreakOut: row.eveningBreakOut, // 3rd last punch
+    eveningBreakIn: row.eveningBreakIn,
     outTime: row.outTime,
   }));
 
@@ -62,7 +87,3 @@ async function get(searchParams) {
 }
 
 export { get };
-
-
-
-
