@@ -271,13 +271,14 @@ async function savePunchesToDB(punches) {
     const batch = punches.slice(i, i + batchSize);
     await prisma.punchData.createMany({
       data: batch.map((p) => {
-          const [day, month, year] = p.date.split("-");
+        const [day, month, year] = p.date.split("-");
         const formattedDate = `${year}-${month}-${day}`;
-      
-        
+
         return {
           uid: parseInt(p.uid),
+          // mIdCard: parseInt(p.uid),
           timestamp: new Date(`${formattedDate}T${p.time}`),
+          machineIP: p.machineIP || '', 
         };
       }),
       skipDuplicates: true,
@@ -329,6 +330,7 @@ async function fetchPunches(fromDate, toDate) {
               .tz("Asia/Kolkata")
               .format("DD-MM-YYYY"),
             time: moment(log.recordTime).tz("Asia/Kolkata").format("HH:mm:ss"),
+            machineIP: log.ip,
             // punchType: log.type === 0 ? "Check-In" : "Check-Out",
           };
         });

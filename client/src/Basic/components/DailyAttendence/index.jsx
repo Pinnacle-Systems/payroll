@@ -8,6 +8,7 @@ import Modal from "../../../UiComponents/Modal";
 import { GroupBy } from "../../../Utils/DropdownData";
 import { getCommonParams } from "../../../Utils/helper";
 import Swal from "sweetalert2";
+import moment from "moment-timezone";
 const Form = () => {
   const [date, setDate] = useState("");
   const [employeeCategoryId, setEmployeeCategoryId] = useState("");
@@ -107,6 +108,34 @@ const Form = () => {
     //     item.outTime ? new Date(item.outTime).toLocaleTimeString() : "-",
     //   className: " text-gray-900 text-left pl-2 uppercase w-30",
     // },
+    {
+      header: "In Date",
+      accessor: (item) =>
+        item.inTime
+          ?  moment.utc(item.inTime).format("YYYY-MM-DD")
+          : "-",
+    },
+    {
+      header: "In Time",
+      accessor: (item) =>
+        item.inTime
+          ? moment.utc(item.inTime).format("HH:mm:ss")
+          : "-",
+    },
+    {
+      header: "Out Date",
+      accessor: (item) =>
+        item.outTime
+          ?  moment.utc(item.outTime).format("YYYY-MM-DD")
+          : "-",
+    },
+    {
+      header: "Out Time",
+      accessor: (item) =>
+        item.outTime
+          ? moment.utc(item.outTime).format("HH:mm:ss")
+          : "-",
+    },
   ];
   const EmployeeOptions = employeeCategory?.data?.map((val) => ({
     value: val?.id,
@@ -147,7 +176,7 @@ const Form = () => {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[50%]  h-[55%]"}
+            widthClass={"w-[30%]  h-[55%]"}
             onClose={() => {
               setForm(false);
             }}
@@ -178,7 +207,7 @@ const Form = () => {
                             />
                           </div>
                           {console.log(date, "sendDate")}
-                          <div className="w-52">
+                          {/* <div className="w-52">
                             <label className="block text-xs font-semibold text-slate-700 mb-1">
                               Employee Category
                               <span className="text-red-500">*</span>
@@ -204,8 +233,8 @@ const Form = () => {
           transition-all duration-150 shadow-sm"
                               styles={customSelectStyles}
                             />
-                          </div>
-                          <div className="mb-3">
+                          </div> */}
+                          {/* <div className="mb-3">
                             {" "}
                             <label className="block text-xs font-semibold text-slate-700 mb-1">
                               {" "}
@@ -225,7 +254,7 @@ const Form = () => {
                                 </option>
                               ))}{" "}
                             </select>{" "}
-                          </div>
+                          </div> */}
                           <div>
                             <button
                               onClick={() => {
