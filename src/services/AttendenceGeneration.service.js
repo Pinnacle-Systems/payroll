@@ -51,36 +51,92 @@ async function get(searchParams) {
   //   GROUP BY uid
   //   ORDER BY uid
   // `;
-  const rawData = await prisma.$queryRaw`
-  SELECT uid,
-         MIN(CASE WHEN rn = 1 THEN ts END) AS inTime,
-         MIN(CASE WHEN rn = 2 THEN ts END) AS firstBreakOut,
-         MIN(CASE WHEN rn = 3 THEN ts END) AS firstBreakIn,
-         MAX(CASE WHEN rn = cnt THEN ts END) AS outTime,
-         MAX(CASE WHEN rn = cnt-1 THEN ts END) AS eveningBreakIn,
-         MAX(CASE WHEN rn = cnt-2 THEN ts END) AS eveningBreakOut
-  FROM (
-      SELECT 
-          uid,
-          timestamp AS ts,
-          ROW_NUMBER() OVER (PARTITION BY uid ORDER BY timestamp) AS rn,
-          COUNT(*) OVER (PARTITION BY uid) AS cnt
+  //   const rawData = await prisma.$queryRaw`
+  //   SELECT uid,
+  //          MIN(CASE WHEN rn = 1 THEN ts END) AS inTime,
+  //          MIN(CASE WHEN rn = 2 THEN ts END) AS firstBreakOut,
+  //          MIN(CASE WHEN rn = 3 THEN ts END) AS firstBreakIn,
+  //          MAX(CASE WHEN rn = cnt THEN ts END) AS outTime,
+  //          MAX(CASE WHEN rn = cnt-1 THEN ts END) AS eveningBreakIn,
+  //          MAX(CASE WHEN rn = cnt-2 THEN ts END) AS eveningBreakOut
+  //   FROM (
+  //       SELECT
+  //           uid,
+  //           timestamp AS ts,
+  //           ROW_NUMBER() OVER (PARTITION BY uid ORDER BY timestamp) AS rn,
+  //           COUNT(*) OVER (PARTITION BY uid) AS cnt
+  //       FROM PunchData
+  //       WHERE DATE(timestamp) = ${date}
+  //   ) t
+  //   GROUP BY uid
+  //   ORDER BY uid
+  // `;
+   const rawData = await prisma.$queryRaw`
+    WITH Punches AS (
+      SELECT
+        uid,
+        machineType,
+        timestamp AS ts,
+        ROW_NUMBER() OVER (PARTITION BY uid, machineType ORDER BY timestamp ASC) AS rn_asc,
+        ROW_NUMBER() OVER (PARTITION BY uid, machineType ORDER BY timestamp DESC) AS rn_desc,
+        COUNT(*) OVER (PARTITION BY uid, machineType) AS cnt
       FROM PunchData
       WHERE DATE(timestamp) = ${date}
-  ) t
-  GROUP BY uid
-  ORDER BY uid
-`;
+    )
+    SELECT
+      uid,
+
+      -- IN time
+      COALESCE(
+        MIN(CASE WHEN machineType='IN' AND rn_asc=1 THEN ts END),
+        MIN(CASE WHEN machineType='BOTH' AND rn_asc=1 THEN ts END)
+      ) AS inTime,
+
+      -- First Break Out
+      COALESCE(
+        MAX(CASE WHEN machineType='OUT' AND rn_desc=3 THEN ts END),
+        MIN(CASE WHEN machineType='BOTH' AND rn_asc=2 THEN ts END)
+      ) AS firstBreakOut,
+
+      -- First Break In
+      COALESCE(
+        MIN(CASE WHEN machineType='IN' AND rn_asc=2 THEN ts END),
+        MIN(CASE WHEN machineType='BOTH' AND rn_asc=3 THEN ts END)
+      ) AS firstBreakIn,
+
+      -- Evening Break Out
+      COALESCE(
+        MAX(CASE WHEN machineType='OUT' AND rn_desc=2 THEN ts END),
+        MIN(CASE WHEN machineType='BOTH' AND rn_asc=4 THEN ts END)
+      ) AS eveningBreakOut,
+
+      -- Evening Break In
+      COALESCE(
+        MIN(CASE WHEN machineType='IN' AND rn_asc=3 THEN ts END),
+        MIN(CASE WHEN machineType='BOTH' AND rn_asc=5 THEN ts END)
+      ) AS eveningBreakIn,
+
+      -- Out Time
+      COALESCE(
+        MAX(CASE WHEN machineType='OUT' AND rn_desc=1 THEN ts END),
+        MAX(CASE WHEN machineType='BOTH' AND rn_desc=1 THEN ts END)
+      ) AS outTime
+
+    FROM Punches
+    GROUP BY uid
+    ORDER BY uid;
+  `;
+
 
   const data = rawData.map((row) => ({
     uid: row.uid,
-    inTime: row.inTime, // MySQL DATETIME format
-    firstBreakOut: row.firstBreakOut, // 2nd punch
-    firstBreakIn: row.firstBreakIn, // 3rd punch
+    inTime: row.inTime || null, // MySQL DATETIME format
+    firstBreakOut: row.firstBreakOut || null, // 2nd punch
+    firstBreakIn: row.firstBreakIn || null, // 3rd punch
 
-    eveningBreakOut: row.eveningBreakOut, // 3rd last punch
-    eveningBreakIn: row.eveningBreakIn,
-    outTime: row.outTime,
+    eveningBreakOut: row.eveningBreakOut || null, // 3rd last punch
+    eveningBreakIn: row.eveningBreakIn || null,
+    outTime: row.outTime || null,
   }));
 
   return { data };

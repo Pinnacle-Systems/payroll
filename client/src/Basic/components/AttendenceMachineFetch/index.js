@@ -68,6 +68,7 @@ const Attendance = () => {
           <table className="min-w-full bg-white border border-gray-200 rounded-lg overflow-hidden">
             <thead className="bg-blue-500 text-white">
               <tr>
+                <th className="px-4 py-2 text-left">S.No</th>
                 <th className="px-4 py-2 text-left">Employee Id</th>
                 {/* <th className="px-4 py-2 text-left">Name</th> */}
                 <th className="px-4 py-2 text-left">Date</th>
@@ -81,6 +82,7 @@ const Attendance = () => {
                   key={index}
                   className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
                 >
+                  <td className="px-4 py-2">{index + 1}</td>
                   <td className="px-4 py-2">{p.uid}</td>
                   {/* <td className="px-4 py-2">{p.name}</td> */}
                   <td className="px-4 py-2">{p.date}</td>

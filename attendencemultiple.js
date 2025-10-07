@@ -135,7 +135,7 @@ async function fetchPunchesFromAllDevices(fromDate, toDate) {
 
       const fromTs = moment(fromDate, "DD-MM-YYYY").startOf("day").valueOf();
       const toTs = moment(toDate, "DD-MM-YYYY").endOf("day").valueOf();
-
+      console.log(fromTs, toTs, "fromTs,toTs");
       const punches = (logs.data || [])
         .filter((log) => {
           const logTs = moment(log.recordTime).valueOf();

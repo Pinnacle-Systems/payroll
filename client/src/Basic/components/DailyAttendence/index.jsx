@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 import { ReusableTable, DateInput, customSelectStyles } from "../../../Inputs";
 import Select from "react-select";
@@ -12,7 +12,7 @@ import moment from "moment-timezone";
 const Form = () => {
   const [date, setDate] = useState("");
   const [employeeCategoryId, setEmployeeCategoryId] = useState("");
-
+  const [reportView, setReportView] = useState("Single");
   const [form, setForm] = useState(true);
   const childRecord = useRef(0);
   const params = getCommonParams();
@@ -118,7 +118,7 @@ const Form = () => {
       header: "In Time",
       accessor: (item) =>
         item.inTime ? moment.utc(item.inTime).format("HH:mm:ss") : "-",
-      className: " text-gray-900 w-8  text-center",
+      className: " text-gray-900   text-center",
     },
     {
       header: "Morning Break Out",
@@ -180,26 +180,438 @@ const Form = () => {
       <div onKeyDown={handleKeyDown} className="p-1 ">
         <div className="w-full flex bg-white p-1 justify-between  items-center">
           <h1 className="master-header">Attendence Generation</h1>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-x-4">
+            <select
+              value={reportView}
+              onChange={(e) => {
+                setReportView(e.target.value);
+              }}
+              className="w-[110px]  px-1 py-0.5 text-xs text-[12px] border border-gray-300 rounded-lg
+    focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+    transition-all duration-150 shadow-sm"
+            >
+              <option value="Seperate">Seperate</option>
+              <option value="Single">Single</option>
+            </select>
             <button
               onClick={() => {
                 setForm(true);
                 OnNew();
               }}
-              className="bg-white border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+              className="bg-white w-[110px]  border ms-4 border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
             >
               + Generate
             </button>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-3">
+        {/* <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-3">
           <ReusableTable
             columns={columns}
             data={allData?.data}
             itemsPerPage={10}
             rowActions={false}
           />
+        </div> */}
+        <div
+          className={`w-[85vw] mt-3   p-2 overflow-auto bg-white max-h-[370px]`}
+        >
+          <table className="w-full border-collapse table-fixed ">
+            <thead className="bg-gray-200 text-gray-800">
+              <tr>
+                <th
+                  className={`w-[15px] px-1 text-center font-medium text-[13px] `}
+                >
+                  S.No
+                </th>
+
+                <th
+                  className={`w-[35px]  py-2 text-center font-medium text-[13px] `}
+                >
+                  Employee Id
+                </th>
+                <th
+                  className={`w-12  py-2 item-center font-medium text-[13px] `}
+                >
+                  In Date
+                </th>
+                <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
+                  In
+                </th>
+                <th
+                  className={`w-12 py-2 item-center font-medium text-[13px] `}
+                >
+                  Out Date
+                </th>
+                <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
+                  Out
+                </th>
+                <th
+                  className={`${
+                    reportView === "Seperate" ? "w-8 " : "w-24 "
+                  }  py-2 text-center font-medium text-[13px] `}
+                >
+                  {/* Morning Break Out */}
+                </th>
+                <th
+                  className={`w-8  py-2 text-center font-medium text-[13px] `}
+                >
+                  {/* Morning Break In */}
+                </th>
+
+                <th
+                  className={`w-12 py-2  item-center font-medium text-[13px] `}
+                >
+                  {/* Evening Break In */}
+                </th>
+
+                <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
+                  {/* Out Date */}
+                </th>
+                <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
+                  {/* Out Time */}
+                </th>
+              </tr>
+            </thead>
+            {/* <tbody>
+              {allData?.data?.map((item, index) => {
+                return (
+                  <tr className=" w-full table-row">
+                    <td className="border border-gray-300 py-1.5  text-center px-1">
+                      {index + 1}
+                    </td>
+
+                    <td className=" border border-gray-300 text-[12px] py-0.5 item-center ">
+                      <input
+                        type="text"
+                        value={item?.uid}
+                        className={`text-center bg-transparent w-[110px]  focus:outline-none focus:border-transparent `}
+                      />
+                    </td>
+                    <td className=" border border-gray-300 text-[12px] py-0.5 item-center">
+                      <input
+                        type="text"
+                        value={
+                          item.inTime
+                            ? moment.utc(item.inTime).format("YYYY-MM-DD")
+                            : "-"
+                        }
+                        className={`text-center bg-transparent w-[110px]  focus:outline-none focus:border-transparent `}
+                      />
+                    </td>
+
+                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
+                      <input
+                        min="0"
+                        type="text"
+                        value={
+                          item.inTime
+                            ? moment.utc(item.inTime).format("HH:mm:ss")
+                            : "-"
+                        }
+                        onFocus={(e) => e.target.select()}
+                        className={`w-full bg-transparent  text-center focus:outline-none focus:border-transparent  `}
+                      />
+                    </td>
+
+                    <td className="border border-gray-300 text-[12px] py-0.5 item-center">
+                      <input
+                        min="0"
+                        type="text"
+                        value={
+                          item.firstBreakOut
+                            ? moment.utc(item.firstBreakOut).format("HH:mm:ss")
+                            : "-"
+                        }
+                        onFocus={(e) => e.target.select()}
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />
+                    </td>
+                    <td className="border border-gray-300 text-[12px] py-0.5 item-center">
+                      <input
+                        type="text"
+                        value={
+                          item.firstBreakIn
+                            ? moment.utc(item.firstBreakIn).format("HH:mm:ss")
+                            : "-"
+                        }
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                        disabled
+                      />
+                    </td>
+
+                    <td className="border border-gray-300 text-[12px] text-center px-1">
+                      <input
+                        type="text"
+                        value={
+                          item.eveningBreakOut
+                            ? moment
+                                .utc(item.eveningBreakOut)
+                                .format("HH:mm:ss")
+                            : "-"
+                        }
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                        disabled
+                      />
+                    </td>
+
+                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
+                      <input
+                        type="text"
+                        value={
+                          item.eveningBreakIn
+                            ? moment.utc(item.eveningBreakIn).format("HH:mm:ss")
+                            : "-"
+                        }
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                        disabled
+                      />
+                    </td>
+                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
+                      <input
+                        type="text"
+                        value={
+                          item.outTime
+                            ? moment.utc(item.outTime).format("YYYY-MM-DD")
+                            : "-"
+                        }
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />
+                    </td>
+                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
+                      <input
+                        type="text"
+                        value={
+                          item.outTime
+                            ? moment.utc(item.outTime).format("HH:mm:ss")
+                            : "-"
+                        }
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody> */}
+            <tbody>
+              {allData?.data?.map((item, index) => (
+                <React.Fragment key={index}>
+                  {/* Row 1 - In + Morning */}
+                  <tr>
+                    {/* S.No rowspan */}
+                    <td
+                      rowSpan={2}
+                      className="border border-gray-300 py-1.5 text-[12px]  text-center px-1"
+                    >
+                      {index + 1}
+                    </td>
+
+                    {/* Employee Id rowspan */}
+                    <td
+                      rowSpan={2}
+                      className="border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={item?.uid}
+                        className={`text-center bg-transparent w-[110px]  focus:outline-none focus:border-transparent `}
+                      />
+                    </td>
+
+                    {/* In Date */}
+                    <td
+                      rowSpan={2}
+                      className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={
+                          item.inTime
+                            ? moment.utc(item.inTime).format("YYYY-MM-DD")
+                            : "-"
+                        }
+                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                      />
+                    </td>
+
+                    {/* In Time */}
+                    <td
+                      rowSpan={2}
+                      className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        min="0"
+                        type="text"
+                        value={
+                          item.inTime
+                            ? moment.utc(item.inTime).format("HH:mm:ss")
+                            : "-"
+                        }
+                        onFocus={(e) => e.target.select()}
+                        className={`w-full bg-transparent  text-center focus:outline-none focus:border-transparent  `}
+                      />
+                    </td>
+                       {/* Out Date */}
+                     <td
+                      rowSpan={2}
+                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={
+                          item.outTime
+                            ? moment.utc(item.outTime).format("YYYY-MM-DD")
+                            : "-"
+                        }
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />
+                    </td> 
+                    {/* Out Time*/}
+
+                    <td
+                      rowSpan={2}
+                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={
+                          item.outTime
+                            ? moment.utc(item.outTime).format("HH:mm:ss")
+                            : "-"
+                        }
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />
+                    </td>
+                    {reportView === "Seperate" && (
+                      <>
+                        <td className=" border border-gray-300 text-[12px] py-0.5 ">
+                          <input
+                            type="text"
+                            value={"OUT"}
+                            className={`w-full text-center bg-transparent  focus:outline-none focus:border-transparent `}
+                          />
+                        </td>
+                        <td className="border border-gray-300 text-[12px] py-0.5 item-center">
+                          <input
+                            min="0"
+                            type="text"
+                            value={
+                              item.firstBreakOut
+                                ? moment
+                                    .utc(item.firstBreakOut)
+                                    .format("HH:mm:ss")
+                                : "-"
+                            }
+                            onFocus={(e) => e.target.select()}
+                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                          />
+                        </td>
+                        <td className="border border-gray-300 text-[12px] text-center px-1">
+                          <input
+                            type="text"
+                            value={
+                              item.eveningBreakOut
+                                ? moment
+                                    .utc(item.eveningBreakOut)
+                                    .format("HH:mm:ss")
+                                : "-"
+                            }
+                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                            disabled
+                          />
+                        </td>
+                      </>
+                    )}
+                    {reportView === "Single" && (
+                      <>
+                        <td className="border border-gray-300 text-[12px] py-0.5 item-center">
+                          <input
+                            type="text"
+                            value={`${
+                              item.firstBreakOut
+                                ? moment
+                                    .utc(item.firstBreakOut)
+                                    .format("HH:mm:ss")
+                                : "-"
+                            } , ${
+                              item.firstBreakIn
+                                ? moment
+                                    .utc(item.firstBreakIn)
+                                    .format("HH:mm:ss")
+                                : "-"
+                            } , ${
+                              item.eveningBreakOut
+                                ? moment
+                                    .utc(item.eveningBreakOut)
+                                    .format("HH:mm:ss")
+                                : "-"
+                            } , ${
+                              item.eveningBreakIn
+                                ? moment
+                                    .utc(item.eveningBreakIn)
+                                    .format("HH:mm:ss")
+                                : "-"
+                            }`}
+                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                            disabled
+                          />
+                        </td>
+                      </>
+                    )}
+
+                    {/* Morning Break Out */}
+
+                    {/* Evening Break Out */}
+
+                 
+                  </tr>
+
+                  {/* Row 2 - Evening + Out */}
+                  {reportView === "Seperate" && (
+                    <>
+                      <td className=" border border-gray-300 text-[12px] py-0.5 item-center">
+                        <input
+                          type="text"
+                          value={"IN"}
+                          className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                        />
+                      </td>
+                      {/* Morning Break In */}
+                      <td className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <input
+                          type="text"
+                          value={
+                            item.firstBreakIn
+                              ? moment.utc(item.firstBreakIn).format("HH:mm:ss")
+                              : "-"
+                          }
+                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                          disabled
+                        />
+                      </td>
+
+                      <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
+                        <input
+                          type="text"
+                          value={
+                            item.eveningBreakIn
+                              ? moment
+                                  .utc(item.eveningBreakIn)
+                                  .format("HH:mm:ss")
+                              : "-"
+                          }
+                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                          disabled
+                        />
+                      </td>
+                    </>
+                  )}
+
+                  <tr>{/* Evening Break In */}</tr>
+                </React.Fragment>
+              ))}
+            </tbody>
+          </table>
         </div>
         {form === true && (
           <Modal
@@ -235,7 +647,6 @@ const Form = () => {
                               ref={designationRef}
                             />
                           </div>
-                          {console.log(date, "sendDate")}
                           {/* <div className="w-52">
                             <label className="block text-xs font-semibold text-slate-700 mb-1">
                               Employee Category

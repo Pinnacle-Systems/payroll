@@ -1858,6 +1858,7 @@ model PunchData {
   machineIP          String?
   MachineInOutGrid   MachineInOutGrid? @relation(fields: [machineInOutGridId], references: [id])
   machineInOutGridId Int?
+  machineType        String?
 
   @@unique([uid, timestamp])
 }

@@ -278,7 +278,7 @@
 //           uid: parseInt(p.uid),
 //           // mIdCard: parseInt(p.uid),
 //           timestamp: new Date(`${formattedDate}T${p.time}`),
-//           machineIP: p.machineIP || '', 
+//           machineIP: p.machineIP || "",
 //         };
 //       }),
 //       skipDuplicates: true,
@@ -314,9 +314,12 @@
 //       const fromTs = moment(fromDate, "DD-MM-YYYY").startOf("day").valueOf();
 //       const toTs = moment(toDate, "DD-MM-YYYY").endOf("day").valueOf();
 
+//       console.log(fromTs, toTs, "fromTs,toTs");
+
 //       const punches = (logs.data || [])
 //         .filter((log) => {
 //           const logTs = moment(log.recordTime).valueOf();
+
 //           return logTs >= fromTs && logTs <= toTs;
 //         })
 //         .map((log) => {
@@ -334,7 +337,7 @@
 //             // punchType: log.type === 0 ? "Check-In" : "Check-Out",
 //           };
 //         });
-//       await savePunchesToDB(punches);
+//       //   await savePunchesToDB(punches);
 
 //       return punches;
 //     } catch (err) {
