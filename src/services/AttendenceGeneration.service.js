@@ -71,7 +71,7 @@ async function get(searchParams) {
   //   GROUP BY uid
   //   ORDER BY uid
   // `;
-   const rawData = await prisma.$queryRaw`
+  const rawData = await prisma.$queryRaw`
     WITH Punches AS (
       SELECT
         uid,
@@ -89,44 +89,43 @@ async function get(searchParams) {
       -- IN time
       COALESCE(
         MIN(CASE WHEN machineType='IN' AND rn_asc=1 THEN ts END),
-        MIN(CASE WHEN machineType='BOTH' AND rn_asc=1 THEN ts END)
+        MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=1 THEN ts END)
       ) AS inTime,
 
       -- First Break Out
       COALESCE(
         MAX(CASE WHEN machineType='OUT' AND rn_desc=3 THEN ts END),
-        MIN(CASE WHEN machineType='BOTH' AND rn_asc=2 THEN ts END)
+        MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=2 THEN ts END)
       ) AS firstBreakOut,
 
       -- First Break In
       COALESCE(
         MIN(CASE WHEN machineType='IN' AND rn_asc=2 THEN ts END),
-        MIN(CASE WHEN machineType='BOTH' AND rn_asc=3 THEN ts END)
+        MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=3 THEN ts END)
       ) AS firstBreakIn,
 
       -- Evening Break Out
       COALESCE(
         MAX(CASE WHEN machineType='OUT' AND rn_desc=2 THEN ts END),
-        MIN(CASE WHEN machineType='BOTH' AND rn_asc=4 THEN ts END)
+        MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=4 THEN ts END)
       ) AS eveningBreakOut,
 
       -- Evening Break In
       COALESCE(
         MIN(CASE WHEN machineType='IN' AND rn_asc=3 THEN ts END),
-        MIN(CASE WHEN machineType='BOTH' AND rn_asc=5 THEN ts END)
+        MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=5 THEN ts END)
       ) AS eveningBreakIn,
 
       -- Out Time
       COALESCE(
         MAX(CASE WHEN machineType='OUT' AND rn_desc=1 THEN ts END),
-        MAX(CASE WHEN machineType='BOTH' AND rn_desc=1 THEN ts END)
+        MAX(CASE WHEN machineType='IN / OUT' AND rn_desc=1 THEN ts END)
       ) AS outTime
 
     FROM Punches
     GROUP BY uid
     ORDER BY uid;
   `;
-
 
   const data = rawData.map((row) => ({
     uid: row.uid,
