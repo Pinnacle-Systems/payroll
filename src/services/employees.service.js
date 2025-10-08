@@ -295,7 +295,7 @@ async function create(req) {
     esi,
     salary,
     salaryMethod,
-
+    mIdCard,
     religion,
     aadharNo,
     panNo,
@@ -347,6 +347,7 @@ async function create(req) {
       email: email ? email : "",
       uanNo: uanNo ? uanNo : "",
       image: image ? image.buffer : null,
+      mIdCard: mIdCard ? parseInt(mIdCard) : null,
 
       presentAddress: presentAddressObj.address
         ? presentAddressObj.address
@@ -376,13 +377,12 @@ async function create(req) {
 
       Branch: branchId ? { connect: { id: parseInt(branchId) } } : undefined,
       Company: companyId ? { connect: { id: parseInt(companyId) } } : undefined,
-      finYear:finYearId ? {connect:{id:parseInt(finYearId)}} : undefined,
+      finYear: finYearId ? { connect: { id: parseInt(finYearId) } } : undefined,
 
       BloodGroup: bloodGroupId
         ? { connect: { id: parseInt(bloodGroupId) } }
         : undefined,
 
-       
       shiftCommonTemplate: shiftCommonTemplateId
         ? { connect: { id: parseInt(shiftCommonTemplateId) } }
         : undefined,
@@ -494,7 +494,7 @@ async function update(id, req) {
     esi,
     salary,
     salaryMethod,
-
+    mIdCard,
     religion,
     aadharNo,
     panNo,
@@ -558,6 +558,8 @@ async function update(id, req) {
       uanNo: uanNo ? uanNo : "",
       active: active === "true" ? true : false,
       image: image ? image.buffer : removeImage ? null : undefined,
+      mIdCard: mIdCard ? parseInt(mIdCard) : null,
+
       BloodGroup: bloodGroupId
         ? { connect: { id: parseInt(bloodGroupId) } }
         : undefined,

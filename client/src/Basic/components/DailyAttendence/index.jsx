@@ -165,6 +165,11 @@ const Form = () => {
         item.outTime ? moment.utc(item.outTime).format("HH:mm:ss") : "-",
       className: " text-gray-900  text-center",
     },
+    {
+      header: "Status",
+      accessor: (item) => item?.status,
+      className: " text-gray-900  text-center",
+    },
   ];
   const EmployeeOptions = employeeCategory?.data?.map((val) => ({
     value: val?.id,
@@ -214,7 +219,7 @@ const Form = () => {
           />
         </div> */}
         <div
-          className={`w-[85vw] mt-3   p-2 overflow-auto bg-white max-h-[370px]`}
+          className={`w-[90vw] mt-3   p-2 overflow-auto bg-white max-h-[500px]`}
         >
           <table className="w-full border-collapse table-fixed ">
             <thead className="bg-gray-200 text-gray-800">
@@ -226,9 +231,9 @@ const Form = () => {
                 </th>
 
                 <th
-                  className={`w-[35px]  py-2 text-center font-medium text-[13px] `}
+                  className={`w-[45px]  py-2 text-center font-medium text-[13px] `}
                 >
-                  Employee Id
+                  Employee MId
                 </th>
                 <th
                   className={`w-12  py-2 item-center font-medium text-[13px] `}
@@ -247,16 +252,16 @@ const Form = () => {
                   Out
                 </th>
                 <th
+                  className={`w-8  py-2 text-center font-medium text-[13px] `}
+                >
+                  Status
+                </th>
+                <th
                   className={`${
                     reportView === "Seperate" ? "w-8 " : "w-24 "
                   }  py-2 text-center font-medium text-[13px] `}
                 >
                   {/* Morning Break Out */}
-                </th>
-                <th
-                  className={`w-8  py-2 text-center font-medium text-[13px] `}
-                >
-                  {/* Morning Break In */}
                 </th>
 
                 <th
@@ -413,8 +418,8 @@ const Form = () => {
                     >
                       <input
                         type="text"
-                        value={item?.uid}
-                        className={`text-center bg-transparent w-[110px]  focus:outline-none focus:border-transparent `}
+                        value={item?.mIdCard}
+                        className={`w-full  text-center bg-transparent   focus:outline-none focus:border-transparent `}
                       />
                     </td>
 
@@ -428,7 +433,7 @@ const Form = () => {
                         value={
                           item.inTime
                             ? moment.utc(item.inTime).format("YYYY-MM-DD")
-                            : "-"
+                            : ""
                         }
                         className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
                       />
@@ -445,14 +450,14 @@ const Form = () => {
                         value={
                           item.inTime
                             ? moment.utc(item.inTime).format("HH:mm:ss")
-                            : "-"
+                            : ""
                         }
                         onFocus={(e) => e.target.select()}
                         className={`w-full bg-transparent  text-center focus:outline-none focus:border-transparent  `}
                       />
                     </td>
-                       {/* Out Date */}
-                     <td
+                    {/* Out Date */}
+                    <td
                       rowSpan={2}
                       className="  border border-gray-300 text-[12px] py-0.5 item-center"
                     >
@@ -461,11 +466,11 @@ const Form = () => {
                         value={
                           item.outTime
                             ? moment.utc(item.outTime).format("YYYY-MM-DD")
-                            : "-"
+                            : ""
                         }
                         className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                       />
-                    </td> 
+                    </td>
                     {/* Out Time*/}
 
                     <td
@@ -477,9 +482,20 @@ const Form = () => {
                         value={
                           item.outTime
                             ? moment.utc(item.outTime).format("HH:mm:ss")
-                            : "-"
+                            : ""
                         }
                         className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />
+                    </td>
+                    {/* Status */}
+                    <td
+                      rowSpan={2}
+                      className="border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={item?.status}
+                        className={`text-center bg-transparent w-[110px]  focus:outline-none focus:border-transparent `}
                       />
                     </td>
                     {reportView === "Seperate" && (
@@ -500,7 +516,7 @@ const Form = () => {
                                 ? moment
                                     .utc(item.firstBreakOut)
                                     .format("HH:mm:ss")
-                                : "-"
+                                : ""
                             }
                             onFocus={(e) => e.target.select()}
                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
@@ -514,7 +530,7 @@ const Form = () => {
                                 ? moment
                                     .utc(item.eveningBreakOut)
                                     .format("HH:mm:ss")
-                                : "-"
+                                : ""
                             }
                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
                             disabled
@@ -532,25 +548,25 @@ const Form = () => {
                                 ? moment
                                     .utc(item.firstBreakOut)
                                     .format("HH:mm:ss")
-                                : "-"
+                                : ""
                             } , ${
                               item.firstBreakIn
                                 ? moment
                                     .utc(item.firstBreakIn)
                                     .format("HH:mm:ss")
-                                : "-"
+                                : ""
                             } , ${
                               item.eveningBreakOut
                                 ? moment
                                     .utc(item.eveningBreakOut)
                                     .format("HH:mm:ss")
-                                : "-"
+                                : ""
                             } , ${
                               item.eveningBreakIn
                                 ? moment
                                     .utc(item.eveningBreakIn)
                                     .format("HH:mm:ss")
-                                : "-"
+                                : ""
                             }`}
                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
                             disabled
@@ -562,8 +578,6 @@ const Form = () => {
                     {/* Morning Break Out */}
 
                     {/* Evening Break Out */}
-
-                 
                   </tr>
 
                   {/* Row 2 - Evening + Out */}
@@ -583,7 +597,7 @@ const Form = () => {
                           value={
                             item.firstBreakIn
                               ? moment.utc(item.firstBreakIn).format("HH:mm:ss")
-                              : "-"
+                              : ""
                           }
                           className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
                           disabled
@@ -598,7 +612,7 @@ const Form = () => {
                               ? moment
                                   .utc(item.eveningBreakIn)
                                   .format("HH:mm:ss")
-                              : "-"
+                              : ""
                           }
                           className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
                           disabled

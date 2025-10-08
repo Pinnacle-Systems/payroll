@@ -106,13 +106,13 @@ export default function Form() {
   const [mobileMatches, setMobileMatches] = useState([]);
   const [aadharMatch, setAadharMatch] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
-
   const [cannotRejoin, setCannotRejoin] = useState(false);
   const [lastWorkingDate, setLastWorkingDate] = useState(null);
   const [leaveReason, setLeaveReason] = useState("");
   const [contextMenu, setContextMenu] = useState(null);
   const [educationContext, setEducationContext] = useState(null);
   const [familyContext, setFamilyContext] = useState(null);
+  const [mIdCard,setMIdCard] = useState('')
 
   const handleRightClick = (event, rowIndex, type) => {
     event.preventDefault();
@@ -371,7 +371,7 @@ export default function Form() {
       setIdNumber(data?.idNumber || "");
       setRegNo(data?.regNo || "");
       setReligion(data?.religion);
-
+      setMIdCard(data?.mIdCard || '')
       setEmail(data?.email || "");
 
       // Employment Info
@@ -500,7 +500,7 @@ export default function Form() {
     gender,
     disability,
     identificationMark,
-
+    mIdCard,
     bloodGroupId,
     maritalStatus,
     height,
@@ -671,7 +671,8 @@ export default function Form() {
       data?.permanentAddress.stateId &&
       data?.presentAddress.countryId &&
       data?.permanentAddress.countryId &&
-      data?.employeeSubCategoryId
+      data?.employeeSubCategoryId &&
+      data?.mIdCard
     ) {
       return true;
     }
@@ -854,7 +855,7 @@ export default function Form() {
     setRejoinReason("");
     setDesignationId("");
     setEmployeeCategoryId("");
-
+    setMIdCard('')
     setPayCategory("");
     setIdNumber("");
     setLastWorkingDate("");
@@ -2033,6 +2034,19 @@ useEffect(() => {
                               readOnly={readOnly}
                               // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                            />
+                          </div>
+                          <div className="col-span-1">
+                            <TextInput
+                              ref={input1Ref}
+                              name="MId Card Number"
+                              value={mIdCard}
+                              setValue={setMIdCard}
+                              // required={true}
+                              readOnly={readOnly}
+                              // disabled={childRecord.current > 0}
+                              onKeyDown={(e) => handleKeyNext(e, input2Ref)}
+                              type="number"
                             />
                           </div>
 
