@@ -144,8 +144,8 @@ async function create(body) {
             ? {
                 create: ShiftTemplateItems?.map((item) => ({
                   date: item?.date ? new Date(item?.date) : null,
-                  templateId: item?.templateId
-                    ? parseInt(item.templateId)
+                  shiftCommonTemplateId: item?.shiftCommonTemplateId
+                    ? parseInt(item.shiftCommonTemplateId)
                     : undefined,
                   shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
                   inNextDay: item?.inNextDay ? item.inNextDay : undefined,
@@ -239,9 +239,9 @@ async function updateShiftTemplateItems(tx, ShiftTemplateItems, data) {
           id: parseInt(item.id),
         },
         data: {
-          shiftTemplateId: data?.id ? data?.id : undefined,
+          shiftshiftCommonTemplateId: data?.id ? data?.id : undefined,
           date: item?.date ? new Date(item?.date) : null,
-          templateId: item?.templateId ? parseInt(item.templateId) : undefined,
+          shiftCommonTemplateId: item?.shiftCommonTemplateId ? parseInt(item.shiftCommonTemplateId) : undefined,
           shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
           inNextDay: item?.inNextDay ? item.inNextDay : undefined,
           toleranceInBeforeStart: item?.toleranceInBeforeStart
@@ -325,8 +325,8 @@ async function updateShiftTemplateItems(tx, ShiftTemplateItems, data) {
     } else {
       return await tx.ShiftTemplateItems.create({
         data: {
-          shiftTemplateId: data?.id ? data?.id : undefined,
-          templateId: item?.templateId ? parseInt(item.templateId) : undefined,
+          shiftshiftCommonTemplateId: data?.id ? data?.id : undefined,
+          shiftCommonTemplateId: item?.shiftCommonTemplateId ? parseInt(item.shiftCommonTemplateId) : undefined,
           shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
           shiftFrom: item?.shiftFrom ? item?.shiftFrom : "",
           shiftTo: item?.shiftTo ? item?.shiftTo : "",
@@ -394,8 +394,8 @@ async function update(id, body) {
             ShiftTemplateItems?.length > 0
               ? ShiftTemplateItems?.map((item) => ({
                   date: item?.date ? new Date(item?.date) : null,
-                  templateId: item?.templateId
-                    ? parseInt(item.templateId)
+                  shiftCommonTemplateId: item?.shiftCommonTemplateId
+                    ? parseInt(item.shiftCommonTemplateId)
                     : undefined,
                   shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
                   shiftFrom: item?.shiftFrom ? item?.shiftFrom : "",

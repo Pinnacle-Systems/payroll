@@ -9,6 +9,7 @@ import { GroupBy } from "../../../Utils/DropdownData";
 import { getCommonParams } from "../../../Utils/helper";
 import Swal from "sweetalert2";
 import moment from "moment-timezone";
+import { allow } from "joi";
 const Form = () => {
   const [date, setDate] = useState("");
   const [employeeCategoryId, setEmployeeCategoryId] = useState("");
@@ -180,6 +181,16 @@ const Form = () => {
     setEmployeeCategoryId("");
     setGroupBy("");
   };
+  const absentData =
+    allData?.data?.filter((item) => item.status === "Absent") || [];
+  const regularData =
+    allData?.data?.filter((item) => item.status === "Regular") || [];
+  const irregularData =
+    allData?.data?.filter((item) => item.status === "Irregular") || [];
+  console.log(absentData, "absentData");
+  console.log(regularData, "regularData");
+  console.log(irregularData, "irregularData");
+
   return (
     <div>
       <div onKeyDown={handleKeyDown} className="p-1 ">
@@ -218,8 +229,9 @@ const Form = () => {
             rowActions={false}
           />
         </div> */}
+
         <div
-          className={`w-[90vw] mt-3   p-2 overflow-auto bg-white max-h-[500px]`}
+          className={`w-[90vw] mt-3  p-2 overflow-auto bg-white max-h-[500px]`}
         >
           <table className="w-full border-collapse table-fixed ">
             <thead className="bg-gray-200 text-gray-800">
@@ -251,11 +263,11 @@ const Form = () => {
                 <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
                   Out
                 </th>
-                <th
+                {/* <th
                   className={`w-8  py-2 text-center font-medium text-[13px] `}
                 >
                   Status
-                </th>
+                </th> */}
                 <th
                   className={`${
                     reportView === "Seperate" ? "w-8 " : "w-24 "
@@ -265,7 +277,7 @@ const Form = () => {
                 </th>
 
                 <th
-                  className={`w-12 py-2  item-center font-medium text-[13px] `}
+                  className={`w-8 py-2  item-center font-medium text-[13px] `}
                 >
                   {/* Evening Break In */}
                 </th>
@@ -277,129 +289,14 @@ const Form = () => {
                   {/* Out Time */}
                 </th>
               </tr>
+              {/*
+               */}
             </thead>
-            {/* <tbody>
-              {allData?.data?.map((item, index) => {
-                return (
-                  <tr className=" w-full table-row">
-                    <td className="border border-gray-300 py-1.5  text-center px-1">
-                      {index + 1}
-                    </td>
 
-                    <td className=" border border-gray-300 text-[12px] py-0.5 item-center ">
-                      <input
-                        type="text"
-                        value={item?.uid}
-                        className={`text-center bg-transparent w-[110px]  focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-                    <td className=" border border-gray-300 text-[12px] py-0.5 item-center">
-                      <input
-                        type="text"
-                        value={
-                          item.inTime
-                            ? moment.utc(item.inTime).format("YYYY-MM-DD")
-                            : "-"
-                        }
-                        className={`text-center bg-transparent w-[110px]  focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
+            <p className=" z-10 w-[100px] text-sm px-1 py-0.5  ">REGULAR</p>
 
-                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
-                      <input
-                        min="0"
-                        type="text"
-                        value={
-                          item.inTime
-                            ? moment.utc(item.inTime).format("HH:mm:ss")
-                            : "-"
-                        }
-                        onFocus={(e) => e.target.select()}
-                        className={`w-full bg-transparent  text-center focus:outline-none focus:border-transparent  `}
-                      />
-                    </td>
-
-                    <td className="border border-gray-300 text-[12px] py-0.5 item-center">
-                      <input
-                        min="0"
-                        type="text"
-                        value={
-                          item.firstBreakOut
-                            ? moment.utc(item.firstBreakOut).format("HH:mm:ss")
-                            : "-"
-                        }
-                        onFocus={(e) => e.target.select()}
-                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                      />
-                    </td>
-                    <td className="border border-gray-300 text-[12px] py-0.5 item-center">
-                      <input
-                        type="text"
-                        value={
-                          item.firstBreakIn
-                            ? moment.utc(item.firstBreakIn).format("HH:mm:ss")
-                            : "-"
-                        }
-                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                        disabled
-                      />
-                    </td>
-
-                    <td className="border border-gray-300 text-[12px] text-center px-1">
-                      <input
-                        type="text"
-                        value={
-                          item.eveningBreakOut
-                            ? moment
-                                .utc(item.eveningBreakOut)
-                                .format("HH:mm:ss")
-                            : "-"
-                        }
-                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                        disabled
-                      />
-                    </td>
-
-                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
-                      <input
-                        type="text"
-                        value={
-                          item.eveningBreakIn
-                            ? moment.utc(item.eveningBreakIn).format("HH:mm:ss")
-                            : "-"
-                        }
-                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                        disabled
-                      />
-                    </td>
-                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
-                      <input
-                        type="text"
-                        value={
-                          item.outTime
-                            ? moment.utc(item.outTime).format("YYYY-MM-DD")
-                            : "-"
-                        }
-                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                      />
-                    </td>
-                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
-                      <input
-                        type="text"
-                        value={
-                          item.outTime
-                            ? moment.utc(item.outTime).format("HH:mm:ss")
-                            : "-"
-                        }
-                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                      />
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody> */}
             <tbody>
-              {allData?.data?.map((item, index) => (
+              {regularData?.map((item, index) => (
                 <React.Fragment key={index}>
                   {/* Row 1 - In + Morning */}
                   <tr>
@@ -488,16 +385,16 @@ const Form = () => {
                       />
                     </td>
                     {/* Status */}
-                    <td
+                    {/* <td
                       rowSpan={2}
                       className="border border-gray-300 text-[12px] py-0.5 item-center"
                     >
                       <input
                         type="text"
                         value={item?.status}
-                        className={`text-center bg-transparent w-[110px]  focus:outline-none focus:border-transparent `}
+                        className={`text-left w-full pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
                       />
-                    </td>
+                    </td> */}
                     {reportView === "Seperate" && (
                       <>
                         <td className=" border border-gray-300 text-[12px] py-0.5 ">
@@ -625,8 +522,264 @@ const Form = () => {
                 </React.Fragment>
               ))}
             </tbody>
+            <p className=" z-10 w-[100px] text-sm px-1 py-0.5 ">IRREGULAR</p>
+            <tbody>
+              {irregularData?.map((item, index) => (
+                <React.Fragment key={index}>
+                  {/* Row 1 - In + Morning */}
+                  <tr>
+                    {/* S.No rowspan */}
+                    <td
+                      rowSpan={2}
+                      className="border border-gray-300 py-1.5 text-[12px]  text-center px-1"
+                    >
+                      {index + 1}
+                    </td>
+
+                    {/* Employee Id rowspan */}
+                    <td
+                      rowSpan={2}
+                      className="border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={item?.mIdCard}
+                        className={`w-full  text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                      />
+                    </td>
+
+                    {/* In Date */}
+                    <td
+                      rowSpan={2}
+                      className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={
+                          item.inTime
+                            ? moment.utc(item.inTime).format("YYYY-MM-DD")
+                            : ""
+                        }
+                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                      />
+                    </td>
+
+                    {/* In Time */}
+                    <td
+                      rowSpan={2}
+                      className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        min="0"
+                        type="text"
+                        value={
+                          item.inTime
+                            ? moment.utc(item.inTime).format("HH:mm:ss")
+                            : ""
+                        }
+                        onFocus={(e) => e.target.select()}
+                        className={`w-full bg-transparent  text-center focus:outline-none focus:border-transparent  `}
+                      />
+                    </td>
+                    {/* Out Date */}
+                    <td
+                      rowSpan={2}
+                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={
+                          item.outTime
+                            ? moment.utc(item.outTime).format("YYYY-MM-DD")
+                            : ""
+                        }
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />
+                    </td>
+                    {/* Out Time*/}
+
+                    <td
+                      rowSpan={2}
+                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={
+                          item.outTime
+                            ? moment.utc(item.outTime).format("HH:mm:ss")
+                            : ""
+                        }
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />
+                    </td>
+                    {/* Status */}
+                    {/* <td
+                      rowSpan={2}
+                      className="border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={item?.status}
+                        className={`text-left w-full pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                      />
+                    </td> */}
+                    {reportView === "Seperate" && (
+                      <>
+                        <td className=" border border-gray-300 text-[12px] py-0.5 ">
+                          <input
+                            type="text"
+                            value={"OUT"}
+                            className={`w-full text-center bg-transparent  focus:outline-none focus:border-transparent `}
+                          />
+                        </td>
+                        <td className="border border-gray-300 text-[12px] py-0.5 item-center">
+                          <input
+                            min="0"
+                            type="text"
+                            value={
+                              item.firstBreakOut
+                                ? moment
+                                    .utc(item.firstBreakOut)
+                                    .format("HH:mm:ss")
+                                : ""
+                            }
+                            onFocus={(e) => e.target.select()}
+                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                          />
+                        </td>
+                        <td className="border border-gray-300 text-[12px] text-center px-1">
+                          <input
+                            type="text"
+                            value={
+                              item.eveningBreakOut
+                                ? moment
+                                    .utc(item.eveningBreakOut)
+                                    .format("HH:mm:ss")
+                                : ""
+                            }
+                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                            disabled
+                          />
+                        </td>
+                      </>
+                    )}
+                    {reportView === "Single" && (
+                      <>
+                        <td className="border border-gray-300 text-[12px] py-0.5 item-center">
+                          <input
+                            type="text"
+                            value={`${
+                              item.firstBreakOut
+                                ? moment
+                                    .utc(item.firstBreakOut)
+                                    .format("HH:mm:ss")
+                                : ""
+                            } , ${
+                              item.firstBreakIn
+                                ? moment
+                                    .utc(item.firstBreakIn)
+                                    .format("HH:mm:ss")
+                                : ""
+                            } , ${
+                              item.eveningBreakOut
+                                ? moment
+                                    .utc(item.eveningBreakOut)
+                                    .format("HH:mm:ss")
+                                : ""
+                            } , ${
+                              item.eveningBreakIn
+                                ? moment
+                                    .utc(item.eveningBreakIn)
+                                    .format("HH:mm:ss")
+                                : ""
+                            }`}
+                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                            disabled
+                          />
+                        </td>
+                      </>
+                    )}
+
+                    {/* Morning Break Out */}
+
+                    {/* Evening Break Out */}
+                  </tr>
+
+                  {/* Row 2 - Evening + Out */}
+                  {reportView === "Seperate" && (
+                    <>
+                      <td className=" border border-gray-300 text-[12px] py-0.5 item-center">
+                        <input
+                          type="text"
+                          value={"IN"}
+                          className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                        />
+                      </td>
+                      {/* Morning Break In */}
+                      <td className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <input
+                          type="text"
+                          value={
+                            item.firstBreakIn
+                              ? moment.utc(item.firstBreakIn).format("HH:mm:ss")
+                              : ""
+                          }
+                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                          disabled
+                        />
+                      </td>
+
+                      <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
+                        <input
+                          type="text"
+                          value={
+                            item.eveningBreakIn
+                              ? moment
+                                  .utc(item.eveningBreakIn)
+                                  .format("HH:mm:ss")
+                              : ""
+                          }
+                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                          disabled
+                        />
+                      </td>
+                    </>
+                  )}
+
+                  <tr>{/* Evening Break In */}</tr>
+                </React.Fragment>
+              ))}
+            </tbody>
+            <p className="z-10 w-[100px] text-sm px-1 py-0.5 ">ABSENT</p>
+            <tbody>
+              {absentData?.map((item, index) => (
+                <>
+                  {/* Row 1 - In + Morning */}
+                  <tr>
+                    {/* S.No rowspan */}
+                    <td
+                      className="border border-gray-300 py-1.5 text-[12px]  text-center px-1"
+                    >
+                      {index + 1}
+                    </td>
+
+                    {/* Employee Id rowspan */}
+                    <td
+                      className="border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={item?.mIdCard}
+                        className={`w-full  text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                      />
+                    </td>
+                  </tr>
+                </>
+              ))}
+            </tbody>
           </table>
         </div>
+
         {form === true && (
           <Modal
             isOpen={form}

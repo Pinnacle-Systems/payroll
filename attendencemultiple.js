@@ -60,7 +60,7 @@
 //     `🔗 Connecting to ${device.name} at ${device.ip}:${device.port}...`
 //   );
 
-//   const zk = new ZKLib(device.ip, device.port, 120000);
+//   const zk = new ZKLib(device.ip, device.port, 30000);
 //   try {
 //     await zk.createSocket();
 //     console.log(`✅ Connected to ${device.name}`);

@@ -1429,8 +1429,8 @@ model ShiftTemplateItems {
   updatedBy               User?               @relation("updatedBy", fields: [updatedById], references: [id])
   updatedById             Int?
   active                  Boolean?            @default(true)
-  shiftCommonTemplate     ShiftCommonTemplate @relation(fields: [templateId], references: [id])
-  templateId              Int
+  shiftCommonTemplate     ShiftCommonTemplate @relation(fields: [shiftCommonTemplateId], references: [id])
+  shiftCommonTemplateId   Int
   shift                   Shift               @relation(fields: [shiftId], references: [id])
   shiftId                 Int
   shiftFrom               String?

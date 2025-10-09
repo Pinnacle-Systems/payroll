@@ -79,20 +79,43 @@ Attendance AS (
 )
 SELECT
   e.id,
-  COALESCE(a.mIdCard, e.mIdCard) AS mIdCard,
-  -- final COALESCE merge
+  e.mIdCard,
   COALESCE(a.inTimeIn, a.inTimeBoth) AS inTime,
   COALESCE(a.firstBreakOutOut, a.firstBreakOutBoth) AS firstBreakOut,
   COALESCE(a.firstBreakInIn, a.firstBreakInBoth) AS firstBreakIn,
   COALESCE(a.eveningBreakOutOut, a.eveningBreakOutBoth) AS eveningBreakOut,
   COALESCE(a.eveningBreakInIn, a.eveningBreakInBoth) AS eveningBreakIn,
   COALESCE(a.outTimeOut, a.outTimeBoth) AS outTime,
-  CASE WHEN a.mIdCard IS NULL THEN 'Absent' ELSE 'Present' END AS status
+
+  CASE 
+    WHEN a.mIdCard IS NULL THEN 'Absent'
+    WHEN EXISTS (
+      SELECT 1
+      FROM ShiftTemplateItems s
+      WHERE s.shiftCommonTemplateId = e.shiftCommonTemplateId
+         -- IN check
+      -- AND TIME(COALESCE(a.inTimeIn, a.inTimeBoth)) 
+      --     BETWEEN CAST(s.toleranceInBeforeStart AS TIME) 
+      --         AND CAST(s.toleranceInAfterEnd AS TIME)
+      -- OUT check
+      -- AND TIME(COALESCE(a.outTimeOut, a.outTimeBoth)) 
+      --     BETWEEN CAST(s.toleranceOutBeforeStart AS TIME) 
+      --         AND CAST(s.toleranceOutAfterEnd AS TIME)
+        -- IN check (only hours and minutes)
+        AND TIME_FORMAT(COALESCE(a.inTimeIn, a.inTimeBoth), '%H:%i') 
+            BETWEEN TIME_FORMAT(s.toleranceInBeforeStart, '%H:%i')
+                AND TIME_FORMAT(s.toleranceInAfterEnd, '%H:%i')
+        -- OUT check (only hours and minutes)
+        AND TIME_FORMAT(COALESCE(a.outTimeOut, a.outTimeBoth), '%H:%i') 
+            BETWEEN TIME_FORMAT(s.toleranceOutBeforeStart, '%H:%i')
+                AND TIME_FORMAT(s.toleranceOutAfterEnd, '%H:%i')
+    ) THEN 'Regular'
+    ELSE 'Irregular'
+  END AS status
 
 FROM Employee e
 LEFT JOIN Attendance a ON e.mIdCard = a.mIdCard
 ORDER BY e.id;
-
 `;
 
   // Map to desired output format

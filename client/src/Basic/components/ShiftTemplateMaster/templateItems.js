@@ -28,7 +28,7 @@ const TemplateItems = ({
   childRecord,
   setReadOnly,
   setId,
-  today
+  today,
 }) => {
   const [modal, setModal] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
@@ -183,7 +183,7 @@ const TemplateItems = ({
 
   const addNewRow = () => {
     const newRow = {
-      templateId: "",
+      shiftCommonTemplateId: "",
       quarterDetails: [
         {
           day: "",
@@ -308,7 +308,7 @@ const TemplateItems = ({
       return option?.label; // or option?.value if you prefer
     })
     .filter(Boolean); // remove undefined/null
-console.log(ShiftTemplateItems,"ShiftTemplateItems");
+  console.log(ShiftTemplateItems, "ShiftTemplateItems");
 
   return (
     <>
@@ -354,9 +354,6 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
             <div className="border border-slate-200 p-2 bg-white rounded-md shadow-sm col-span-1">
               <h2 className="font-medium text-slate-700 mb-2">Basic Details</h2>
               <div className="grid grid-cols-6 gap-4">
-              
-
-             
                 <div className="">
                   <TextInput
                     name="Doc Id"
@@ -488,9 +485,13 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
                       <select
                         disabled={readOnly || childRecord.current > 0}
                         className="text-left w-full focus:outline-none rounded py-1 bg-transparent"
-                        value={item.templateId}
+                        value={item.shiftCommonTemplateId}
                         onChange={(e) =>
-                          handleInputChange(e.target.value, index, "templateId")
+                          handleInputChange(
+                            e.target.value,
+                            index,
+                            "shiftCommonTemplateId"
+                          )
                         }
                       >
                         <option>Select Shift Common Template</option>
@@ -512,9 +513,24 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
                         disabled={readOnly || childRecord.current > 0}
                         className="text-left focus:outline-none w-full rounded py-1 bg-transparent"
                         value={item.shiftId}
-                        onChange={(e) =>
-                          handleInputChange(e.target.value, index, "shiftId")
-                        }
+                        onChange={(e) => {
+                          const selectedShiftId = e.target.value;
+                          const selectedShift = shiftData?.data?.find(
+                            (s) => s.id == selectedShiftId
+                          );
+
+                          handleInputChange(selectedShiftId, index, "shiftId"); // update shiftId
+                          handleInputChange(
+                            selectedShift?.from || "00:00:00",
+                            index,
+                            "startTime"
+                          ); // update startTime
+                          handleInputChange(
+                            selectedShift?.to || "00:00:00",
+                            index,
+                            "endTime"
+                          ); // update endTime
+                        }}
                       >
                         <option>Select Shift</option>
                         {(id
@@ -530,41 +546,27 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
                     <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
                       <input
                         type="text"
-                        value={
-                          item?.shiftFrom ||
-                          shiftData?.data?.find((i) => i.id == item?.shiftId)
-                            ?.from ||
-                          ""
-                        }
+                        value={item.startTime}
                         onChange={(e) =>
-                          handleInputChange(e.target.value, index, "shiftFrom")
+                          handleInputChange(e.target.value, index, "startTime")
                         }
                         className={`w-full bg-transparent text-left pl-1  focus:outline-none focus:border-transparent ${
-                          readOnly || childRecord.current > 0
-                            ? "text-gray-600"
-                            : "text-black"
+                          readOnly ? "text-gray-600" : "text-black"
                         }`}
-                        disabled={readOnly || childRecord.current > 0}
+                        readOnly
                       />
                     </td>
                     <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
                       <input
                         type="text"
-                        value={
-                          item.shiftTo ||
-                          shiftData?.data?.find((i) => i.id == item?.shiftId)
-                            ?.to ||
-                          ""
-                        }
+                        value={item.endTime}
                         onChange={(e) =>
-                          handleInputChange(e.target.value, index, "shiftTo")
+                          handleInputChange(e.target.value, index, "endTime")
                         }
                         className={`w-full bg-transparent text-left pl-1  focus:outline-none focus:border-transparent ${
-                          readOnly || childRecord.current > 0
-                            ? "text-gray-600"
-                            : "text-black"
+                          readOnly ? "text-gray-600" : "text-black"
                         }`}
-                        disabled={readOnly || childRecord.current > 0}
+                        readOnly
                       />
                     </td>
                     {/* In Next Day */}
@@ -769,8 +771,12 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
                             </label>
                             <input
                               min="0"
-                              type="text"
-                              value={selectedRow?.toleranceInBeforeStart || ""}
+                              type="time" // enforce proper format
+                              step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
+                              value={
+                                selectedRow?.toleranceInBeforeStart ||
+                                "00:00:00"
+                              }
                               onFocus={(e) => e.target.select()}
                               onChange={(e) =>
                                 handleInputChange(
@@ -797,8 +803,11 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
                             </label>
                             <input
                               min="0"
-                              type="text"
-                              value={selectedRow?.toleranceInAfterEnd || ""}
+                              type="time" // enforce proper format
+                              step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
+                              value={
+                                selectedRow?.toleranceInAfterEnd || "00:00:00"
+                              }
                               onFocus={(e) => e.target.select()}
                               onChange={(e) =>
                                 handleInputChange(
@@ -825,8 +834,12 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
                             </label>
                             <input
                               min="0"
-                              type="text"
-                              value={selectedRow?.toleranceOutBeforeStart || ""}
+                              type="time" // enforce proper format
+                              step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
+                              value={
+                                selectedRow?.toleranceOutBeforeStart ||
+                                "00:00:00"
+                              }
                               onFocus={(e) => e.target.select()}
                               onChange={(e) =>
                                 handleInputChange(
@@ -853,8 +866,11 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
                             </label>
                             <input
                               min="0"
-                              type="text"
-                              value={selectedRow?.toleranceOutAfterEnd || ""}
+                              type="time" // enforce proper format
+                              step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
+                              value={
+                                selectedRow?.toleranceOutAfterEnd || "00:00:00"
+                              }
                               onFocus={(e) => e.target.select()}
                               onChange={(e) =>
                                 handleInputChange(
@@ -909,14 +925,15 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
                       <div className="space-y-4">
                         <div className="flex flex-wrap gap-y-6 gap-x-10">
                           {/* First Break Out */}
-                          <div className="mb-3 w-24">
+                          <div className="mb-3 w-28">
                             <label className="react-select-tag-label">
                               First Break Out
                             </label>
                             <input
                               min="0"
-                              type="text"
-                              value={selectedRow?.fbOut || ""}
+                              type="time" // enforce proper format
+                              step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
+                              value={selectedRow?.fbOut || "00:00:00"}
                               onFocus={(e) => e.target.select()}
                               onChange={(e) =>
                                 handleInputChange(
@@ -937,14 +954,15 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
                           </div>
 
                           {/* First Break In */}
-                          <div className="mb-3 w-24">
+                          <div className="mb-3 w-28">
                             <label className="react-select-tag-label">
                               First Break In
                             </label>
                             <input
                               min="0"
-                              type="text"
-                              value={selectedRow?.fbIn || ""}
+                              type="time" // enforce proper format
+                              step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
+                              value={selectedRow?.fbIn || "00:00:00"}
                               onFocus={(e) => e.target.select()}
                               onChange={(e) =>
                                 handleInputChange(
@@ -965,14 +983,15 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
                           </div>
 
                           {/* Lunch Start */}
-                          <div className="mb-3 w-24">
+                          <div className="mb-3 w-28">
                             <label className="react-select-tag-label">
                               Lunch Start
                             </label>
                             <input
                               min="0"
-                              type="text"
-                              value={selectedRow?.lunchBst || ""}
+                              type="time" // enforce proper format
+                              step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
+                              value={selectedRow?.lunchBst || "00:00:00"}
                               onFocus={(e) => e.target.select()}
                               onChange={(e) =>
                                 handleInputChange(
@@ -1021,14 +1040,15 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
                           </div>
 
                           {/* Lunch End */}
-                          <div className="mb-3 w-24">
+                          <div className="mb-3 w-28">
                             <label className="react-select-tag-label">
                               Lunch End
                             </label>
                             <input
                               min="0"
-                              type="text"
-                              value={selectedRow?.lunchBET || ""}
+                              type="time" // enforce proper format
+                              step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
+                              value={selectedRow?.lunchBET || "00:00:00"}
                               onFocus={(e) => e.target.select()}
                               onChange={(e) =>
                                 handleInputChange(
@@ -1077,14 +1097,15 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
                           </div>
 
                           {/* Second Break Out */}
-                          <div className="mb-3 w-[110px]">
+                          <div className="mb-3 w-28">
                             <label className="react-select-tag-label">
                               Second Break Out
                             </label>
                             <input
                               min="0"
-                              type="text"
-                              value={selectedRow?.sbOut || ""}
+                              type="time" // enforce proper format
+                              step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
+                              value={selectedRow?.sbOut || "00:00:00"}
                               onFocus={(e) => e.target.select()}
                               onChange={(e) =>
                                 handleInputChange(
@@ -1093,7 +1114,7 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
                                   "sbOut"
                                 )
                               }
-                              className={`w-[95px] px-3 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
+                              className={`w-full px-3 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
                         focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                         transition-all duration-150 shadow-sm ${
                           readOnly || childRecord.current > 0
@@ -1105,14 +1126,15 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
                           </div>
 
                           {/* Second Break In */}
-                          <div className="mb-3 w-[110px] -ml-4">
+                          <div className="mb-3 w-28 ">
                             <label className="react-select-tag-label">
                               Second Break In
                             </label>
                             <input
                               min="0"
-                              type="text"
-                              value={selectedRow?.sbIn || ""}
+                              type="time" // enforce proper format
+                              step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
+                              value={selectedRow?.sbIn || "00:00:00"}
                               onFocus={(e) => e.target.select()}
                               onChange={(e) =>
                                 handleInputChange(
@@ -1121,7 +1143,7 @@ console.log(ShiftTemplateItems,"ShiftTemplateItems");
                                   "sbIn"
                                 )
                               }
-                              className={` w-[95px] px-3 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
+                              className={` w-full px-3 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
                         focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
                         transition-all duration-150 shadow-sm ${
                           readOnly || childRecord.current > 0

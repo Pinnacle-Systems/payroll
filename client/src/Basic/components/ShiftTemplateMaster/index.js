@@ -16,7 +16,7 @@ import Swal from "sweetalert2";
 import { useDispatch } from "react-redux";
 
 const ShiftTemplateMaster = () => {
-  const today = Date()
+  const today = Date();
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
 
@@ -68,7 +68,7 @@ const ShiftTemplateMaster = () => {
     setShiftTemplateItems((prev) => {
       let newArray = Array?.from({ length: 1 - prev?.length }, () => {
         return {
-          templateId: "",
+          shiftCommonTemplateId: "",
           quarterDetails: [
             {
               oTDetailsId: "",
@@ -113,7 +113,6 @@ const ShiftTemplateMaster = () => {
           })) || [],
       }));
 
-
       setShiftTemplateItems(mappedGrid ? mappedGrid : []);
       setCategoryId(data?.category ? data?.category : "");
       childRecord.current = data?.childRecord ? data?.childRecord : 0;
@@ -134,12 +133,11 @@ const ShiftTemplateMaster = () => {
     companyId,
     id,
     branchId,
-    ShiftTemplateItems: ShiftTemplateItems?.filter((item) => item.templateId),
+    ShiftTemplateItems: ShiftTemplateItems?.filter(
+      (item) => item.shiftCommonTemplateId
+    ),
     categoryId,
   };
-
- 
- 
 
   const handleSubmitCustom = async (callback, data, text) => {
     try {
@@ -197,7 +195,11 @@ const ShiftTemplateMaster = () => {
       });
       return false;
     }
-    if (ShiftTemplateItems?.some((i) => !i.templateId || i.templateId === "")) {
+    if (
+      ShiftTemplateItems?.some(
+        (i) => !i.shiftCommonTemplateId || i.shiftCommonTemplateId === ""
+      )
+    ) {
       Swal.fire({
         icon: "error",
         title: "Submission error",
@@ -218,7 +220,6 @@ const ShiftTemplateMaster = () => {
   };
 
   const saveData = () => {
-   
     if (!validateData(data)) {
       return;
     }
@@ -285,7 +286,6 @@ const ShiftTemplateMaster = () => {
     }
   };
 
-
   const getNextDocId = useCallback(() => {
     if (id) return;
     if (allData?.nextDocId) {
@@ -307,13 +307,11 @@ const ShiftTemplateMaster = () => {
     setId(id);
     setForm(true);
     setReadOnly(true);
-  
   };
   const handleEdit = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(false);
-    
   };
 
   const columns = [

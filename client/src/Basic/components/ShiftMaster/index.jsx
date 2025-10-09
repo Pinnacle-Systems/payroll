@@ -368,8 +368,8 @@ const ShiftMaster = () => {
                             }
                             ref={shiftRef}
                           />
-                          <div className="w-20">
-                            <TextInput
+                          <div className="w-28">
+                            {/* <TextInput
                               name="From"
                               type="text"
                               value={from}
@@ -379,10 +379,29 @@ const ShiftMaster = () => {
                               disabled={
                                 childRecord.current > 0 ? true : undefined
                               }
+                            /> */}
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              From
+                            </label>
+
+                            <input
+                              type="time" // enforce proper format
+                              step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
+                              value={from || "00:00:00"}
+                              onChange={(e) => setFrom(e.target.value)}
+                              className={`w-full px-3 py-1 text-xs text-[12px]  border input-font border-gray-300 rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm ${
+            readOnly || childRecord.current > 0
+              ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+              : "bg-white hover:border-gray-400"
+          }`}
+                              disabled={readOnly || childRecord.current > 0}
+                              placeholder="From"
                             />
                           </div>
-                          <div className="w-20">
-                            <TextInput
+                          <div className="w-28">
+                            {/* <TextInput
                               name="To"
                               type="text"
                               value={to}
@@ -392,6 +411,25 @@ const ShiftMaster = () => {
                               disabled={
                                 childRecord.current > 0 ? true : undefined
                               }
+                            /> */}
+                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                              To
+                            </label>
+
+                            <input
+                              type="time" // enforce proper format
+                              step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
+                              value={to || "00:00:00"}
+                              onChange={(e) => setTo(e.target.value)}
+                              className={`w-full px-3 py-1 text-xs text-[12px]  border input-font border-gray-300 rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+          transition-all duration-150 shadow-sm ${
+            readOnly || childRecord.current > 0
+              ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+              : "bg-white hover:border-gray-400"
+          }`}
+                              disabled={readOnly || childRecord.current > 0}
+                              placeholder="To"
                             />
                           </div>
                         </div>
