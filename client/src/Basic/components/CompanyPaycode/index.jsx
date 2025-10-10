@@ -39,7 +39,7 @@ const CompanyPaycode = () => {
   const [payComponentId, setPayComponentId] = useState("");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [docId, setDocId] = useState("");
+  const [docId, setDocId] = useState("New");
   const [active, setActive] = useState(true);
   const [errors, setErrors] = useState({});
   const [form, setForm] = useState(false);
@@ -53,7 +53,7 @@ const CompanyPaycode = () => {
 
   const params = getCommonParams();
 
-  const { branchId, companyId } = params;
+  const { branchId, companyId ,finYearId} = params;
 
   const { data: company } = useGetCompanyQuery({ params });
   const [companyCode, setCompanyCode] = useState(company?.data[0].code);
@@ -100,7 +100,7 @@ const CompanyPaycode = () => {
 
   const syncFormWithDb = useCallback(
     (data) => {
-      setDocId(data?.docId);
+      setDocId(data?.docId || "New");
       setDate(
         data?.date
           ? moment.utc(data.date).format("YYYY-MM-DD")
@@ -127,7 +127,7 @@ const CompanyPaycode = () => {
     date,
 
     docId,
-
+    finYearId,
     companyId,
     id,
     branchId,
@@ -236,14 +236,14 @@ const CompanyPaycode = () => {
 
   console.log(allData, "alldata");
 
-  const getNextDocId = useCallback(() => {
-    if (id) return;
-    if (allData?.nextDocId) {
-      setDocId(allData?.nextDocId);
-    }
-  }, [allData, id]);
+  // const getNextDocId = useCallback(() => {
+  //   if (id) return;
+  //   if (allData?.nextDocId) {
+  //     setDocId(allData?.nextDocId);
+  //   }
+  // }, [allData, id]);
 
-  useEffect(getNextDocId, [getNextDocId]);
+  // useEffect(getNextDocId, [getNextDocId]);
   console.log(allData, "alldata");
   const onNew = () => {
     setId("");

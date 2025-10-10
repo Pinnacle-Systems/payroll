@@ -112,7 +112,7 @@ export default function Form() {
   const [contextMenu, setContextMenu] = useState(null);
   const [educationContext, setEducationContext] = useState(null);
   const [familyContext, setFamilyContext] = useState(null);
-  const [mIdCard,setMIdCard] = useState('')
+  const [mIdCard, setMIdCard] = useState("");
 
   const handleRightClick = (event, rowIndex, type) => {
     event.preventDefault();
@@ -371,7 +371,7 @@ export default function Form() {
       setIdNumber(data?.idNumber || "");
       setRegNo(data?.regNo || "");
       setReligion(data?.religion);
-      setMIdCard(data?.mIdCard || '')
+      setMIdCard(data?.mIdCard || "");
       setEmail(data?.email || "");
 
       // Employment Info
@@ -589,6 +589,10 @@ export default function Form() {
       } else {
         returnData = await callback(formData).unwrap();
       }
+      if (returnData?.success === false) {
+        throw new Error(returnData?.message || "Save failed");
+      }
+
       setId(returnData?.data?.id);
 
       // setStep(1);
@@ -855,7 +859,7 @@ export default function Form() {
     setRejoinReason("");
     setDesignationId("");
     setEmployeeCategoryId("");
-    setMIdCard('')
+    setMIdCard("");
     setPayCategory("");
     setIdNumber("");
     setLastWorkingDate("");
@@ -991,47 +995,47 @@ export default function Form() {
   //   ]);
   // }, []);
   useEffect(() => {
-  if ( bankDetails.length === 0) {
-    setBankDetails([
-      {
-        Sno: "",
-        bankName: "",
-        branchName: "",
-        acountNumber: "",
-        ifscCode: "",
-      },
-    ]);
-  }
-}, [bankDetails]);
+    if (bankDetails.length === 0) {
+      setBankDetails([
+        {
+          Sno: "",
+          bankName: "",
+          branchName: "",
+          acountNumber: "",
+          ifscCode: "",
+        },
+      ]);
+    }
+  }, [bankDetails]);
 
-useEffect(() => {
-  if ( educationDetails.length === 0) {
-    setEducationDetails([
-      {
-        Sno: "",
-        courseName: "",
-        universityName: "",
-        institutionName: "",
-        yearOfPass: "",
-      },
-    ]);
-  }
-}, [educationDetails]);
-useEffect(() => {
-  if ( familyDetails.length === 0) {
-    setFamilyDetails([
-      {
-        Sno: "",
-        name: "",
-        dob: "",
-        age: "",
-        relationShipId: "",
-        occupation: "",
-        nominee: "",
-      },
-    ]);
-  }
-}, [familyDetails]);
+  useEffect(() => {
+    if (educationDetails.length === 0) {
+      setEducationDetails([
+        {
+          Sno: "",
+          courseName: "",
+          universityName: "",
+          institutionName: "",
+          yearOfPass: "",
+        },
+      ]);
+    }
+  }, [educationDetails]);
+  useEffect(() => {
+    if (familyDetails.length === 0) {
+      setFamilyDetails([
+        {
+          Sno: "",
+          name: "",
+          dob: "",
+          age: "",
+          relationShipId: "",
+          occupation: "",
+          nominee: "",
+        },
+      ]);
+    }
+  }, [familyDetails]);
   function addNewRow() {
     setBankDetails((prev) => [
       ...prev,
@@ -3444,7 +3448,7 @@ useEffect(() => {
                 </div>
               </div>
             </div>
-           
+
             {contextMenu && (
               <div
                 style={{

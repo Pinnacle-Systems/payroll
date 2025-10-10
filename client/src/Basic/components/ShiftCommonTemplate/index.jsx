@@ -28,7 +28,7 @@ const ShiftCommonTemplateMaster = () => {
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
 
-  const [docId, setDocId] = useState("");
+  const [docId, setDocId] = useState("New");
   const [active, setActive] = useState(true);
   const [name, setName] = useState("");
   const [notes, setNotes] = useState("");
@@ -58,7 +58,7 @@ const ShiftCommonTemplateMaster = () => {
 
   const syncFormWithDb = useCallback(
     (data) => {
-      setDocId(data?.docId || "");
+      setDocId(data?.docId || "New");
       setName(data?.name || "");
       setNotes(data?.notes || "");
       setActive(id ? data?.active ?? false : true);
@@ -175,14 +175,14 @@ const ShiftCommonTemplateMaster = () => {
       }
     }
   };
-  const getNextDocId = useCallback(() => {
-    if (id) return;
-    if (allData?.nextDocId) {
-      setDocId(allData?.nextDocId);
-    }
-  }, [allData, id]);
+  // const getNextDocId = useCallback(() => {
+  //   if (id) return;
+  //   if (allData?.nextDocId) {
+  //     setDocId(allData?.nextDocId);
+  //   }
+  // }, [allData, id]);
 
-  useEffect(getNextDocId, [getNextDocId]);
+  // useEffect(getNextDocId, [getNextDocId]);
   const handleKeyDown = (event) => {
     let charCode = String.fromCharCode(event.which).toLowerCase();
     if ((event.ctrlKey || event.metaKey) && charCode === "s") {

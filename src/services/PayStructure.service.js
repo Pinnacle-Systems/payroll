@@ -146,13 +146,23 @@ async function getSearch(req) {
 async function create(body) {
   const {
     date,
-    docId,
     category,
     employeeCategoryId,
     branchId,
     payStructure,
     companyId,
+    finYearId,
   } = await body;
+  let finYearDate = await getFinYearStartTimeEndTime(finYearId);
+  const shortCode = finYearDate
+    ? getYearShortCodeForFinYear(finYearDate?.startTime, finYearDate?.endTime)
+    : "";
+  let docId = await getNextDocId(
+    branchId,
+    shortCode,
+    finYearDate?.startTime,
+    finYearDate?.endTime
+  );
 
   let data;
 

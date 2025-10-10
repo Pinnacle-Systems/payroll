@@ -78,8 +78,8 @@ async function get(req) {
 }
 
 async function getOne(id) {
-  const childRecord = await prisma.shiftTemplateItems.count({
-    where: { templateId: parseInt(id) },
+  const childRecord = await prisma.employee.count({
+    where: { shiftCommonTemplateId: parseInt(id) },
   });
   const data = await prisma.shiftCommonTemplate.findUnique({
     where: {
@@ -116,7 +116,17 @@ async function getSearch(req) {
 }
 
 async function create(body) {
-  const { branchId, companyId, active, docId, name, notes } = await body;
+  const { branchId, companyId, active, finYearId, name, notes } = await body;
+  let finYearDate = await getFinYearStartTimeEndTime(finYearId);
+    const shortCode = finYearDate
+      ? getYearShortCodeForFinYear(finYearDate?.startTime, finYearDate?.endTime)
+      : "";
+    let docId = await getNextDocId(
+      branchId,
+      shortCode,
+      finYearDate?.startTime,
+      finYearDate?.endTime
+    );
   const data = await prisma.shiftCommonTemplate.create({
     data: {
       companyId: parseInt(companyId),

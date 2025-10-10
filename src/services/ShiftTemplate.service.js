@@ -123,9 +123,18 @@ async function getSearch(req) {
 }
 
 async function create(body) {
-  const { branchId, companyId, active, categoryId, docId, ShiftTemplateItems } =
+  const { branchId, companyId, active, categoryId, finYearId, ShiftTemplateItems } =
     await body;
-
+let finYearDate = await getFinYearStartTimeEndTime(finYearId);
+  const shortCode = finYearDate
+    ? getYearShortCodeForFinYear(finYearDate?.startTime, finYearDate?.endTime)
+    : "";
+  let docId = await getNextDocId(
+    branchId,
+    shortCode,
+    finYearDate?.startTime,
+    finYearDate?.endTime
+  );
   console.log(ShiftTemplateItems, "ShiftTemplateItems");
   let data;
 

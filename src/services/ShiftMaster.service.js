@@ -118,7 +118,17 @@ async function getSearch(req) {
 }
 
 async function create(body) {
-  const { name, branchId, companyId, active, description, from,to,docId } = await body;
+  const { name, branchId, companyId, active, description, from,to,finYearId} = await body;
+  let finYearDate = await getFinYearStartTimeEndTime(finYearId);
+    const shortCode = finYearDate
+      ? getYearShortCodeForFinYear(finYearDate?.startTime, finYearDate?.endTime)
+      : "";
+    let docId = await getNextDocId(
+      branchId,
+      shortCode,
+      finYearDate?.startTime,
+      finYearDate?.endTime
+    );
   const data = await prisma.shift.create({
     data: {
       name,
@@ -133,7 +143,7 @@ async function create(body) {
 }
 
 async function update(id, body) {
-  const { name, branchId, companyId, active, description, docId,from,to, } = await body;
+  const { name, branchId, companyId, active, description,from,to, } = await body;
   const dataFound = await prisma.shift.findUnique({
     where: {
       id: parseInt(id),
@@ -150,7 +160,6 @@ async function update(id, body) {
       companyId: parseInt(companyId),
       branchId: parseInt(branchId),
       description,
-      docId,
       from,to,
     },
   });

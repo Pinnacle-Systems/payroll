@@ -22,7 +22,7 @@ const ShiftMaster = () => {
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [docId, setDocId] = useState("");
+  const [docId, setDocId] = useState("New");
   const [active, setActive] = useState(true);
   const [errors, setErrors] = useState({});
   const [form, setForm] = useState(false);
@@ -34,7 +34,7 @@ const ShiftMaster = () => {
 
   const params = getCommonParams();
 
-  const { branchId, companyId } = params;
+  const { branchId, companyId ,finYearId} = params;
 
   const {
     data: allData,
@@ -60,7 +60,7 @@ const ShiftMaster = () => {
   const syncFormWithDb = useCallback(
     (data) => {
       setName(data?.name || "");
-      setDocId(data?.docId || "");
+      setDocId(data?.docId || "New");
       setDescription(data?.description || "");
       setActive(id ? data?.active ?? false : true);
       setFrom(data?.from || "");
@@ -84,6 +84,7 @@ const ShiftMaster = () => {
     companyId,
     id,
     branchId,
+    finYearId
   };
 
   const validateData = (data) => {
@@ -210,14 +211,14 @@ const ShiftMaster = () => {
     setForm(true);
     setReadOnly(false);
   };
-  const getNextDocId = useCallback(() => {
-    if (id) return;
-    if (allData?.nextDocId) {
-      setDocId(allData?.nextDocId);
-    }
-  }, [allData, id]);
+  // const getNextDocId = useCallback(() => {
+  //   if (id) return;
+  //   if (allData?.nextDocId) {
+  //     setDocId(allData?.nextDocId);
+  //   }
+  // }, [allData, id]);
 
-  useEffect(getNextDocId, [getNextDocId]);
+  // useEffect(getNextDocId, [getNextDocId]);
   const ACTIVE = (
     <div className="bg-gradient-to-r from-green-200 to-green-500 inline-flex items-center justify-center rounded-full border-2 w-6 border-green-500 shadow-lg text-white hover:scale-110 transition-transform duration-300">
       <Power size={10} />

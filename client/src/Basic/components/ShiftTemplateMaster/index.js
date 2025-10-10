@@ -22,7 +22,7 @@ const ShiftTemplateMaster = () => {
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [docId, setDocId] = useState("");
+  const [docId, setDocId] = useState("New");
   const [active, setActive] = useState(true);
   const [form, setForm] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -33,7 +33,7 @@ const ShiftTemplateMaster = () => {
   const params = getCommonParams();
   const [shiftId, setshiftId] = useState("");
 
-  const { branchId, companyId } = params;
+  const { branchId, companyId ,finYearId} = params;
 
   const dispatch = useDispatch();
 
@@ -95,7 +95,7 @@ const ShiftTemplateMaster = () => {
   const syncFormWithDb = useCallback(
     (data) => {
       setName(data?.name || "");
-      setDocId(data?.docId);
+      setDocId(data?.docId || "New");
 
       setDescription(data?.description || "");
       setActive(id ? data?.active ?? false : true);
@@ -137,6 +137,7 @@ const ShiftTemplateMaster = () => {
       (item) => item.shiftCommonTemplateId
     ),
     categoryId,
+    finYearId
   };
 
   const handleSubmitCustom = async (callback, data, text) => {
@@ -286,14 +287,14 @@ const ShiftTemplateMaster = () => {
     }
   };
 
-  const getNextDocId = useCallback(() => {
-    if (id) return;
-    if (allData?.nextDocId) {
-      setDocId(allData?.nextDocId);
-    }
-  }, [allData, id]);
+  // const getNextDocId = useCallback(() => {
+  //   if (id) return;
+  //   if (allData?.nextDocId) {
+  //     setDocId(allData?.nextDocId);
+  //   }
+  // }, [allData, id]);
 
-  useEffect(getNextDocId, [getNextDocId]);
+  // useEffect(getNextDocId, [getNextDocId]);
   const onNew = () => {
     setId("");
 
