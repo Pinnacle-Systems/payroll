@@ -1852,13 +1852,12 @@ model PunchData {
   id                 Int               @id @default(autoincrement())
   Employee           Employee?         @relation(fields: [employeeId], references: [id])
   employeeId         Int?
-  uid                Int
   timestamp          DateTime
-  mIdCard            Int?
+  mIdCard            Int
   machineIP          String?
   MachineInOutGrid   MachineInOutGrid? @relation(fields: [machineInOutGridId], references: [id])
   machineInOutGridId Int?
   machineType        String?
 
-  @@unique([uid, timestamp])
+  @@unique([mIdCard, timestamp])
 }

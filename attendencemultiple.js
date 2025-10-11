@@ -60,7 +60,7 @@ async function connectToDevice(device) {
     `🔗 Connecting to ${device.name} at ${device.ip}:${device.port}...`
   );
 
-  const zk = new ZKLib(device.ip, device.port, 30000);
+  const zk = new ZKLib(device.ip, device.port, 300000);
   try {
     await zk.createSocket();
     console.log(`✅ Connected to ${device.name}`);
@@ -105,7 +105,8 @@ async function savePunchesToDB(punches, deviceIP) {
         const formattedDate = `${year}-${month}-${day}`;
 
         return {
-          uid: parseInt(p.uid),
+          mIdCard: parseInt(p.mIdCard),
+
           timestamp: new Date(`${formattedDate}T${p.time}`),
           machineIP: deviceIP,
         };
@@ -132,29 +133,33 @@ async function fetchPunchesFromAllDevices(fromDate, toDate) {
       // Fetch data from device
       // const users = await zk.getUsers();
       const logs = await zk.getAttendances();
-        console.log(logs,"received");
-        
-    //   const fromTs = moment(fromDate, "DD-MM-YYYY").startOf("day").valueOf();
-    //   const toTs = moment(toDate, "DD-MM-YYYY").endOf("day").valueOf();
-    const fromTs = moment.tz(fromDate, "DD-MM-YYYY", "Asia/Kolkata")
-  .startOf("day")
-  .utc()
-  .valueOf();
+      console.log(logs, "received");
 
-const toTs = moment.tz(toDate, "DD-MM-YYYY", "Asia/Kolkata")
-  .endOf("day")
-  .utc()
-  .valueOf();
+      //   const fromTs = moment(fromDate, "DD-MM-YYYY").startOf("day").valueOf();
+      //   const toTs = moment(toDate, "DD-MM-YYYY").endOf("day").valueOf();
+      const fromTs = moment
+        .tz(fromDate, "DD-MM-YYYY", "Asia/Kolkata")
+        .startOf("day")
+        .utc()
+        .valueOf();
+
+      const toTs = moment
+        .tz(toDate, "DD-MM-YYYY", "Asia/Kolkata")
+        .endOf("day")
+        .utc()
+        .valueOf();
       console.log(fromTs, toTs, "fromTs,toTs");
       const punches = (logs.data || [])
         .filter((log) => {
-        //   const logTs = moment(log.recordTime).valueOf();
+          //   const logTs = moment(log.recordTime).valueOf();
           const logTs = moment.utc(log.recordTime).valueOf();
 
           return logTs >= fromTs && logTs <= toTs;
         })
         .map((log) => ({
-          uid: log.deviceUserId,
+          // uid: log.deviceUserId,
+          mIdCard:parseInt(log.deviceUserId) ,
+
           date: moment(log.recordTime).tz("Asia/Kolkata").format("DD-MM-YYYY"),
           time: moment(log.recordTime).tz("Asia/Kolkata").format("HH:mm:ss"),
           machineIP: device.ip,

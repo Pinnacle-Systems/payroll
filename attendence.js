@@ -1,5 +1,3 @@
-
-
 // //  **************************   working code ************
 
 // import express from "express";
@@ -95,6 +93,7 @@
 //     try {
 //       // const users = await zk.getUsers();
 //       const logs = await zk.getAttendances();
+//       console.log(logs, "received");
 
 //       // const usersMap = {};
 //       // (users.data || []).forEach(u => usersMap[u.userId] = u.name);
