@@ -60,7 +60,7 @@ async function connectToDevice(device) {
     `🔗 Connecting to ${device.name} at ${device.ip}:${device.port}...`
   );
 
-  const zk = new ZKLib(device.ip, device.port, 300000);
+  const zk = new ZKLib(device.ip, device.port, 1600000);
   try {
     await zk.createSocket();
     console.log(`✅ Connected to ${device.name}`);
@@ -107,7 +107,8 @@ async function savePunchesToDB(punches, deviceIP) {
         return {
           mIdCard: parseInt(p.mIdCard),
 
-          timestamp: new Date(`${formattedDate}T${p.time}`),
+          // timestamp: new Date(`${formattedDate}T${p.time}`),
+          timestamp: moment.tz(`${formattedDate} ${p.time}`, "YYYY-MM-DD HH:mm:ss", "Asia/Kolkata" ).toDate(),
           machineIP: deviceIP,
         };
       }),
@@ -133,7 +134,6 @@ async function fetchPunchesFromAllDevices(fromDate, toDate) {
       // Fetch data from device
       // const users = await zk.getUsers();
       const logs = await zk.getAttendances();
-      console.log(logs, "received");
 
       //   const fromTs = moment(fromDate, "DD-MM-YYYY").startOf("day").valueOf();
       //   const toTs = moment(toDate, "DD-MM-YYYY").endOf("day").valueOf();
@@ -167,9 +167,9 @@ async function fetchPunchesFromAllDevices(fromDate, toDate) {
 
       console.log(`✅ Found ${punches.length} punches from ${device.name}`);
 
-      if (punches.length > 0) {
-        await savePunchesToDB(punches, device.ip);
-      }
+      // if (punches.length > 0) {
+      //   await savePunchesToDB(punches, device.ip);
+      // }
 
       allPunches.push(...punches);
 

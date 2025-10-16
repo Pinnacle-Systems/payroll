@@ -1,39 +1,3 @@
-// import { PrismaClient } from "@prisma/client";
-// const prisma = new PrismaClient();
-
-// async function get(searchParams) {
-//   const { date } = searchParams;
-
-//   if (!date) {
-//     throw new Error("date are required");
-//   }
-
-//   const [year, month, day] = date.split("-");
-
-//   // Create start and end of day in IST
-//   // const startIST = new Date(`${year}-${month}-${day}T00:00:00+05:30`);
-//   // const endIST = new Date(`${year}-${month}-${day}T23:59:59+05:30`);
-//   const startIST = new Date(`${year}-${month}-${day}T00:00:00`);
-//   const endIST = new Date(`${year}-${month}-${day}T23:59:59`);
-//   console.log(startIST,'startIST');
-//   console.log(endIST,'endIST');
-
-//   const data = await prisma.punchData.findMany({
-//     // where: {
-//     //   timestamp: {
-//     //     gte: startIST,
-//     //     lte: endIST,
-//     //   },
-//     // },
-//     orderBy: {
-//       timestamp: "asc",
-//     },
-//   });
-
-//   return { data };
-// }
-
-// export { get };
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
@@ -51,41 +15,40 @@ WITH Punches AS (
     ROW_NUMBER() OVER (PARTITION BY p.mIdCard, p.machineType ORDER BY p.timestamp DESC) AS rn_desc,
     COUNT(*) OVER (PARTITION BY p.mIdCard, p.machineType) AS cnt
   FROM PunchData p
-  WHERE DATE(p.timestamp) = ${date} 
+  WHERE DATE(CONVERT_TZ(p.timestamp, '+00:00', '+05:30')) = ${date} 
 ),
 Attendance AS (
   SELECT
     mIdCard,
-    -- IN
+    -- IN punches
     MIN(CASE WHEN machineType='IN' AND rn_asc=1 THEN ts END) AS inTimeIn,
     MIN(CASE WHEN machineType='IN' AND rn_asc=2 THEN ts END) AS firstBreakInIn,
     MIN(CASE WHEN machineType='IN' AND rn_asc=3 THEN ts END) AS eveningBreakInIn,
 
-    -- OUT
+    -- OUT punches
     MAX(CASE WHEN machineType='OUT' AND rn_desc=1 THEN ts END) AS outTimeOut,
     MAX(CASE WHEN machineType='OUT' AND rn_desc=2 THEN ts END) AS eveningBreakOutOut,
     MAX(CASE WHEN machineType='OUT' AND rn_desc=3 THEN ts END) AS firstBreakOutOut,
 
-    -- BOTH (only if multiple punches)
+    -- BOTH punches
     MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=1 AND cnt >= 1 THEN ts END) AS inTimeBoth,
     MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=2 AND cnt >= 3 THEN ts END) AS firstBreakOutBoth,
     MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=3 AND cnt >= 3 THEN ts END) AS firstBreakInBoth,
     MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=4 AND cnt >= 4 THEN ts END) AS eveningBreakOutBoth,
     MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=5 AND cnt >= 5 THEN ts END) AS eveningBreakInBoth,
     MAX(CASE WHEN machineType='IN / OUT' AND rn_desc=1 AND cnt >= 2 THEN ts END) AS outTimeBoth
-
   FROM Punches
   GROUP BY mIdCard
 )
 SELECT
   e.id,
   e.mIdCard,
-  COALESCE(a.inTimeIn, a.inTimeBoth) AS inTime,
-  COALESCE(a.firstBreakOutOut, a.firstBreakOutBoth) AS firstBreakOut,
-  COALESCE(a.firstBreakInIn, a.firstBreakInBoth) AS firstBreakIn,
-  COALESCE(a.eveningBreakOutOut, a.eveningBreakOutBoth) AS eveningBreakOut,
-  COALESCE(a.eveningBreakInIn, a.eveningBreakInBoth) AS eveningBreakIn,
-  COALESCE(a.outTimeOut, a.outTimeBoth) AS outTime,
+  COALESCE(CONVERT_TZ(a.inTimeIn, '+00:00', '+05:30'), CONVERT_TZ(a.inTimeBoth, '+00:00', '+05:30')) AS inTime,
+  COALESCE(CONVERT_TZ(a.firstBreakOutOut, '+00:00', '+05:30'), CONVERT_TZ(a.firstBreakOutBoth, '+00:00', '+05:30')) AS firstBreakOut,
+  COALESCE(CONVERT_TZ(a.firstBreakInIn, '+00:00', '+05:30'), CONVERT_TZ(a.firstBreakInBoth, '+00:00', '+05:30')) AS firstBreakIn,
+  COALESCE(CONVERT_TZ(a.eveningBreakOutOut, '+00:00', '+05:30'), CONVERT_TZ(a.eveningBreakOutBoth, '+00:00', '+05:30')) AS eveningBreakOut,
+  COALESCE(CONVERT_TZ(a.eveningBreakInIn, '+00:00', '+05:30'), CONVERT_TZ(a.eveningBreakInBoth, '+00:00', '+05:30')) AS eveningBreakIn,
+  COALESCE(CONVERT_TZ(a.outTimeOut, '+00:00', '+05:30'), CONVERT_TZ(a.outTimeBoth, '+00:00', '+05:30')) AS outTime,
 
   CASE 
     WHEN a.mIdCard IS NULL THEN 'Absent'
@@ -93,20 +56,10 @@ SELECT
       SELECT 1
       FROM ShiftTemplateItems s
       WHERE s.shiftCommonTemplateId = e.shiftCommonTemplateId
-         -- IN check
-      -- AND TIME(COALESCE(a.inTimeIn, a.inTimeBoth)) 
-      --     BETWEEN CAST(s.toleranceInBeforeStart AS TIME) 
-      --         AND CAST(s.toleranceInAfterEnd AS TIME)
-      -- OUT check
-      -- AND TIME(COALESCE(a.outTimeOut, a.outTimeBoth)) 
-      --     BETWEEN CAST(s.toleranceOutBeforeStart AS TIME) 
-      --         AND CAST(s.toleranceOutAfterEnd AS TIME)
-        -- IN check (only hours and minutes)
-        AND TIME_FORMAT(COALESCE(a.inTimeIn, a.inTimeBoth), '%H:%i') 
+        AND TIME_FORMAT(CONVERT_TZ(COALESCE(a.inTimeIn, a.inTimeBoth), '+00:00', '+05:30'), '%H:%i')
             BETWEEN TIME_FORMAT(s.toleranceInBeforeStart, '%H:%i')
                 AND TIME_FORMAT(s.toleranceInAfterEnd, '%H:%i')
-        -- OUT check (only hours and minutes)
-        AND TIME_FORMAT(COALESCE(a.outTimeOut, a.outTimeBoth), '%H:%i') 
+        AND TIME_FORMAT(CONVERT_TZ(COALESCE(a.outTimeOut, a.outTimeBoth), '+00:00', '+05:30'), '%H:%i')
             BETWEEN TIME_FORMAT(s.toleranceOutBeforeStart, '%H:%i')
                 AND TIME_FORMAT(s.toleranceOutAfterEnd, '%H:%i')
     ) THEN 'Regular'
@@ -121,8 +74,6 @@ ORDER BY e.id;
   // Map to desired output format
   const data = rawData.map((row) => ({
     mIdCard: row.mIdCard,
-    // uid: row.uid,
-
     inTime: row.inTime || null,
     firstBreakOut: row.firstBreakOut || null,
     firstBreakIn: row.firstBreakIn || null,

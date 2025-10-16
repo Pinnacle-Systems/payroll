@@ -83,7 +83,7 @@ const Attendance = () => {
                   className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
                 >
                   <td className="px-4 py-2">{index + 1}</td>
-                  <td className="px-4 py-2">{p.uid}</td>
+                  <td className="px-4 py-2">{p.mIdCard}</td>
                   {/* <td className="px-4 py-2">{p.name}</td> */}
                   <td className="px-4 py-2">{p.date}</td>
                   <td className="px-4 py-2">{p.time}</td>
