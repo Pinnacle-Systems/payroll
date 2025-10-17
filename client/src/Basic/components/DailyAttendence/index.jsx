@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { ReusableTable, DateInput, customSelectStyles } from "../../../Inputs";
 import Select from "react-select";
 import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCategoryMasterService";
+import { useGetEmployeeQuery } from "../../../redux/services/EmployeeMasterService";
 import { useLazyGetAttendenceGenerationQuery } from "../../../redux/services/AttenedenceGeneration";
 import Modal from "../../../UiComponents/Modal";
 import { GroupBy } from "../../../Utils/DropdownData";
@@ -23,6 +24,10 @@ const Form = () => {
   const [triggerReport, { data: allData, isFetching }] =
     useLazyGetAttendenceGenerationQuery();
   const { data: employeeCategory } = useGetEmployeeCategoryQuery({ params });
+  console.log(allData, "allData");
+
+  const { data: employeeData } = useGetEmployeeQuery({ params });
+  console.log(employeeData, "employeeData");
 
   useEffect(() => {
     if (form && designationRef.current) {
@@ -37,7 +42,6 @@ const Form = () => {
     }
   };
 
-  console.log(allData);
   const columns = [
     {
       header: "S.No",
@@ -248,6 +252,11 @@ const Form = () => {
                   Employee MId
                 </th>
                 <th
+                  className={`w-[45px]  py-2 text-center font-medium text-[13px] `}
+                >
+                  Employee Name
+                </th>
+                <th
                   className={`w-12  py-2 item-center font-medium text-[13px] `}
                 >
                   In Date
@@ -317,6 +326,16 @@ const Form = () => {
                         type="text"
                         value={item?.mIdCard}
                         className={`w-full  text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                      />
+                    </td>
+                    <td
+                      rowSpan={2}
+                      className="border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={item?.firstName}
+                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
                       />
                     </td>
 
@@ -440,31 +459,39 @@ const Form = () => {
                         <td className="border border-gray-300 text-[12px] py-0.5 item-center">
                           <input
                             type="text"
-                            value={`${
-                              item.firstBreakOut
-                                ? moment
-                                    .utc(item.firstBreakOut)
-                                    .format("HH:mm:ss")
-                                : ""
-                            } , ${
-                              item.firstBreakIn
-                                ? moment
-                                    .utc(item.firstBreakIn)
-                                    .format("HH:mm:ss")
-                                : ""
-                            } , ${
-                              item.eveningBreakOut
-                                ? moment
-                                    .utc(item.eveningBreakOut)
-                                    .format("HH:mm:ss")
-                                : ""
-                            } , ${
-                              item.eveningBreakIn
-                                ? moment
-                                    .utc(item.eveningBreakIn)
-                                    .format("HH:mm:ss")
-                                : ""
-                            }`}
+                            // value={`${
+                            //   item.firstBreakOut
+                            //     ? moment
+                            //         .utc(item.firstBreakOut)
+                            //         .format("HH:mm:ss")
+                            //     : ""
+                            // } , ${
+                            //   item.firstBreakIn
+                            //     ? moment
+                            //         .utc(item.firstBreakIn)
+                            //         .format("HH:mm:ss")
+                            //     : ""
+                            // } , ${
+                            //   item.eveningBreakOut
+                            //     ? moment
+                            //         .utc(item.eveningBreakOut)
+                            //         .format("HH:mm:ss")
+                            //     : ""
+                            // } , ${
+                            //   item.eveningBreakIn
+                            //     ? moment
+                            //         .utc(item.eveningBreakIn)
+                            //         .format("HH:mm:ss")
+                            //     : ""
+                            // }`}
+                            value={[
+      item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
+      item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
+      item.eveningBreakOut ? moment.utc(item.eveningBreakOut).format("HH:mm:ss") : null,
+      item.eveningBreakIn ? moment.utc(item.eveningBreakIn).format("HH:mm:ss") : null,
+    ]
+      .filter(Boolean) // remove null or empty values
+      .join(" , ")} // join only existing values
                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
                             disabled
                           />
@@ -547,6 +574,16 @@ const Form = () => {
                         className={`w-full  text-center bg-transparent   focus:outline-none focus:border-transparent `}
                       />
                     </td>
+                    <td
+                      rowSpan={2}
+                      className="border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={item?.firstName}
+                        className={`w-full text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                      />
+                    </td>
 
                     {/* In Date */}
                     <td
@@ -668,31 +705,39 @@ const Form = () => {
                         <td className="border border-gray-300 text-[12px] py-0.5 item-center">
                           <input
                             type="text"
-                            value={`${
-                              item.firstBreakOut
-                                ? moment
-                                    .utc(item.firstBreakOut)
-                                    .format("HH:mm:ss")
-                                : ""
-                            } , ${
-                              item.firstBreakIn
-                                ? moment
-                                    .utc(item.firstBreakIn)
-                                    .format("HH:mm:ss")
-                                : ""
-                            } , ${
-                              item.eveningBreakOut
-                                ? moment
-                                    .utc(item.eveningBreakOut)
-                                    .format("HH:mm:ss")
-                                : ""
-                            } , ${
-                              item.eveningBreakIn
-                                ? moment
-                                    .utc(item.eveningBreakIn)
-                                    .format("HH:mm:ss")
-                                : ""
-                            }`}
+                            // value={`${
+                            //   item.firstBreakOut
+                            //     ? moment
+                            //         .utc(item.firstBreakOut)
+                            //         .format("HH:mm:ss")
+                            //     : ""
+                            // } , ${
+                            //   item.firstBreakIn
+                            //     ? moment
+                            //         .utc(item.firstBreakIn)
+                            //         .format("HH:mm:ss")
+                            //     : ""
+                            // } , ${
+                            //   item.eveningBreakOut
+                            //     ? moment
+                            //         .utc(item.eveningBreakOut)
+                            //         .format("HH:mm:ss")
+                            //     : ""
+                            // } , ${
+                            //   item.eveningBreakIn
+                            //     ? moment
+                            //         .utc(item.eveningBreakIn)
+                            //         .format("HH:mm:ss")
+                            //     : ""
+                            // }`}
+                            value={[
+      item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
+      item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
+      item.eveningBreakOut ? moment.utc(item.eveningBreakOut).format("HH:mm:ss") : null,
+      item.eveningBreakIn ? moment.utc(item.eveningBreakIn).format("HH:mm:ss") : null,
+    ]
+      .filter(Boolean) // remove null or empty values
+      .join(" , ")} // join only existing values
                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
                             disabled
                           />
@@ -757,20 +802,23 @@ const Form = () => {
                   {/* Row 1 - In + Morning */}
                   <tr>
                     {/* S.No rowspan */}
-                    <td
-                      className="border border-gray-300 py-1.5 text-[12px]  text-center px-1"
-                    >
+                    <td className="border border-gray-300 py-1.5 text-[12px]  text-center px-1">
                       {index + 1}
                     </td>
 
                     {/* Employee Id rowspan */}
-                    <td
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
+                    <td className="border border-gray-300 text-[12px] py-0.5 item-center">
                       <input
                         type="text"
                         value={item?.mIdCard}
                         className={`w-full  text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                      />
+                    </td>
+                    <td className="border border-gray-300 text-[12px] py-0.5 item-center">
+                      <input
+                        type="text"
+                        value={item?.firstName}
+                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
                       />
                     </td>
                   </tr>

@@ -435,11 +435,11 @@ const TemplateItems = ({
                   >
                     Quarter
                   </th>
-                  <th
+                  {/* <th
                     className={`w-[60px] px-4 py-2 text-center font-medium text-[13px] `}
                   >
                     Out Next Day
-                  </th>
+                  </th> */}
                   <th
                     className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
                   >
@@ -665,7 +665,7 @@ const TemplateItems = ({
                     </td>
 
                     {/* Out Next Day */}
-                    <td className="border border-gray-300 text-[12px] py-0.5 item-center">
+                    {/* <td className="border border-gray-300 text-[12px] py-0.5 item-center">
                       <select
                         disabled={readOnly || childRecord.current > 0}
                         className="text-left w-full bg-transparent text-[12px] focus:outline-none rounded py-1 "
@@ -681,7 +681,7 @@ const TemplateItems = ({
                           </option>
                         ))}
                       </select>
-                    </td>
+                    </td> */}
                     {/* Shift Time Hrs */}
                     <td className="border border-gray-300 text-[12px] py-0.5 item-center ">
                       <input

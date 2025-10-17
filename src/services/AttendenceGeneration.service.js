@@ -43,6 +43,8 @@ Attendance AS (
 SELECT
   e.id,
   e.mIdCard,
+  e.firstName,
+
   COALESCE(CONVERT_TZ(a.inTimeIn, '+00:00', '+05:30'), CONVERT_TZ(a.inTimeBoth, '+00:00', '+05:30')) AS inTime,
   COALESCE(CONVERT_TZ(a.firstBreakOutOut, '+00:00', '+05:30'), CONVERT_TZ(a.firstBreakOutBoth, '+00:00', '+05:30')) AS firstBreakOut,
   COALESCE(CONVERT_TZ(a.firstBreakInIn, '+00:00', '+05:30'), CONVERT_TZ(a.firstBreakInBoth, '+00:00', '+05:30')) AS firstBreakIn,
@@ -59,12 +61,32 @@ SELECT
         AND TIME_FORMAT(CONVERT_TZ(COALESCE(a.inTimeIn, a.inTimeBoth), '+00:00', '+05:30'), '%H:%i')
             BETWEEN TIME_FORMAT(s.toleranceInBeforeStart, '%H:%i')
                 AND TIME_FORMAT(s.toleranceInAfterEnd, '%H:%i')
-        AND TIME_FORMAT(CONVERT_TZ(COALESCE(a.outTimeOut, a.outTimeBoth), '+00:00', '+05:30'), '%H:%i')
-            BETWEEN TIME_FORMAT(s.toleranceOutBeforeStart, '%H:%i')
-                AND TIME_FORMAT(s.toleranceOutAfterEnd, '%H:%i')
+
+
+      -- AND (
+      --   s.inNextDay = 'No'
+      --   OR (
+      --     TIME_FORMAT(CONVERT_TZ(COALESCE(a.outTimeOut, a.outTimeBoth), '+00:00', '+05:30'), '%H:%i')
+      --     BETWEEN TIME_FORMAT(s.toleranceOutBeforeStart, '%H:%i')
+      --         AND TIME_FORMAT(s.toleranceOutAfterEnd, '%H:%i') 
+      --   )
+      -- )
+AND (
+     ( s.inNextDay = 'No'
+       AND TIME(CONVERT_TZ(COALESCE(a.outTimeOut, a.outTimeBoth), '+00:00', '+05:30')) <= '23:59:59'
+     )
+     OR
+     ( s.inNextDay = 'Yes' 
+       AND TIME_FORMAT(CONVERT_TZ(COALESCE(a.outTimeOut, a.outTimeBoth), '+00:00', '+05:30'), '%H:%i')
+           BETWEEN TIME_FORMAT(s.toleranceOutBeforeStart, '%H:%i')
+               AND TIME_FORMAT(s.toleranceOutAfterEnd, '%H:%i')
+     )
+)
+
+
     ) THEN 'Regular'
     ELSE 'Irregular'
-  END AS status
+  END AS status 
 
 FROM Employee e
 LEFT JOIN Attendance a ON e.mIdCard = a.mIdCard
@@ -74,6 +96,7 @@ ORDER BY e.id;
   // Map to desired output format
   const data = rawData.map((row) => ({
     mIdCard: row.mIdCard,
+    firstName: row.firstName,
     inTime: row.inTime || null,
     firstBreakOut: row.firstBreakOut || null,
     firstBreakIn: row.firstBreakIn || null,

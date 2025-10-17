@@ -60,7 +60,7 @@ async function connectToDevice(device) {
     `🔗 Connecting to ${device.name} at ${device.ip}:${device.port}...`
   );
 
-  const zk = new ZKLib(device.ip, device.port, 1600000);
+  const zk = new ZKLib(device.ip, device.port, 1200000);
   try {
     await zk.createSocket();
     console.log(`✅ Connected to ${device.name}`);
@@ -97,8 +97,25 @@ async function savePunchesToDB(punches, deviceIP) {
   if (punches.length === 0) return;
 
   const batchSize = 5000;
+
   for (let i = 0; i < punches.length; i += batchSize) {
     const batch = punches.slice(i, i + batchSize);
+    const mIdCards = [...new Set(batch.map((p) => parseInt(p.mIdCard)))];
+    const employees = await prisma.employee.findMany({
+      where: { mIdCard: { in: mIdCards } },
+    });
+    const employeeMap = {};
+    employees.forEach((e) => {
+      employeeMap[e.mIdCard] = e.id; // map mIdCard => employeeId
+    });
+    const ips = [...new Set(batch.map((p) => p.machineIP))];
+    const machineGrid = await prisma.machineInOutGrid.findMany({
+      where: { machineIP: { in: ips } },
+    });
+    const machineMap = {};
+    machineGrid.forEach((m) => {
+      machineMap[m.machineIP] = m.machineTypeOne;
+    });
     await prisma.punchData.createMany({
       data: batch.map((p) => {
         const [day, month, year] = p.date.split("-");
@@ -106,10 +123,10 @@ async function savePunchesToDB(punches, deviceIP) {
 
         return {
           mIdCard: parseInt(p.mIdCard),
-
-          // timestamp: new Date(`${formattedDate}T${p.time}`),
-          timestamp: moment.tz(`${formattedDate} ${p.time}`, "YYYY-MM-DD HH:mm:ss", "Asia/Kolkata" ).toDate(),
-          machineIP: deviceIP,
+          timestamp: new Date(`${formattedDate}T${p.time}`),
+          machineIP: p.machineIP || "",
+          machineType: machineMap[p.machineIP] || "UNKNOWN",
+          employeeId: employeeMap[parseInt(p.mIdCard)] || null,
         };
       }),
       skipDuplicates: true,
@@ -128,41 +145,27 @@ async function fetchPunchesFromAllDevices(fromDate, toDate) {
     console.log(`\n📥 Fetching punches from ${device.name}...`);
 
     try {
-      // Connect to current device
+   
       const zk = await connectToDevice(device);
 
-      // Fetch data from device
-      // const users = await zk.getUsers();
       const logs = await zk.getAttendances();
+      console.log(logs,"Logs")
+      const fromTs = moment(fromDate, "DD-MM-YYYY").startOf("day").valueOf();
+      const toTs = moment(toDate, "DD-MM-YYYY").endOf("day").valueOf();
 
-      //   const fromTs = moment(fromDate, "DD-MM-YYYY").startOf("day").valueOf();
-      //   const toTs = moment(toDate, "DD-MM-YYYY").endOf("day").valueOf();
-      const fromTs = moment
-        .tz(fromDate, "DD-MM-YYYY", "Asia/Kolkata")
-        .startOf("day")
-        .utc()
-        .valueOf();
-
-      const toTs = moment
-        .tz(toDate, "DD-MM-YYYY", "Asia/Kolkata")
-        .endOf("day")
-        .utc()
-        .valueOf();
-      console.log(fromTs, toTs, "fromTs,toTs");
       const punches = (logs.data || [])
         .filter((log) => {
-          //   const logTs = moment(log.recordTime).valueOf();
-          const logTs = moment.utc(log.recordTime).valueOf();
+          const logTs = moment(log.recordTime).valueOf();
 
           return logTs >= fromTs && logTs <= toTs;
         })
         .map((log) => ({
-          // uid: log.deviceUserId,
-          mIdCard:parseInt(log.deviceUserId) ,
+         
+          mIdCard: parseInt(log.deviceUserId),
 
           date: moment(log.recordTime).tz("Asia/Kolkata").format("DD-MM-YYYY"),
           time: moment(log.recordTime).tz("Asia/Kolkata").format("HH:mm:ss"),
-          machineIP: device.ip,
+          machineIP: log.ip,
         }));
 
       console.log(`✅ Found ${punches.length} punches from ${device.name}`);
@@ -173,14 +176,13 @@ async function fetchPunchesFromAllDevices(fromDate, toDate) {
 
       allPunches.push(...punches);
 
-      // Disconnect from current device immediately after fetching
+     
       await disconnectCurrentDevice();
 
-      // Small delay before connecting to next device
-      await new Promise((res) => setTimeout(res, 1000));
+      await new Promise((res) => setTimeout(res, 2000));
     } catch (err) {
       console.error(`❌ Failed to fetch from ${device.name}:`, err.message);
-      // Continue to next device even if current one fails
+    
       await disconnectCurrentDevice();
     }
   }
