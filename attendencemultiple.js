@@ -23,7 +23,9 @@ app.use(express.json());
 const DEVICES = [
   { ip: "192.168.1.50", port: 4370, name: "Pinnacle" },
 
-  //   { ip: "192.168.101.241", port: 4370, name: "Device-101-241" },
+ 
+];
+ //   { ip: "192.168.101.241", port: 4370, name: "Device-101-241" },
   //   { ip: "192.168.101.242", port: 4370, name: "Device-101-242" },
   //   { ip: "192.168.103.241", port: 4370, name: "Device-241" },
   //   { ip: "192.168.103.244", port: 4370, name: "Device-244" },
@@ -32,8 +34,6 @@ const DEVICES = [
   //   { ip: "192.168.103.247", port: 4370, name: "Device-247" },
   //   { ip: "192.168.103.248", port: 4370, name: "Device-248" },
   // Add more devices as needed
-];
-
 // ----------------------
 // ZKLib Connection Management
 // ----------------------
