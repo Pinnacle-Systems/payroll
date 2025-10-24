@@ -72,9 +72,23 @@ SELECT
       --   )
       -- )
 AND (
-     ( s.inNextDay = 'No'
-       AND TIME(CONVERT_TZ(COALESCE(a.outTimeOut, a.outTimeBoth), '+00:00', '+05:30')) <= '23:59:59'
-     )
+    --  ( s.inNextDay = 'No'
+    --    AND TIME(CONVERT_TZ(COALESCE(a.outTimeOut, a.outTimeBoth), '+00:00', '+05:30')) <= '23:59:59'
+    --  )
+     (
+  s.inNextDay = 'No'
+    AND CONVERT_TZ(COALESCE(a.outTimeOut, a.outTimeBoth), '+00:00', '+05:30')
+        <= (
+          SELECT CONVERT_TZ(
+                   CONCAT(DATE_ADD(${date}, INTERVAL 1 DAY), ' ', TIME_FORMAT(next_s.toleranceInBeforeStart, '%H:%i:%s')),
+                   '+00:00', '+05:30'
+                 )
+        
+          FROM ShiftTemplateItems next_s
+          WHERE next_s.shiftCommonTemplateId = s.shiftCommonTemplateId
+          LIMIT 1
+        )
+)
      OR
      ( s.inNextDay = 'Yes' 
        AND TIME_FORMAT(CONVERT_TZ(COALESCE(a.outTimeOut, a.outTimeBoth), '+00:00', '+05:30'), '%H:%i')
