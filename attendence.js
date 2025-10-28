@@ -28,11 +28,14 @@ const ESSL_DEVICE_PORT = 4370;
 // Persistent ZKLib Connection
 // ----------------------
 let zk = null;
+
+
+
 let zkConnected = false;
 
 async function connectZKLib() {
   if (zkConnected) return; // already connected
-  zk = new ZKLib(ESSL_DEVICE_IP, ESSL_DEVICE_PORT, 120000);
+  zk = new ZKLib(ESSL_DEVICE_IP, ESSL_DEVICE_PORT, 300000);
   try {
     await zk.createSocket();
     console.log(
