@@ -1,13 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import moment from "moment";
+import { useGetEmployeeQuery } from "../../../redux/services/EmployeeMasterService";
+import { getCommonParams } from "../../../Utils/helper";
 
 const Attendance = () => {
   const [punches, setPunches] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
+  const params = getCommonParams();
 
+  // ✅ RTK Query for employee list
+  const { data: allData, isLoading: empLoading } = useGetEmployeeQuery({ params });
+  const employeeData = allData?.data || [];
+
+  // ✅ Fetch punches based on date range
   const fetchPunches = async () => {
     setLoading(true);
     try {
@@ -16,17 +24,27 @@ const Attendance = () => {
           "DD-MM-YYYY"
         )}&toDate=${moment(toDate).format("DD-MM-YYYY")}`
       );
-      setPunches(res.data.data);
+
+      const punchesData = res.data.data || [];
+
+      // ✅ Map punches with employee names from employeeData
+      const updatedPunches = punchesData.map((p) => {
+        const matchedEmp = employeeData.find(
+          (emp) => emp.mIdCard?.toString() === p.mIdCard?.toString()
+        );
+        return {
+          ...p,
+          employeeName: matchedEmp ? matchedEmp.firstName : "Unknown",
+        };
+      });
+
+      setPunches(updatedPunches);
     } catch (err) {
       console.error(err);
       setPunches([]);
     }
     setLoading(false);
   };
-
-  // useEffect(() => {
-  //   fetchPunches();
-  // }, [fromDate, toDate]);
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
@@ -54,12 +72,13 @@ const Attendance = () => {
         <button
           onClick={fetchPunches}
           className="bg-blue-500 text-white px-4 py-2 mt-5 rounded hover:bg-blue-600 transition"
+          disabled={empLoading || loading}
         >
-          Fetch
+          {loading ? "Fetching..." : "Fetch"}
         </button>
       </div>
 
-      {loading ? (
+      {loading || empLoading ? (
         <p className="text-gray-500">Loading...</p>
       ) : punches.length === 0 ? (
         <p className="text-gray-500">No data found.</p>
@@ -69,11 +88,10 @@ const Attendance = () => {
             <thead className="bg-blue-500 text-white">
               <tr>
                 <th className="px-4 py-2 text-left">S.No</th>
-                <th className="px-4 py-2 text-left">Employee Id</th>
-                {/* <th className="px-4 py-2 text-left">Name</th> */}
+                <th className="px-4 py-2 text-left">Employee ID</th>
+                <th className="px-4 py-2 text-left">Name</th>
                 <th className="px-4 py-2 text-left">Date</th>
                 <th className="px-4 py-2 text-left">Time</th>
-                {/* <th className="px-4 py-2 text-left">Punch Type</th> */}
               </tr>
             </thead>
             <tbody>
@@ -84,10 +102,9 @@ const Attendance = () => {
                 >
                   <td className="px-4 py-2">{index + 1}</td>
                   <td className="px-4 py-2">{p.mIdCard}</td>
-                  {/* <td className="px-4 py-2">{p.name}</td> */}
+                  <td className="px-4 py-2">{p.employeeName}</td>
                   <td className="px-4 py-2">{p.date}</td>
                   <td className="px-4 py-2">{p.time}</td>
-                  {/* <td className="px-4 py-2">{p.punchType}</td> */}
                 </tr>
               ))}
             </tbody>

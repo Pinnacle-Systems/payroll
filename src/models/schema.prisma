@@ -373,6 +373,7 @@ model Employee {
   Attendance            Attendance[]
   PunchData             PunchData[]
   mIdCard               Int?                  @unique
+  PythonPunchData       PythonPunchData[]
 }
 
 model EmployeeBankDetails {
@@ -1769,6 +1770,7 @@ model MachineInOutGrid {
   default             String?
   notes               String?
   PunchData           PunchData[]
+  PythonPunchData     PythonPunchData[]
 }
 
 model OT {
@@ -1849,6 +1851,20 @@ model Attendance {
 }
 
 model PunchData {
+  id                 Int               @id @default(autoincrement())
+  Employee           Employee?         @relation(fields: [employeeId], references: [id])
+  employeeId         Int?
+  timestamp          DateTime
+  mIdCard            Int
+  machineIP          String?
+  MachineInOutGrid   MachineInOutGrid? @relation(fields: [machineInOutGridId], references: [id])
+  machineInOutGridId Int?
+  machineType        String?
+
+  @@unique([mIdCard, timestamp])
+}
+
+model PythonPunchData {
   id                 Int               @id @default(autoincrement())
   Employee           Employee?         @relation(fields: [employeeId], references: [id])
   employeeId         Int?

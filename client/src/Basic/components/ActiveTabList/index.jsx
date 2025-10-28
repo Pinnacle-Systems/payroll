@@ -43,6 +43,7 @@ import {
   EmployeeResignation,
   AttendanceGeneration,
   DailyAttendence,
+  PythonPunchFetch,
 
  
   
@@ -139,7 +140,8 @@ const ActiveTabList = () => {
     "OT":<OTMaster/>,
     "EMPLOYEE RESIGNATION":<EmployeeResignation/>,
     "ATTENDENCE GENERATION" :<DailyAttendence/>,
-    "PUNCH DATA":<Attendance/>
+    "PUNCH DATA":<Attendance/>,
+    "PUNCH DOWNLOAD":<PythonPunchFetch/>
 
 
 

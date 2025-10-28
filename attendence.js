@@ -144,7 +144,7 @@ async function fetchPunches(fromDate, toDate) {
             // punchType: log.type === 0 ? "Check-In" : "Check-Out",
           };
         });
-      // await savePunchesToDB(punches);
+      await savePunchesToDB(punches);
 
       return punches;
     } catch (err) {
