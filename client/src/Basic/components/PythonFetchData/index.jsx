@@ -5,7 +5,7 @@ function FetchLogs() {
   const [to, setTo] = useState("");
   const [logs, setLogs] = useState([]);
   const [page, setPage] = useState(1);
-  const [perPage] = useState(100); // show 100 rows per page
+  const [perPage] = useState(100); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -25,12 +25,12 @@ function FetchLogs() {
       );
       const data = await res.json();
 
-      if (!data.success) throw new Error(data.error || "Unknown error");
+      if (!data?.success) throw new Error(data?.error || "Unknown error");
 
-      setLogs(data.data);
+      setLogs(data?.data);
       setPage(1);
     } catch (err) {
-      setError(err.message);
+      setError(err?.message);
       console.error("Error fetching logs:", err);
     } finally {
       setLoading(false);
@@ -38,8 +38,8 @@ function FetchLogs() {
   };
 
   // pagination
-  const totalPages = Math.ceil(logs.length / perPage);
-  const paginatedLogs = logs.slice((page - 1) * perPage, page * perPage);
+  const totalPages = Math.ceil(logs?.length / perPage);
+  const paginatedLogs = logs?.slice((page - 1) * perPage, page * perPage);
 
   return (
     <div style={{ padding: 20, fontFamily: "Arial" }}>
@@ -71,7 +71,7 @@ function FetchLogs() {
 
       {error && <p style={{ color: "red" }}>❌ {error}</p>}
 
-      <p>Total Logs: {logs.length}</p>
+      <p>Total Logs: {logs?.length || 0}</p>
 
       {paginatedLogs.length > 0 && (
         <>
@@ -95,7 +95,7 @@ function FetchLogs() {
               {paginatedLogs.map((log, i) => (
                 <tr key={i}>
                   <td>{(page - 1) * perPage + i + 1}</td>
-                  <td>{log.user_id}</td>
+                  <td>{log.mIdCard}</td>
                   <td>{log.timestamp}</td>
                 </tr>
               ))}
@@ -124,7 +124,7 @@ function FetchLogs() {
         </>
       )}
 
-      {!loading && logs.length === 0 && (
+      {!loading && logs?.length === 0 && (
         <p style={{ color: "#666" }}>No logs available.</p>
       )}
     </div>
