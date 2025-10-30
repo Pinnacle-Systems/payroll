@@ -1,13 +1,20 @@
 import React, { useState } from "react";
-
+import { useGetEmployeeQuery } from "../../../redux/services/EmployeeMasterService";
+import { getCommonParams } from "../../../Utils/helper";
 function FetchLogs() {
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const [logs, setLogs] = useState([]);
   const [page, setPage] = useState(1);
-  const [perPage] = useState(100); 
+  const [perPage] = useState(100);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  // ✅ RTK Query for employee list
+  const params = getCommonParams();
+  const { data: allData, isLoading: empLoading } = useGetEmployeeQuery({
+    params,
+  });
+  const employeeData = allData?.data || [];
 
   const fetchLogs = async () => {
     if (!from || !to) {
@@ -21,13 +28,23 @@ function FetchLogs() {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/fetch-logs?from_date=${from}&to_date=${to}`
+        `http://127.0.0.1:8000/fetch-logs?from_date=${from}&to_date=${to}`
       );
+
       const data = await res.json();
 
       if (!data?.success) throw new Error(data?.error || "Unknown error");
+      const mergedLogs = data.data.map((log) => {
+        const matchedEmp = employeeData.find(
+          (emp) => emp.mIdCard === log.mIdCard
+        );
+        return {
+          ...log,
+          firstName: matchedEmp ? matchedEmp.firstName : "Unknown", // Default if not found
+        };
+      });
 
-      setLogs(data?.data);
+      setLogs(mergedLogs);
       setPage(1);
     } catch (err) {
       setError(err?.message);
@@ -87,15 +104,19 @@ function FetchLogs() {
             <thead>
               <tr style={{ background: "#f1f5f9" }}>
                 <th>S.No</th>
+
                 <th>User ID</th>
+                <th>Employee name</th>
                 <th>Timestamp</th>
               </tr>
             </thead>
             <tbody>
-              {paginatedLogs.map((log, i) => (
+              {paginatedLogs?.map((log, i) => (
                 <tr key={i}>
                   <td>{(page - 1) * perPage + i + 1}</td>
                   <td>{log.mIdCard}</td>
+                  <td>{log.firstName}</td>
+
                   <td>{log.timestamp}</td>
                 </tr>
               ))}
