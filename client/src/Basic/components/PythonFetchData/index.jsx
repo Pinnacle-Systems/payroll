@@ -17,6 +17,7 @@ function FetchLogs() {
   const employeeData = allData?.data || [];
 
   const fetchLogs = async () => {
+    
     if (!from || !to) {
       alert("Please select both dates.");
       return;
@@ -34,9 +35,9 @@ function FetchLogs() {
       const data = await res.json();
 
       if (!data?.success) throw new Error(data?.error || "Unknown error");
-      const mergedLogs = data.data.map((log) => {
-        const matchedEmp = employeeData.find(
-          (emp) => emp.mIdCard === log.mIdCard
+      const mergedLogs = data?.data?.map((log) => {
+        const matchedEmp = employeeData?.find(
+          (emp) => emp?.mIdCard === log?.mIdCard
         );
         return {
           ...log,
@@ -90,7 +91,7 @@ function FetchLogs() {
 
       <p>Total Logs: {logs?.length || 0}</p>
 
-      {paginatedLogs.length > 0 && (
+      {paginatedLogs?.length > 0 && (
         <>
           <table
             border="1"

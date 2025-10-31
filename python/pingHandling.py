@@ -6,6 +6,9 @@ from database import SessionLocal
 from models import PythonPunchData, MachineInOutGrid, Employee
 from zk import ZK
 import socket
+import platform
+import subprocess
+import time
 
 app = FastAPI()
 
@@ -18,25 +21,61 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+def check_ping(host, timeout=2000):
+    """
+    ✅ Check ping latency (ms). Returns True if reachable.
+    Works on both Windows and Linux.
+    """
+    param = "-n" if platform.system().lower() == "windows" else "-c"
+    try:
+        output = subprocess.run(
+            ["ping", param, "1", "-w", str(timeout), host],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        return output.returncode == 0
+    except Exception:
+        return False
+
+
+def connect_with_retry(MACHINE_IP, retries=3, delay=5):
+    """
+    ✅ Try connecting to the device up to 3 times with delay.
+    Returns (zk, conn) or (None, None) if failed.
+    """
+    for attempt in range(1, retries + 1):
+        try:
+            print(f"🔁 Attempt {attempt}/{retries} connecting to {MACHINE_IP}...")
+            socket.setdefaulttimeout(10)
+            zk = ZK(MACHINE_IP, port=4370, timeout=10)
+            conn = zk.connect()
+            print(f"✅ Connection successful on attempt {attempt}")
+            return zk, conn
+        except Exception as e:
+            print(f"⚠️ Attempt {attempt} failed for {MACHINE_IP}: {e}")
+            if attempt < retries:
+                print(f"⏳ Retrying in {delay} seconds...")
+                time.sleep(delay)
+            else:
+                print(f"❌ All {retries} attempts failed for {MACHINE_IP}")
+    return None, None
+
 
 @app.get("/fetch-logs")
 async def fetch_logs(from_date: str = Query(...), to_date: str = Query(...)):
     """
     ✅ Multi-Device Smart Incremental Fetch
-    Logic:
-      - Loop through all device IPs one by one.
-      - Connect → Fetch → Insert → Disconnect.
-      - For each day in the range, insert only new punches.
-      - Keep old logic for machineInOutGridId and machineTypeOne.
+    - Checks ping first but never skips due to high ping
+    - Retries 3 times if connection fails
+    - Handles large date ranges safely
     """
-
+    print("🚀 API called")
     db = SessionLocal()
     conn = None
 
-    # ✅ Define your device list manually
     DEVICES = [
         {"ip": "192.168.1.50"},
-    
     ]
 
     try:
@@ -45,14 +84,20 @@ async def fetch_logs(from_date: str = Query(...), to_date: str = Query(...)):
 
         total_new = 0
         all_logs_db = []
-
         employees = {e.mIdCard: e.id for e in db.query(Employee).all()}
 
         for device in DEVICES:
             MACHINE_IP = device["ip"]
-            print(f"🔹 Connecting to device {MACHINE_IP}...")
+            print(f"\n🔹 Checking device {MACHINE_IP} connectivity...")
 
-            # ---- Get machine details once ----
+            # ✅ Step 1: Ping check (only for info — don’t skip)
+            reachable = check_ping(MACHINE_IP)
+            if not reachable:
+                print(f"⚠️ Device {MACHINE_IP} ping failed — continuing with connection attempts anyway.")
+            else:
+                print(f"✅ Device {MACHINE_IP} reachable (ping OK).")
+
+            # ✅ Step 2: Get machine details
             machine_info = (
                 db.query(MachineInOutGrid)
                 .filter(MachineInOutGrid.machineIp == MACHINE_IP)
@@ -62,22 +107,22 @@ async def fetch_logs(from_date: str = Query(...), to_date: str = Query(...)):
             machineInOutGridId = machine_info.id if machine_info else None
             machineType = machine_info.machineTypeOne if machine_info else None
 
-            # ---- Try connecting to device ----
-            try:
-                socket.setdefaulttimeout(10)
-                zk = ZK(MACHINE_IP, port=4370, timeout=10)
-                conn = zk.connect()
-                all_logs = conn.get_attendance()
-                print(f"✅ Connected and fetched {len(all_logs)} logs from {MACHINE_IP}")
-            except Exception as e:
-                all_logs = []
-                print(f"⚠️ Device {MACHINE_IP} connection failed: {e}")
+            # ✅ Step 3: Try connecting (always attempt, even if ping fails)
+            zk, conn = connect_with_retry(MACHINE_IP, retries=3, delay=5)
+            if not conn:
+                print(f"⚠️ Skipping device {MACHINE_IP} after 3 failed connection attempts.")
+                continue
 
-            # ✅ Filter only logs in the requested range
-            filtered_logs = [
-                log for log in all_logs
-                if from_dt <= log.timestamp < to_dt
-            ]
+            # ✅ Step 4: Fetch logs
+            try:
+                all_logs = conn.get_attendance()
+                print(f"✅ Retrieved {len(all_logs)} logs from {MACHINE_IP}")
+            except Exception as e:
+                print(f"⚠️ Failed to fetch logs from {MACHINE_IP}: {e}")
+                all_logs = []
+
+            # ✅ Step 5: Filter logs by date range
+            filtered_logs = [log for log in all_logs if from_dt <= log.timestamp < to_dt]
 
             current = from_dt
             while current < to_dt:
@@ -146,7 +191,7 @@ async def fetch_logs(from_date: str = Query(...), to_date: str = Query(...)):
 
                 current += timedelta(days=1)
 
-            # ✅ Disconnect safely
+            # ✅ Step 6: Disconnect safely
             if conn:
                 try:
                     conn.disconnect()
@@ -155,7 +200,7 @@ async def fetch_logs(from_date: str = Query(...), to_date: str = Query(...)):
                 except Exception:
                     pass
 
-        # ✅ Fetch only requested range logs from DB
+        # ✅ Step 7: Fetch all logs from DB
         all_logs_db = (
             db.query(PythonPunchData)
             .filter(PythonPunchData.timestamp.between(from_dt, to_dt))
@@ -189,4 +234,3 @@ async def fetch_logs(from_date: str = Query(...), to_date: str = Query(...)):
 
     finally:
         db.close()
-  
