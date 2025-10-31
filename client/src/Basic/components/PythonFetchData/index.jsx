@@ -17,7 +17,7 @@ function FetchLogs() {
   const employeeData = allData?.data || [];
 
   const fetchLogs = async () => {
-    
+
     if (!from || !to) {
       alert("Please select both dates.");
       return;
@@ -115,10 +115,10 @@ function FetchLogs() {
               {paginatedLogs?.map((log, i) => (
                 <tr key={i}>
                   <td>{(page - 1) * perPage + i + 1}</td>
-                  <td>{log.mIdCard}</td>
-                  <td>{log.firstName}</td>
+                  <td>{log?.mIdCard}</td>
+                  <td>{log?.firstName}</td>
 
-                  <td>{log.timestamp}</td>
+                  <td>{log?.timestamp}</td>
                 </tr>
               ))}
             </tbody>
