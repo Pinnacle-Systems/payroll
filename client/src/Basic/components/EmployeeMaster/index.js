@@ -1869,8 +1869,8 @@ export default function Form() {
                             <Select
                               options={EmployeeOptions}
                               value={
-                                EmployeeOptions.find(
-                                  (opt) => opt.value === employeeCategoryId
+                                EmployeeOptions?.find(
+                                  (opt) => opt?.value === employeeCategoryId
                                 ) || null
                               }
                               onChange={(selected) =>
@@ -1918,7 +1918,7 @@ export default function Form() {
                                 getFilteredFilteredEmployeeSubCategory(
                                   employeeCategoryId
                                 )?.find(
-                                  (opt) => opt.value === employeeSubCategoryId
+                                  (opt) => opt?.value === employeeSubCategoryId
                                 ) || null
                               }
                               onChange={(selected) =>
@@ -1961,8 +1961,8 @@ export default function Form() {
                             <Select
                               options={DepartmentOptions}
                               value={
-                                DepartmentOptions.find(
-                                  (opt) => opt.value === departmentId
+                                DepartmentOptions?.find(
+                                  (opt) => opt?.value === departmentId
                                 ) || null
                               }
                               onChange={(selected) =>
@@ -2006,8 +2006,8 @@ export default function Form() {
                             <Select
                               options={DesignaionOptions}
                               value={
-                                DesignaionOptions.find(
-                                  (opt) => opt.value === desiginationId
+                                DesignaionOptions?.find(
+                                  (opt) => opt?.value === desiginationId
                                 ) || null
                               }
                               onChange={(selected) =>
@@ -2078,7 +2078,7 @@ export default function Form() {
                               options={ShiftCommonTemplateOptions}
                               value={
                                 ShiftCommonTemplateOptions?.find(
-                                  (opt) => opt.value === shiftCommonTemplateId
+                                  (opt) => opt?.value === shiftCommonTemplateId
                                 ) || null
                               }
                               onChange={(selected) =>

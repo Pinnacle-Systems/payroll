@@ -3,7 +3,7 @@ const prisma = new PrismaClient();
 
 async function get(searchParams) {
   const { date } = searchParams;
-  if (!date) throw new Error("date is required");
+  if (!date) throw new Error("Date is required");
 
   const rawData = await prisma.$queryRaw`
 WITH Punches AS (
@@ -73,18 +73,33 @@ SELECT
             BETWEEN TIME_FORMAT(s.toleranceInBeforeStart, '%H:%i')
                 AND TIME_FORMAT(s.toleranceInAfterEnd, '%H:%i')
         AND (
-             ( s.inNextDay = 'No'
-               AND COALESCE(a.outTimeOut, a.outTimeBoth)
-                   <= (
-                        SELECT CONCAT(
-                          DATE_ADD(${date}, INTERVAL 1 DAY), ' ',
-                          TIME_FORMAT(next_s.toleranceInBeforeStart, '%H:%i:%s')
-                        )
-                        FROM ShiftTemplateItems next_s
-                        WHERE next_s.shiftCommonTemplateId = s.shiftCommonTemplateId
-                        LIMIT 1
-                      )
-             )
+            --  ( s.inNextDay = 'No'
+            --    AND COALESCE(a.outTimeOut, a.outTimeBoth)
+            --        <= (
+            --             SELECT CONCAT(
+            --               DATE_ADD, INTERVAL 1 DAY), ' ',
+            --               TIME_FORMAT(next_s.toleranceInBeforeStart, '%H:%i:%s')
+            --             )
+            --             FROM ShiftTemplateItems next_s
+            --             WHERE next_s.shiftCommonTemplateId = s.shiftCommonTemplateId
+            --             LIMIT 1
+            --           )
+            --  )
+            ( s.inNextDay = 'No'
+  AND TIME(COALESCE(a.outTimeOut, a.outTimeBoth))
+      > TIME(s.toleranceOutBeforeStart)
+  AND COALESCE(a.outTimeOut, a.outTimeBoth)
+      < (
+           SELECT CONCAT(
+             DATE_ADD(${date}, INTERVAL 1 DAY), ' ',
+             TIME_FORMAT(next_s.toleranceInBeforeStart, '%H:%i:%s')
+           )
+           FROM ShiftTemplateItems next_s
+           WHERE next_s.shiftCommonTemplateId = s.shiftCommonTemplateId
+           LIMIT 1
+         )
+)
+
              OR
              ( s.inNextDay = 'Yes'
                AND TIME_FORMAT(COALESCE(a.outTimeOut, a.outTimeBoth), '%H:%i')
