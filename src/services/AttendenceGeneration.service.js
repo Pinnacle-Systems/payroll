@@ -24,30 +24,33 @@ Attendance AS (
     -- IN punches
     MIN(CASE WHEN machineType='IN' AND rn_asc=1 THEN ts END) AS inTimeIn,
     MIN(CASE WHEN machineType='IN' AND rn_asc=2 THEN ts END) AS firstBreakInIn,
-    MIN(CASE WHEN machineType='IN' AND rn_asc=3 THEN ts END) AS eveningBreakInIn,
+    MIN(CASE WHEN machineType='IN' AND rn_asc=3 THEN ts END) AS lunchBreakInIn,
+    MIN(CASE WHEN machineType='IN' AND rn_asc=4 THEN ts END) AS eveningBreakInIn,
 
     -- OUT punches
     MAX(CASE WHEN machineType='OUT' AND rn_desc=1 THEN ts END) AS outTimeOut,
     MAX(CASE WHEN machineType='OUT' AND rn_desc=2 THEN ts END) AS eveningBreakOutOut,
-    MAX(CASE WHEN machineType='OUT' AND rn_desc=3 THEN ts END) AS firstBreakOutOut,
+    MAX(CASE WHEN machineType='OUT' AND rn_desc=3 THEN ts END) AS lunchBreakOutOut,
+    MAX(CASE WHEN machineType='OUT' AND rn_desc=4 THEN ts END) AS firstBreakOutOut,
 
     -- BOTH punches old logic 
-    MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=1 AND cnt >= 1 THEN ts END) AS inTimeBoth,
-    MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=2 AND cnt >= 3 THEN ts END) AS firstBreakOutBoth,
-    MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=3 AND cnt >= 3 THEN ts END) AS firstBreakInBoth,
-    MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=4 AND cnt >= 4 THEN ts END) AS eveningBreakOutBoth,
-    MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=5 AND cnt >= 5 THEN ts END) AS eveningBreakInBoth,
-    MAX(CASE WHEN machineType='IN / OUT' AND rn_desc=1 AND cnt >= 2 THEN ts END) AS outTimeBoth
-
-
-    --  BOTH punches (revised logic for unlimited punches)
     -- MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=1 AND cnt >= 1 THEN ts END) AS inTimeBoth,
     -- MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=2 AND cnt >= 3 THEN ts END) AS firstBreakOutBoth,
-    -- MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=3 AND cnt >= 4 THEN ts END) AS firstBreakInBoth,
+    -- MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=3 AND cnt >= 3 THEN ts END) AS firstBreakInBoth,
+    -- MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=4 AND cnt >= 4 THEN ts END) AS eveningBreakOutBoth,
+    -- MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=5 AND cnt >= 5 THEN ts END) AS eveningBreakInBoth,
+    -- MAX(CASE WHEN machineType='IN / OUT' AND rn_desc=1 AND cnt >= 2 THEN ts END) AS outTimeBoth
+    MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=1 AND cnt >= 1 THEN ts END) AS inTimeBoth,
+    MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=2 AND cnt >= 2 THEN ts END) AS firstBreakOutBoth,
+    MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=3 AND cnt >= 3 THEN ts END) AS firstBreakInBoth,
+    MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=4 AND cnt >= 4 THEN ts END) AS lunchBreakOutBoth,
+    MAX(CASE WHEN machineType='IN / OUT' AND rn_desc=4 AND cnt >= 4 THEN ts END) AS lunchBreakInBoth,
+    MAX(CASE WHEN machineType='IN / OUT' AND rn_desc=3 AND cnt >= 3 THEN ts END) AS eveningBreakOutBoth,
+    MAX(CASE WHEN machineType='IN / OUT' AND rn_desc=2 AND cnt >= 2 THEN ts END) AS eveningBreakInBoth,
+    MAX(CASE WHEN machineType='IN / OUT' AND rn_desc=1 AND cnt >= 1 THEN ts END) AS outTimeBoth
 
-    -- MAX(CASE WHEN machineType='IN / OUT' AND rn_desc=1 AND cnt >= 2 THEN ts END) AS outTimeBoth,
-    -- MAX(CASE WHEN machineType='IN / OUT' AND rn_desc=2 AND cnt >= 4 THEN ts END) AS eveningBreakInBoth,
-    -- MAX(CASE WHEN machineType='IN / OUT' AND rn_desc=3 AND cnt >= 5 THEN ts END) AS eveningBreakOutBoth
+
+    
   FROM Punches
   GROUP BY mIdCard
 )
@@ -59,9 +62,43 @@ SELECT
   COALESCE(a.inTimeIn, a.inTimeBoth) AS inTime,
   COALESCE(a.firstBreakOutOut, a.firstBreakOutBoth) AS firstBreakOut,
   COALESCE(a.firstBreakInIn, a.firstBreakInBoth) AS firstBreakIn,
+  COALESCE(a.lunchBreakOutBoth) AS lunchBreakOut,
+  COALESCE(a.lunchBreakInBoth) AS lunchBreakIn,
   COALESCE(a.eveningBreakOutOut, a.eveningBreakOutBoth) AS eveningBreakOut,
   COALESCE(a.eveningBreakInIn, a.eveningBreakInBoth) AS eveningBreakIn,
   COALESCE(a.outTimeOut, a.outTimeBoth) AS outTime,
+    -- 👇 Total worked minutes (from first inTime to last outTime)
+-- 👇 Total worked time (in HH:MM:SS format)
+
+
+  -- ✅ Always calculate total work time using first & last punch (regardless of category)
+  CASE
+    WHEN pr.totalPunches > 1 THEN
+      TIME_FORMAT(
+        SEC_TO_TIME(
+          TIMESTAMPDIFF(
+            SECOND,
+            CONVERT_TZ(pr.firstPunch, '+00:00', '+05:30'),
+            CONVERT_TZ(pr.lastPunch, '+00:00', '+05:30')
+          )
+        ),
+        '%H:%i:%s'
+      )
+    ELSE NULL
+  END AS totalWorkedTime,
+
+  CASE
+    WHEN pr.totalPunches > 1 THEN
+      TIMESTAMPDIFF(
+        MINUTE,
+        CONVERT_TZ(pr.firstPunch, '+00:00', '+05:30'),
+        CONVERT_TZ(pr.lastPunch, '+00:00', '+05:30')
+      )
+    ELSE 0
+  END AS totalMinutes,
+
+
+
 
   CASE 
     WHEN a.mIdCard IS NULL THEN 'Absent'
@@ -122,10 +159,14 @@ ORDER BY e.id;
     inTime: row.inTime || null,
     firstBreakOut: row.firstBreakOut || null,
     firstBreakIn: row.firstBreakIn || null,
+    lunchBreakOut: row.lunchBreakOut || null,
+    lunchBreakIn: row.lunchBreakIn || null,
     eveningBreakOut: row.eveningBreakOut || null,
     eveningBreakIn: row.eveningBreakIn || null,
     outTime: row.outTime || null,
     status: row.status,
+    totalWorkedTime: row.totalWorkedTime,
+    totalMinutes: row.totalMinutes || 0, // 👈 include in result
   }));
 
   return { data };

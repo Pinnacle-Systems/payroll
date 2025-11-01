@@ -235,7 +235,7 @@ const Form = () => {
         </div> */}
 
         <div
-          className={`w-[90vw] mt-3  p-2 overflow-auto bg-white max-h-[500px]`}
+          className={` mt-3  p-2 overflow-auto bg-white max-h-[500px]`}
         >
           <table className="w-full border-collapse table-fixed ">
             <thead className="bg-gray-200 text-gray-800">
@@ -247,7 +247,7 @@ const Form = () => {
                 </th>
 
                 <th
-                  className={`w-[45px]  py-2 text-center font-medium text-[13px] `}
+                  className={`w-[40px]  py-2 text-center font-medium text-[13px] `}
                 >
                   Employee MId
                 </th>
@@ -257,7 +257,7 @@ const Form = () => {
                   Employee Name
                 </th>
                 <th
-                  className={`w-12  py-2 item-center font-medium text-[13px] `}
+                  className={`w-8  py-2 item-center font-medium text-[13px] `}
                 >
                   In Date
                 </th>
@@ -265,7 +265,7 @@ const Form = () => {
                   In
                 </th>
                 <th
-                  className={`w-12 py-2 item-center font-medium text-[13px] `}
+                  className={`w-8 py-2 item-center font-medium text-[13px] `}
                 >
                   Out Date
                 </th>
@@ -279,7 +279,7 @@ const Form = () => {
                 </th> */}
                 <th
                   className={`${
-                    reportView === "Seperate" ? "w-8 " : "w-24 "
+                    reportView === "Seperate" ? "w-8 " : "w-32 "
                   }  py-2 text-center font-medium text-[13px] `}
                 >
                   {/* Morning Break Out */}
@@ -297,6 +297,9 @@ const Form = () => {
                 <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
                   {/* Out Time */}
                 </th>
+                <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
+                  Total worked Hours
+                  </th>
               </tr>
               {/*
                */}
@@ -442,6 +445,20 @@ const Form = () => {
                           <input
                             type="text"
                             value={
+                              item.lunchBreakOut
+                                ? moment
+                                    .utc(item.lunchBreakOut)
+                                    .format("HH:mm:ss")
+                                : ""
+                            }
+                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                            disabled
+                          />
+                        </td>
+                        <td className="border border-gray-300 text-[12px] text-center px-1">
+                          <input
+                            type="text"
+                            value={
                               item.eveningBreakOut
                                 ? moment
                                     .utc(item.eveningBreakOut)
@@ -487,6 +504,8 @@ const Form = () => {
                             value={[
       item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
       item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
+      item.lunchBreakOut ? moment.utc(item.lunchBreakOut).format("HH:mm:ss") : null,
+      item.lunchBreakIn ? moment.utc(item.lunchBreakIn).format("HH:mm:ss") : null,
       item.eveningBreakOut ? moment.utc(item.eveningBreakOut).format("HH:mm:ss") : null,
       item.eveningBreakIn ? moment.utc(item.eveningBreakIn).format("HH:mm:ss") : null,
     ]
@@ -498,6 +517,20 @@ const Form = () => {
                         </td>
                       </>
                     )}
+                       <td
+                      rowSpan={2}
+                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={
+                          item.totalWorkedTime || ''
+
+                          
+                        }
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />
+                    </td>
 
                     {/* Morning Break Out */}
 
@@ -528,6 +561,20 @@ const Form = () => {
                         />
                       </td>
 
+                      <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
+                        <input
+                          type="text"
+                          value={
+                            item.lunchBreakIn
+                              ? moment
+                                  .utc(item.lunchBreakIn)
+                                  .format("HH:mm:ss")
+                              : ""
+                          }
+                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                          disabled
+                        />
+                      </td>
                       <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
                         <input
                           type="text"
@@ -684,6 +731,21 @@ const Form = () => {
                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                           />
                         </td>
+                        <td className="border border-gray-300 text-[12px] py-0.5 item-center">
+                          <input
+                            min="0"
+                            type="text"
+                            value={
+                              item.lunchBreakOut
+                                ? moment
+                                    .utc(item.lunchBreakOut)
+                                    .format("HH:mm:ss")
+                                : ""
+                            }
+                            onFocus={(e) => e.target.select()}
+                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                          />
+                        </td>
                         <td className="border border-gray-300 text-[12px] text-center px-1">
                           <input
                             type="text"
@@ -733,6 +795,8 @@ const Form = () => {
                             value={[
       item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
       item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
+      item.lunchBreakOut ? moment.utc(item.lunchBreakOut).format("HH:mm:ss") : null,
+      item.lunchBreakIn ? moment.utc(item.lunchBreakIn).format("HH:mm:ss") : null,
       item.eveningBreakOut ? moment.utc(item.eveningBreakOut).format("HH:mm:ss") : null,
       item.eveningBreakIn ? moment.utc(item.eveningBreakIn).format("HH:mm:ss") : null,
     ]
@@ -767,6 +831,18 @@ const Form = () => {
                           value={
                             item.firstBreakIn
                               ? moment.utc(item.firstBreakIn).format("HH:mm:ss")
+                              : ""
+                          }
+                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                          disabled
+                        />
+                      </td>
+                      <td className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <input
+                          type="text"
+                          value={
+                            item.lunchBreakIn
+                              ? moment.utc(item.lunchBreakIn).format("HH:mm:ss")
                               : ""
                           }
                           className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
