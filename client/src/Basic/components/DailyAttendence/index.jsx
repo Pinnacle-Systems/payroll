@@ -42,140 +42,7 @@ const Form = () => {
     }
   };
 
-  const columns = [
-    {
-      header: "S.No",
-      accessor: (item, index) => index + 1,
-      className: " text-gray-900 w-4  text-center",
-    },
-    {
-      header: "UID",
-      accessor: (item) => item?.uid,
-      className: " text-gray-900 w-4  text-center",
-    },
-
-    // {
-    //   header: "ID Card",
-    //   accessor: (item) => item?.Employee?.idNumber,
-    //   //   cellClass: () => "  text-gray-900",
-    //   className: " text-gray-900 text-left pl-2 uppercase w-30",
-    // },
-
-    // {
-    //   header: "EMP Name",
-    //   accessor: (item) => item?.Employee?.firstName,
-    //   //   cellClass: () => " text-gray-900",
-    //   className: " text-gray-900 text-left pl-2 uppercase w-36",
-    // },
-    // {
-    //   header: "EMP Category",
-    //   accessor: (item) => item?.Employee?.EmployeeCategory?.name,
-    //   //   cellClass: () => " text-gray-900",
-    //   className: " text-gray-900 text-left pl-2 uppercase w-40",
-    // },
-    // {
-    //   header: "Department",
-    //   accessor: (item) => item?.Employee?.department?.name,
-    //   className: " text-gray-900 text-left pl-2 uppercase w-40",
-    // },
-    // {
-    //   header: "Designation",
-    //   accessor: (item) => item?.Employee?.designation?.name,
-    //   className: " text-gray-900 text-left pl-2 uppercase w-40",
-    // },
-    // // {
-    // //   header: "Shift",
-    // //   accessor: (item) => item?.Employee?.shiftCommonTemplate?.name,
-    // //   className: " text-gray-900 text-left pl-2 uppercase w-40",
-    // // },
-
-    // {
-    //   header: "In Date",
-    //   accessor: (item) =>
-    //     item.inDate ? new Date(item.inDate).toLocaleDateString() : "-",
-    //   className: " text-gray-900 text-left pl-2 uppercase w-30",
-    // },
-    // {
-    //   header: "In Time",
-    //   accessor: (item) =>
-    //     item.inTime ? new Date(item.inTime).toLocaleTimeString() : "-",
-    //   className: " text-gray-900 text-left pl-2 uppercase w-30",
-    // },
-    // {
-    //   header: "Out Date",
-    //   accessor: (item) =>
-    //     item.outDate ? new Date(item.outDate).toLocaleDateString() : "-",
-    //   className: " text-gray-900 text-left pl-2 uppercase w-30",
-    // },
-    // {
-    //   header: "Out Time",
-    //   accessor: (item) =>
-    //     item.outTime ? new Date(item.outTime).toLocaleTimeString() : "-",
-    //   className: " text-gray-900 text-left pl-2 uppercase w-30",
-    // },
-    {
-      header: "In Date",
-      accessor: (item) =>
-        item.inTime ? moment.utc(item.inTime).format("YYYY-MM-DD") : "-",
-      className: " text-gray-900   text-center",
-    },
-    {
-      header: "In Time",
-      accessor: (item) =>
-        item.inTime ? moment.utc(item.inTime).format("HH:mm:ss") : "-",
-      className: " text-gray-900   text-center",
-    },
-    {
-      header: "Morning Break Out",
-      accessor: (item) =>
-        item.firstBreakOut
-          ? moment.utc(item.firstBreakOut).format("HH:mm:ss")
-          : "-",
-      className: " text-gray-900 w-32 text-center",
-    },
-    {
-      header: "Morning Break In",
-      accessor: (item) =>
-        item.firstBreakIn
-          ? moment.utc(item.firstBreakIn).format("HH:mm:ss")
-          : "-",
-      className: " text-gray-900  text-center",
-    },
-    {
-      header: "Evening Break Out",
-      accessor: (item) =>
-        item.eveningBreakOut
-          ? moment.utc(item.eveningBreakOut).format("HH:mm:ss")
-          : "-",
-      className: " text-gray-900  text-center",
-    },
-    {
-      header: "Evening Break In",
-      accessor: (item) =>
-        item.eveningBreakIn
-          ? moment.utc(item.eveningBreakIn).format("HH:mm:ss")
-          : "-",
-      className: " text-gray-900  text-center",
-    },
-
-    {
-      header: "Out Date",
-      accessor: (item) =>
-        item.outTime ? moment.utc(item.outTime).format("YYYY-MM-DD") : "-",
-      className: " text-gray-900  text-center",
-    },
-    {
-      header: "Out Time",
-      accessor: (item) =>
-        item.outTime ? moment.utc(item.outTime).format("HH:mm:ss") : "-",
-      className: " text-gray-900  text-center",
-    },
-    {
-      header: "Status",
-      accessor: (item) => item?.status,
-      className: " text-gray-900  text-center",
-    },
-  ];
+ 
   const EmployeeOptions = employeeCategory?.data?.map((val) => ({
     value: val?.id,
     label: val?.name,
@@ -225,17 +92,10 @@ const Form = () => {
           </div>
         </div>
 
-        {/* <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-3">
-          <ReusableTable
-            columns={columns}
-            data={allData?.data}
-            itemsPerPage={10}
-            rowActions={false}
-          />
-        </div> */}
+       
 
         <div
-          className={` mt-3  p-2 overflow-auto bg-white max-h-[500px]`}
+          className={` mt-3  p-2 overflow-auto bg-white max-h-[600px]`}
         >
           <table className="w-full border-collapse table-fixed ">
             <thead className="bg-gray-200 text-gray-800">
@@ -247,7 +107,7 @@ const Form = () => {
                 </th>
 
                 <th
-                  className={`w-[40px]  py-2 text-center font-medium text-[13px] `}
+                  className={`w-12  py-2 text-center font-medium text-[13px] `}
                 >
                   Employee MId
                 </th>
@@ -272,34 +132,51 @@ const Form = () => {
                 <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
                   Out
                 </th>
-                {/* <th
-                  className={`w-8  py-2 text-center font-medium text-[13px] `}
-                >
-                  Status
-                </th> */}
+               
                 <th
-                  className={`${
-                    reportView === "Seperate" ? "w-8 " : "w-32 "
-                  }  py-2 text-center font-medium text-[13px] `}
+                  className={`${reportView === "Seperate" ? "w-8 " : "w-32 "
+                    }  py-2 text-center font-medium text-[13px] `}
                 >
-                  {/* Morning Break Out */}
+                  
                 </th>
+                {
+                  reportView === "Single" ?  
+                  <th className={`w-12 py-2 item-center font-medium text-[13px] `}>
+                  Total worked Hours
+                </th> : null
+                }
+                {
+                  reportView === "Single" ?  
+                  <th className={`w-12 py-2 item-center font-medium text-[13px] `}>
+                    OT Hours
+                  </th> : null
+                }
 
                 <th
                   className={`w-8 py-2  item-center font-medium text-[13px] `}
                 >
-                  {/* Evening Break In */}
+                  
                 </th>
 
                 <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
-                  {/* Out Date */}
+                  
                 </th>
                 <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
-                  {/* Out Time */}
+                  
                 </th>
-                <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
+                    {
+                  reportView === "Seperate" ?  
+                  <th className={`w-12 py-2 item-center font-medium text-[13px] `}>
                   Total worked Hours
-                  </th>
+                </th> : null
+                }
+                    {
+                  reportView === "Seperate" ?  
+                  <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
+                    OT Hours
+                 </th> : null
+                }
+                
               </tr>
               {/*
                */}
@@ -406,17 +283,7 @@ const Form = () => {
                         className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                       />
                     </td>
-                    {/* Status */}
-                    {/* <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.status}
-                        className={`text-left w-full pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td> */}
+
                     {reportView === "Seperate" && (
                       <>
                         <td className=" border border-gray-300 text-[12px] py-0.5 ">
@@ -433,8 +300,8 @@ const Form = () => {
                             value={
                               item.firstBreakOut
                                 ? moment
-                                    .utc(item.firstBreakOut)
-                                    .format("HH:mm:ss")
+                                  .utc(item.firstBreakOut)
+                                  .format("HH:mm:ss")
                                 : ""
                             }
                             onFocus={(e) => e.target.select()}
@@ -447,8 +314,8 @@ const Form = () => {
                             value={
                               item.lunchBreakOut
                                 ? moment
-                                    .utc(item.lunchBreakOut)
-                                    .format("HH:mm:ss")
+                                  .utc(item.lunchBreakOut)
+                                  .format("HH:mm:ss")
                                 : ""
                             }
                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
@@ -461,8 +328,8 @@ const Form = () => {
                             value={
                               item.eveningBreakOut
                                 ? moment
-                                    .utc(item.eveningBreakOut)
-                                    .format("HH:mm:ss")
+                                  .utc(item.eveningBreakOut)
+                                  .format("HH:mm:ss")
                                 : ""
                             }
                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
@@ -502,22 +369,22 @@ const Form = () => {
                             //     : ""
                             // }`}
                             value={[
-      item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
-      item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
-      item.lunchBreakOut ? moment.utc(item.lunchBreakOut).format("HH:mm:ss") : null,
-      item.lunchBreakIn ? moment.utc(item.lunchBreakIn).format("HH:mm:ss") : null,
-      item.eveningBreakOut ? moment.utc(item.eveningBreakOut).format("HH:mm:ss") : null,
-      item.eveningBreakIn ? moment.utc(item.eveningBreakIn).format("HH:mm:ss") : null,
-    ]
-      .filter(Boolean) // remove null or empty values
-      .join(" , ")} // join only existing values
+                              item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
+                              item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
+                              item.lunchBreakOut ? moment.utc(item.lunchBreakOut).format("HH:mm:ss") : null,
+                              item.lunchBreakIn ? moment.utc(item.lunchBreakIn).format("HH:mm:ss") : null,
+                              item.eveningBreakOut ? moment.utc(item.eveningBreakOut).format("HH:mm:ss") : null,
+                              item.eveningBreakIn ? moment.utc(item.eveningBreakIn).format("HH:mm:ss") : null,
+                            ]
+                              .filter(Boolean) // remove null or empty values
+                              .join(" , ")} // join only existing values
                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
                             disabled
                           />
                         </td>
                       </>
                     )}
-                       <td
+                    <td
                       rowSpan={2}
                       className="  border border-gray-300 text-[12px] py-0.5 item-center"
                     >
@@ -526,15 +393,26 @@ const Form = () => {
                         value={
                           item.totalWorkedTime || ''
 
-                          
+
+                        }
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />
+                    </td>
+                    <td
+                      rowSpan={2}
+                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={
+                          item.otHours || ''
+
+
                         }
                         className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                       />
                     </td>
 
-                    {/* Morning Break Out */}
-
-                    {/* Evening Break Out */}
                   </tr>
 
                   {/* Row 2 - Evening + Out */}
@@ -567,8 +445,8 @@ const Form = () => {
                           value={
                             item.lunchBreakIn
                               ? moment
-                                  .utc(item.lunchBreakIn)
-                                  .format("HH:mm:ss")
+                                .utc(item.lunchBreakIn)
+                                .format("HH:mm:ss")
                               : ""
                           }
                           className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
@@ -581,8 +459,8 @@ const Form = () => {
                           value={
                             item.eveningBreakIn
                               ? moment
-                                  .utc(item.eveningBreakIn)
-                                  .format("HH:mm:ss")
+                                .utc(item.eveningBreakIn)
+                                .format("HH:mm:ss")
                               : ""
                           }
                           className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
@@ -723,8 +601,8 @@ const Form = () => {
                             value={
                               item.firstBreakOut
                                 ? moment
-                                    .utc(item.firstBreakOut)
-                                    .format("HH:mm:ss")
+                                  .utc(item.firstBreakOut)
+                                  .format("HH:mm:ss")
                                 : ""
                             }
                             onFocus={(e) => e.target.select()}
@@ -738,8 +616,8 @@ const Form = () => {
                             value={
                               item.lunchBreakOut
                                 ? moment
-                                    .utc(item.lunchBreakOut)
-                                    .format("HH:mm:ss")
+                                  .utc(item.lunchBreakOut)
+                                  .format("HH:mm:ss")
                                 : ""
                             }
                             onFocus={(e) => e.target.select()}
@@ -752,8 +630,8 @@ const Form = () => {
                             value={
                               item.eveningBreakOut
                                 ? moment
-                                    .utc(item.eveningBreakOut)
-                                    .format("HH:mm:ss")
+                                  .utc(item.eveningBreakOut)
+                                  .format("HH:mm:ss")
                                 : ""
                             }
                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
@@ -793,15 +671,15 @@ const Form = () => {
                             //     : ""
                             // }`}
                             value={[
-      item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
-      item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
-      item.lunchBreakOut ? moment.utc(item.lunchBreakOut).format("HH:mm:ss") : null,
-      item.lunchBreakIn ? moment.utc(item.lunchBreakIn).format("HH:mm:ss") : null,
-      item.eveningBreakOut ? moment.utc(item.eveningBreakOut).format("HH:mm:ss") : null,
-      item.eveningBreakIn ? moment.utc(item.eveningBreakIn).format("HH:mm:ss") : null,
-    ]
-      .filter(Boolean) // remove null or empty values
-      .join(" , ")} // join only existing values
+                              item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
+                              item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
+                              item.lunchBreakOut ? moment.utc(item.lunchBreakOut).format("HH:mm:ss") : null,
+                              item.lunchBreakIn ? moment.utc(item.lunchBreakIn).format("HH:mm:ss") : null,
+                              item.eveningBreakOut ? moment.utc(item.eveningBreakOut).format("HH:mm:ss") : null,
+                              item.eveningBreakIn ? moment.utc(item.eveningBreakIn).format("HH:mm:ss") : null,
+                            ]
+                              .filter(Boolean) // remove null or empty values
+                              .join(" , ")} // join only existing values
                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
                             disabled
                           />
@@ -809,9 +687,34 @@ const Form = () => {
                       </>
                     )}
 
-                    {/* Morning Break Out */}
+                    <td
+                      rowSpan={2}
+                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={
+                          item.totalWorkedTime || ''
 
-                    {/* Evening Break Out */}
+
+                        }
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />
+                    </td>
+                    <td
+                      rowSpan={2}
+                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={
+                          item.otHours || ''
+
+
+                        }
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />
+                    </td>
                   </tr>
 
                   {/* Row 2 - Evening + Out */}
@@ -856,8 +759,8 @@ const Form = () => {
                           value={
                             item.eveningBreakIn
                               ? moment
-                                  .utc(item.eveningBreakIn)
-                                  .format("HH:mm:ss")
+                                .utc(item.eveningBreakIn)
+                                .format("HH:mm:ss")
                               : ""
                           }
                           className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
