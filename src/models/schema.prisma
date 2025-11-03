@@ -81,6 +81,7 @@ model Company {
   OT                  OT[]
   EmployeeResign      EmployeeResign[]
   Attendance          Attendance[]
+  ShiftType           ShiftType[]
 }
 
 model Subscription {
@@ -145,6 +146,7 @@ model Branch {
   OT                  OT[]
   EmployeeResign      EmployeeResign[]
   Attendance          Attendance[]
+  ShiftType           ShiftType[]
 }
 
 model UserOnBranch {
@@ -281,6 +283,8 @@ model User {
   EmployeeResignupdatedBy      EmployeeResign[]      @relation(name: "updatedBy")
   AttendanceCreatedBy          Attendance[]          @relation(name: "createdBy")
   AttendanceupdatedBy          Attendance[]          @relation(name: "updatedBy")
+  ShiftTypeCreatedBy           ShiftType[]           @relation(name: "createdBy")
+  ShiftTypeupdatedBy           ShiftType[]           @relation(name: "updatedBy")
 }
 
 model Employee {
@@ -1876,4 +1880,17 @@ model PythonPunchData {
   machineType        String?
 
   @@unique([mIdCard, timestamp])
+}
+
+model ShiftType {
+  id                Int      @id @default(autoincrement())
+  Company           Company? @relation(fields: [companyId], references: [id])
+  companyId         Int?
+  branch            Branch?  @relation(fields: [branchId], references: [id])
+  branchId          Int?
+  createdBy         User?    @relation("createdBy", fields: [createdById], references: [id])
+  createdById       Int?
+  updatedBy         User?    @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById       Int?
+  selectedShiftType String?
 }

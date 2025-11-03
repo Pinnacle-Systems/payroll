@@ -8,7 +8,6 @@ export { default as HomePage } from "../../Uniform/Components/HomePage"
 export { default as StateMaster } from "./StateMaster";
 export { default as CountryMaster } from "./CountryMaster";
 export { default as CurrencyMaster } from "./CurrencyMaster";
-
 export { default as Dashboard } from "./Dashboard"
 export { default as PageMaster } from "./PageMaster";
 export { default as CityMaster } from "./CityMaster";
@@ -20,7 +19,6 @@ export { default as AccountSettings } from "./AccountSettings";
 export { default as ControlPanel } from "./ControlPanel";
 export { default as EmployeeMaster } from "./EmployeeMaster";
 export { default as PageGroupMaster } from './PageGroupMaster';
-
 export { default as PartyCategorymaster } from "./PartyCategoryMaster";
 export { default as HolidayCalendar } from "./HolidayForm"
 export { default as PayTermMaster } from './PayTermMaster';
@@ -64,3 +62,4 @@ export {default as AttendanceGeneration} from './AttendanceReport'
 export {default as AttendenceData} from './AttendenceMachineFetch' 
 export {default as DailyAttendence} from './DailyAttendence'
 export {default as PythonPunchFetch} from './PythonFetchData'
+export {default as BreakReport} from './BreakReport'

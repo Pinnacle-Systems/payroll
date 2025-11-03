@@ -44,6 +44,7 @@ import {
   AttendanceGeneration,
   DailyAttendence,
   PythonPunchFetch,
+  BreakReport,
 
  
   
@@ -141,7 +142,8 @@ const ActiveTabList = () => {
     "EMPLOYEE RESIGNATION":<EmployeeResignation/>,
     "ATTENDENCE GENERATION" :<DailyAttendence/>,
     "PUNCH DATA":<Attendance/>,
-    "PUNCH DOWNLOAD":<PythonPunchFetch/>
+    "PUNCH DOWNLOAD":<PythonPunchFetch/>,
+    "BREAK REPORT" : <BreakReport/>
 
 
 

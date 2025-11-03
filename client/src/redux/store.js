@@ -44,6 +44,7 @@ import {
   employeeResign,
   attendenceReportApi,
   attendenceGenerationApi,
+  BreakReportApi,
   
 
 } from "./services"
@@ -63,6 +64,7 @@ import {
   DispatchedApi,
   GeneralPurchaseApi, RawMaterialOpeningStockApi,
   purchaseInwardEntryApi,
+  shiftTypeApi,
 
 } from "./uniformService";
 import SizeMasterApi from "./uniformService/SizeMasterService";
@@ -200,6 +202,8 @@ const commonReducers = {
   [employeeResign.reducerPath] : employeeResign.reducer,
   [attendenceReportApi.reducerPath] : attendenceReportApi.reducer,
   [attendenceGenerationApi.reducerPath] : attendenceGenerationApi.reducer,
+  [shiftTypeApi.reducerPath] : shiftTypeApi.reducer,
+  [BreakReportApi.reducerPath] : BreakReportApi.reducer,
 
 
 }
@@ -313,6 +317,8 @@ preEmployeeApi.middleware,
 employeeResign.middleware,
 attendenceReportApi.middleware,
 attendenceGenerationApi.middleware,
+shiftTypeApi.middleware,
+BreakReportApi.middleware,
 ];
 
 

@@ -66,6 +66,8 @@ import {
   employeeResign,
   AttendanceReport,
   AttendenceGeneration,
+  shiftType,
+  BreakReport,
 } from "./src/routes/index.js";
 
 import { socketMain } from "./src/sockets/socket.js";
@@ -151,21 +153,22 @@ app.use("/employeeSubcategory", employeeSubCategory);
 app.use("/payFrequency", payfrequency);
 app.use("/payComponent", payComponents);
 app.use("/companyPayCode", companyPaycode);
-app.use('/bloodGroup',bloodGroup)
-app.use('/payStructure',payStructure)
-app.use('/leveltype',LevelType)
-app.use('/pFEsiEditor',pFEsiEditor)
-app.use('/relationShip',relationShip)
-app.use('/proofMaster',proof)
-app.use('/leaveCode',leaveCode)
-app.use('/leaveopeningBalance',leaveOpeningBalance)
-app.use('/machineInOutEntry',MachineInOutEntry)
-app.use('/oTMAster',OTMaster)
-app.use('/preEmployeeRegistration',preEmployee)
-app.use('/employeeResign',employeeResign)
-app.use('/attendenceReport',AttendanceReport)
-app.use('/attendenceGeneration',AttendenceGeneration)
-
+app.use('/bloodGroup', bloodGroup)
+app.use('/payStructure', payStructure)
+app.use('/leveltype', LevelType)
+app.use('/pFEsiEditor', pFEsiEditor)
+app.use('/relationShip', relationShip)
+app.use('/proofMaster', proof)
+app.use('/leaveCode', leaveCode)
+app.use('/leaveopeningBalance', leaveOpeningBalance)
+app.use('/machineInOutEntry', MachineInOutEntry)
+app.use('/oTMAster', OTMaster)
+app.use('/preEmployeeRegistration', preEmployee)
+app.use('/employeeResign', employeeResign)
+app.use('/attendenceReport', AttendanceReport)
+app.use('/attendenceGeneration', AttendenceGeneration)
+app.use('/shiftType', shiftType)
+app.use('/breakReport',BreakReport)
 app.get("/retreiveFile/:fileName", (req, res) => {
   const { fileName } = req.params;
   res.sendFile(__dirname + "/uploads/" + fileName);

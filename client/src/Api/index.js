@@ -114,3 +114,5 @@ export const EMP_API =  "preEmployeeRegistration"
 export const EMP_RESIGN = 'employeeResign'
 export const ATTENDENCE_REPORT = 'attendenceReport'
 export const ATTENDENCE_GENERATION = '/attendenceGeneration'
+export const SHIFT_TYPE = 'shiftType'
+export const BREAK_REPORT = 'breakReport'

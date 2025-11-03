@@ -4,7 +4,7 @@ import { ReusableTable, DateInput, customSelectStyles } from "../../../Inputs";
 import Select from "react-select";
 import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCategoryMasterService";
 import { useGetEmployeeQuery } from "../../../redux/services/EmployeeMasterService";
-import { useLazyGetAttendenceGenerationQuery } from "../../../redux/services/AttenedenceGeneration";
+import { useLazyGetbreakReportQuery } from "../../../redux/services/BreakReportGenerationService";
 import Modal from "../../../UiComponents/Modal";
 import { GroupBy } from "../../../Utils/DropdownData";
 import { getCommonParams } from "../../../Utils/helper";
@@ -21,7 +21,7 @@ const Form = () => {
   const designationRef = useRef(null);
 
   const [triggerReport, { data: allData, isFetching }] =
-    useLazyGetAttendenceGenerationQuery();
+    useLazyGetbreakReportQuery();
   const { data: employeeCategory } = useGetEmployeeCategoryQuery({ params });
 
   const { data: employeeData } = useGetEmployeeQuery({ params });
@@ -50,18 +50,20 @@ const Form = () => {
     setGroupBy("");
   };
   const absentData =
-    allData?.data?.filter((item) => item.status === "Absent") || [];
+    allData?.data?.filter((item) => item.breakStatus === "No Punches Available") || [];
   const regularData =
-    allData?.data?.filter((item) => item.status === "Regular") || [];
+    allData?.data?.filter((item) => item.breakStatus === "Correct Break") || [];
   const irregularData =
-    allData?.data?.filter((item) => item.status === "Irregular") || [];
+    allData?.data?.filter((item) => item.breakStatus === "Delayed Break") || [];
+  const SinglePunchData =
+    allData?.data?.filter((item) => item.breakStatus === "Only One Punch Available") || [];
 
 
   return (
     <div>
       <div onKeyDown={handleKeyDown} className="p-1 ">
         <div className="w-full flex bg-white p-1 justify-between  items-center">
-          <h1 className="master-header">Attendence Generation</h1>
+          <h1 className="master-header">Break Report</h1>
           <div className="flex items-center gap-x-4">
             <select
               value={reportView}
@@ -93,103 +95,7 @@ const Form = () => {
           className={` mt-3  p-2 overflow-auto bg-white max-h-[600px]`}
         >
           <table className="w-full border-collapse table-fixed ">
-            {/* <thead className="bg-gray-200 text-gray-800">
-              <tr>
-                <th
-                  className={`w-[15px] px-1 text-center font-medium text-[13px] `}
-                >
-                  S.No
-                </th>
 
-                <th
-                  className={`w-12  py-2 text-center font-medium text-[13px] `}
-                >
-                  Employee MId
-                </th>
-                <th
-                  className={`w-[45px]  py-2 text-center font-medium text-[13px] `}
-                >
-                  Employee Name
-                </th>
-                <th
-                  className={`w-[45px]  py-2 text-center font-medium text-[13px] `}
-                >
-                  Shift
-                </th>
-                <th
-                  className={`w-[45px]  py-2 text-center font-medium text-[13px] `}
-                >
-                  Department
-                </th>
-                <th
-                  className={`w-[45px]  py-2 text-center font-medium text-[13px] `}
-                >
-                  Designation
-                </th>
-                <th
-                  className={`w-8  py-2 item-center font-medium text-[13px] `}
-                >
-                  In Date
-                </th>
-                <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
-                  In
-                </th>
-                <th
-                  className={`w-8 py-2 item-center font-medium text-[13px] `}
-                >
-                  Out Date
-                </th>
-                <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
-                  Out
-                </th>
-
-                <th
-                  className={`${reportView === "Seperate" ? "w-8 " : "w-32 "
-                    }  py-2 text-center font-medium text-[13px] `}
-                >
-
-                </th>
-                {
-                  reportView === "Single" ?
-                    <th className={`w-12 py-2 item-center font-medium text-[13px] `}>
-                      Total worked Hours
-                    </th> : null
-                }
-                {
-                  reportView === "Single" ?
-                    <th className={`w-12 py-2 item-center font-medium text-[13px] `}>
-                      OT Hours
-                    </th> : null
-                }
-
-                <th
-                  className={`w-8 py-2  item-center font-medium text-[13px] `}
-                >
-
-                </th>
-
-                <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
-
-                </th>
-                <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
-
-                </th>
-                {
-                  reportView === "Seperate" ?
-                    <th className={`w-12 py-2 item-center font-medium text-[13px] `}>
-                      Total worked Hours
-                    </th> : null
-                }
-                {
-                  reportView === "Seperate" ?
-                    <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
-                      OT Hours
-                    </th> : null
-                }
-
-              </tr>
-             
-            </thead> */}
             <thead className="bg-gray-200 text-gray-800 ">
               <tr>
                 <th
@@ -208,50 +114,30 @@ const Form = () => {
                 >
                   Employee Name
                 </th>
-                <th
-                  className={`w-[45px]  py-2 text-center font-medium text-[13px] `}
-                >
-                  Shift
-                </th>
-                <th
-                  className={`w-[45px]  py-2 text-center font-medium text-[13px] `}
-                >
-                  Department
-                </th>
-                <th
-                  className={`w-[45px]  py-2 text-center font-medium text-[13px] `}
-                >
-                  Designation
-                </th>
+
                 <th
                   className={`w-8  py-2 item-center font-medium text-[13px] `}
                 >
-                  In Date
+                  Date
                 </th>
-                <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
-                  In
-                </th>
+
+
                 <th
-                  className={`w-8 py-2 item-center font-medium text-[13px] `}
+                  colSpan={2}
+                  className={`w-20 py-2 text-center font-medium text-[13px]`}                >
+                   Punches
+                </th>
+
+
+                <th
+                  className={`w-8  py-2 item-center font-medium text-[13px] `}
                 >
-                  Out Date
+                  Time taken
                 </th>
-                <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
-                  Out
-                </th>
-
                 <th
-                  colSpan={reportView === "Seperate" ? 4 : 2}
-                  className={`${reportView === "Single" ? "w-32" : "w-40"} py-2 text-center font-medium text-[13px]`}                >
-                  Other Punches
-                </th>
-
-
-                <th className={`w-[45px] py-2 item-center font-medium text-[13px] `}>
-                  worked Hours
-                </th>
-                <th className={`w-12 py-2 item-center font-medium text-[13px] `}>
-                  OT Hours
+                  className={`w-52  py-2 item-center font-medium text-[13px] `}
+                >
+                  
                 </th>
 
               </tr>
@@ -259,7 +145,8 @@ const Form = () => {
                */}
             </thead>
 
-            <p className=" z-10 w-[100px] text-sm px-1 py-0.5  ">REGULAR</p>
+
+            <p className=" z-10 w-[200px] text-sm px-1 py-0.5  ">Reached at Correct Time</p>
 
             <tbody>
               {regularData?.map((item, index) => (
@@ -295,37 +182,8 @@ const Form = () => {
                         className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
                       />
                     </td>
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.shiftName}
-                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.departmentName
-                        }
-                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.designationName}
-                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
+
+
 
                     {/* In Date */}
                     <td
@@ -335,62 +193,17 @@ const Form = () => {
                       <input
                         type="text"
                         value={
-                          item.inTime
-                            ? moment.utc(item.inTime).format("YYYY-MM-DD")
+                          item.firstBreakOut
+                            ? moment
+                              .utc(item.firstBreakOut)
+                              .format("YYYY-MM-DD")
                             : ""
                         }
                         className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
                       />
                     </td>
 
-                    {/* In Time */}
-                    <td
-                      rowSpan={2}
-                      className=" border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        min="0"
-                        type="text"
-                        value={
-                          item.inTime
-                            ? moment.utc(item.inTime).format("HH:mm:ss")
-                            : ""
-                        }
-                        onFocus={(e) => e.target.select()}
-                        className={`w-full bg-transparent  text-center focus:outline-none focus:border-transparent  `}
-                      />
-                    </td>
-                    {/* Out Date */}
-                    <td
-                      rowSpan={2}
-                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={
-                          item.outTime
-                            ? moment.utc(item.outTime).format("YYYY-MM-DD")
-                            : ""
-                        }
-                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                      />
-                    </td>
-                    {/* Out Time*/}
 
-                    <td
-                      rowSpan={2}
-                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={
-                          item.outTime
-                            ? moment.utc(item.outTime).format("HH:mm:ss")
-                            : ""
-                        }
-                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                      />
-                    </td>
 
                     {reportView === "Seperate" && (
                       <>
@@ -416,34 +229,7 @@ const Form = () => {
                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                           />
                         </td>
-                        <td className="border border-gray-300 text-[12px] text-center px-1">
-                          <input
-                            type="text"
-                            value={
-                              item.lunchBreakOut
-                                ? moment
-                                  .utc(item.lunchBreakOut)
-                                  .format("HH:mm:ss")
-                                : ""
-                            }
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                            disabled
-                          />
-                        </td>
-                        <td className="border border-gray-300 text-[12px] text-center px-1">
-                          <input
-                            type="text"
-                            value={
-                              item.eveningBreakOut
-                                ? moment
-                                  .utc(item.eveningBreakOut)
-                                  .format("HH:mm:ss")
-                                : ""
-                            }
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                            disabled
-                          />
-                        </td>
+
                       </>
                     )}
                     {reportView === "Single" && (
@@ -455,10 +241,7 @@ const Form = () => {
                             value={[
                               item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
                               item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
-                              item.lunchBreakOut ? moment.utc(item.lunchBreakOut).format("HH:mm:ss") : null,
-                              item.lunchBreakIn ? moment.utc(item.lunchBreakIn).format("HH:mm:ss") : null,
-                              item.eveningBreakOut ? moment.utc(item.eveningBreakOut).format("HH:mm:ss") : null,
-                              item.eveningBreakIn ? moment.utc(item.eveningBreakIn).format("HH:mm:ss") : null,
+
                             ]
                               .filter(Boolean) // remove null or empty values
                               .join(" , ")} // join only existing values
@@ -470,30 +253,14 @@ const Form = () => {
                     )}
                     <td
                       rowSpan={2}
-                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                      className=" border border-gray-300 text-[12px] py-0.5 item-center"
                     >
                       <input
-                        type="text"
+                        type="number"
                         value={
-                          item.totalWorkedTime || ''
-
-
+                          item.breakDuration || 0
                         }
-                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                      />
-                    </td>
-                    <td
-                      rowSpan={2}
-                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={
-                          item.otHours || ''
-
-
-                        }
-                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
                       />
                     </td>
 
@@ -523,34 +290,7 @@ const Form = () => {
                         />
                       </td>
 
-                      <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
-                        <input
-                          type="text"
-                          value={
-                            item.lunchBreakIn
-                              ? moment
-                                .utc(item.lunchBreakIn)
-                                .format("HH:mm:ss")
-                              : ""
-                          }
-                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                          disabled
-                        />
-                      </td>
-                      <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
-                        <input
-                          type="text"
-                          value={
-                            item.eveningBreakIn
-                              ? moment
-                                .utc(item.eveningBreakIn)
-                                .format("HH:mm:ss")
-                              : ""
-                          }
-                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                          disabled
-                        />
-                      </td>
+
                     </>
                   )}
 
@@ -558,7 +298,7 @@ const Form = () => {
                 </React.Fragment>
               ))}
             </tbody>
-            <p className=" z-10 w-[100px] text-sm px-1 py-0.5 ">IRREGULAR</p>
+            <p className=" z-10 w-[100px] text-sm px-1 py-0.5 ">Delayed</p>
             <tbody>
               {irregularData?.map((item, index) => (
                 <React.Fragment key={index}>
@@ -590,39 +330,11 @@ const Form = () => {
                       <input
                         type="text"
                         value={item?.firstName}
-                        className={`w-full text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
                       />
                     </td>
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.shiftName}
-                        className={`w-full text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.departmentName}
-                        className={`w-full text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.designationName}
-                        className={`w-full text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
+
+
 
                     {/* In Date */}
                     <td
@@ -632,62 +344,17 @@ const Form = () => {
                       <input
                         type="text"
                         value={
-                          item.inTime
-                            ? moment.utc(item.inTime).format("YYYY-MM-DD")
+                          item.firstBreakOut
+                            ? moment
+                              .utc(item.firstBreakOut)
+                              .format("YYYY-MM-DD")
                             : ""
                         }
                         className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
                       />
                     </td>
 
-                    {/* In Time */}
-                    <td
-                      rowSpan={2}
-                      className=" border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        min="0"
-                        type="text"
-                        value={
-                          item.inTime
-                            ? moment.utc(item.inTime).format("HH:mm:ss")
-                            : ""
-                        }
-                        onFocus={(e) => e.target.select()}
-                        className={`w-full bg-transparent  text-center focus:outline-none focus:border-transparent`}
-                      />
-                    </td>
-                    {/* Out Date */}
-                    <td
-                      rowSpan={2}
-                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={
-                          item.outTime
-                            ? moment.utc(item.outTime).format("YYYY-MM-DD")
-                            : ""
-                        }
-                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent`}
-                      />
-                    </td>
-                    {/* Out Time*/}
 
-                    <td
-                      rowSpan={2}
-                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={
-                          item.outTime
-                            ? moment.utc(item.outTime).format("HH:mm:ss")
-                            : ""
-                        }
-                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                      />
-                    </td>
 
                     {reportView === "Seperate" && (
                       <>
@@ -713,35 +380,7 @@ const Form = () => {
                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                           />
                         </td>
-                        <td className="border border-gray-300 text-[12px] py-0.5 item-center">
-                          <input
-                            min="0"
-                            type="text"
-                            value={
-                              item.lunchBreakOut
-                                ? moment
-                                  .utc(item.lunchBreakOut)
-                                  .format("HH:mm:ss")
-                                : ""
-                            }
-                            onFocus={(e) => e.target.select()}
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                          />
-                        </td>
-                        <td className="border border-gray-300 text-[12px] text-center px-1">
-                          <input
-                            type="text"
-                            value={
-                              item.eveningBreakOut
-                                ? moment
-                                  .utc(item.eveningBreakOut)
-                                  .format("HH:mm:ss")
-                                : ""
-                            }
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                            disabled
-                          />
-                        </td>
+
                       </>
                     )}
                     {reportView === "Single" && (
@@ -749,38 +388,11 @@ const Form = () => {
                         <td colSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
                           <input
                             type="text"
-                            // value={`${
-                            //   item.firstBreakOut
-                            //     ? moment
-                            //         .utc(item.firstBreakOut)
-                            //         .format("HH:mm:ss")
-                            //     : ""
-                            // } , ${
-                            //   item.firstBreakIn
-                            //     ? moment
-                            //         .utc(item.firstBreakIn)
-                            //         .format("HH:mm:ss")
-                            //     : ""
-                            // } , ${
-                            //   item.eveningBreakOut
-                            //     ? moment
-                            //         .utc(item.eveningBreakOut)
-                            //         .format("HH:mm:ss")
-                            //     : ""
-                            // } , ${
-                            //   item.eveningBreakIn
-                            //     ? moment
-                            //         .utc(item.eveningBreakIn)
-                            //         .format("HH:mm:ss")
-                            //     : ""
-                            // }`}
+
                             value={[
                               item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
                               item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
-                              item.lunchBreakOut ? moment.utc(item.lunchBreakOut).format("HH:mm:ss") : null,
-                              item.lunchBreakIn ? moment.utc(item.lunchBreakIn).format("HH:mm:ss") : null,
-                              item.eveningBreakOut ? moment.utc(item.eveningBreakOut).format("HH:mm:ss") : null,
-                              item.eveningBreakIn ? moment.utc(item.eveningBreakIn).format("HH:mm:ss") : null,
+
                             ]
                               .filter(Boolean) // remove null or empty values
                               .join(" , ")} // join only existing values
@@ -790,35 +402,19 @@ const Form = () => {
                         </td>
                       </>
                     )}
-
                     <td
                       rowSpan={2}
-                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                      className=" border border-gray-300 text-[12px] py-0.5 item-center"
                     >
                       <input
-                        type="text"
+                        type="number"
                         value={
-                          item.totalWorkedTime || ''
-
-
+                          item.breakDuration || 0
                         }
-                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
                       />
                     </td>
-                    <td
-                      rowSpan={2}
-                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={
-                          item.otHours || ''
 
-
-                        }
-                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                      />
-                    </td>
                   </tr>
 
                   {/* Row 2 - Evening + Out */}
@@ -844,33 +440,8 @@ const Form = () => {
                           disabled
                         />
                       </td>
-                      <td className="border border-gray-300 text-[12px] py-0.5 item-center">
-                        <input
-                          type="text"
-                          value={
-                            item.lunchBreakIn
-                              ? moment.utc(item.lunchBreakIn).format("HH:mm:ss")
-                              : ""
-                          }
-                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                          disabled
-                        />
-                      </td>
 
-                      <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
-                        <input
-                          type="text"
-                          value={
-                            item.eveningBreakIn
-                              ? moment
-                                .utc(item.eveningBreakIn)
-                                .format("HH:mm:ss")
-                              : ""
-                          }
-                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                          disabled
-                        />
-                      </td>
+
                     </>
                   )}
 
@@ -878,7 +449,114 @@ const Form = () => {
                 </React.Fragment>
               ))}
             </tbody>
-            <p className="z-10 w-[100px] text-sm px-1 py-0.5 ">ABSENT</p>
+            <p className="z-10 w-[100px] text-sm px-1 py-0.5 ">Single Punch</p>
+            <tbody>
+              {SinglePunchData?.map((item, index) => (
+                <React.Fragment key={index}>
+                  {/* Row 1 - In + Morning */}
+                  <tr>
+                    {/* S.No rowspan */}
+                    <td
+                      rowSpan={2}
+                      className="border border-gray-300 py-1.5 text-[12px]  text-center px-1"
+                    >
+                      {index + 1}
+                    </td>
+
+                    {/* Employee Id rowspan */}
+                    <td
+                      rowSpan={2}
+                      className="border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={item?.mIdCard}
+                        className={`w-full  text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                      />
+                    </td>
+                    <td
+                      rowSpan={2}
+                      className="border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={item?.firstName}
+                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                      />
+                    </td>
+
+
+
+                    {/* In Date */}
+                    <td
+                      rowSpan={2}
+                      className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={
+                          item.firstBreakOut
+                            ? moment
+                              .utc(item.firstBreakOut)
+                              .format("YYYY-MM-DD")
+                            : ""
+                        }
+                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                      />
+                    </td>
+
+
+
+                    {reportView === "Seperate" && (
+                      <>
+                       
+                        <td colSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
+                          <input
+                            min="0"
+                            type="text"
+                            value={
+                              item.firstBreakOut
+                                ? moment
+                                  .utc(item.firstBreakOut)
+                                  .format("HH:mm:ss")
+                                : ""
+                            }
+                            onFocus={(e) => e.target.select()}
+                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                          />
+                        </td>
+
+                      </>
+                    )}
+                    {reportView === "Single" && (
+                      <>
+                        <td colSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
+                          <input
+                            type="text"
+
+                            value={[
+                              item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
+                              item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
+
+                            ]
+                              .filter(Boolean) // remove null or empty values
+                              .join(" , ")} // join only existing values
+                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                            disabled
+                          />
+                        </td>
+                      </>
+                    )}
+                  
+
+                  </tr>
+
+                
+                  <tr>{/* Evening Break In */}</tr>
+                </React.Fragment>
+              ))}
+            </tbody>
+            <p className="z-10 w-[100px] text-sm px-1 py-0.5 ">No Punches</p>
             <tbody>
               {absentData?.map((item, index) => (
                 <>
@@ -908,6 +586,7 @@ const Form = () => {
                 </>
               ))}
             </tbody>
+
           </table>
         </div>
 

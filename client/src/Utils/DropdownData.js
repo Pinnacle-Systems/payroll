@@ -332,3 +332,8 @@ export const GroupBy = [
   {show:"Department" ,value:"department"},
   {show:"Designation" ,value:"designation"}
 ]
+
+export const ShiftType = [
+    {show:"Hourly" ,value:"Hourly"},
+  {show:"Quarter" ,value:"Quarter"}
+]
