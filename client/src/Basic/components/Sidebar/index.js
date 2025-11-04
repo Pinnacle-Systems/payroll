@@ -139,6 +139,12 @@ const Sidebar = ({ isOpen, setIsOpen, isMainDropdownOpen, setIsMainDropdownOpen 
       groups: transactionsGroup,
       pages: transactions
     },
+    {
+      heading: 'Reports',
+      logo: <PanelLeftClose size={24} />,
+      groups: reportGroups,
+      pages: reports
+    },
 
   ]
   console.log(isOpen, "isOpen", isMainDropdownOpen, "isMainDropdownOpen")

@@ -143,7 +143,7 @@ const ActiveTabList = () => {
     "ATTENDENCE GENERATION" :<DailyAttendence/>,
     "PUNCH DATA":<Attendance/>,
     "PUNCH DOWNLOAD":<PythonPunchFetch/>,
-    "BREAK REPORT" : <BreakReport/>
+    "BREAK WISE REPORT" : <BreakReport/>
 
 
 

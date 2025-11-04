@@ -209,7 +209,7 @@ const Form = () => {
                   Employee Name
                 </th>
                 <th
-                  className={`w-[45px]  py-2 text-center font-medium text-[13px] `}
+                  className={`w-[35px]  py-2 text-center font-medium text-[13px] `}
                 >
                   Shift
                 </th>
@@ -219,7 +219,7 @@ const Form = () => {
                   Department
                 </th>
                 <th
-                  className={`w-[45px]  py-2 text-center font-medium text-[13px] `}
+                  className={`w-[65px]  py-2 text-center font-medium text-[13px] `}
                 >
                   Designation
                 </th>
@@ -250,7 +250,7 @@ const Form = () => {
                 <th className={`w-[45px] py-2 item-center font-medium text-[13px] `}>
                   worked Hours
                 </th>
-                <th className={`w-12 py-2 item-center font-medium text-[13px] `}>
+                <th className={`w-[40px] py-2 item-center font-medium text-[13px] `}>
                   OT Hours
                 </th>
 

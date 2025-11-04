@@ -24,6 +24,8 @@ const BreakReportApi = createApi({
                 };
             },
             providesTags: ["breakReport"],
+            keepUnusedDataFor: 21600,
+
         }),
         getbreakReportById: builder.query({
             query: (id) => {

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import BreakTimeCells from './BreakTimeCells'
 
 import { ReusableTable, DateInput, customSelectStyles } from "../../../Inputs";
 import Select from "react-select";
@@ -10,10 +11,11 @@ import { GroupBy } from "../../../Utils/DropdownData";
 import { getCommonParams } from "../../../Utils/helper";
 import Swal from "sweetalert2";
 import moment from "moment-timezone";
+import EmployeeBreakRow from './EmployeeBreakRow'
 const Form = () => {
   const [date, setDate] = useState("");
   const [employeeCategoryId, setEmployeeCategoryId] = useState("");
-  const [reportView, setReportView] = useState("Seperate");
+
   const [form, setForm] = useState(true);
   const childRecord = useRef(0);
   const params = getCommonParams();
@@ -24,7 +26,7 @@ const Form = () => {
     useLazyGetbreakReportQuery();
   const { data: employeeCategory } = useGetEmployeeCategoryQuery({ params });
 
-  const { data: employeeData } = useGetEmployeeQuery({ params });
+  // const { data: employeeData } = useGetEmployeeQuery({ params });
 
   useEffect(() => {
     if (form && designationRef.current) {
@@ -50,33 +52,129 @@ const Form = () => {
     setGroupBy("");
   };
   const absentData =
-    allData?.data?.filter((item) => item.breakStatus === "No Punches Available") || [];
+    allData?.data?.filter((item) => item.morningBreakStatus === "No Punches Available") || [];
   const regularData =
-    allData?.data?.filter((item) => item.breakStatus === "Correct Break") || [];
+    allData?.data?.filter((item) => item.morningBreakStatus === "Correct Break") || [];
   const irregularData =
-    allData?.data?.filter((item) => item.breakStatus === "Delayed Break") || [];
+    allData?.data?.filter((item) => item.morningBreakStatus === "Delayed Break") || [];
   const SinglePunchData =
-    allData?.data?.filter((item) => item.breakStatus === "Only One Punch Available") || [];
+    allData?.data?.filter((item) => item.morningBreakStatus === "Only One Punch Available") || [];
+  const lunchabsentData =
+    allData?.data?.filter((item) => item.lunchBreakStatus === "Lunch No Punches Available") || [];
+  const lunchregularData =
+    allData?.data?.filter((item) => item.lunchBreakStatus === "Correct Lunch Break") || [];
+  const lunchirregularData =
+    allData?.data?.filter((item) => item.lunchBreakStatus === "Delayed Lunch Break") || [];
+  const lunchSinglePunchData =
+    allData?.data?.filter((item) => item.lunchBreakStatus === "Only One Punch Available Lunch") || [];
+  const eveningabsentData =
+    allData?.data?.filter((item) => item.eveningBreakStatus === "Evening No Punches Available") || [];
+  const eveningregularData =
+    allData?.data?.filter((item) => item.eveningBreakStatus === "Correct Evening Break") || [];
+  const eveningirregularData =
+    allData?.data?.filter((item) => item.eveningBreakStatus === "Delayed Evening Break") || [];
+  const eveningSinglePunchData =
+    allData?.data?.filter((item) => item.eveningBreakStatus === "Evening Only One Punch Available") || [];
 
+  console.log("lunchregularData:", lunchregularData);
+  const prepareEmployeeData = () => {
+    // Get ALL unique employees from ALL data sources
+    const allEmployeesMap = new Map();
 
+    // Combine all data arrays
+    const allDataArrays = [
+      ...(regularData || []),
+      ...(irregularData || []),
+      ...(SinglePunchData || []),
+      ...(absentData || []),
+      ...(lunchregularData || []),
+      ...(lunchirregularData || []),
+      ...(lunchSinglePunchData || []),
+      ...(lunchabsentData || []),
+      ...(eveningregularData || []),
+      ...(eveningirregularData || []),
+      ...(eveningSinglePunchData || []),
+      ...(eveningabsentData || [])
+    ];
+
+    // First pass: Create unique employees with all fields
+    allDataArrays.forEach(employee => {
+      if (employee?.mIdCard) {
+        if (!allEmployeesMap.has(employee.mIdCard)) {
+          // Initialize employee with all possible fields
+          allEmployeesMap.set(employee.mIdCard, {
+            mIdCard: employee.mIdCard,
+            firstName: employee.firstName,
+            departmentName: employee.departmentName,
+            designationName: employee.designationName,
+            reportDate : employee?.reportDate ,
+            // Morning break fields
+            firstBreakOut: null,
+            firstBreakIn: null,
+            breakDuration: 0,
+            morningBreakStatus: employee.morningBreakStatus,
+            // Lunch break fields
+            lunchBreakOut: null,
+            lunchBreakIn: null,
+            lunchBreakDuration: 0,
+            lunchBreakStatus: employee.lunchBreakStatus,
+            // Evening break fields
+            eveningBreakOut: null,
+            eveningBreakIn: null,
+            eveningBreakDuration: 0,
+            eveningBreakStatus: employee.eveningBreakStatus
+          });
+        }
+      }
+    });
+
+    // Second pass: Populate break data from specific arrays
+    allEmployeesMap?.forEach((employee, mIdCard) => {
+      // Morning Break Data
+      const morningEmp = [...regularData, ...irregularData, ...SinglePunchData, ...absentData]
+        .find(emp => emp.mIdCard === mIdCard);
+      if (morningEmp) {
+        employee.firstBreakOut = morningEmp.firstBreakOut || employee.firstBreakOut;
+        employee.firstBreakIn = morningEmp.firstBreakIn || employee.firstBreakIn;
+        employee.breakDuration = morningEmp.breakDuration || employee.breakDuration;
+        employee.morningBreakStatus = morningEmp.morningBreakStatus || employee.morningBreakStatus;
+      }
+
+      // Lunch Break Data
+      const lunchEmp = [...lunchregularData, ...lunchirregularData, ...lunchSinglePunchData, ...lunchabsentData]
+        .find(emp => emp.mIdCard === mIdCard);
+      if (lunchEmp) {
+        employee.lunchBreakOut = lunchEmp.lunchBreakOut || employee.lunchBreakOut;
+        employee.lunchBreakIn = lunchEmp.lunchBreakIn || employee.lunchBreakIn;
+        employee.lunchBreakDuration = lunchEmp.lunchBreakDuration || employee.lunchBreakDuration;
+        employee.lunchBreakStatus = lunchEmp.lunchBreakStatus || employee.lunchBreakStatus;
+      }
+
+      // Evening Break Data
+      const eveningEmp = [...eveningregularData, ...eveningirregularData, ...eveningSinglePunchData, ...eveningabsentData]
+        .find(emp => emp.mIdCard === mIdCard);
+      if (eveningEmp) {
+        employee.eveningBreakOut = eveningEmp.eveningBreakOut || employee.eveningBreakOut;
+        employee.eveningBreakIn = eveningEmp.eveningBreakIn || employee.eveningBreakIn;
+        employee.eveningBreakDuration = eveningEmp.eveningBreakDuration || employee.eveningBreakDuration;
+        employee.eveningBreakStatus = eveningEmp.eveningBreakStatus || employee.eveningBreakStatus;
+      }
+    });
+
+    return Array.from(allEmployeesMap.values());
+  };
+  const employeeData = React.useMemo(() => prepareEmployeeData(), [
+    regularData, irregularData, SinglePunchData, absentData,
+    lunchregularData, lunchirregularData, lunchSinglePunchData, lunchabsentData,
+    eveningregularData, eveningirregularData, eveningSinglePunchData, eveningabsentData
+  ]);
   return (
     <div>
       <div onKeyDown={handleKeyDown} className="p-1 ">
         <div className="w-full flex bg-white p-1 justify-between  items-center">
-          <h1 className="master-header">Break Report</h1>
+          <h1 className="master-header">DataWise Break Report</h1>
           <div className="flex items-center gap-x-4">
-            <select
-              value={reportView}
-              onChange={(e) => {
-                setReportView(e.target.value);
-              }}
-              className="w-[110px]  px-1 py-0.5 text-xs text-[12px] border border-gray-300 rounded-lg
-    focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-    transition-all duration-150 shadow-sm"
-            >
-              <option value="Seperate">Seperate</option>
-              <option value="Single">Single</option>
-            </select>
+
             <button
               onClick={() => {
                 setForm(true);
@@ -91,502 +189,68 @@ const Form = () => {
 
 
 
-        <div
-          className={` mt-3  p-2 overflow-auto bg-white max-h-[600px]`}
-        >
-          <table className="w-full border-collapse table-fixed ">
-
-            <thead className="bg-gray-200 text-gray-800 ">
+        <div className="mt-3 w-full p-2 overflow-x-auto bg-white max-h-[580px]">
+          <table className="w-full  border-collapse table-fixed">
+            <thead className="bg-gray-200 text-gray-800">
               <tr>
-                <th
-                  className={`w-[15px] px-1 text-center font-medium text-[13px] `}
-                >
-                  S.No
+                <th className="w-[15px] px-1 text-center font-medium text-[13px]  ">S.No</th>
+                <th className="w-6 py-2 text-center font-medium text-[13px]  ">Emp MId</th>
+                <th className="w-[40px] py-2 text-center font-medium text-[13px]  ">Emp Name</th>
+                <th className="w-[35px] py-2 text-center font-medium text-[13px]  ">Department</th>
+                <th className="w-[55px] py-2 text-center font-medium text-[13px]  ">Designation</th>
+                <th className="w-8 py-2 text-center font-medium text-[13px]  border-r border-gray-300">Date</th>
+
+                {/* Morning Tea Break */}
+                <th colSpan={4} className="w-24 py-2 text-center font-medium text-[13px] border border-gray-300">
+                  Morning Tea Break
                 </th>
 
-                <th
-                  className={`w-8  py-2 text-center font-medium text-[13px] `}
-                >
-                  Emp MId
-                </th>
-                <th
-                  className={`w-[45px]  py-2 text-center font-medium text-[13px] `}
-                >
-                  Employee Name
+                {/* Lunch Break */}
+                <th colSpan={4} className="w-24 py-2 text-center font-medium text-[13px] border border-gray-300">
+                  Lunch Break
                 </th>
 
-                <th
-                  className={`w-8  py-2 item-center font-medium text-[13px] `}
-                >
-                  Date
+                {/* Evening Tea Break */}
+                <th colSpan={4} className="w-24 py-2 text-center font-medium text-[13px] border border-gray-300">
+                  Evening Tea Break
                 </th>
-
-
-                <th
-                  colSpan={2}
-                  className={`w-20 py-2 text-center font-medium text-[13px]`}                >
-                   Punches
-                </th>
-
-
-                <th
-                  className={`w-8  py-2 item-center font-medium text-[13px] `}
-                >
-                  Time taken
-                </th>
-                <th
-                  className={`w-52  py-2 item-center font-medium text-[13px] `}
-                >
-                  
-                </th>
-
               </tr>
-              {/*
-               */}
+
+              {/* Sub-headers for each break */}
+              <tr>
+                <th colSpan={6} className="border border-gray-300"></th>
+
+                {/* Morning Tea Break sub-headers */}
+                <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
+                <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
+                <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
+                <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
+
+                {/* Lunch Break sub-headers */}
+                <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
+                <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
+                <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
+                <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
+
+                {/* Evening Tea Break sub-headers */}
+                <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
+                <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
+                <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
+                <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
+              </tr>
             </thead>
 
-
-            <p className=" z-10 w-[200px] text-sm px-1 py-0.5  ">Reached at Correct Time</p>
-
             <tbody>
-              {regularData?.map((item, index) => (
-                <React.Fragment key={index}>
-                  {/* Row 1 - In + Morning */}
-                  <tr>
-                    {/* S.No rowspan */}
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 py-1.5 text-[12px]  text-center px-1"
-                    >
-                      {index + 1}
-                    </td>
+              {employeeData?.map((employee, index) => (
+                <EmployeeBreakRow
+                  key={employee.mIdCard || index}
+                  employee={employee}
+                  index={index}
+                  date={date} // Pass the selected date as prop
 
-                    {/* Employee Id rowspan */}
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.mIdCard}
-                        className={`w-full  text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.firstName}
-                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-
-
-
-                    {/* In Date */}
-                    <td
-                      rowSpan={2}
-                      className=" border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={
-                          item.firstBreakOut
-                            ? moment
-                              .utc(item.firstBreakOut)
-                              .format("YYYY-MM-DD")
-                            : ""
-                        }
-                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-
-
-
-                    {reportView === "Seperate" && (
-                      <>
-                        <td className=" border border-gray-300 text-[12px] py-0.5 ">
-                          <input
-                            type="text"
-                            value={"OUT"}
-                            className={`w-full text-center bg-transparent  focus:outline-none focus:border-transparent `}
-                          />
-                        </td>
-                        <td className="border border-gray-300 text-[12px] py-0.5 item-center">
-                          <input
-                            min="0"
-                            type="text"
-                            value={
-                              item.firstBreakOut
-                                ? moment
-                                  .utc(item.firstBreakOut)
-                                  .format("HH:mm:ss")
-                                : ""
-                            }
-                            onFocus={(e) => e.target.select()}
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                          />
-                        </td>
-
-                      </>
-                    )}
-                    {reportView === "Single" && (
-                      <>
-                        <td colSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
-                          <input
-                            type="text"
-
-                            value={[
-                              item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
-                              item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
-
-                            ]
-                              .filter(Boolean) // remove null or empty values
-                              .join(" , ")} // join only existing values
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                            disabled
-                          />
-                        </td>
-                      </>
-                    )}
-                    <td
-                      rowSpan={2}
-                      className=" border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="number"
-                        value={
-                          item.breakDuration || 0
-                        }
-                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-
-                  </tr>
-
-                  {/* Row 2 - Evening + Out */}
-                  {reportView === "Seperate" && (
-                    <>
-                      <td className=" border border-gray-300 text-[12px] py-0.5 item-center">
-                        <input
-                          type="text"
-                          value={"IN"}
-                          className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                        />
-                      </td>
-                      {/* Morning Break In */}
-                      <td className="border border-gray-300 text-[12px] py-0.5 item-center">
-                        <input
-                          type="text"
-                          value={
-                            item.firstBreakIn
-                              ? moment.utc(item.firstBreakIn).format("HH:mm:ss")
-                              : ""
-                          }
-                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                          disabled
-                        />
-                      </td>
-
-
-                    </>
-                  )}
-
-                  <tr>{/* Evening Break In */}</tr>
-                </React.Fragment>
+                />
               ))}
             </tbody>
-            <p className=" z-10 w-[100px] text-sm px-1 py-0.5 ">Delayed</p>
-            <tbody>
-              {irregularData?.map((item, index) => (
-                <React.Fragment key={index}>
-                  {/* Row 1 - In + Morning */}
-                  <tr>
-                    {/* S.No rowspan */}
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 py-1.5 text-[12px]  text-center px-1"
-                    >
-                      {index + 1}
-                    </td>
-
-                    {/* Employee Id rowspan */}
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.mIdCard}
-                        className={`w-full  text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.firstName}
-                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-
-
-
-                    {/* In Date */}
-                    <td
-                      rowSpan={2}
-                      className=" border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={
-                          item.firstBreakOut
-                            ? moment
-                              .utc(item.firstBreakOut)
-                              .format("YYYY-MM-DD")
-                            : ""
-                        }
-                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-
-
-
-                    {reportView === "Seperate" && (
-                      <>
-                        <td className=" border border-gray-300 text-[12px] py-0.5 ">
-                          <input
-                            type="text"
-                            value={"OUT"}
-                            className={`w-full text-center bg-transparent  focus:outline-none focus:border-transparent `}
-                          />
-                        </td>
-                        <td className="border border-gray-300 text-[12px] py-0.5 item-center">
-                          <input
-                            min="0"
-                            type="text"
-                            value={
-                              item.firstBreakOut
-                                ? moment
-                                  .utc(item.firstBreakOut)
-                                  .format("HH:mm:ss")
-                                : ""
-                            }
-                            onFocus={(e) => e.target.select()}
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                          />
-                        </td>
-
-                      </>
-                    )}
-                    {reportView === "Single" && (
-                      <>
-                        <td colSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
-                          <input
-                            type="text"
-
-                            value={[
-                              item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
-                              item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
-
-                            ]
-                              .filter(Boolean) // remove null or empty values
-                              .join(" , ")} // join only existing values
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                            disabled
-                          />
-                        </td>
-                      </>
-                    )}
-                    <td
-                      rowSpan={2}
-                      className=" border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="number"
-                        value={
-                          item.breakDuration || 0
-                        }
-                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-
-                  </tr>
-
-                  {/* Row 2 - Evening + Out */}
-                  {reportView === "Seperate" && (
-                    <>
-                      <td className=" border border-gray-300 text-[12px] py-0.5 item-center">
-                        <input
-                          type="text"
-                          value={"IN"}
-                          className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                        />
-                      </td>
-                      {/* Morning Break In */}
-                      <td className="border border-gray-300 text-[12px] py-0.5 item-center">
-                        <input
-                          type="text"
-                          value={
-                            item.firstBreakIn
-                              ? moment.utc(item.firstBreakIn).format("HH:mm:ss")
-                              : ""
-                          }
-                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                          disabled
-                        />
-                      </td>
-
-
-                    </>
-                  )}
-
-                  <tr>{/* Evening Break In */}</tr>
-                </React.Fragment>
-              ))}
-            </tbody>
-            <p className="z-10 w-[100px] text-sm px-1 py-0.5 ">Single Punch</p>
-            <tbody>
-              {SinglePunchData?.map((item, index) => (
-                <React.Fragment key={index}>
-                  {/* Row 1 - In + Morning */}
-                  <tr>
-                    {/* S.No rowspan */}
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 py-1.5 text-[12px]  text-center px-1"
-                    >
-                      {index + 1}
-                    </td>
-
-                    {/* Employee Id rowspan */}
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.mIdCard}
-                        className={`w-full  text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.firstName}
-                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-
-
-
-                    {/* In Date */}
-                    <td
-                      rowSpan={2}
-                      className=" border border-gray-300 text-[12px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={
-                          item.firstBreakOut
-                            ? moment
-                              .utc(item.firstBreakOut)
-                              .format("YYYY-MM-DD")
-                            : ""
-                        }
-                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-
-
-
-                    {reportView === "Seperate" && (
-                      <>
-                       
-                        <td colSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
-                          <input
-                            min="0"
-                            type="text"
-                            value={
-                              item.firstBreakOut
-                                ? moment
-                                  .utc(item.firstBreakOut)
-                                  .format("HH:mm:ss")
-                                : ""
-                            }
-                            onFocus={(e) => e.target.select()}
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                          />
-                        </td>
-
-                      </>
-                    )}
-                    {reportView === "Single" && (
-                      <>
-                        <td colSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
-                          <input
-                            type="text"
-
-                            value={[
-                              item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
-                              item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
-
-                            ]
-                              .filter(Boolean) // remove null or empty values
-                              .join(" , ")} // join only existing values
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                            disabled
-                          />
-                        </td>
-                      </>
-                    )}
-                  
-
-                  </tr>
-
-                
-                  <tr>{/* Evening Break In */}</tr>
-                </React.Fragment>
-              ))}
-            </tbody>
-            <p className="z-10 w-[100px] text-sm px-1 py-0.5 ">No Punches</p>
-            <tbody>
-              {absentData?.map((item, index) => (
-                <>
-                  {/* Row 1 - In + Morning */}
-                  <tr>
-                    {/* S.No rowspan */}
-                    <td className="border border-gray-300 py-1.5 text-[12px]  text-center px-1">
-                      {index + 1}
-                    </td>
-
-                    {/* Employee Id rowspan */}
-                    <td className="border border-gray-300 text-[12px] py-0.5 item-center">
-                      <input
-                        type="text"
-                        value={item?.mIdCard}
-                        className={`w-full  text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-                    <td className="border border-gray-300 text-[12px] py-0.5 item-center">
-                      <input
-                        type="text"
-                        value={item?.firstName}
-                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-                  </tr>
-                </>
-              ))}
-            </tbody>
-
           </table>
         </div>
 
@@ -603,7 +267,7 @@ const Form = () => {
               <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center gap-2">
                   <h2 className=" -ml-2   py-0.5 master-header-modal">
-                    ATTENDENCE GENERATION
+                    BREAK REPORT GENERATION
                   </h2>
                 </div>
               </div>
@@ -659,7 +323,7 @@ const Form = () => {
                             </label>{" "}
                             <select
                               value={groupBy}
-                              className="w-full px-1 py-0.5 text-xs text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-150 shadow-sm"
+                              className="w-full px-1 py-0.5 text-xs text-[12px] border border-black rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-150 shadow-sm"
                               onChange={(e) => setGroupBy(e.target.value)}
                             >
                               {" "}

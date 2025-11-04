@@ -11,7 +11,7 @@ const AttendenceGenerationApi = createApi({
   tagTypes: ["attendenceGeneration"],
   endpoints: (builder) => ({
     getAttendenceGeneration: builder.query({
-      query: ({ searchParams}) => {
+      query: ({ searchParams }) => {
         if (!searchParams) {
           throw new Error("searchParams (inDate and groupBy) are required");
         }
@@ -24,6 +24,8 @@ const AttendenceGenerationApi = createApi({
         };
       },
       providesTags: ["attendenceGeneration"],
+      keepUnusedDataFor: 21600,
+
     }),
     getAttendenceGenerationById: builder.query({
       query: (id) => {
