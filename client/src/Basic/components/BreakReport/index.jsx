@@ -190,7 +190,7 @@ const Form = () => {
 
 
         <div className="mt-3 w-full p-2 overflow-x-auto bg-white max-h-[580px]">
-          <table className="w-full  border-collapse table-fixed">
+          <table className="w-full min-w-[1200px] border-collapse table-fixed">
             <thead className="bg-gray-200 text-gray-800">
               <tr>
                 <th className="w-[15px] px-1 text-center font-medium text-[13px]  ">S.No</th>
@@ -201,17 +201,17 @@ const Form = () => {
                 <th className="w-8 py-2 text-center font-medium text-[13px]  border-r border-gray-300">Date</th>
 
                 {/* Morning Tea Break */}
-                <th colSpan={4} className="w-24 py-2 text-center font-medium text-[13px] border border-gray-300">
+                <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
                   Morning Tea Break
                 </th>
 
                 {/* Lunch Break */}
-                <th colSpan={4} className="w-24 py-2 text-center font-medium text-[13px] border border-gray-300">
+                <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
                   Lunch Break
                 </th>
 
                 {/* Evening Tea Break */}
-                <th colSpan={4} className="w-24 py-2 text-center font-medium text-[13px] border border-gray-300">
+                <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
                   Evening Tea Break
                 </th>
               </tr>
