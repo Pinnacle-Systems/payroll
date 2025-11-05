@@ -107,7 +107,7 @@ const Form = () => {
             firstName: employee.firstName,
             departmentName: employee.departmentName,
             designationName: employee.designationName,
-            reportDate : employee?.reportDate ,
+            reportDate: employee?.reportDate,
             // Morning break fields
             firstBreakOut: null,
             firstBreakIn: null,
@@ -188,72 +188,71 @@ const Form = () => {
         </div>
 
 
+        
+          <div className="mt-3 w-full p-2 overflow-x-auto bg-white max-h-[580px]">
+            <table className="w-full  border-collapse table-fixed">
+              <thead className="bg-gray-200 text-gray-800">
+                <tr>
+                  <th className="w-[15px] px-1 text-center font-medium text-[13px]  ">S.No</th>
+                  <th className="w-6 py-2 text-center font-medium text-[13px]  ">Emp MId</th>
+                  <th className="w-[40px] py-2 text-center font-medium text-[13px]  ">Emp Name</th>
+                  <th className="w-[35px] py-2 text-center font-medium text-[13px]  ">Department</th>
+                  <th className="w-[55px] py-2 text-center font-medium text-[13px]  ">Designation</th>
+                  <th className="w-8 py-2 text-center font-medium text-[13px]  border-r border-gray-300">Date</th>
 
-        <div className="mt-3 w-full p-2 overflow-x-auto bg-white max-h-[580px]">
-          <table className="w-full min-w-[1200px] border-collapse table-fixed">
-            <thead className="bg-gray-200 text-gray-800">
-              <tr>
-                <th className="w-[15px] px-1 text-center font-medium text-[13px]  ">S.No</th>
-                <th className="w-6 py-2 text-center font-medium text-[13px]  ">Emp MId</th>
-                <th className="w-[40px] py-2 text-center font-medium text-[13px]  ">Emp Name</th>
-                <th className="w-[35px] py-2 text-center font-medium text-[13px]  ">Department</th>
-                <th className="w-[55px] py-2 text-center font-medium text-[13px]  ">Designation</th>
-                <th className="w-8 py-2 text-center font-medium text-[13px]  border-r border-gray-300">Date</th>
+                  {/* Morning Tea Break */}
+                  <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
+                    Morning Tea Break
+                  </th>
 
-                {/* Morning Tea Break */}
-                <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
-                  Morning Tea Break
-                </th>
+                  {/* Lunch Break */}
+                  <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
+                    Lunch Break
+                  </th>
 
-                {/* Lunch Break */}
-                <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
-                  Lunch Break
-                </th>
+                  {/* Evening Tea Break */}
+                  <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
+                    Evening Tea Break
+                  </th>
+                </tr>
 
-                {/* Evening Tea Break */}
-                <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
-                  Evening Tea Break
-                </th>
-              </tr>
+                {/* Sub-headers for each break */}
+                <tr>
+                  <th colSpan={6} className="border border-gray-300"></th>
 
-              {/* Sub-headers for each break */}
-              <tr>
-                <th colSpan={6} className="border border-gray-300"></th>
+                  {/* Morning Tea Break sub-headers */}
+                  <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
 
-                {/* Morning Tea Break sub-headers */}
-                <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
-                <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
-                <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
-                <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
+                  {/* Lunch Break sub-headers */}
+                  <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
 
-                {/* Lunch Break sub-headers */}
-                <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
-                <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
-                <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
-                <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
+                  {/* Evening Tea Break sub-headers */}
+                  <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
+                </tr>
+              </thead>
 
-                {/* Evening Tea Break sub-headers */}
-                <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
-                <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
-                <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
-                <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
-              </tr>
-            </thead>
+              <tbody>
+                {employeeData?.map((employee, index) => (
+                  <EmployeeBreakRow
+                    key={employee.mIdCard || index}
+                    employee={employee}
+                    index={index}
+                    date={date} // Pass the selected date as prop
 
-            <tbody>
-              {employeeData?.map((employee, index) => (
-                <EmployeeBreakRow
-                  key={employee.mIdCard || index}
-                  employee={employee}
-                  index={index}
-                  date={date} // Pass the selected date as prop
-
-                />
-              ))}
-            </tbody>
-          </table>
-        </div>
-
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
         {form === true && (
           <Modal
             isOpen={form}

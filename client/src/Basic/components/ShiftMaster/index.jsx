@@ -15,6 +15,7 @@ import {
 } from "../../../redux/services/ShiftMasterService";
 import { getCommonParams } from "../../../Utils/helper";
 import Swal from "sweetalert2";
+import Loader from "../Loader";
 
 const ShiftMaster = () => {
   const [readOnly, setReadOnly] = useState(false);
@@ -250,6 +251,7 @@ const ShiftMaster = () => {
       className: "text-gray-900 text-center uppercase w-16",
     },
   ];
+  if (isLoading || isFetching) return <Loader />;
 
   return (
     <div>

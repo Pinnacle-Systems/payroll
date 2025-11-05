@@ -10,6 +10,7 @@ import {
   DropdownInput,
 } from "../../../Inputs";
 
+import Loader from "../Loader";
 
 
 import { useGetCompanyQuery } from "../../../redux/services/CompanyMasterService";
@@ -58,7 +59,8 @@ const CompanyPaycode = () => {
   const { data: company } = useGetCompanyQuery({ params });
   const [companyCode, setCompanyCode] = useState(company?.data[0].code);
 
-  const { data: allData, refetch } = useGetCompanyPayCodeQuery({
+  const { data: allData,isLoading,
+    isFetching,  refetch } = useGetCompanyPayCodeQuery({
     params,
     searchParams: searchValue,
   });
@@ -289,6 +291,7 @@ const CompanyPaycode = () => {
       className: " text-gray-900 text-center uppercase w-32",
     },
   ];
+  if (isLoading || isFetching) return <Loader />;
 
   return (
     <>

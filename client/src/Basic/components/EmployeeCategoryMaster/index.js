@@ -24,6 +24,8 @@ import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
 import Swal from "sweetalert2";
 import { getCommonParams } from "../../../Utils/helper";
+import Loader from "../Loader";
+
 const MODEL = "Employee Category Master";
 export default function Form() {
   const [form, setForm] = useState(false);
@@ -266,6 +268,8 @@ export default function Form() {
     " ",
     " ",
   ];
+      if (isLoading || isFetching) return <Loader />;
+  
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
       <div className="w-full flex bg-white p-1 justify-between  items-center">

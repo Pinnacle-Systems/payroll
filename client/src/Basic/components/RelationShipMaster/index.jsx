@@ -16,6 +16,7 @@ import { Check, Power } from "lucide-react";
 import Modal from "../../../UiComponents/Modal";
 import Swal from "sweetalert2";
 import { getCommonParams } from "../../../Utils/helper";
+import Loader from "../Loader";
 
 export default function Form() {
 
@@ -31,12 +32,13 @@ export default function Form() {
 
   const params = getCommonParams();
 
-  const { branchId,companyId } = params;
+  const { branchId, companyId } = params;
 
-  const { data: allData } = useGetRelationShipQuery({
-    params,
-    searchParams: searchValue,
-  });
+  const { data: allData, isLoading,
+    isFetching, } = useGetRelationShipQuery({
+      params,
+      searchParams: searchValue,
+    });
   const {
     data: singleData,
     isFetching: isSingleFetching,
@@ -49,7 +51,7 @@ export default function Form() {
 
   const syncFormWithDb = useCallback(
     (data) => {
-      
+
       setName(data?.name || "");
 
       setActive(id ? data?.active ?? false : true);
@@ -62,7 +64,7 @@ export default function Form() {
     syncFormWithDb(singleData?.data);
   }, [isSingleFetching, isSingleLoading, id, syncFormWithDb, singleData]);
 
-  
+
 
   const data = {
     name,
@@ -211,14 +213,16 @@ export default function Form() {
     setId(id);
     setForm(true);
     setReadOnly(true);
-    
+
   };
   const handleEdit = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(false);
- 
+
   };
+  if (isLoading || isFetching) return <Loader />;
+
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
       <div className="w-full flex bg-white p-1 justify-between  items-center">

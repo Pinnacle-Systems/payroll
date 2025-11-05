@@ -30,6 +30,7 @@ import {
 import { useGetShiftCommonTemplateQuery } from "../../../redux/services/ShiftCommonTemplate.service";
 import { useGetFinYearQuery } from "../../../redux/services/FinYearMasterService";
 import Swal from "sweetalert2";
+import Loader from "../Loader";
 
 const PayFrequencymaster = () => {
   const [readOnly, setReadOnly] = useState(false);
@@ -58,7 +59,8 @@ const PayFrequencymaster = () => {
     searchParams: searchValue,
   });
 
-  const { data: allData } = useGetPayFrequencyQuery({
+  const { data: allData , isLoading,
+    isFetching, } = useGetPayFrequencyQuery({
     params,
     searchParams: searchValue,
   });
@@ -307,6 +309,9 @@ const PayFrequencymaster = () => {
 
     setPayFrequencyType(newBlend);
   };
+
+      if (isLoading || isFetching) return <Loader />;
+
 
   return (
     <div>

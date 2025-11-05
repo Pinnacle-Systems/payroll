@@ -27,6 +27,8 @@ import { useGetEmployeeQuery } from "../../../redux/services/EmployeeMasterServi
 import Select from "react-select";
 import { useGetLeaveCodeQuery } from "../../../redux/services/LeaveCode.servive";
 import { useDispatch } from "react-redux";
+import Loader from "../Loader";
+
 const Designation = () => {
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
@@ -57,10 +59,11 @@ const Designation = () => {
   const { branchId, companyId } = params;
   const designationRef = useRef(null);
 
-  const { data: allData } = useGetLeaveOpeningBalanceQuery({
-    params,
-    searchParams: searchValue,
-  });
+  const { data: allData, isLoading,
+    isFetching, } = useGetLeaveOpeningBalanceQuery({
+      params,
+      searchParams: searchValue,
+    });
   const { data: yearData } = useGetFinYearQuery({
     params,
     searchParams: searchValue,
@@ -289,6 +292,7 @@ const Designation = () => {
     label: val?.name,
     value: val?.id,
   }));
+  if (isLoading || isFetching) return <Loader />;
 
   return (
     <div>
@@ -379,8 +383,8 @@ const Designation = () => {
                                 id
                                   ? yearData?.data
                                   : yearData?.data?.filter(
-                                      (item) => item?.active
-                                    ),
+                                    (item) => item?.active
+                                  ),
                                 "code",
                                 "id"
                               )}

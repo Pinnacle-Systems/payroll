@@ -316,8 +316,8 @@ const SidebarComponent = ({
                     <li
                       key={group?.id}
                       className="rounded-md relative my-0"
-                      // onMouseEnter={() => setHoveredGroupId(group.id)}
-                      // onMouseLeave={() => setHoveredGroupId(null)}
+                    // onMouseEnter={() => setHoveredGroupId(group.id)}
+                    // onMouseLeave={() => setHoveredGroupId(null)}
                     >
                       {/* Sub-Dropdown Trigger */}
                       <div
@@ -327,11 +327,18 @@ const SidebarComponent = ({
                           ""
                         ) : (
                           <div className="text-[14px] font-semibold ml-2.5 text-gray-800 mt-2">
-                            {(group?.name + " MASTER")
+                            {/* {(group?.name + " MASTER")
                               .toLowerCase()
                               .replace(/\b[a-z]/g, (char) =>
                                 char.toUpperCase()
-                              )}
+                              )} */}
+                            {heading === "Masters"
+                              ? (group?.name + " MASTER")
+                                .toLowerCase()
+                                .replace(/\b[a-z]/g, (char) => char.toUpperCase())
+                              : group?.name
+                                ?.toLowerCase()
+                                .replace(/\b[a-z]/g, (char) => char.toUpperCase())}
                           </div>
                         )}
 
@@ -350,7 +357,7 @@ const SidebarComponent = ({
                                     dispatch(push({ name: page.name }));
                                     secureLocalStorage.setItem(
                                       sessionStorage.getItem("sessionId") +
-                                        "currentPage",
+                                      "currentPage",
                                       page?.id
                                     );
                                     // navigate(page.type)

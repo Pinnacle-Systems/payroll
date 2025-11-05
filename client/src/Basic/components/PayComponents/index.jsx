@@ -21,6 +21,7 @@ import {
   useGetPayComponentQuery,
   useUpdatePayComponentMutation,
 } from "../../../redux/services/PayComponentsService";
+import Loader from "../Loader";
 
 const PayComponents = () => {
   const [readOnly, setReadOnly] = useState(false);
@@ -42,7 +43,8 @@ const PayComponents = () => {
   const params = getCommonParams();
 
   const { branchId,companyId } = params;
-  const { data: allData } = useGetPayComponentQuery({
+  const { data: allData , isLoading,
+    isFetching,} = useGetPayComponentQuery({
     params,
     searchParams: searchValue,
   });
@@ -222,6 +224,7 @@ const PayComponents = () => {
       className: " text-gray-900  text-left pl-2 uppercase w-44",
     },
   ];
+  if (isLoading || isFetching) return <Loader />;
 
   return (
     <>

@@ -24,6 +24,8 @@ import Select from "react-select";
 import { useDispatch } from "react-redux";
 import moment from "moment";
 import { common } from "../../../Utils/DropdownData";
+import Loader from "../Loader";
+
 const Form = () => {
   const today = new Date();
 
@@ -60,7 +62,8 @@ const Form = () => {
   const { branchId, companyId, finYearId } = params;
   const designationRef = useRef(null);
 
-  const { data: allData } = useGetEmployeeResignQuery({
+  const { data: allData, isLoading,
+    isFetching, } = useGetEmployeeResignQuery({
     params,
     searchParams: searchValue,
   });
@@ -319,6 +322,7 @@ const Form = () => {
         aadharNo: val?.aadharNo,
         mobileNumber: val?.mobileNumber,
       })) || [];
+        if (isLoading || isFetching) return <Loader />;
 
   return (
     <div>

@@ -17,6 +17,7 @@ const TemplateItems = ({
   setForm,
   ShitCommonData,
   shiftData,
+  shiftTypeData,
   readOnly,
   ShiftTemplateItems,
   setShiftTemplateItems,
@@ -41,6 +42,17 @@ const TemplateItems = ({
 
   const [contextMenu, setContextMenu] = useState(null);
   const [quarterContextMenu, setQuarterContextMenu] = useState(null);
+
+
+  console.log(shiftTypeData, "shiftTypeData");
+
+
+  const selectedShiftType = shiftTypeData?.data?.find(val => val?.selectedShiftType)?.selectedShiftType;
+
+
+
+  console.log(selectedShiftType, "selectedShiftType")
+
   const handleRightClick = (event, rowIndex, type) => {
     event.preventDefault();
     setContextMenu({
@@ -239,10 +251,10 @@ const TemplateItems = ({
 
   const handleDeleteRow = (id) => {
     setShiftTemplateItems((yarnBlend) => {
-      if (yarnBlend.length <= 1) {
+      if (yarnBlend?.length <= 1) {
         return yarnBlend;
       }
-      return yarnBlend.filter((_, index) => index !== parseInt(id));
+      return yarnBlend?.filter((_, index) => index !== parseInt(id));
     });
   };
   const handleDeleteAllRows = () => {
@@ -253,46 +265,115 @@ const TemplateItems = ({
   };
 
   // Delete a single quarterDetails row
-  const handleDeleteQuarterRow = (parentIndex, subIndex) => {
-    setShiftTemplateItems((prev) => {
-      const updated = structuredClone(prev);
+  // const handleDeleteQuarterRow = (parentIndex, subIndex) => {
+  //   setShiftTemplateItems((prev) => {
+  //     const updated = structuredClone(prev);
 
-      if (
-        updated[parentIndex].quarterDetails &&
-        updated[parentIndex].quarterDetails.length > 1
-      ) {
-        updated[parentIndex].quarterDetails.splice(subIndex, 1);
-      }
+  //     if (
+  //       updated[parentIndex].quarterDetails &&
+  //       updated[parentIndex].quarterDetails.length > 1
+  //     ) {
+  //       updated[parentIndex].quarterDetails.splice(subIndex, 1);
+  //     }
 
-      // Sync modal if this parent row is open
-      if (parentIndex === selectedIndex) {
-        setSelectedRow(updated[parentIndex]);
-      }
+  //     // Sync modal if this parent row is open
+  //     if (parentIndex === selectedIndex) {
+  //       setSelectedRow(updated[parentIndex]);
+  //     }
 
-      return updated;
-    });
-  };
+  //     return updated;
+  //   });
+  // };
 
-  // Delete all quarterDetails except the first (or clear all)
-  const handleDeleteAllQuarterRows = (parentIndex) => {
-    setShiftTemplateItems((prev) => {
-      const updated = structuredClone(prev);
+  // // Delete all quarterDetails except the first (or clear all)
+  // const handleDeleteAllQuarterRows = (parentIndex) => {
+  //   setShiftTemplateItems((prev) => {
+  //     const updated = structuredClone(prev);
 
-      if (updated[parentIndex].quarterDetails?.length > 1) {
-        // Keep first row or set to empty array
-        updated[parentIndex].quarterDetails = [
-          updated[parentIndex].quarterDetails[0],
-        ];
-      }
+  //     if (updated[parentIndex].quarterDetails?.length > 1) {
+  //       // Keep first row or set to empty array
+  //       updated[parentIndex].quarterDetails = [
+  //         updated[parentIndex].quarterDetails[0],
+  //       ];
+  //     }
 
-      // Sync modal if this parent row is open
-      if (parentIndex === selectedIndex) {
-        setSelectedRow(updated[parentIndex]);
-      }
+  //     // Sync modal if this parent row is open
+  //     if (parentIndex === selectedIndex) {
+  //       setSelectedRow(updated[parentIndex]);
+  //     }
 
-      return updated;
-    });
-  };
+  //     return updated;
+  //   });
+  // };
+const handleDeleteQuarterRow = (parentIndex, subIndex) => {
+  setShiftTemplateItems((prev) => {
+    const updated = structuredClone(prev);
+
+    const parent = updated[parentIndex];
+    if (!parent?.quarterDetails) return prev;
+
+    if (parent.quarterDetails.length > 1) {
+      // 🧹 Remove the selected row
+      parent.quarterDetails.splice(subIndex, 1);
+    } else {
+      // 🧾 Only one row — clear its values but keep it present
+      parent.quarterDetails[0] = {
+        day: "",
+        oTDetailsId: "",
+        ftMins: "",
+        from: "",
+        to: "",
+        ttMins: "",
+        endTime: "",
+        nextDay: "",
+        checkHrs: "",
+        total: "",
+        pickFrom: "",
+        formula: "",
+      };
+    }
+
+    // 🔁 Sync modal if this parent row is open
+    if (parentIndex === selectedIndex) {
+      setSelectedRow(parent);
+    }
+
+    return updated;
+  });
+};
+
+const handleDeleteAllQuarterRows = (parentIndex) => {
+  setShiftTemplateItems((prev) => {
+    const updated = structuredClone(prev);
+    const parent = updated[parentIndex];
+    if (!parent?.quarterDetails) return prev;
+
+    // 🧹 Clear all quarter details, but keep one empty row
+    parent.quarterDetails = [
+      {
+        day: "",
+        oTDetailsId: "",
+        ftMins: "",
+        from: "",
+        to: "",
+        ttMins: "",
+        endTime: "",
+        nextDay: "",
+        checkHrs: "",
+        total: "",
+        pickFrom: "",
+        formula: "",
+      },
+    ];
+
+    // 🔁 Sync modal if this parent row is open
+    if (parentIndex === selectedIndex) {
+      setSelectedRow(parent);
+    }
+
+    return updated;
+  });
+};
 
   const OTOptions = OTData?.data?.flatMap?.((data) =>
     data?.OTDetails?.map((val) => ({
@@ -301,13 +382,10 @@ const TemplateItems = ({
     }))
   );
 
-  const selectedPayCodes = selectedRow?.quarterDetails
-    ?.filter((item) => item?.oTDetailsId) // only rows where a pay code is selected
-    .map((item) => {
-      const option = OTOptions.find((opt) => opt.value === item.oTDetailsId);
-      return option?.label; // or option?.value if you prefer
-    })
-    .filter(Boolean); // remove undefined/null
+  const selectedPayCodes = selectedRow?.quarterDetails?.filter((item) => item?.oTDetailsId)?.map((item) => {
+    const option = OTOptions?.find((opt) => opt?.value === item?.oTDetailsId);
+    return option?.label;
+  })?.filter(Boolean);
   console.log(ShiftTemplateItems, "ShiftTemplateItems");
 
   return (
@@ -433,7 +511,8 @@ const TemplateItems = ({
                   <th
                     className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
                   >
-                    Quarter
+                    {selectedShiftType === "Hourly" ? "Hourly" : "Quarter"}
+
                   </th>
                   {/* <th
                     className={`w-[60px] px-4 py-2 text-center font-medium text-[13px] `}
@@ -450,9 +529,7 @@ const TemplateItems = ({
                   >
                     OT Hrs
                   </th>
-                  {/* <th
-                    className={`w-72  item-center font-medium text-[13px] `}
-                  ></th> */}
+
                 </tr>
               </thead>
               <tbody>
@@ -473,11 +550,10 @@ const TemplateItems = ({
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "date")
                         }
-                        className={`bg-transparent pl-1  w-[110px] text-[11.5px] focus:outline-none ${
-                          readOnly || childRecord.current > 0
-                            ? "text-gray-600"
-                            : "text-black"
-                        }`}
+                        className={`bg-transparent pl-1  w-[110px] text-[11.5px] focus:outline-none ${readOnly || childRecord.current > 0
+                          ? "text-gray-600"
+                          : "text-black"
+                          }`}
                         disabled={readOnly || childRecord.current > 0}
                       />
                     </td>
@@ -498,8 +574,8 @@ const TemplateItems = ({
                         {(id
                           ? ShitCommonData?.data || []
                           : ShitCommonData?.data.filter(
-                              (item) => item.active
-                            ) || []
+                            (item) => item.active
+                          ) || []
                         )?.map((blend) => (
                           <option value={blend.id} key={blend.id}>
                             {blend?.name}
@@ -550,9 +626,8 @@ const TemplateItems = ({
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "startTime")
                         }
-                        className={`w-full bg-transparent text-left pl-1  focus:outline-none focus:border-transparent ${
-                          readOnly ? "text-gray-600" : "text-black"
-                        }`}
+                        className={`w-full bg-transparent text-left pl-1  focus:outline-none focus:border-transparent ${readOnly ? "text-gray-600" : "text-black"
+                          }`}
                         readOnly
                       />
                     </td>
@@ -563,9 +638,8 @@ const TemplateItems = ({
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "endTime")
                         }
-                        className={`w-full bg-transparent text-left pl-1  focus:outline-none focus:border-transparent ${
-                          readOnly ? "text-gray-600" : "text-black"
-                        }`}
+                        className={`w-full bg-transparent text-left pl-1  focus:outline-none focus:border-transparent ${readOnly ? "text-gray-600" : "text-black"
+                          }`}
                         readOnly
                       />
                     </td>
@@ -639,14 +713,16 @@ const TemplateItems = ({
                     </td>
                     <td className="text-center border border-gray-300">
                       <button
-                        className="text-blue-600 text-center   bg-blue-50 rounded"
-                        // onClick={() => {
-                        //   setThirdModal(true);
-                        //   setSelectedRow(item);
-                        //   setSelectedIndex(index);
-                        // }}
-                        onClick={() => handleOpenQuarterModal(index)}
+                        className={`${selectedShiftType ? "text-blue-600 text-center   bg-blue-50 rounded" : "text-blue-600 text-center   bg-blue-50 rounded cursor-not-allowed"} `}
+                        onClick={() => {
+                          if (selectedShiftType) {
+                            handleOpenQuarterModal(index)
+
+                          }
+                        }
+                        }
                         title="Open"
+                        disabled={!selectedShiftType}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -696,11 +772,10 @@ const TemplateItems = ({
                             "shiftTimeHrs"
                           )
                         }
-                        className={`w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2 ${
-                          readOnly || childRecord.current > 0
-                            ? "text-gray-600"
-                            : "text-black"
-                        }`}
+                        className={`w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2 ${readOnly || childRecord.current > 0
+                          ? "text-gray-600"
+                          : "text-black"
+                          }`}
                         disabled={readOnly || childRecord.current > 0}
                       />
                     </td>
@@ -714,11 +789,10 @@ const TemplateItems = ({
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "otHrs")
                         }
-                        className={`w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2 ${
-                          readOnly || childRecord.current > 0
-                            ? "text-gray-600"
-                            : "text-black"
-                        }`}
+                        className={`w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2 ${readOnly || childRecord.current > 0
+                          ? "text-gray-600"
+                          : "text-black"
+                          }`}
                         disabled={readOnly || childRecord.current > 0}
                         onContextMenu={(e) => {
                           if (!readOnly) {
@@ -787,11 +861,10 @@ const TemplateItems = ({
                               }
                               className={`w-[120px] px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
                         focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                        transition-all duration-150 shadow-sm ${
-                          readOnly || childRecord.current > 0
-                            ? "text-gray-600"
-                            : "text-black"
-                        } `}
+                        transition-all duration-150 shadow-sm ${readOnly || childRecord.current > 0
+                                  ? "text-gray-600"
+                                  : "text-black"
+                                } `}
                               disabled={readOnly || childRecord.current > 0}
                             />
                           </div>
@@ -818,11 +891,10 @@ const TemplateItems = ({
                               }
                               className={`w-[120px] px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
                         focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                        transition-all duration-150 shadow-sm ${
-                          readOnly || childRecord.current > 0
-                            ? "text-gray-600"
-                            : "text-black"
-                        } `}
+                        transition-all duration-150 shadow-sm ${readOnly || childRecord.current > 0
+                                  ? "text-gray-600"
+                                  : "text-black"
+                                } `}
                               disabled={readOnly || childRecord.current > 0}
                             />
                           </div>
@@ -850,11 +922,10 @@ const TemplateItems = ({
                               }
                               className={`w-[120px] px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
                         focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                        transition-all duration-150 shadow-sm ${
-                          readOnly || childRecord.current > 0
-                            ? "text-gray-600"
-                            : "text-black"
-                        }`}
+                        transition-all duration-150 shadow-sm ${readOnly || childRecord.current > 0
+                                  ? "text-gray-600"
+                                  : "text-black"
+                                }`}
                               disabled={readOnly || childRecord.current > 0}
                             />
                           </div>
@@ -881,11 +952,10 @@ const TemplateItems = ({
                               }
                               className={`w-[120px] px-3 py-1 text-xs border uppercase border-gray-300 rounded-lg
                         focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                        transition-all duration-150 shadow-sm ${
-                          readOnly || childRecord.current > 0
-                            ? "text-gray-600"
-                            : "text-black"
-                        }`}
+                        transition-all duration-150 shadow-sm ${readOnly || childRecord.current > 0
+                                  ? "text-gray-600"
+                                  : "text-black"
+                                }`}
                               disabled={readOnly || childRecord.current > 0}
                             />
                           </div>
@@ -944,11 +1014,10 @@ const TemplateItems = ({
                               }
                               className={`w-full px-3 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
                         focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                        transition-all duration-150 shadow-sm ${
-                          readOnly || childRecord.current > 0
-                            ? "text-gray-600"
-                            : "text-black"
-                        }`}
+                        transition-all duration-150 shadow-sm ${readOnly || childRecord.current > 0
+                                  ? "text-gray-600"
+                                  : "text-black"
+                                }`}
                               disabled={readOnly || childRecord.current > 0}
                             />
                           </div>
@@ -973,11 +1042,10 @@ const TemplateItems = ({
                               }
                               className={`w-full px-3 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
                         focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                        transition-all duration-150 shadow-sm ${
-                          readOnly || childRecord.current > 0
-                            ? "text-gray-600"
-                            : "text-black"
-                        } `}
+                        transition-all duration-150 shadow-sm ${readOnly || childRecord.current > 0
+                                  ? "text-gray-600"
+                                  : "text-black"
+                                } `}
                               disabled={readOnly || childRecord.current > 0}
                             />
                           </div>
@@ -1002,11 +1070,10 @@ const TemplateItems = ({
                               }
                               className={`w-full px-3 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
                         focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                        transition-all duration-150 shadow-sm ${
-                          readOnly || childRecord.current > 0
-                            ? "text-gray-600"
-                            : "text-black"
-                        } `}
+                        transition-all duration-150 shadow-sm ${readOnly || childRecord.current > 0
+                                  ? "text-gray-600"
+                                  : "text-black"
+                                } `}
                               disabled={readOnly || childRecord.current > 0}
                             />
                           </div>
@@ -1059,11 +1126,10 @@ const TemplateItems = ({
                               }
                               className={`w-full px-3 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
                         focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                        transition-all duration-150 shadow-sm ${
-                          readOnly || childRecord.current > 0
-                            ? "text-gray-600"
-                            : "text-black"
-                        } `}
+                        transition-all duration-150 shadow-sm ${readOnly || childRecord.current > 0
+                                  ? "text-gray-600"
+                                  : "text-black"
+                                } `}
                               disabled={readOnly || childRecord.current > 0}
                             />
                           </div>
@@ -1116,11 +1182,10 @@ const TemplateItems = ({
                               }
                               className={`w-full px-3 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
                         focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                        transition-all duration-150 shadow-sm ${
-                          readOnly || childRecord.current > 0
-                            ? "text-gray-600"
-                            : "text-black"
-                        }`}
+                        transition-all duration-150 shadow-sm ${readOnly || childRecord.current > 0
+                                  ? "text-gray-600"
+                                  : "text-black"
+                                }`}
                               disabled={readOnly || childRecord.current > 0}
                             />
                           </div>
@@ -1145,11 +1210,10 @@ const TemplateItems = ({
                               }
                               className={` w-full px-3 py-1 text-[12px] border uppercase border-gray-300 rounded-lg
                         focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-                        transition-all duration-150 shadow-sm ${
-                          readOnly || childRecord.current > 0
-                            ? "text-gray-600"
-                            : "text-black"
-                        }`}
+                        transition-all duration-150 shadow-sm ${readOnly || childRecord.current > 0
+                                  ? "text-gray-600"
+                                  : "text-black"
+                                }`}
                               disabled={readOnly || childRecord.current > 0}
                             />
                           </div>
@@ -1175,7 +1239,7 @@ const TemplateItems = ({
               <div className="border-b py-2 px-1 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center">
                   <h2 className="text-lg py-0.5 font-semibold text-gray-800">
-                    Quarter Details
+                    {selectedShiftType === "Hourly" ? "Hourly Details" : "Quarter Details"}
                   </h2>
                 </div>
               </div>
@@ -1205,7 +1269,7 @@ const TemplateItems = ({
                                 <th
                                   className={`w-16 py-2 text-center font-medium text-[13px] `}
                                 >
-                                  Quarters
+                                  {selectedShiftType === "Hourly" ? "Hours" : "Quarters"}
                                 </th>
                                 <th
                                   className={`w-8 py-2 text-center font-medium text-[13px] `}
@@ -1295,7 +1359,7 @@ const TemplateItems = ({
                                         }
                                       >
                                         <option>Select</option>
-                                        {Days.map((blend) => (
+                                        {Days?.map((blend) => (
                                           <option
                                             value={blend.value}
                                             key={blend.value}
@@ -1407,11 +1471,10 @@ const TemplateItems = ({
                                             subIndex
                                           )
                                         }
-                                        className={`w-full bg-transparent uppercase  focus:outline-none focus:border-transparent text-right pr-2 ${
-                                          readOnly || childRecord.current > 0
-                                            ? "text-gray-600"
-                                            : "text-black"
-                                        }`}
+                                        className={`w-full bg-transparent uppercase  focus:outline-none focus:border-transparent text-right pr-2 ${readOnly || childRecord.current > 0
+                                          ? "text-gray-600"
+                                          : "text-black"
+                                          }`}
                                         disabled={
                                           readOnly || childRecord.current > 0
                                         }
@@ -1431,11 +1494,10 @@ const TemplateItems = ({
                                             subIndex
                                           )
                                         }
-                                        className={`w-full bg-transparent uppercase text-right pr-2  focus:outline-none focus:border-transparent   ${
-                                          readOnly || childRecord.current > 0
-                                            ? "text-gray-600"
-                                            : "text-black"
-                                        }`}
+                                        className={`w-full bg-transparent uppercase text-right pr-2  focus:outline-none focus:border-transparent   ${readOnly || childRecord.current > 0
+                                          ? "text-gray-600"
+                                          : "text-black"
+                                          }`}
                                         disabled={
                                           readOnly || childRecord.current > 0
                                         }
@@ -1455,11 +1517,10 @@ const TemplateItems = ({
                                             subIndex
                                           )
                                         }
-                                        className={`w-full bg-transparent uppercase text-right pr-2  focus:outline-none focus:border-transparent   ${
-                                          readOnly || childRecord.current > 0
-                                            ? "text-gray-600"
-                                            : "text-black"
-                                        }`}
+                                        className={`w-full bg-transparent uppercase text-right pr-2  focus:outline-none focus:border-transparent   ${readOnly || childRecord.current > 0
+                                          ? "text-gray-600"
+                                          : "text-black"
+                                          }`}
                                         disabled={
                                           readOnly || childRecord.current > 0
                                         }
@@ -1479,11 +1540,10 @@ const TemplateItems = ({
                                             subIndex
                                           )
                                         }
-                                        className={`w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2 ${
-                                          readOnly || childRecord.current > 0
-                                            ? "text-gray-600"
-                                            : "text-black"
-                                        }`}
+                                        className={`w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2 ${readOnly || childRecord.current > 0
+                                          ? "text-gray-600"
+                                          : "text-black"
+                                          }`}
                                         disabled={
                                           readOnly || childRecord.current > 0
                                         }
@@ -1503,11 +1563,10 @@ const TemplateItems = ({
                                             subIndex
                                           )
                                         }
-                                        className={`w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2 ${
-                                          readOnly || childRecord.current > 0
-                                            ? "text-gray-600"
-                                            : "text-black"
-                                        }`}
+                                        className={`w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2 ${readOnly || childRecord.current > 0
+                                          ? "text-gray-600"
+                                          : "text-black"
+                                          }`}
                                         disabled={
                                           readOnly || childRecord.current > 0
                                         }
@@ -1554,11 +1613,10 @@ const TemplateItems = ({
                                             subIndex
                                           )
                                         }
-                                        className={`w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2 ${
-                                          readOnly || childRecord.current > 0
-                                            ? "text-gray-600"
-                                            : "text-black"
-                                        }`}
+                                        className={`w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2 ${readOnly || childRecord.current > 0
+                                          ? "text-gray-600"
+                                          : "text-black"
+                                          }`}
                                         disabled={
                                           readOnly || childRecord.current > 0
                                         }
@@ -1583,8 +1641,8 @@ const TemplateItems = ({
                                             e.target.value === ""
                                               ? ""
                                               : Number(e.target.value).toFixed(
-                                                  2
-                                                );
+                                                2
+                                              );
                                           e.target.value = formatted;
                                           handleInputChange(
                                             e.target.value,
@@ -1593,11 +1651,10 @@ const TemplateItems = ({
                                             subIndex
                                           );
                                         }}
-                                        className={`w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2 ${
-                                          readOnly || childRecord.current > 0
-                                            ? "text-gray-600"
-                                            : "text-black"
-                                        }`}
+                                        className={`w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2 ${readOnly || childRecord.current > 0
+                                          ? "text-gray-600"
+                                          : "text-black"
+                                          }`}
                                         disabled={
                                           readOnly || childRecord.current > 0
                                         }
@@ -1646,13 +1703,12 @@ const TemplateItems = ({
                                             setFormulaModal(true);
                                           }
                                         }}
-                                        className={`flex items-center justify-center w-6 h-6 rounded mx-auto ${
-                                          val?.pickFrom
-                                            ?.trim()
-                                            .toLowerCase() === "formula"
-                                            ? "cursor-pointer"
-                                            : "cursor-not-allowed opacity-50"
-                                        }`}
+                                        className={`flex items-center justify-center w-6 h-6 rounded mx-auto ${val?.pickFrom
+                                          ?.trim()
+                                          .toLowerCase() === "formula"
+                                          ? "cursor-pointer"
+                                          : "cursor-not-allowed opacity-50"
+                                          }`}
                                         title={
                                           val?.pickFrom
                                             ?.trim()
@@ -1827,8 +1883,8 @@ const TemplateItems = ({
                                   backgroundColor: state.isSelected
                                     ? "#3b82f6" // blue background for selected
                                     : state.isFocused
-                                    ? "#e5e7eb" // light gray on hover
-                                    : "white",
+                                      ? "#e5e7eb" // light gray on hover
+                                      : "white",
                                   fontSize: "11px",
                                   padding: "5px 10px",
                                   cursor: "pointer",
@@ -1851,9 +1907,8 @@ const TemplateItems = ({
                               onChange={(e) =>
                                 setModalFormulaValue(e.target.value)
                               }
-                              className={`border border-gray-300 h-24 px-2 py-1 w-full text-[11px]  rounded focus:outline-none focus:ring-1 focus:ring-blue-400 ${
-                                readOnly ? "text-gray-600" : "text-black"
-                              }`}
+                              className={`border border-gray-300 h-24 px-2 py-1 w-full text-[11px]  rounded focus:outline-none focus:ring-1 focus:ring-blue-400 ${readOnly ? "text-gray-600" : "text-black"
+                                }`}
                               placeholder="Type or select Pay Code"
                               disabled={readOnly}
                             />
@@ -1862,11 +1917,10 @@ const TemplateItems = ({
                         <div className="flex justify-end gap-2 mt-2">
                           <button
                             className={`px-3 py-1 text-red-600 border border-red-600 text-xs rounded 
-    ${
-      readOnly
-        ? "bg-gray-100 text-gray-400 cursor-not-allowed hover:bg-gray-100 hover:text-gray-400"
-        : "hover:bg-red-600 hover:text-white"
-    }`}
+    ${readOnly
+                                ? "bg-gray-100 text-gray-400 cursor-not-allowed hover:bg-gray-100 hover:text-gray-400"
+                                : "hover:bg-red-600 hover:text-white"
+                              }`}
                             onClick={() => {
                               setModalFormulaValue(""); // clear modal input
                             }}
@@ -1876,11 +1930,10 @@ const TemplateItems = ({
                           </button>
                           <button
                             className={`px-4 py-1 text-green-600 border border-green-600 text-xs rounded 
-    ${
-      readOnly
-        ? "bg-gray-100 text-gray-400 cursor-not-allowed hover:bg-gray-100 hover:text-gray-400"
-        : "hover:bg-green-600 hover:text-white"
-    }`}
+    ${readOnly
+                                ? "bg-gray-100 text-gray-400 cursor-not-allowed hover:bg-gray-100 hover:text-gray-400"
+                                : "hover:bg-green-600 hover:text-white"
+                              }`}
                             onClick={() => {
                               if (activeFormulaRow !== null) {
                                 handleInputChange(

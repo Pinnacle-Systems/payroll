@@ -20,6 +20,8 @@ import {
 } from "../../../Inputs";
 import { statusDropdown } from "../../../Utils/DropdownData";
 import Swal from "sweetalert2";
+import Loader from "../Loader";
+
 const EmployeeSubCategory = () => {
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
@@ -37,7 +39,8 @@ const EmployeeSubCategory = () => {
   const { branchId, companyId } = params;
 
  
-  const { data: allData } = useGetemployeeSubCategoryQuery({
+  const { data: allData ,isLoading,
+    isFetching, } = useGetemployeeSubCategoryQuery({
     params,
     searchParams: searchValue,
   });
@@ -255,6 +258,9 @@ const EmployeeSubCategory = () => {
     value: val?.id,
     label: val?.name,
   }));
+
+      if (isLoading || isFetching) return <Loader />;
+
   return (
     <div>
       <div onKeyDown={handleKeyDown} className="p-1 ">

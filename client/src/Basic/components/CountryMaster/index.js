@@ -21,6 +21,7 @@ import { statusDropdown } from "../../../Utils/DropdownData";
 import Modal from "../../../UiComponents/Modal";
 
 import { useDispatch, useSelector } from "react-redux";
+import Loader from "../Loader";
 
 import { Check, Power } from "lucide-react";
 import Swal from "sweetalert2";
@@ -320,6 +321,7 @@ export default function Form() {
       setCountryCode("");
     }
   };
+  if (isLoading || isFetching) return <Loader />;
 
   return (
     <div onKeyDown={handleKeyDown} className="p-1">

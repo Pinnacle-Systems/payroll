@@ -36,6 +36,7 @@ import moment from "moment";
 import { useDispatch } from "react-redux";
 import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCategoryMasterService";
 import secureLocalStorage from "react-secure-storage";
+import Loader from "../Loader";
 
 const PayStructure = () => {
   const today = new Date();
@@ -53,7 +54,6 @@ const PayStructure = () => {
   const [employeeCategoryId, setEmployeeCategoryId] = useState("");
   const [date, setDate] = useState(moment.utc(today).format("YYYY-MM-DD"));
   const dispatch = useDispatch();
-  console.log(date, "date");
 
   const params = getCommonParams();
 
@@ -62,7 +62,8 @@ const PayStructure = () => {
   const { data: company } = useGetCompanyQuery({ params });
   const [companyCode, setCompanyCode] = useState(company?.data[0].code);
 
-  const { data: allData, refetch } = useGetPayStructureQuery({
+  const { data: allData, isLoading,
+    isFetching,  refetch } = useGetPayStructureQuery({
     params,
     searchParams: searchValue,
   });
@@ -312,6 +313,7 @@ const validateData = (data) => {
       className: " text-gray-900 text-center uppercase w-32",
     },
   ];
+  if (isLoading || isFetching) return <Loader />;
 
   return (
     <>

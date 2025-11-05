@@ -30,6 +30,7 @@ import { Check, Power } from "lucide-react";
 import Modal from "../../../UiComponents/Modal";
 import { ReusableInput } from "../../../Uniform/Components/styleesheet/CommonInput";
 import Swal from "sweetalert2";
+import Loader from "../Loader";
 
 export default function Form() {
   const [form, setForm] = useState(false);
@@ -257,13 +258,11 @@ export default function Form() {
     setId(id);
     setForm(true);
     setReadOnly(true);
-    console.log("view");
   };
   const handleEdit = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(false);
-    console.log("Edit");
   };
 
   const ACTIVE = (
@@ -310,6 +309,8 @@ export default function Form() {
       className: " text-gray-900 text-center uppercase w-28",
     },
   ];
+      if (isLoading || isFetching) return <Loader />;
+  
   return (
     <div onKeyDown={handleKeyDown} className="p-1 ">
       <div className="w-full flex bg-white p-1 justify-between  items-center">

@@ -16,6 +16,7 @@ import Swal from "sweetalert2";
 
 import moment from "moment";
 import { useDispatch } from "react-redux";
+import Loader from "../Loader";
 
 const OTMaster = () => {
   const today = new Date();
@@ -34,7 +35,8 @@ const OTMaster = () => {
 
   const { branchId, companyId } = params;
 
-  const { data: allData, refetch } = useGetOTMasterQuery({
+  const { data: allData , isLoading,
+    isFetching, refetch } = useGetOTMasterQuery({
     params,
     searchParams: searchValue,
   });
@@ -234,6 +236,7 @@ const OTMaster = () => {
       className: " text-gray-900 text-center uppercase w-32",
     },
   ];
+    if (isLoading || isFetching) return <Loader />;
 
   return (
     <>

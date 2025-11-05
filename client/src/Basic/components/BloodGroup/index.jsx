@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import secureLocalStorage from "react-secure-storage";
 import {
-useGetBloodGroupQuery,
+  useGetBloodGroupQuery,
   useGetBloodGroupByIdQuery,
   useAddBloodGroupMutation,
   useUpdateBloodGroupMutation,
@@ -21,6 +21,7 @@ import { Check, Power } from "lucide-react";
 import Modal from "../../../UiComponents/Modal";
 import Swal from "sweetalert2";
 import { getCommonParams } from "../../../Utils/helper";
+import Loader from "../Loader";
 
 export default function Form() {
   const [readOnly, setReadOnly] = useState(false);
@@ -37,11 +38,12 @@ export default function Form() {
   const bloodGroupNameref = useRef(null);
 
   const params = getCommonParams();
-  const { data: allData } = useGetBloodGroupQuery({
-    params,
-    searchParams: searchValue,
-  });
-  const { branchId ,companyId} = params;
+  const { data: allData, isLoading,
+    isFetching, } = useGetBloodGroupQuery({
+      params,
+      searchParams: searchValue,
+    });
+  const { branchId, companyId } = params;
   const {
     data: singleData,
     isFetching: isSingleFetching,
@@ -224,14 +226,14 @@ export default function Form() {
     setId(id);
     setForm(true);
     setReadOnly(true);
-    console.log("view");
   };
   const handleEdit = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(false);
-    console.log("Edit");
   };
+        if (isLoading || isFetching) return <Loader />;
+
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
       <div className="w-full flex bg-white p-1 justify-between  items-center">

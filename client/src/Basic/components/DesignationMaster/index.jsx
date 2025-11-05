@@ -27,6 +27,8 @@ import Modal from "../../../UiComponents/Modal";
 import { Check, Power } from "lucide-react";
 import Swal from "sweetalert2";
 import { getCommonParams } from "../../../Utils/helper";
+import Loader from "../Loader";
+
 const Designation = () => {
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
@@ -279,6 +281,8 @@ const Designation = () => {
     " ",
     " ",
   ];
+    if (isLoading || isFetching) return <Loader />;
+  
   return (
     <div>
       <div onKeyDown={handleKeyDown} className="p-1 ">

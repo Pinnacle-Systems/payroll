@@ -51,7 +51,7 @@ const EmployeeBreakRow = ({ employee, index, date }) => {
                 <input
                     type="text"
                     value={employee?.mIdCard || 'N/A'}
-                    className="w-full text-center bg-transparent focus:outline-none"
+                    className="w-full text-right pr-1 bg-transparent focus:outline-none"
                     readOnly
                 />
             </td>

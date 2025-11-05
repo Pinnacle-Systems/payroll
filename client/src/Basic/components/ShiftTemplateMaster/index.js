@@ -14,6 +14,11 @@ import { useGetOTMasterQuery } from "../../../redux/services/OTMaster.service";
 import TemplateItems from "./templateItems";
 import Swal from "sweetalert2";
 import { useDispatch } from "react-redux";
+import {
+  useGetshiftTypeQuery,
+  useGetshiftTypeByIdQuery,
+} from "../../../redux/uniformService/shiftTYpeService";
+import Loader from "../Loader";
 
 const ShiftTemplateMaster = () => {
   const today = Date();
@@ -33,14 +38,16 @@ const ShiftTemplateMaster = () => {
   const params = getCommonParams();
   const [shiftId, setshiftId] = useState("");
 
-  const { branchId, companyId ,finYearId} = params;
+  const { branchId, companyId, finYearId } = params;
 
   const dispatch = useDispatch();
 
-  const { data: allData, refetch } = useGetShiftTemplateMasterQuery({
-    params,
-    searchParams: searchValue,
-  });
+  const { data: allData, isLoading,
+    isFetching, refetch } = useGetShiftTemplateMasterQuery({
+      params,
+      searchParams: searchValue,
+
+    });
 
   const {
     data: singleData,
@@ -60,6 +67,8 @@ const ShiftTemplateMaster = () => {
     params,
     searchParams: searchValue,
   });
+
+  const { data: shiftTypeData } = useGetshiftTypeQuery({ params })
 
   const { data: OTData } = useGetOTMasterQuery({ params });
 
@@ -335,6 +344,7 @@ const ShiftTemplateMaster = () => {
       className: " text-gray-900 text-center uppercase w-32",
     },
   ];
+  if (isLoading || isFetching) return <Loader />;
 
   return (
     <div>
@@ -347,6 +357,7 @@ const ShiftTemplateMaster = () => {
             setId={setId}
             ShitCommonData={ShitCommonData}
             shiftData={shiftData}
+            shiftTypeData={shiftTypeData}
             readOnly={readOnly}
             ShiftTemplateItems={ShiftTemplateItems}
             setShiftTemplateItems={setShiftTemplateItems}

@@ -282,7 +282,7 @@ const Form = () => {
                       <input
                         type="text"
                         value={item?.mIdCard}
-                        className={`w-full  text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                        className={`w-full  text-right pr-1 bg-transparent   focus:outline-none focus:border-transparent `}
                       />
                     </td>
                     <td
@@ -462,7 +462,7 @@ const Form = () => {
                             ]
                               .filter(Boolean) // remove null or empty values
                               .join(" , ")} // join only existing values
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                            className={`w-full bg-transparent text-left pl-1 focus:outline-none focus:border-transparent `}
                             disabled
                           />
                         </td>
@@ -580,7 +580,7 @@ const Form = () => {
                       <input
                         type="text"
                         value={item?.mIdCard}
-                        className={`w-full  text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                        className={`w-full   text-right pr-1 bg-transparent   focus:outline-none focus:border-transparent `}
                       />
                     </td>
                     <td
@@ -749,31 +749,7 @@ const Form = () => {
                         <td colSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
                           <input
                             type="text"
-                            // value={`${
-                            //   item.firstBreakOut
-                            //     ? moment
-                            //         .utc(item.firstBreakOut)
-                            //         .format("HH:mm:ss")
-                            //     : ""
-                            // } , ${
-                            //   item.firstBreakIn
-                            //     ? moment
-                            //         .utc(item.firstBreakIn)
-                            //         .format("HH:mm:ss")
-                            //     : ""
-                            // } , ${
-                            //   item.eveningBreakOut
-                            //     ? moment
-                            //         .utc(item.eveningBreakOut)
-                            //         .format("HH:mm:ss")
-                            //     : ""
-                            // } , ${
-                            //   item.eveningBreakIn
-                            //     ? moment
-                            //         .utc(item.eveningBreakIn)
-                            //         .format("HH:mm:ss")
-                            //     : ""
-                            // }`}
+                       
                             value={[
                               item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
                               item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
@@ -784,7 +760,7 @@ const Form = () => {
                             ]
                               .filter(Boolean) // remove null or empty values
                               .join(" , ")} // join only existing values
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                            className={`w-full bg-transparent text-left pl-1 focus:outline-none focus:border-transparent `}
                             disabled
                           />
                         </td>
@@ -894,7 +870,7 @@ const Form = () => {
                       <input
                         type="text"
                         value={item?.mIdCard}
-                        className={`w-full  text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                        className={`w-full   text-right pr-1 bg-transparent   focus:outline-none focus:border-transparent `}
                       />
                     </td>
                     <td className="border border-gray-300 text-[12px] py-0.5 item-center">

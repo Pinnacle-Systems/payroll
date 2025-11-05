@@ -21,6 +21,7 @@ import { Check, Power } from "lucide-react";
 import Modal from "../../../UiComponents/Modal";
 import Swal from "sweetalert2";
 import { getCommonParams } from "../../../Utils/helper";
+import Loader from "../Loader";
 
 
 export default function Form() {
@@ -39,7 +40,8 @@ export default function Form() {
    const params = getCommonParams();
  
    const { branchId,companyId } = params;;
-  const { data: allData } = useGetLeaveCodeQuery({
+  const { data: allData , isLoading,
+    isFetching,} = useGetLeaveCodeQuery({
     params,
     searchParams: searchValue,
   });
@@ -225,6 +227,8 @@ export default function Form() {
     setReadOnly(false);
     
   };
+    if (isLoading || isFetching) return <Loader />;
+
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
       <div className="w-full flex bg-white p-1 justify-between  items-center">

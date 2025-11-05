@@ -50,6 +50,7 @@ import { useGetEmployeeResignQuery } from "../../../redux/services/EmployeeResig
 import { useGetemployeeSubCategoryQuery } from "../../../redux/services/EmployeeSubCategoryservice";
 import { useGetEmpQuery } from "../../../redux/services/preEmployee";
 import { useGetShiftCommonTemplateQuery } from "../../../redux/services/ShiftCommonTemplate.service";
+import Loader from "../Loader";
 
 export default function Form() {
   const [form, setForm] = useState(false);
@@ -246,8 +247,8 @@ export default function Form() {
         if (rejectedEmployee) {
           const lastWorkingDate = rejectedEmployee.lastWorkingDate
             ? new Date(rejectedEmployee.lastWorkingDate)
-                .toISOString()
-                .slice(0, 10)
+              .toISOString()
+              .slice(0, 10)
             : "Not available";
           Swal.fire({
             // icon: "error",
@@ -257,9 +258,8 @@ export default function Form() {
       <p class="swal-reason">This employee has already worked and resigned. Not allowed to rejoin.</p>
             <p class="swal-reason"><b>Last Working Date:</b> ${lastWorkingDate}</p>
             <p class="swal-p-reason">Reason for Leaving : </p>
-         <textarea class="swal-reason-textarea-white" readonly>${
-           rejectedEmployee?.leaveReason || "No reason specified"
-         }</textarea>
+         <textarea class="swal-reason-textarea-white" readonly>${rejectedEmployee?.leaveReason || "No reason specified"
+              }</textarea>
 
        <p class="swal-text">Do you still want to allow this employee to join?</p>
     `,
@@ -290,14 +290,12 @@ export default function Form() {
           Swal.fire({
             html: `
       <p class="swal-reason">⚠️ This employee already worked and resigned.</p>
-      <p class="swal-reason"><b>Last Working Date: </b>${
-        matches[0]?.date?.split("T")[0] || ""
-      }</p>
+      <p class="swal-reason"><b>Last Working Date: </b>${matches[0]?.date?.split("T")[0] || ""
+              }</p>
 
        <p class="swal-p-reason">Reason for Leaving : </p>
-      <textarea class="swal-reason-textarea-white" readonly>${
-        matches[0]?.leaveReason || "No reason specified"
-      }</textarea>
+      <textarea class="swal-reason-textarea-white" readonly>${matches[0]?.leaveReason || "No reason specified"
+              }</textarea>
 
     `,
             confirmButtonText: "OK",
@@ -321,6 +319,8 @@ export default function Form() {
     isLoading,
     isFetching,
   } = useGetEmployeeQuery({ params });
+
+
 
   console.log(allData, "allData");
 
@@ -655,43 +655,236 @@ export default function Form() {
   };
 
   const validateData = (data) => {
-    if (
-      data?.mobileNumber &&
-      data?.employeeType &&
-      data?.firstName &&
-      data?.dob &&
-      data?.gender &&
-      data?.disability &&
-      data?.bloodGroupId &&
-      data?.joiningDate &&
-      data?.departmentId &&
-      data?.employeeCategoryId &&
-      data?.desiginationId &&
-      data?.shiftCommonTemplateId &&
-      data?.email &&
-      data?.presentAddress.cityId &&
-      data?.permanentAddress.cityId &&
-      data?.presentAddress.stateId &&
-      data?.permanentAddress.stateId &&
-      data?.presentAddress.countryId &&
-      data?.permanentAddress.countryId &&
-      data?.employeeSubCategoryId &&
-      data?.mIdCard
-    ) {
-      return true;
+    // if (
+    //   data?.mobileNumber &&
+    //   data?.employeeType &&
+    //   data?.firstName &&
+    //   data?.dob &&
+    //   data?.gender &&
+    //   data?.disability &&
+    //   data?.bloodGroupId &&
+    //   data?.joiningDate &&
+    //   data?.departmentId &&
+    //   data?.employeeCategoryId &&
+    //   data?.desiginationId &&
+    //   data?.shiftCommonTemplateId &&
+    //   data?.email &&
+    //   data?.presentAddress.cityId &&
+    //   data?.permanentAddress.cityId &&
+    //   data?.presentAddress.stateId &&
+    //   data?.permanentAddress.stateId &&
+    //   data?.presentAddress.countryId &&
+    //   data?.permanentAddress.countryId &&
+    //   data?.employeeSubCategoryId &&
+    //   data?.mIdCard
+    // ) {
+    //   return true;
+    // }
+
+    // return false;
+    if (!mobileNumber) {
+      // toast.info("Category is Missing");
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "MobileNumber is Missing",
+      });
+      return false;
+    }
+    if (!aadharNo) {
+      // toast.info("Category is Missing");
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Aadhar Number is Missing",
+      });
+      return false;
     }
 
-    return false;
+    if (!employeeType) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "EmployeeType is Missing",
+      });
+      return false;
+    }
+    if (!firstName) {
+      // toast.info("Category is Missing");
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "First Name is Missing",
+      });
+      return false;
+    }
+    if (!dob) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "DOB is Missing",
+      });
+      return false;
+    }
+    if (!gender) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Gender is Missing",
+      });
+      return false;
+    }
+    if (!disability) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Disability is Missing",
+      });
+      return false;
+    }
+    if (!bloodGroupId) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "BloodGroup is Missing",
+      });
+      return false;
+    }
+    if (!joiningDate) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "JoiningDate is Missing",
+      });
+      return false;
+    }
+    if (!employeeCategoryId) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "EmployeeCategory is Missing",
+      });
+      return false;
+    }
+    if (!employeeSubCategoryId) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Employee SubCategory is Missing",
+      });
+      return false;
+    }
+    if (!departmentId) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Department is Missing",
+      });
+      return false;
+    }
+
+    if (!desiginationId) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Desigination is Missing",
+      });
+      return false;
+    }
+    if (!mIdCard) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "M Id Card is Missing",
+      });
+      return false;
+    }
+    if (!shiftCommonTemplateId) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Shift Common Template is Missing",
+      });
+      return false;
+    }
+    if (!payCategory) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Pay Category is Missing",
+      });
+      return false;
+    }
+    if (!email) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Email is Missing",
+      });
+      return false;
+    }
+
+
+    if (!data?.presentAddress.countryId) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Choose Present Country",
+      });
+      return false;
+    }
+    if (!data?.presentAddress.stateId) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Choose Present State",
+      });
+      return false;
+    }
+    if (!data?.presentAddress.cityId) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Choose Present City",
+      });
+      return false;
+    }
+    if (!data?.permanentAddress.countryId) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Choose Permanent Country",
+      });
+      return false;
+    }
+    if (!data?.permanentAddress.stateId) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Choose Permanent State",
+      });
+      return false;
+    }
+    if (!data?.permanentAddress.cityId) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Choose Permanent City",
+      });
+      return false;
+    }
+
+
+
+
+
+
+    return true;
   };
 
   const saveData = async () => {
     // Front-end validation
     if (!validateData(data)) {
-      Swal.fire({
-        icon: "error",
-        title: "Submission error",
-        text: "Please fill all required fields...!",
-      });
       return;
     }
 
@@ -1336,6 +1529,7 @@ export default function Form() {
     value: val?.id,
     label: val?.name,
   }));
+  if (isLoading || isFetching) return <Loader />;
 
   return (
     <>
@@ -1409,11 +1603,10 @@ export default function Form() {
 
                   {regNo && (
                     <span
-                      className={`px-2 py-0.5 text-xs text-bold rounded-full ${
-                        active
-                          ? "bg-green-100 text-green-800"
-                          : "bg-red-100 text-red-800"
-                      }`}
+                      className={`px-2 py-0.5 text-xs text-bold rounded-full ${active
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                        }`}
                     >
                       {regNo}
                     </span>
@@ -1428,9 +1621,8 @@ export default function Form() {
                         onClick={() => {
                           if (!cannotRejoin) setReadOnly(false); // only allow edit if rejoin is allowed
                         }}
-                        className={`px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded ${
-                          cannotRejoin ? "opacity-50 cursor-not-allowed" : ""
-                        }`}
+                        className={`px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded ${cannotRejoin ? "opacity-50 cursor-not-allowed" : ""
+                          }`}
                       >
                         Edit
                       </button>
@@ -1483,11 +1675,10 @@ export default function Form() {
                       key={tabNumber}
                       onClick={() => handleTabClick(tabNumber)}
                       className={`px-3 py-1 field-text border-b-2 rounded-t-md transition-colors duration-200
-                ${
-                  step === tabNumber
-                    ? "border-b-2 border-secondary text-secondary font-semibold bg-white"
-                    : "border-b-2 border-transparent text-gray-500 hover:border-secondary hover:text-secondary"
-                }`}
+                ${step === tabNumber
+                          ? "border-b-2 border-secondary text-secondary font-semibold bg-white"
+                          : "border-b-2 border-transparent text-gray-500 hover:border-secondary hover:text-secondary"
+                        }`}
                     >
                       {tabNumber}
                     </button>
@@ -1518,7 +1709,7 @@ export default function Form() {
                               // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
                               ref={stateNameRef}
-                              // className='bg-yellow-100'
+                            // className='bg-yellow-100'
                             />
                             {showDropdown && (
                               <div
@@ -1567,7 +1758,7 @@ export default function Form() {
                               readOnly={readOnly}
                               // disabled={childRecord.current > 0}
                               onKeyDown={(e) => handleKeyNext(e, input2Ref)}
-                              // className='bg-yellow-100'
+                            // className='bg-yellow-100'
                             />
                           </div>
                           <div className="w-30">
@@ -1800,7 +1991,7 @@ export default function Form() {
           transition-all duration-150 shadow-sm "
                               onChange={setLeaveReason}
                               disabled={true}
-                              // disabled={childRecord.current > 0}
+                            // disabled={childRecord.current > 0}
                             ></textarea>
                           </div>
                           <div className="ml-3">
@@ -1814,7 +2005,7 @@ export default function Form() {
                               setActive={setActive}
                               required={true}
                               readOnly={readOnly}
-                              // disabled={childRecord.current > 0}
+                            // disabled={childRecord.current > 0}
                             />
                             {/* <TextArea/> */}
                           </div>
@@ -1843,7 +2034,7 @@ export default function Form() {
                               setValue={setJoiningDate}
                               required={true}
                               readOnly={readOnly}
-                              // disabled={childRecord.current > 0}
+                            // disabled={childRecord.current > 0}
                             />
                           </div>
                           <div className="w-52">
@@ -2106,7 +2297,7 @@ export default function Form() {
                               required={true}
                               readOnly={readOnly}
                               options={payType}
-                              // disabled={childRecord.current > 0}
+                            // disabled={childRecord.current > 0}
                             />
                           </div>
                           {/* <div className="col-span-1">
@@ -2135,11 +2326,10 @@ export default function Form() {
                               className={`w-full px-1 py-0.5 text-xs text-[12px] border border-gray-300 rounded-lg
     focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
     transition-all duration-150 shadow-sm
-    ${
-      readOnly
-        ? "bg-gray-100 text-gray-500 cursor-not-allowed"
-        : "bg-white text-gray-900 hover:border-gray-400"
-    }
+    ${readOnly
+                                  ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                                  : "bg-white text-gray-900 hover:border-gray-400"
+                                }
    `}
                             >
                               <option value="">Select</option>
@@ -2163,11 +2353,10 @@ export default function Form() {
                               className={`w-full px-1 py-0.5 text-xs text-[12px] border border-gray-300 rounded-lg
     focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
     transition-all duration-150 shadow-sm
-    ${
-      readOnly
-        ? "bg-gray-100 text-gray-500 cursor-not-allowed"
-        : "bg-white text-gray-900 hover:border-gray-400"
-    }
+    ${readOnly
+                                  ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                                  : "bg-white text-gray-900 hover:border-gray-400"
+                                }
    `}
                             >
                               <option value="">Select</option>
@@ -2235,7 +2424,7 @@ export default function Form() {
                             value={religion}
                             setValue={setReligion}
                             readOnly={readOnly}
-                            // disabled={childRecord.current > 0}
+                          // disabled={childRecord.current > 0}
                           />
                         </div>
 
@@ -2245,7 +2434,7 @@ export default function Form() {
                             value={panNo}
                             setValue={setPanNo}
                             readOnly={readOnly}
-                            // disabled={childRecord.current > 0}
+                          // disabled={childRecord.current > 0}
                           />
                         </div>
                         <div>
@@ -2254,7 +2443,7 @@ export default function Form() {
                             value={esiNo}
                             setValue={setEsiNo}
                             readOnly={readOnly}
-                            // disabled={childRecord.current > 0}
+                          // disabled={childRecord.current > 0}
                           />
                         </div>
                         <div>
@@ -2263,7 +2452,7 @@ export default function Form() {
                             value={pfNo}
                             setValue={setPfNo}
                             readOnly={readOnly}
-                            // disabled={childRecord.current > 0}
+                          // disabled={childRecord.current > 0}
                           />
                         </div>
                         <div>
@@ -2272,7 +2461,7 @@ export default function Form() {
                             value={uanNo}
                             setValue={setUanNo}
                             readOnly={readOnly}
-                            // disabled={childRecord.current > 0}
+                          // disabled={childRecord.current > 0}
                           />
                         </div>
                         <div className="w-72">
@@ -2288,12 +2477,11 @@ export default function Form() {
                             readOnly={readOnly}
                             className={`w-full px-2 py-1 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-          transition-all duration-150 shadow-sm   ${
-            readOnly || childRecord.current > 0
-              ? "bg-gray-100 text-gray-500 cursor-not-allowed"
-              : "bg-white hover:border-gray-400"
-          }`}
-                            // disabled={childRecord.current > 0}
+          transition-all duration-150 shadow-sm   ${readOnly || childRecord.current > 0
+                                ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                                : "bg-white hover:border-gray-400"
+                              }`}
+                          // disabled={childRecord.current > 0}
                           />
                         </div>
                       </div>
@@ -2316,7 +2504,7 @@ export default function Form() {
                                   handlePresentChange("address", val)
                                 }
                                 readOnly={readOnly}
-                                // disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               />
                               {errors.address && (
                                 <span className="text-red-500 text-xs ml-1">
@@ -2493,7 +2681,7 @@ export default function Form() {
                                   handlePresentChange("village", val)
                                 }
                                 readOnly={readOnly}
-                                // disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               />
                             </div>
 
@@ -2505,7 +2693,7 @@ export default function Form() {
                                   handlePresentChange("pincode", val)
                                 }
                                 readOnly={readOnly}
-                                // disabled={childRecord.current > 0}
+                              // disabled={childRecord.current > 0}
                               />
                             </div>
                             {/* <div className="col-span-1 w-[255px] mt-2">
@@ -2829,11 +3017,10 @@ export default function Form() {
                                       }
                                       disabled={readOnly}
                                       // disabled={childRecord.current > 0}
-                                      className={`w-full focus:outline-none  uppercase focus:border-none pl-2 bg-transparent  ${
-                                        readOnly
-                                          ? "text-gray-600"
-                                          : "text-black"
-                                      }`}
+                                      className={`w-full focus:outline-none  uppercase focus:border-none pl-2 bg-transparent  ${readOnly
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                        }`}
                                     />
                                   </td>
                                   <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
@@ -2848,13 +3035,12 @@ export default function Form() {
                                           e.target.value
                                         )
                                       }
-                                      className={`w-full focus:outline-none uppercase focus:border-none pl-3 bg-transparent  ${
-                                        readOnly
-                                          ? "text-gray-600"
-                                          : "text-black"
-                                      }`}
+                                      className={`w-full focus:outline-none uppercase focus:border-none pl-3 bg-transparent  ${readOnly
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                        }`}
                                       disabled={readOnly}
-                                      // disabled={childRecord.current > 0}
+                                    // disabled={childRecord.current > 0}
                                     />
                                   </td>
                                   <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
@@ -2869,13 +3055,12 @@ export default function Form() {
                                           e.target.value
                                         )
                                       }
-                                      className={`w-full focus:outline-none uppercase focus:border-none text-right pr-3 bg-transparent  ${
-                                        readOnly
-                                          ? "text-gray-600"
-                                          : "text-black"
-                                      }`}
+                                      className={`w-full focus:outline-none uppercase focus:border-none text-right pr-3 bg-transparent  ${readOnly
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                        }`}
                                       disabled={readOnly}
-                                      // disabled={childRecord.current > 0}
+                                    // disabled={childRecord.current > 0}
                                     />
                                   </td>
                                   <td className=" border border-gray-300 text-[12px] py-1.5 items-center">
@@ -2890,11 +3075,10 @@ export default function Form() {
                                           e.target.value
                                         )
                                       }
-                                      className={`w-full focus:outline-none uppercase focus:border-none text-left pl-2 bg-transparent  ${
-                                        readOnly
-                                          ? "text-gray-600"
-                                          : "text-black"
-                                      }`}
+                                      className={`w-full focus:outline-none uppercase focus:border-none text-left pl-2 bg-transparent  ${readOnly
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                        }`}
                                       onKeyDown={(e) => {
                                         if (e.key === "Enter") {
                                           e.preventDefault();
@@ -2910,7 +3094,7 @@ export default function Form() {
                                         }
                                       }}
                                       disabled={readOnly}
-                                      // disabled={childRecord.current > 0}
+                                    // disabled={childRecord.current > 0}
                                     />
                                   </td>
                                   {/* <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
@@ -3019,11 +3203,10 @@ export default function Form() {
                                       }
                                       disabled={readOnly}
                                       // disabled={childRecord.current > 0}
-                                      className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${
-                                        readOnly
-                                          ? "text-gray-600"
-                                          : "text-black"
-                                      }`}
+                                      className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${readOnly
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                        }`}
                                     />
                                   </td>
                                   <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
@@ -3038,14 +3221,13 @@ export default function Form() {
                                           e.target.value
                                         )
                                       }
-                                      className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${
-                                        readOnly
-                                          ? "text-gray-600"
-                                          : "text-black"
-                                      }`}
+                                      className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${readOnly
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                        }`}
                                       disabled={readOnly}
 
-                                      // disabled={childRecord.current > 0}
+                                    // disabled={childRecord.current > 0}
                                     />
                                   </td>
                                   <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
@@ -3060,14 +3242,13 @@ export default function Form() {
                                           e.target.value
                                         )
                                       }
-                                      className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${
-                                        readOnly
-                                          ? "text-gray-600"
-                                          : "text-black"
-                                      }`}
+                                      className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${readOnly
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                        }`}
                                       disabled={readOnly}
 
-                                      // disabled={childRecord.current > 0}
+                                    // disabled={childRecord.current > 0}
                                     />
                                   </td>
                                   <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
@@ -3082,11 +3263,10 @@ export default function Form() {
                                           e.target.value
                                         )
                                       }
-                                      className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${
-                                        readOnly
-                                          ? "text-gray-600"
-                                          : "text-black"
-                                      }`}
+                                      className={`w-full pl-2 focus:outline-none bg-transparent uppercase focus:border-none ${readOnly
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                        }`}
                                       disabled={readOnly}
                                       onKeyDown={(e) => {
                                         if (e.key === "Enter") {
@@ -3107,7 +3287,7 @@ export default function Form() {
                                         }
                                       }}
 
-                                      // disabled={childRecord.current > 0}
+                                    // disabled={childRecord.current > 0}
                                     />
                                   </td>
                                   {/* <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
@@ -3223,11 +3403,10 @@ export default function Form() {
                                       }
                                       disabled={readOnly}
                                       // disabled={childRecord.current > 0}
-                                      className={`w-full pl-1 focus:outline-none uppercase  focus:border-none bg-transparent  ${
-                                        readOnly
-                                          ? "text-gray-600"
-                                          : "text-black"
-                                      }`}
+                                      className={`w-full pl-1 focus:outline-none uppercase  focus:border-none bg-transparent  ${readOnly
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                        }`}
                                     />
                                   </td>
                                   <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
@@ -3242,13 +3421,12 @@ export default function Form() {
                                           e.target.value
                                         )
                                       }
-                                      className={` pl-1 w-[110px] focus:outline-none uppercase  focus:border-none bg-transparent  ${
-                                        readOnly
-                                          ? "text-gray-600"
-                                          : "text-black"
-                                      }`}
+                                      className={` pl-1 w-[110px] focus:outline-none uppercase  focus:border-none bg-transparent  ${readOnly
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                        }`}
                                       disabled={readOnly}
-                                      // disabled={childRecord.current > 0}
+                                    // disabled={childRecord.current > 0}
                                     />
                                   </td>
                                   <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
@@ -3263,13 +3441,12 @@ export default function Form() {
                                           e.target.value
                                         )
                                       }
-                                      className={`w-full pr-2 text-right focus:outline-none uppercase  focus:border-none bg-transparent ${
-                                        readOnly
-                                          ? "text-gray-600"
-                                          : "text-black"
-                                      }`}
+                                      className={`w-full pr-2 text-right focus:outline-none uppercase  focus:border-none bg-transparent ${readOnly
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                        }`}
                                       disabled={readOnly}
-                                      // disabled={childRecord.current > 0}
+                                    // disabled={childRecord.current > 0}
                                     />
                                   </td>
                                   <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
@@ -3368,13 +3545,12 @@ export default function Form() {
                                           e.target.value
                                         )
                                       }
-                                      className={`w-full pl-2 focus:outline-none uppercase  focus:border-none bg-transparent ${
-                                        readOnly
-                                          ? "text-gray-600"
-                                          : "text-black"
-                                      }`}
+                                      className={`w-full pl-2 focus:outline-none uppercase  focus:border-none bg-transparent ${readOnly
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                        }`}
                                       disabled={readOnly}
-                                      // disabled={childRecord.current > 0}
+                                    // disabled={childRecord.current > 0}
                                     />
                                   </td>
                                   <td className=" border border-gray-300 text-[12px] py-1.5 item-center">
@@ -3389,11 +3565,10 @@ export default function Form() {
                                           e.target.value
                                         )
                                       }
-                                      className={`w-full pl-2 focus:outline-none uppercase  focus:border-none bg-transparent ${
-                                        readOnly
-                                          ? "text-gray-600"
-                                          : "text-black"
-                                      }`}
+                                      className={`w-full pl-2 focus:outline-none uppercase  focus:border-none bg-transparent ${readOnly
+                                        ? "text-gray-600"
+                                        : "text-black"
+                                        }`}
                                       disabled={readOnly}
                                       onKeyDown={(e) => {
                                         if (e.key === "Enter") {
@@ -3413,7 +3588,7 @@ export default function Form() {
                                           );
                                         }
                                       }}
-                                      // disabled={childRecord.current > 0}
+                                    // disabled={childRecord.current > 0}
                                     />
                                   </td>
                                   {/* <td className=" border border-gray-300 text-[12px] py-1.5 text-center item-center">

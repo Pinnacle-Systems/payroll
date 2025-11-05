@@ -21,6 +21,7 @@ import {
   useGetShiftCommonTemplateQuery,
   useUpdateShiftCommonTemplateMutation,
 } from "../../../redux/services/ShiftCommonTemplate.service";
+import Loader from "../Loader";
 
 import Swal from "sweetalert2";
 
@@ -42,7 +43,8 @@ const ShiftCommonTemplateMaster = () => {
 
   const { branchId, companyId } = params;
 
-  const { data: allData } = useGetShiftCommonTemplateQuery({
+  const { data: allData , isLoading,
+    isFetching,} = useGetShiftCommonTemplateQuery({
     params,
     searchParams: searchValue,
   });
@@ -245,6 +247,7 @@ const ShiftCommonTemplateMaster = () => {
   //   value: val?.id,
   //   label: val?.name,
   // }));
+  if (isLoading || isFetching) return <Loader />;
 
   return (
     <div>

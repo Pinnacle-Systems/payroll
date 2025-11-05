@@ -29,6 +29,7 @@ import { Check, Power } from "lucide-react";
 import Swal from "sweetalert2";
 import { getCommonParams } from "../../../Utils/helper";
 import { useGetCountriesQuery } from "../../../redux/services/CountryMasterService";
+import Loader from "../Loader";
 
 const MODEL = "City Master";
 
@@ -317,6 +318,7 @@ export default function Form() {
     label: val?.name,
   }));
   const selectedOption = options?.find((opt) => opt?.value === state) || null;
+  if (isLoading || isFetching) return <Loader />;
 
   return (
     <>

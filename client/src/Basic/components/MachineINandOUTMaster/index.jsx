@@ -17,6 +17,7 @@ import Swal from "sweetalert2";
 import moment from "moment";
 import { useDispatch } from "react-redux";
 import { common, machinetype } from "../../../Utils/DropdownData";
+import Loader from "../Loader";
 
 const Form = () => {
   const today = new Date();
@@ -36,7 +37,8 @@ const Form = () => {
 
   const { branchId, companyId, branchCode } = params;
 
-  const { data: allData, refetch } = useGetMachineInOutQuery({
+  const { data: allData , isLoading,
+    isFetching, refetch } = useGetMachineInOutQuery({
     params,
     searchParams: searchValue,
   });
@@ -292,6 +294,8 @@ const Form = () => {
       return [prevRows[0]];
     });
   };
+    if (isLoading || isFetching) return <Loader />;
+  
   return (
     <>
       <div>

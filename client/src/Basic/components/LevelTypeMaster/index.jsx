@@ -16,6 +16,7 @@ import { Check, Power } from "lucide-react";
 import Modal from "../../../UiComponents/Modal";
 import Swal from "sweetalert2";
 import { getCommonParams } from "../../../Utils/helper";
+import Loader from "../Loader";
 
 export default function Form() {
   // const [openTable, setOpenTable] = useState(false);
@@ -36,7 +37,8 @@ export default function Form() {
 
   const { branchId ,companyId} = params;
 
-  const { data: allData } = useGetLevelTypeQuery({
+  const { data: allData , isLoading,
+    isFetching,} = useGetLevelTypeQuery({
     params,
     searchParams: searchValue,
   });
@@ -214,14 +216,15 @@ export default function Form() {
     setId(id);
     setForm(true);
     setReadOnly(true);
-    console.log("view");
   };
   const handleEdit = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(false);
-    console.log("Edit");
   };
+
+    if (isLoading || isFetching) return <Loader />;
+
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
       <div className="w-full flex bg-white p-1 justify-between  items-center">

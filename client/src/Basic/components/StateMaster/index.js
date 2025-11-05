@@ -26,6 +26,7 @@ import Swal from "sweetalert2";
 import Select from "react-select";
 import { color, fontSize, margin } from "@mui/system";
 import { getCommonParams } from "../../../Utils/helper";
+import Loader from "../Loader";
 
 export default function Form() {
   const [form, setForm] = useState(false);
@@ -56,10 +57,11 @@ export default function Form() {
     })) || [];
   const selectedOption = options.find((opt) => opt.value === country) || null;
 
-  const { data: allData } = useGetStateQuery({
-    params,
-    searchParams: searchValue,
-  });
+  const { data: allData, isLoading,
+    isFetching } = useGetStateQuery({
+      params,
+      searchParams: searchValue,
+    });
 
   const {
     data: singleData,
@@ -316,6 +318,7 @@ export default function Form() {
     label: item.name, // text shown in dropdown
     value: item.id, // stored value
   }));
+  if (isLoading || isFetching) return <Loader />;
 
   return (
     <div onKeyDown={handleKeyDown} className="p-1">

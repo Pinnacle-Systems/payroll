@@ -17,6 +17,7 @@ import Swal from "sweetalert2";
 
 import moment from "moment";
 import { useDispatch } from "react-redux";
+import Loader from "../Loader";
 
 import secureLocalStorage from "react-secure-storage";
 
@@ -32,19 +33,20 @@ const PFEsiEditor = () => {
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
   const [pfEsiGrid, setPfEsiGrid] = useState([]);
-    const [payCodeType, setPayCodeType] = useState("");
+  const [payCodeType, setPayCodeType] = useState("");
   const [date, setDate] = useState(moment.utc(today).format("YYYY-MM-DD"));
   const dispatch = useDispatch();
- 
+
 
   const params = getCommonParams();
 
-  const { branchId,companyId } = params;
+  const { branchId, companyId } = params;
 
-  const { data: allData, refetch } = useGetPFEsiEditorQuery({
-    params,
-    searchParams: searchValue,
-  });
+  const { data: allData, isLoading,
+    isFetching, refetch } = useGetPFEsiEditorQuery({
+      params,
+      searchParams: searchValue,
+    });
 
   const { data: companyPayCode } = useGetCompanyPayCodeQuery({
     params,
@@ -84,26 +86,26 @@ const PFEsiEditor = () => {
       );
       setPayDetailsId(data?.payDetailsId || "");
 
-         const pfEsiPayDetails = companyPayCode?.data?.flatMap(
-      (cp) => cp?.PayDetails || []
-    );
-      setPickFrom(
-        findFromList(data?.payDetailsId,  pfEsiPayDetails, "pickFrom")
+      const pfEsiPayDetails = companyPayCode?.data?.flatMap(
+        (cp) => cp?.PayDetails || []
       );
-       const fullDetail = pfEsiPayDetails?.find(
-      (pd) => pd.id === data?.payDetailsId
-    );
-    setPayCodeType(fullDetail?.payComponent?.payCode?.toUpperCase() || "");
+      setPickFrom(
+        findFromList(data?.payDetailsId, pfEsiPayDetails, "pickFrom")
+      );
+      const fullDetail = pfEsiPayDetails?.find(
+        (pd) => pd.id === data?.payDetailsId
+      );
+      setPayCodeType(fullDetail?.payComponent?.payCode?.toUpperCase() || "");
 
       // setPfEsiGrid(data?.PfEsiGrid || []);
       setPfEsiGrid(
-  (data?.PfEsiGrid || []).map((item) => ({
-    ...item,
-    fromValue: item.fromValue ? Number(item.fromValue).toFixed(2) : "",
-    toValue: item.toValue ? Number(item.toValue).toFixed(2) : "",
-    percentage: item.percentage ? Number(item.percentage).toFixed(2) : "",
-  }))
-);
+        (data?.PfEsiGrid || []).map((item) => ({
+          ...item,
+          fromValue: item.fromValue ? Number(item.fromValue).toFixed(2) : "",
+          toValue: item.toValue ? Number(item.toValue).toFixed(2) : "",
+          percentage: item.percentage ? Number(item.percentage).toFixed(2) : "",
+        }))
+      );
 
     },
     [id]
@@ -125,11 +127,11 @@ const PFEsiEditor = () => {
   };
 
   const validateData = (data) => {
-  
-    
+
+
     if (
       data?.payDetailsId
-       
+
     ) {
       return true;
     }
@@ -283,6 +285,7 @@ const PFEsiEditor = () => {
       className: " text-gray-900 text-center uppercase w-32",
     },
   ];
+  if (isLoading || isFetching) return <Loader />;
 
   return (
     <>

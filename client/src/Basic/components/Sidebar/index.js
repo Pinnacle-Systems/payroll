@@ -122,7 +122,6 @@ const Sidebar = ({ isOpen, setIsOpen, isMainDropdownOpen, setIsMainDropdownOpen 
   const reportGroups = [...new Set(reports.map(page => page.pageGroupId))].map(pageId => { return { id: pageId, name: findElement(pageId, pageGroup?.data) } })
 
 
-  console.log("masters", masters)
 
 
   const headers = [
@@ -147,7 +146,6 @@ const Sidebar = ({ isOpen, setIsOpen, isMainDropdownOpen, setIsMainDropdownOpen 
     },
 
   ]
-  console.log(isOpen, "isOpen", isMainDropdownOpen, "isMainDropdownOpen")
 
   function click() {
     if (isOpen && isMainDropdownOpen) {
@@ -213,7 +211,6 @@ const Sidebar = ({ isOpen, setIsOpen, isMainDropdownOpen, setIsMainDropdownOpen 
 
             {isOpen && headers.map((ele, index) => {
 
-              console.log("ele", ele)
 
               return (
 

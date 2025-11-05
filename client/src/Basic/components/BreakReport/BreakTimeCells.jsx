@@ -35,8 +35,8 @@ const BreakTimeCells = ({ breakOut, breakIn, duration, status, className = '', s
                 </td>
 
                 {/* Status Column */}
-                <td className={`border border-gray-300 text-[12px] py-0.5 text-center ${className}`}>
-                    <div className={`px-1 py-0.5 rounded text-xs font-medium ${getStatusColor(status)}`}>
+                <td className={`border border-gray-300 text-[12px] py-0.5  ${className}`}>
+                    <div className={`px-1 py-0.5  text-left pl-1 rounded text-xs font-medium ${getStatusColor(status)}`}>
                         {simplifyStatus(status)}
                     </div>
                 </td>
@@ -78,8 +78,8 @@ const BreakTimeCells = ({ breakOut, breakIn, duration, status, className = '', s
             </td>
 
             {/* Break Status */}
-            <td className={`border border-gray-300 text-[12px] py-0.5 text-center ${className}`}>
-                <div className={`px-1 py-0.5 rounded text-xs font-medium ${getStatusColor(status)}`}>
+            <td className={`border border-gray-300 text-[12px] py-0.5 ${className}`}>
+                <div className={`px-1 py-0.5 text-left pl-1 rounded text-xs font-medium ${getStatusColor(status)}`}>
                     {simplifyStatus(status)}
                 </div>
             </td>

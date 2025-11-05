@@ -16,12 +16,14 @@ import {
 } from "../../../Utils/DropdownData";
 
 import Swal from "sweetalert2";
+import { useDispatch } from "react-redux";
 
 
 export default function Approval() {
     const params = getCommonParams();
     const { branchId, companyId, finYearId, userId } = params;
     const [id, setId] = useState("")
+    const dispatch = useDispatch();
 
 
 
@@ -72,6 +74,10 @@ export default function Approval() {
                     Swal.showLoading();
                 },
             });
+            dispatch({
+                type: `ShiftTemplateMaster/invalidateTags`,
+                payload: ["ShiftTemplateMaster"],
+            });
         } catch (error) {
             Swal.fire({
                 icon: "error",
@@ -82,23 +88,14 @@ export default function Approval() {
     }
 
 
-    const validateOneActiveFinYear = (active) => {
-        if (Boolean(active)) {
-            // return !allData.data.some((qty) => id === qty.id ? false : Boolean(qty.active))
-        }
-        return true
-    }
-    console.log(id, 'id');
+
 
     const data = {
         selectedShiftType, id, companyId, branchId, userId
     }
     const saveData = () => {
 
-        if (!validateOneActiveFinYear(data.active)) {
-            toast.error("Only one Fin year can be active...!", { position: "top-center" })
-            return
-        }
+
 
 
         if (id) {
