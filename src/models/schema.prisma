@@ -407,8 +407,8 @@ model EmployeeFamilyDetails {
   name           String?
   dob            DateTime?
   age            Int?
-  RelationShip   RelationShip? @relation(fields: [relationShipId], references: [id])
-  relationShipId Int?
+  RelationShip   RelationShip @relation(fields: [relationShipId], references: [id])
+  relationShipId Int
   occupation     String?
   nominee        String?
 }

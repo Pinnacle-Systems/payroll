@@ -41,10 +41,10 @@ const TemplateItems = ({
     setContextMenu(null);
   };
   useEffect(() => {
-    const normalized = payCategory.map((cat) => {
+    const normalized = payCategory?.map((cat) => {
       const existing = payFrequencyType?.find((t) => t.type === cat.value);
       return {
-        type: cat.value,
+        type: cat?.value,
         payFrequencyItems: existing?.payFrequencyItems || [],
       };
     });
@@ -56,7 +56,7 @@ const TemplateItems = ({
 
   const handleInputChange = (type, index, field, value) => {
     const updated = structuredClone(payFrequencyType);
-    const typeIndex = updated.findIndex((t) => t.type === type);
+    const typeIndex = updated?.findIndex((t) => t.type === type);
 
     if (typeIndex !== -1) {
       updated[typeIndex].payFrequencyItems[index][field] = value;
@@ -64,44 +64,91 @@ const TemplateItems = ({
     }
   };
 
+  // const handleDeleteRow = (type, index) => {
+  //   const updated = structuredClone(payFrequencyType);
+  //   const typeIndex = updated.findIndex((t) => t.type === type);
+
+  //   if (typeIndex !== -1) {
+  //     // Prevent deletion if only one row left
+  //     if (updated[typeIndex].payFrequencyItems.length <= 1) {
+  //       return; // Do nothing
+  //     }
+
+  //     updated[typeIndex].payFrequencyItems.splice(index, 1);
+  //     setPayFrequencyType(updated);
+  //   }
+  // };
+  // const handleDeleteAllRows = (type) => {
+  //   const updated = structuredClone(payFrequencyType);
+  //   const typeIndex = updated.findIndex((t) => t.type === type);
+
+  //   if (typeIndex !== -1) {
+  //     // Prevent deleting all rows if only one row exists
+  //     if (updated[typeIndex].payFrequencyItems.length <= 1) {
+  //       return; // Do nothing
+  //     }
+
+  //     // Keep only the first row
+  //     updated[typeIndex].payFrequencyItems = [
+  //       updated[typeIndex].payFrequencyItems[0],
+  //     ];
+  //     setPayFrequencyType(updated);
+  //   }
+  // };
   const handleDeleteRow = (type, index) => {
-    const updated = structuredClone(payFrequencyType);
-    const typeIndex = updated.findIndex((t) => t.type === type);
+    setPayFrequencyType((prev) => {
+      const updated = structuredClone(prev);
+      const typeIndex = updated?.findIndex((t) => t.type === type);
+      if (typeIndex === -1) return prev;
 
-    if (typeIndex !== -1) {
-      // Prevent deletion if only one row left
-      if (updated[typeIndex].payFrequencyItems.length <= 1) {
-        return; // Do nothing
+      const typeObj = updated[typeIndex];
+      if (!typeObj?.payFrequencyItems) return prev;
+
+      if (typeObj.payFrequencyItems.length > 1) {
+        // 🧹 Delete selected row
+        typeObj.payFrequencyItems?.splice(index, 1);
+      } else {
+        // 🧾 Only one row — clear its data
+        typeObj.payFrequencyItems[0] = {
+          startDate: "",
+          endDate: "",
+          salaryDate: "",
+          notes: "",
+        };
       }
 
-      updated[typeIndex].payFrequencyItems.splice(index, 1);
-      setPayFrequencyType(updated);
-    }
+      return updated;
+    });
   };
+
   const handleDeleteAllRows = (type) => {
-    const updated = structuredClone(payFrequencyType);
-    const typeIndex = updated.findIndex((t) => t.type === type);
+    setPayFrequencyType((prev) => {
+      const updated = structuredClone(prev);
+      const typeIndex = updated?.findIndex((t) => t.type === type);
+      if (typeIndex === -1) return prev;
 
-    if (typeIndex !== -1) {
-      // Prevent deleting all rows if only one row exists
-      if (updated[typeIndex].payFrequencyItems.length <= 1) {
-        return; // Do nothing
-      }
+      const typeObj = updated[typeIndex];
+      if (!typeObj?.payFrequencyItems) return prev;
 
-      // Keep only the first row
-      updated[typeIndex].payFrequencyItems = [
-        updated[typeIndex].payFrequencyItems[0],
+      typeObj.payFrequencyItems = [
+        {
+          startDate: "",
+          endDate: "",
+          salaryDate: "",
+          notes: "",
+        },
       ];
-      setPayFrequencyType(updated);
-    }
+
+      return updated;
+    });
   };
 
   const addNewRow = (type) => {
     const updated = structuredClone(payFrequencyType);
-    const typeIndex = updated.findIndex((t) => t.type === type);
+    const typeIndex = updated?.findIndex((t) => t.type === type);
 
     if (typeIndex !== -1) {
-      updated[typeIndex].payFrequencyItems.push({
+      updated[typeIndex].payFrequencyItems?.push({
         startDate: "",
         endDate: "",
         salaryDate: "",
@@ -121,37 +168,37 @@ const TemplateItems = ({
     if (id) {
       // Edit/View Mode: Ensure all types exist and have at least one row
       if (payFrequencyType && payFrequencyType.length > 0) {
-        const updatedTypes = defaultTypes.map((typeName) => {
-          const existingType = payFrequencyType.find(
+        const updatedTypes = defaultTypes?.map((typeName) => {
+          const existingType = payFrequencyType?.find(
             (t) => t.type === typeName
           );
 
           return existingType
             ? {
-                ...existingType,
-                payFrequencyItems:
-                  existingType.payFrequencyItems?.length > 0
-                    ? existingType.payFrequencyItems
-                    : [
-                        {
-                          startDate: "",
-                          endDate: "",
-                          salaryDate: "",
-                          notes: "",
-                        },
-                      ],
-              }
+              ...existingType,
+              payFrequencyItems:
+                existingType?.payFrequencyItems?.length > 0
+                  ? existingType?.payFrequencyItems
+                  : [
+                    {
+                      startDate: "",
+                      endDate: "",
+                      salaryDate: "",
+                      notes: "",
+                    },
+                  ],
+            }
             : {
-                type: typeName,
-                payFrequencyItems: [
-                  {
-                    startDate: "",
-                    endDate: "",
-                    salaryDate: "",
-                    notes: "",
-                  },
-                ],
-              };
+              type: typeName,
+              payFrequencyItems: [
+                {
+                  startDate: "",
+                  endDate: "",
+                  salaryDate: "",
+                  notes: "",
+                },
+              ],
+            };
         });
 
         setPayFrequencyType(updatedTypes);
@@ -160,7 +207,7 @@ const TemplateItems = ({
       // New form: Initialize if empty
       if (!payFrequencyType || payFrequencyType.length === 0) {
         setPayFrequencyType(
-          defaultTypes.map((type) => ({
+          defaultTypes?.map((type) => ({
             type,
             payFrequencyItems: [
               { startDate: "", endDate: "", salaryDate: "", notes: "" },
@@ -180,8 +227,8 @@ const TemplateItems = ({
 
     let sundays = 0;
     let current = start.clone();
-    while (current.isSameOrBefore(end)) {
-      if (current.day() === 0) sundays++;
+    while (current?.isSameOrBefore(end)) {
+      if (current?.day() === 0) sundays++;
       current.add(1, "day");
     }
 
@@ -259,13 +306,13 @@ const TemplateItems = ({
                   value={
                     finYearId
                       ? moment(
-                          yearData?.data?.find((i) => i.id == finYearId)?.from
-                        )
-                          .utc()
-                          .format("DD-MM-YYYY")
+                        yearData?.data?.find((i) => i.id == finYearId)?.from
+                      )
+                        .utc()
+                        .format("DD-MM-YYYY")
                       : ""
                   }
-                  setValue={() => {}}
+                  setValue={() => { }}
                   required={true}
                   disabled={true}
                 />
@@ -277,13 +324,13 @@ const TemplateItems = ({
                   value={
                     finYearId
                       ? moment(
-                          yearData?.data?.find((i) => i.id == finYearId)?.to
-                        )
-                          .utc()
-                          .format("DD-MM-YYYY")
+                        yearData?.data?.find((i) => i.id == finYearId)?.to
+                      )
+                        .utc()
+                        .format("DD-MM-YYYY")
                       : ""
                   }
-                  setValue={() => {}}
+                  setValue={() => { }}
                   required={true}
                   disabled={true}
                 />
@@ -297,11 +344,10 @@ const TemplateItems = ({
                 <button
                   key={t.type}
                   onClick={() => setActiveTab(t.type)}
-                  className={`px-4 py-2 text-sm font-medium ${
-                    activeTab === t.type
-                      ? "border-b-2 border-blue-500 text-blue-600"
-                      : "text-gray-600"
-                  }`}
+                  className={`px-4 py-2 text-sm font-medium ${activeTab === t.type
+                    ? "border-b-2 border-blue-500 text-blue-600"
+                    : "text-gray-600"
+                    }`}
                 >
                   {t.type}
                 </button>
@@ -313,13 +359,13 @@ const TemplateItems = ({
               <div className="w-full  overflow-x-auto">
                 <div
                   className="w-full overflow-x-auto"
-                  // tabIndex={0}
-                  // onKeyDown={(e) => {
-                  //   if (e.key === "Enter" && !readOnly) {
-                  //     e.preventDefault(); // prevent accidental form submission
-                  //     addNewRow(activeType.type);
-                  //   }
-                  // }}
+                // tabIndex={0}
+                // onKeyDown={(e) => {
+                //   if (e.key === "Enter" && !readOnly) {
+                //     e.preventDefault(); // prevent accidental form submission
+                //     addNewRow(activeType.type);
+                //   }
+                // }}
                 >
                   <table className="w-80 border-collapse table-fixed">
                     <thead className="bg-gray-200 text-gray-800">
@@ -388,12 +434,11 @@ const TemplateItems = ({
                                     e.target.value
                                   )
                                 }
-                                className={`pl-1 bg-transparent w-[110px] text-[11px] focus:outline-none focus:border-transparent ${
-                                  readOnly || childRecord.current > 0
-                                    ? "text-gray-600"
-                                    : "text-black"
-                                }`}
-                                disabled={readOnly || childRecord.current > 0 }
+                                className={`pl-1 bg-transparent w-[110px] text-[11px] focus:outline-none focus:border-transparent ${readOnly || childRecord.current > 0
+                                  ? "text-gray-600"
+                                  : "text-black"
+                                  }`}
+                                disabled={!finYearId || readOnly || childRecord.current > 0}
                               />
                             </td>
                             <td className="border border-gray-300">
@@ -408,12 +453,11 @@ const TemplateItems = ({
                                     e.target.value
                                   )
                                 }
-                                className={`pl-1 bg-transparent  w-[110px] text-[11px] focus:outline-none focus:border-transparent ${
-                                  readOnly || childRecord.current > 0
-                                    ? "text-gray-600"
-                                    : "text-black"
-                                }`}
-                                disabled={readOnly || childRecord.current > 0}
+                                className={`pl-1 bg-transparent  w-[110px] text-[11px] focus:outline-none focus:border-transparent ${readOnly || childRecord.current > 0
+                                  ? "text-gray-600"
+                                  : "text-black"
+                                  }`}
+                                disabled={!item?.startDate  ||readOnly || childRecord.current > 0}
                               />
                             </td>
                             <td className="border border-gray-300">
@@ -428,27 +472,30 @@ const TemplateItems = ({
                                     e.target.value
                                   )
                                 }
-                                className={`pl-1 bg-transparent w-[110px] text-[11px] focus:outline-none focus:border-transparent ${
-                                  readOnly || childRecord.current > 0
-                                    ? "text-gray-600"
-                                    : "text-black"
-                                }`}
-                                disabled={readOnly || childRecord.current > 0}
+                                className={`pl-1 bg-transparent w-[110px] text-[11px] focus:outline-none focus:border-transparent ${readOnly || childRecord.current > 0
+                                  ? "text-gray-600"
+                                  : "text-black"
+                                  }`}
+                                disabled={!item?.endDate || readOnly || childRecord.current > 0}
                               />
                             </td>
-                            <td className="border border-gray-300 text-gray-600 p-1">
+
+
+                            <td className={`border border-gray-300 text-[12px] text-left pl-2 p-1 ${readOnly ? "text-gray-600"
+                              : "text-black"}  `}>
                               {item?.salaryDate
                                 ? new Date(item.salaryDate).toLocaleString(
-                                    "default",
-                                    { month: "long" }
-                                  )
+                                  "default",
+                                  { month: "long" }
+                                )
                                 : ""}
                             </td>
-                            <td className="border border-gray-300 text-[12px] text-gray-600 text-right p-1">
+                            <td className={`border border-gray-300 text-[12px] text-right p-1 ${readOnly ? "text-gray-600"
+                              : "text-black"}  `}>
                               {totalDays}
                             </td>
-                            <td className="border border-gray-300 text-right text-gray-600  p-1">
-                              {sundays}
+                            <td className={`border border-gray-300 text-[12px] text-right p-1 ${readOnly ? "text-gray-600"
+                              : "text-black"}  `}>                              {sundays}
                             </td>
                             <td
                               className="border border-gray-300 text-[12px] bg-transparent"
@@ -472,16 +519,15 @@ const TemplateItems = ({
                                 onKeyDown={(e) => {
                                   if (e.key === "Enter") {
                                     e.preventDefault();
-                                    if (item?.startDate) {
+                                    if (item?.startDate && item?.endDate && item?.salaryDate) {
                                       addNewRow(activeType.type);
                                     }
                                   }
                                 }}
-                                className={`focus:outline-none text-[12px] focus:border-transparent bg-transparent p-1 ${
-                                  readOnly || childRecord.current > 0
-                                    ? "text-gray-600"
-                                    : "text-black"
-                                }`}
+                                className={`focus:outline-none text-[12px] focus:border-transparent bg-transparent p-1 ${readOnly || childRecord.current > 0
+                                  ? "text-gray-600"
+                                  : "text-black"
+                                  }`}
                                 disabled={readOnly || childRecord.current > 0}
                               />
                             </td>
@@ -495,7 +541,7 @@ const TemplateItems = ({
             )}
           </div>
         </div>
-      </div>
+      </div >
       {contextMenu && (
         <div
           style={{
@@ -529,7 +575,8 @@ const TemplateItems = ({
             </button>
           </div>
         </div>
-      )}
+      )
+      }
     </>
   );
 };

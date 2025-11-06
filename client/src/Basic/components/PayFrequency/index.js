@@ -49,7 +49,7 @@ const PayFrequencymaster = () => {
 
   const params = getCommonParams();
 
-  const { branchId,companyId } = params;
+  const { branchId, companyId } = params;
 
   const { data: company } = useGetCompanyQuery({ params });
   const [companyCode, setCompanyCode] = useState(company?.data[0].code);
@@ -59,12 +59,12 @@ const PayFrequencymaster = () => {
     searchParams: searchValue,
   });
 
-  const { data: allData , isLoading,
+  const { data: allData, isLoading,
     isFetching, } = useGetPayFrequencyQuery({
-    params,
-    searchParams: searchValue,
-  });
-  
+      params,
+      searchParams: searchValue,
+    });
+
 
   const {
     data: singleData,
@@ -155,10 +155,24 @@ const PayFrequencymaster = () => {
   console.log(payFrequencyType, "payFrequencyType  ");
 
   const validateData = (data) => {
-    if (data.finYearId) {
-      return true;
+    if (!finYearId) {
+      // toast.info("Category is Missing");
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Fin Year  is Missing",
+      });
+      return false;
     }
-    return false;
+    if (payFrequencyType.length === 0) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Pay Frequency  should have atleast One Item...!!!",
+      });
+      return false;
+    }
+    return true
   };
 
   const handleSubmitCustom = async (callback, data, text) => {
@@ -188,11 +202,6 @@ const PayFrequencymaster = () => {
 
   const saveData = () => {
     if (!validateData(data)) {
-      Swal.fire({
-        icon: "error",
-        title: "Submission error",
-        text:  "Please fill all required Details!",
-      });
       return;
     }
 
@@ -310,7 +319,7 @@ const PayFrequencymaster = () => {
     setPayFrequencyType(newBlend);
   };
 
-      if (isLoading || isFetching) return <Loader />;
+  if (isLoading || isFetching) return <Loader />;
 
 
   return (

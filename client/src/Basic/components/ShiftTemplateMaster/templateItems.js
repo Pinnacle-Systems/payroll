@@ -249,20 +249,90 @@ const TemplateItems = ({
     });
   };
 
-  const handleDeleteRow = (id) => {
-    setShiftTemplateItems((yarnBlend) => {
-      if (yarnBlend?.length <= 1) {
-        return yarnBlend;
+  // const handleDeleteRow = (id) => {
+  //   setShiftTemplateItems((yarnBlend) => {
+  //     if (yarnBlend?.length <= 1) {
+  //       return yarnBlend;
+  //     }
+  //     return yarnBlend?.filter((_, index) => index !== parseInt(id));
+  //   });
+  // };
+  // const handleDeleteAllRows = () => {
+  //   setShiftTemplateItems((prevRows) => {
+  //     if (prevRows.length <= 1) return prevRows;
+  //     return [prevRows[0]];
+  //   });
+  // };
+  const handleDeleteRow = (index) => {
+    setShiftTemplateItems((prev) => {
+      const updated = structuredClone(prev);
+
+      if (updated.length === 1) {
+        // 🧾 Only one row → clear its data but keep the row
+        updated[0] = {
+          shiftCommonTemplateId: "",
+          shiftId: '',
+          startTime: "00:00:00",
+          endTime: "00:00:00",
+          inNextDay: '',
+          shiftTimeHrs: '',
+          otHrs: '',
+          quarterDetails: [
+            {
+              day: "",
+              oTId: "",
+              ftMins: "",
+              from: "",
+              to: "",
+              ttMins: "",
+              endTime: "",
+              nextDay: "",
+              checkHrs: "",
+              total: "",
+              pickFrom: "",
+              formula: "",
+            },
+          ],
+        };
+        return updated;
       }
-      return yarnBlend?.filter((_, index) => index !== parseInt(id));
+
+      // 🧹 More than one → delete selected row
+      updated.splice(index, 1);
+      return updated;
     });
   };
+
   const handleDeleteAllRows = () => {
-    setShiftTemplateItems((prevRows) => {
-      if (prevRows.length <= 1) return prevRows;
-      return [prevRows[0]];
-    });
+    setShiftTemplateItems(() => [
+      {
+        shiftCommonTemplateId: "",
+        shiftId: '',
+        startTime: "00:00:00",
+        endTime: "00:00:00",
+        inNextDay: '',
+        shiftTimeHrs: '',
+        otHrs: '',
+        quarterDetails: [
+          {
+            day: "",
+            oTId: "",
+            ftMins: "",
+            from: "",
+            to: "",
+            ttMins: "",
+            endTime: "",
+            nextDay: "",
+            checkHrs: "",
+            total: "",
+            pickFrom: "",
+            formula: "",
+          },
+        ],
+      },
+    ]);
   };
+
 
   // Delete a single quarterDetails row
   // const handleDeleteQuarterRow = (parentIndex, subIndex) => {
@@ -305,75 +375,75 @@ const TemplateItems = ({
   //     return updated;
   //   });
   // };
-const handleDeleteQuarterRow = (parentIndex, subIndex) => {
-  setShiftTemplateItems((prev) => {
-    const updated = structuredClone(prev);
+  const handleDeleteQuarterRow = (parentIndex, subIndex) => {
+    setShiftTemplateItems((prev) => {
+      const updated = structuredClone(prev);
 
-    const parent = updated[parentIndex];
-    if (!parent?.quarterDetails) return prev;
+      const parent = updated[parentIndex];
+      if (!parent?.quarterDetails) return prev;
 
-    if (parent.quarterDetails.length > 1) {
-      // 🧹 Remove the selected row
-      parent.quarterDetails.splice(subIndex, 1);
-    } else {
-      // 🧾 Only one row — clear its values but keep it present
-      parent.quarterDetails[0] = {
-        day: "",
-        oTDetailsId: "",
-        ftMins: "",
-        from: "",
-        to: "",
-        ttMins: "",
-        endTime: "",
-        nextDay: "",
-        checkHrs: "",
-        total: "",
-        pickFrom: "",
-        formula: "",
-      };
-    }
+      if (parent.quarterDetails.length > 1) {
+        // 🧹 Remove the selected row
+        parent.quarterDetails.splice(subIndex, 1);
+      } else {
+        // 🧾 Only one row — clear its values but keep it present
+        parent.quarterDetails[0] = {
+          day: "",
+          oTDetailsId: "",
+          ftMins: "",
+          from: "",
+          to: "",
+          ttMins: "",
+          endTime: "",
+          nextDay: "",
+          checkHrs: "",
+          total: "",
+          pickFrom: "",
+          formula: "",
+        };
+      }
 
-    // 🔁 Sync modal if this parent row is open
-    if (parentIndex === selectedIndex) {
-      setSelectedRow(parent);
-    }
+      // 🔁 Sync modal if this parent row is open
+      if (parentIndex === selectedIndex) {
+        setSelectedRow(parent);
+      }
 
-    return updated;
-  });
-};
+      return updated;
+    });
+  };
 
-const handleDeleteAllQuarterRows = (parentIndex) => {
-  setShiftTemplateItems((prev) => {
-    const updated = structuredClone(prev);
-    const parent = updated[parentIndex];
-    if (!parent?.quarterDetails) return prev;
+  const handleDeleteAllQuarterRows = (parentIndex) => {
+    setShiftTemplateItems((prev) => {
+      const updated = structuredClone(prev);
+      const parent = updated[parentIndex];
+      if (!parent?.quarterDetails) return prev;
 
-    // 🧹 Clear all quarter details, but keep one empty row
-    parent.quarterDetails = [
-      {
-        day: "",
-        oTDetailsId: "",
-        ftMins: "",
-        from: "",
-        to: "",
-        ttMins: "",
-        endTime: "",
-        nextDay: "",
-        checkHrs: "",
-        total: "",
-        pickFrom: "",
-        formula: "",
-      },
-    ];
+      // 🧹 Clear all quarter details, but keep one empty row
+      parent.quarterDetails = [
+        {
+          day: "",
+          oTDetailsId: "",
+          ftMins: "",
+          from: "",
+          to: "",
+          ttMins: "",
+          endTime: "",
+          nextDay: "",
+          checkHrs: "",
+          total: "",
+          pickFrom: "",
+          formula: "",
+        },
+      ];
 
-    // 🔁 Sync modal if this parent row is open
-    if (parentIndex === selectedIndex) {
-      setSelectedRow(parent);
-    }
+      // 🔁 Sync modal if this parent row is open
+      if (parentIndex === selectedIndex) {
+        setSelectedRow(parent);
+      }
 
-    return updated;
-  });
-};
+      return updated;
+    });
+  };
 
   const OTOptions = OTData?.data?.flatMap?.((data) =>
     data?.OTDetails?.map((val) => ({
@@ -559,7 +629,7 @@ const handleDeleteAllQuarterRows = (parentIndex) => {
                     </td>
                     <td className=" border border-gray-300 text-[12px] py-0.5 item-center">
                       <select
-                        disabled={readOnly || childRecord.current > 0}
+                        disabled={!item?.date || readOnly || childRecord.current > 0}
                         className="text-left w-full focus:outline-none rounded py-1 bg-transparent"
                         value={item.shiftCommonTemplateId}
                         onChange={(e) =>
@@ -586,9 +656,9 @@ const handleDeleteAllQuarterRows = (parentIndex) => {
 
                     <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
                       <select
-                        disabled={readOnly || childRecord.current > 0}
+                        disabled={!item?.shiftCommonTemplateId || readOnly || childRecord.current > 0}
                         className="text-left focus:outline-none w-full rounded py-1 bg-transparent"
-                        value={item.shiftId}
+                        value={item?.shiftId}
                         onChange={(e) => {
                           const selectedShiftId = e.target.value;
                           const selectedShift = shiftData?.data?.find(
@@ -654,7 +724,7 @@ const handleDeleteAllQuarterRows = (parentIndex) => {
                         }
                       >
                         <option>Select</option>
-                        {commonNew.map((blend) => (
+                        {common?.map((blend) => (
                           <option value={blend.value} key={blend.value}>
                             {blend?.show}
                           </option>
@@ -802,7 +872,7 @@ const handleDeleteAllQuarterRows = (parentIndex) => {
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             e.preventDefault();
-                            if (item?.date) {
+                            if (item?.date && item?.shiftCommonTemplateId && item?.shiftId) {
                               addNewRow();
                             }
                           }
@@ -1303,11 +1373,7 @@ const handleDeleteAllQuarterRows = (parentIndex) => {
                                 >
                                   Next Day
                                 </th>
-                                <th
-                                  className={`w-12 py-2 text-center font-medium text-[13px] `}
-                                >
-                                  Check Hrs
-                                </th>
+
                                 <th
                                   className={`w-8 py-2 text-center font-medium text-[13px] `}
                                 >
@@ -1333,8 +1399,16 @@ const handleDeleteAllQuarterRows = (parentIndex) => {
                             <tbody>
                               {console.log(selectedRow, "selectedRow")}
 
-                              {selectedRow?.quarterDetails?.map(
-                                (val, subIndex) => (
+                              {selectedRow?.quarterDetails?.map((val, subIndex) => {
+                                const ShiftCount = OTOptions?.find((opt) =>
+                                  opt.value === val?.oTDetailsId
+                                )?.label
+
+                                const isShiftCount = ShiftCount === "SHIFTCOUNT"
+
+                                console.log(isShiftCount, "isShiftCount");
+
+                                return (
                                   <tr
                                     key={subIndex}
                                     className=" w-full table-row "
@@ -1386,7 +1460,7 @@ const handleDeleteAllQuarterRows = (parentIndex) => {
                                             subIndex
                                           )
                                         }
-                                        isDisabled={readOnly}
+                                        isDisabled={readOnly || !val?.day}
                                         placeholder="Select "
                                         menuPlacement="auto"
                                         menuPosition="fixed"
@@ -1457,6 +1531,7 @@ const handleDeleteAllQuarterRows = (parentIndex) => {
                                         }}
                                       />
                                     </td>
+
                                     <td className="border border-gray-300 text-[12px] py-0.5 item-center ">
                                       <input
                                         min={"0"}
@@ -1476,14 +1551,15 @@ const handleDeleteAllQuarterRows = (parentIndex) => {
                                           : "text-black"
                                           }`}
                                         disabled={
-                                          readOnly || childRecord.current > 0
+                                          readOnly || childRecord.current > 0 || isShiftCount
                                         }
                                       />
                                     </td>
                                     <td className="border border-gray-300 text-[12px] py-0.5 item-center ">
                                       <input
-                                        min={"0"}
-                                        type="text"
+                                        min="0"
+                                        type="time" // enforce proper format
+                                        step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
                                         value={val?.from}
                                         onFocus={(e) => e.target.select()}
                                         onChange={(e) =>
@@ -1499,14 +1575,15 @@ const handleDeleteAllQuarterRows = (parentIndex) => {
                                           : "text-black"
                                           }`}
                                         disabled={
-                                          readOnly || childRecord.current > 0
+                                          readOnly || childRecord.current > 0 || isShiftCount || !ShiftCount
                                         }
                                       />
                                     </td>
                                     <td className="border border-gray-300 text-[12px] py-0.5 item-center ">
                                       <input
-                                        min={"0"}
-                                        type="text"
+                                        min="0"
+                                        type="time" // enforce proper format
+                                        step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
                                         value={val?.to}
                                         onFocus={(e) => e.target.select()}
                                         onChange={(e) =>
@@ -1522,7 +1599,7 @@ const handleDeleteAllQuarterRows = (parentIndex) => {
                                           : "text-black"
                                           }`}
                                         disabled={
-                                          readOnly || childRecord.current > 0
+                                          readOnly || childRecord.current > 0 || isShiftCount || !val?.from
                                         }
                                       />
                                     </td>
@@ -1545,7 +1622,7 @@ const handleDeleteAllQuarterRows = (parentIndex) => {
                                           : "text-black"
                                           }`}
                                         disabled={
-                                          readOnly || childRecord.current > 0
+                                          readOnly || childRecord.current > 0 || isShiftCount
                                         }
                                       />
                                     </td>
@@ -1568,14 +1645,14 @@ const handleDeleteAllQuarterRows = (parentIndex) => {
                                           : "text-black"
                                           }`}
                                         disabled={
-                                          readOnly || childRecord.current > 0
+                                          readOnly || childRecord.current > 0 || isShiftCount || !val?.to
                                         }
                                       />
                                     </td>
                                     <td className="border border-gray-300 text-[12px] py-0.5 item-center">
                                       <select
                                         disabled={
-                                          readOnly || childRecord.current > 0
+                                          readOnly || childRecord.current > 0 || isShiftCount
                                         }
                                         className="text-left w-full bg-transparent text-[12px] focus:outline-none rounded py-1 "
                                         value={val?.nextDay}
@@ -1599,29 +1676,7 @@ const handleDeleteAllQuarterRows = (parentIndex) => {
                                         ))}
                                       </select>
                                     </td>
-                                    <td className="border border-gray-300 text-[12px] py-0.5 item-center ">
-                                      <input
-                                        min={"0"}
-                                        type="number"
-                                        value={val?.checkHrs}
-                                        onFocus={(e) => e.target.select()}
-                                        onChange={(e) =>
-                                          handleInputChange(
-                                            e.target.value,
-                                            selectedIndex,
-                                            "checkHrs",
-                                            subIndex
-                                          )
-                                        }
-                                        className={`w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2 ${readOnly || childRecord.current > 0
-                                          ? "text-gray-600"
-                                          : "text-black"
-                                          }`}
-                                        disabled={
-                                          readOnly || childRecord.current > 0
-                                        }
-                                      />
-                                    </td>
+
                                     <td className="border border-gray-300 text-[12px] py-0.5 item-center ">
                                       <input
                                         min={"0"}
@@ -1651,12 +1706,12 @@ const handleDeleteAllQuarterRows = (parentIndex) => {
                                             subIndex
                                           );
                                         }}
-                                        className={`w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2 ${readOnly || childRecord.current > 0
+                                        className={`w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2 ${readOnly || childRecord.current > 0 
                                           ? "text-gray-600"
                                           : "text-black"
                                           }`}
                                         disabled={
-                                          readOnly || childRecord.current > 0
+                                          readOnly || childRecord.current > 0 || isShiftCount
                                         }
                                       />
                                     </td>
@@ -1761,6 +1816,7 @@ const handleDeleteAllQuarterRows = (parentIndex) => {
                                     </td>
                                   </tr>
                                 )
+                              }
                               )}
                             </tbody>
                           </table>

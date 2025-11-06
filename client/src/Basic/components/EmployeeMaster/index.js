@@ -873,6 +873,18 @@ export default function Form() {
       });
       return false;
     }
+    if (
+      familyDetails?.some(
+        (i) => !i.relationShipId || i.relationShipId === ""
+      )
+    ) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Family Details  Is Missing...!!!",
+      });
+      return;
+    }
 
 
 

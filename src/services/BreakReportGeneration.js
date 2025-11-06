@@ -130,7 +130,7 @@ MorningBreakEval AS (
     COUNT(punchTime) AS punchCount,
     TIMESTAMPDIFF(MINUTE, MIN(punchTime), MAX(punchTime)) AS breakDuration
   FROM BreakPunches
-  WHERE TIME(punchTime) BETWEEN fbOut AND ADDTIME(fbIn, '00:30:00')
+  WHERE TIME(punchTime) BETWEEN SUBTIME(fbOut, '00:05:00') AND ADDTIME(fbIn, '00:30:00')
   GROUP BY empId, mIdCard, firstName, shiftId, fbOut, fbIn
 ),
 
@@ -167,7 +167,7 @@ EveningBreakEval AS (
     COUNT(punchTime) AS eveningPunchCount,
     TIMESTAMPDIFF(MINUTE, MIN(punchTime), MAX(punchTime)) AS eveningBreakDuration
   FROM BreakPunches
-  WHERE TIME(punchTime) BETWEEN sbOut AND ADDTIME(sbIn, '00:30:00')
+  WHERE TIME(punchTime) BETWEEN SUBTIME(sbOut,'00:05:00') AND ADDTIME(sbIn, '00:30:00')
   GROUP BY empId, mIdCard, firstName, shiftId, sbOut, sbIn
 )
 

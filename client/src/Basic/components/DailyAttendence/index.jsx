@@ -60,7 +60,10 @@ const Form = () => {
   return (
     <div>
       <div onKeyDown={handleKeyDown} className="p-1 ">
-        <div className="w-full flex bg-white p-1 justify-between  items-center">
+
+
+
+        <div className="w-full flex bg-white p-1 justify-between   items-center">
           <h1 className="master-header">Attendence Generation</h1>
           <div className="flex items-center gap-x-4">
             <select
@@ -90,106 +93,10 @@ const Form = () => {
 
 
         <div
-          className={` mt-3  p-2 overflow-auto bg-white max-h-[600px]`}
+          className={` mt-3  p-2 overflow-scroll bg-white max-h-[600px]`}
         >
           <table className="w-full border-collapse table-fixed ">
-            {/* <thead className="bg-gray-200 text-gray-800">
-              <tr>
-                <th
-                  className={`w-[15px] px-1 text-center font-medium text-[13px] `}
-                >
-                  S.No
-                </th>
 
-                <th
-                  className={`w-12  py-2 text-center font-medium text-[13px] `}
-                >
-                  Employee MId
-                </th>
-                <th
-                  className={`w-[45px]  py-2 text-center font-medium text-[13px] `}
-                >
-                  Employee Name
-                </th>
-                <th
-                  className={`w-[45px]  py-2 text-center font-medium text-[13px] `}
-                >
-                  Shift
-                </th>
-                <th
-                  className={`w-[45px]  py-2 text-center font-medium text-[13px] `}
-                >
-                  Department
-                </th>
-                <th
-                  className={`w-[45px]  py-2 text-center font-medium text-[13px] `}
-                >
-                  Designation
-                </th>
-                <th
-                  className={`w-8  py-2 item-center font-medium text-[13px] `}
-                >
-                  In Date
-                </th>
-                <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
-                  In
-                </th>
-                <th
-                  className={`w-8 py-2 item-center font-medium text-[13px] `}
-                >
-                  Out Date
-                </th>
-                <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
-                  Out
-                </th>
-
-                <th
-                  className={`${reportView === "Seperate" ? "w-8 " : "w-32 "
-                    }  py-2 text-center font-medium text-[13px] `}
-                >
-
-                </th>
-                {
-                  reportView === "Single" ?
-                    <th className={`w-12 py-2 item-center font-medium text-[13px] `}>
-                      Total worked Hours
-                    </th> : null
-                }
-                {
-                  reportView === "Single" ?
-                    <th className={`w-12 py-2 item-center font-medium text-[13px] `}>
-                      OT Hours
-                    </th> : null
-                }
-
-                <th
-                  className={`w-8 py-2  item-center font-medium text-[13px] `}
-                >
-
-                </th>
-
-                <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
-
-                </th>
-                <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
-
-                </th>
-                {
-                  reportView === "Seperate" ?
-                    <th className={`w-12 py-2 item-center font-medium text-[13px] `}>
-                      Total worked Hours
-                    </th> : null
-                }
-                {
-                  reportView === "Seperate" ?
-                    <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
-                      OT Hours
-                    </th> : null
-                }
-
-              </tr>
-             
-            </thead> */}
             <thead className="bg-gray-200 text-gray-800 ">
               <tr>
                 <th
@@ -206,7 +113,7 @@ const Form = () => {
                 <th
                   className={`w-[45px]  py-2 text-center font-medium text-[13px] `}
                 >
-                  Employee Name
+                  Emp Name
                 </th>
                 <th
                   className={`w-[35px]  py-2 text-center font-medium text-[13px] `}
@@ -252,6 +159,9 @@ const Form = () => {
                 </th>
                 <th className={`w-[40px] py-2 item-center font-medium text-[13px] `}>
                   OT Hours
+                </th>
+                <th className={`w-[40px] py-2 item-center font-medium text-[13px] `}>
+                  Shift Count
                 </th>
 
               </tr>
@@ -494,6 +404,17 @@ const Form = () => {
 
                         }
                         className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />
+                    </td>
+                    <td
+                      rowSpan={2}
+                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+
+                      <input
+                        type="number"
+
+                        className={`w-full bg-transparent text-right pr-2 focus:outline-none focus:border-transparent  `}
                       />
                     </td>
 
@@ -749,7 +670,7 @@ const Form = () => {
                         <td colSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
                           <input
                             type="text"
-                       
+
                             value={[
                               item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
                               item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
@@ -793,6 +714,17 @@ const Form = () => {
 
                         }
                         className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />
+                    </td>
+                    <td
+                      rowSpan={2}
+                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+
+                      <input
+                        type="number"
+
+                        className={`w-full bg-transparent text-right pr-2 focus:outline-none focus:border-transparent  `}
                       />
                     </td>
                   </tr>
@@ -885,8 +817,8 @@ const Form = () => {
               ))}
             </tbody>
           </table>
-        </div>
 
+        </div>
         {form === true && (
           <Modal
             isOpen={form}

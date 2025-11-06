@@ -15,14 +15,7 @@ async function getNextDocId(
   endTime,
   isTaxBill
 ) {
-  console.log(
-    'argumnts : ',
-    branchId,
-    shortCode,
-    startTime,
-    endTime,
-    isTaxBill
-  );
+ 
 
   let lastObject = await prisma.payFrequency.findFirst({
     where: {
@@ -48,7 +41,6 @@ async function getNextDocId(
 async function get(req) {
   const { companyId, active, branchId, finYearId, searchDocId } = req.query;
 
-  console.log(companyId, active, finYearId, 'received');
 
   const data = await prisma.payFrequency.findMany({
     where: {
@@ -137,16 +129,13 @@ async function getSearch(req) {
 
 async function create(body) {
   const {
-    name,
     branchId,
     companyId,
     active,
-    description,
-    docId,
+  
     finYearId,
     payFrequencyType = [],
   } = body;
-  console.log(payFrequencyType, 'payFrequency');
 
   let data;
 
@@ -243,7 +232,7 @@ async function update(id, body) {
 
         if (createdType && type.payFrequencyItems?.length > 0) {
           await tx.payFrequencyItems.createMany({
-            data: type.payFrequencyItems.map((item) => ({
+            data: type.payFrequencyItems?.map((item) => ({
               payFrequencyTypeId: createdType.id,
               startDate: item?.startDate ? new Date(item.startDate) : undefined,
               endDate: item?.endDate ? new Date(item.endDate) : undefined,
