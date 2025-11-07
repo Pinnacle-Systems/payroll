@@ -46,8 +46,8 @@ async function get(req) {
       //   active: active ? Boolean(active) : undefined,
       docId: Boolean(searchDocId)
         ? {
-            contains: searchDocId,
-          }
+          contains: searchDocId,
+        }
         : undefined,
     },
     include: {
@@ -63,17 +63,17 @@ async function get(req) {
   let finYearDate = await getFinYearStartTimeEndTime(finYearId);
   const shortCode = finYearDate
     ? getYearShortCodeForFinYear(
-        finYearDate?.startDateStartTime,
-        finYearDate?.endDateEndTime
-      )
+      finYearDate?.startDateStartTime,
+      finYearDate?.endDateEndTime
+    )
     : "";
   let newDocId = finYearDate
     ? await getNextDocId(
-        branchId,
-        shortCode,
-        finYearDate?.startDateStartTime,
-        finYearDate?.endDateEndTime
-      )
+      branchId,
+      shortCode,
+      finYearDate?.startDateStartTime,
+      finYearDate?.endDateEndTime
+    )
     : "";
 
   return { statusCode: 0, nextDocId: newDocId, data };
@@ -95,7 +95,7 @@ async function getOne(id) {
     },
   });
   if (!data) return NoRecordFound("ShiftTemplate");
-  return { statusCode: 0, data};
+  return { statusCode: 0, data };
 }
 
 async function getSearch(req) {
@@ -125,7 +125,7 @@ async function getSearch(req) {
 async function create(body) {
   const { branchId, companyId, active, categoryId, finYearId, ShiftTemplateItems } =
     await body;
-let finYearDate = await getFinYearStartTimeEndTime(finYearId);
+  let finYearDate = await getFinYearStartTimeEndTime(finYearId);
   const shortCode = finYearDate
     ? getYearShortCodeForFinYear(finYearDate?.startTime, finYearDate?.endTime)
     : "";
@@ -151,70 +151,71 @@ let finYearDate = await getFinYearStartTimeEndTime(finYearId);
         ShiftTemplateItems:
           ShiftTemplateItems?.length > 0
             ? {
-                create: ShiftTemplateItems?.map((item) => ({
-                  date: item?.date ? new Date(item?.date) : null,
-                  shiftCommonTemplateId: item?.shiftCommonTemplateId
-                    ? parseInt(item.shiftCommonTemplateId)
+              create: ShiftTemplateItems?.map((item) => ({
+                date: item?.date ? new Date(item?.date) : null,
+                shiftCommonTemplateId: item?.shiftCommonTemplateId
+                  ? parseInt(item.shiftCommonTemplateId)
+                  : undefined,
+                shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
+                inNextDay: item?.inNextDay ? item.inNextDay : undefined,
+                toleranceInBeforeStart: item?.toleranceInBeforeStart
+                  ? item.toleranceInBeforeStart
+                  : undefined,
+                startTime: item?.startTime ? item.startTime : undefined,
+                toleranceInAfterEnd: item?.toleranceInAfterEnd
+                  ? item.toleranceInAfterEnd
+                  : undefined,
+                fbOut: item?.fbOut ? item.fbOut : undefined,
+                fbIn: item?.fbIn ? item.fbIn : undefined,
+                lunchBst: item?.lunchBst ? item.lunchBst : undefined,
+                lBSNDay: item?.lBSNDay ? item.lBSNDay : undefined,
+                lunchBET: item?.lunchBET ? item.lunchBET : undefined,
+                lBEnday: item?.lBEnday ? item.lBEnday : undefined,
+                sbOut: item?.sbOut ? item.sbOut : undefined,
+                sbIn: item?.sbIn ? item.sbIn : undefined,
+                toleranceOutBeforeStart: item?.toleranceOutBeforeStart
+                  ? item.toleranceOutBeforeStart
+                  : undefined,
+                endTime: item?.endTime ? item.endTime : undefined,
+                toleranceOutAfterEnd: item?.toleranceOutAfterEnd
+                  ? item.toleranceOutAfterEnd
+                  : undefined,
+                outNxtDay: item?.outNxtDay ? item.outNxtDay : undefined,
+                shiftTimeHrs: item?.shiftTimeHrs
+                  ? item.shiftTimeHrs
+                  : undefined,
+                otHrs: item?.otHrs ? item.otHrs : undefined,
+                quater: item?.quater ? item.quater : undefined,
+                QuarterDetails:
+                  item?.quarterDetails?.length > 0
+                    ? {
+                      createMany: {
+                        data: item?.quarterDetails?.map((q) => ({
+                          day: q.day || "",
+                          oTDetailsId: q.oTDetailsId
+                            ? parseInt(q.oTDetailsId)
+                            : undefined,
+                          name: q.name || '',
+                          ftMins: q.ftMins ? parseInt(q.ftMins) : undefined,
+                          from: q.from || "",
+                          to: q.to || "",
+                          ttMins: q.ttMins ? parseInt(q.ttMins) : undefined,
+                          endTime: q.endTime
+                            ? parseInt(q.endTime)
+                            : undefined,
+                          nextDay: q.nextDay || "",
+                          checkHrs: q.checkHrs
+                            ? parseInt(q.checkHrs)
+                            : undefined,
+                          total: q.total || "",
+                          pickFrom: q.pickFrom || "",
+                          formula: q.formula || "",
+                        })),
+                      },
+                    }
                     : undefined,
-                  shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
-                  inNextDay: item?.inNextDay ? item.inNextDay : undefined,
-                  toleranceInBeforeStart: item?.toleranceInBeforeStart
-                    ? item.toleranceInBeforeStart
-                    : undefined,
-                  startTime: item?.startTime ? item.startTime : undefined,
-                  toleranceInAfterEnd: item?.toleranceInAfterEnd
-                    ? item.toleranceInAfterEnd
-                    : undefined,
-                  fbOut: item?.fbOut ? item.fbOut : undefined,
-                  fbIn: item?.fbIn ? item.fbIn : undefined,
-                  lunchBst: item?.lunchBst ? item.lunchBst : undefined,
-                  lBSNDay: item?.lBSNDay ? item.lBSNDay : undefined,
-                  lunchBET: item?.lunchBET ? item.lunchBET : undefined,
-                  lBEnday: item?.lBEnday ? item.lBEnday : undefined,
-                  sbOut: item?.sbOut ? item.sbOut : undefined,
-                  sbIn: item?.sbIn ? item.sbIn : undefined,
-                  toleranceOutBeforeStart: item?.toleranceOutBeforeStart
-                    ? item.toleranceOutBeforeStart
-                    : undefined,
-                  endTime: item?.endTime ? item.endTime : undefined,
-                  toleranceOutAfterEnd: item?.toleranceOutAfterEnd
-                    ? item.toleranceOutAfterEnd
-                    : undefined,
-                  outNxtDay: item?.outNxtDay ? item.outNxtDay : undefined,
-                  shiftTimeHrs: item?.shiftTimeHrs
-                    ? item.shiftTimeHrs
-                    : undefined,
-                  otHrs: item?.otHrs ? item.otHrs : undefined,
-                  quater: item?.quater ? item.quater : undefined,
-                  QuarterDetails:
-                    item?.quarterDetails?.length > 0
-                      ? {
-                          createMany: {
-                            data: item?.quarterDetails?.map((q) => ({
-                              day: q.day || "",
-                              oTDetailsId: q.oTDetailsId
-                                ? parseInt(q.oTDetailsId)
-                                : undefined,
-                              ftMins: q.ftMins ? parseInt(q.ftMins) : undefined,
-                              from: q.from || "",
-                              to: q.to || "",
-                              ttMins: q.ttMins ? parseInt(q.ttMins) : undefined,
-                              endTime: q.endTime
-                                ? parseInt(q.endTime)
-                                : undefined,
-                              nextDay: q.nextDay || "",
-                              checkHrs: q.checkHrs
-                                ? parseInt(q.checkHrs)
-                                : undefined,
-                              total: q.total ? parseInt(q.total) : undefined,
-                              pickFrom: q.pickFrom || "",
-                              formula: q.formula || "",
-                            })),
-                          },
-                        }
-                      : undefined,
-                })),
-              }
+              })),
+            }
             : undefined,
       },
     });
@@ -520,41 +521,24 @@ async function updateShiftTemplateItems(tx, newItems, existingData) {
           quater: item?.quater ?? undefined,
           QuarterDetails: item?.quarterDetails?.length
             ? {
-                deleteMany: {
-                  id: {
-                    notIn: item.quarterDetails
-                      .filter((q) => q.id)
-                      .map((q) => parseInt(q.id)),
-                  },
+              deleteMany: {
+                id: {
+                  notIn: item.quarterDetails
+                    .filter((q) => q.id)
+                    .map((q) => parseInt(q.id)),
                 },
-                update: item.quarterDetails
-                  .filter((q) => q.id)
-                  .map((q) => ({
-                    where: { id: parseInt(q.id) },
-                    data: {
-                      day: q.day || "",
-                      oTDetailsId: q.oTDetailsId
-                        ? parseInt(q.oTDetailsId)
-                        : undefined,
-                      ftMins: q.ftMins ? parseInt(q.ftMins) : undefined,
-                      from: q.from || "",
-                      to: q.to || "",
-                      ttMins: q.ttMins ? parseInt(q.ttMins) : undefined,
-                      endTime: q.endTime ? parseInt(q.endTime) : undefined,
-                      nextDay: q.nextDay || "",
-                      checkHrs: q.checkHrs ? parseInt(q.checkHrs) : undefined,
-                      total: q.total ? parseInt(q.total) : undefined,
-                      pickFrom: q.pickFrom || "",
-                      formula: q.formula || "",
-                    },
-                  })),
-                create: item.quarterDetails
-                  .filter((q) => !q.id)
-                  .map((q) => ({
+              },
+              update: item.quarterDetails
+                .filter((q) => q.id)
+                .map((q) => ({
+                  where: { id: parseInt(q.id) },
+                  data: {
                     day: q.day || "",
                     oTDetailsId: q.oTDetailsId
                       ? parseInt(q.oTDetailsId)
                       : undefined,
+                    name: q.name || '',
+
                     ftMins: q.ftMins ? parseInt(q.ftMins) : undefined,
                     from: q.from || "",
                     to: q.to || "",
@@ -562,11 +546,29 @@ async function updateShiftTemplateItems(tx, newItems, existingData) {
                     endTime: q.endTime ? parseInt(q.endTime) : undefined,
                     nextDay: q.nextDay || "",
                     checkHrs: q.checkHrs ? parseInt(q.checkHrs) : undefined,
-                    total: q.total ? parseInt(q.total) : undefined,
+                    total: q.total || '',
                     pickFrom: q.pickFrom || "",
                     formula: q.formula || "",
-                  })),
-              }
+                  },
+                })),
+              create: item.quarterDetails?.filter((q) => !q.id)?.map((q) => ({
+                  day: q.day || "",
+                  oTDetailsId: q.oTDetailsId
+                    ? parseInt(q.oTDetailsId)
+                    : undefined,
+                  name: q.name || '',
+                  ftMins: q.ftMins ? parseInt(q.ftMins) : undefined,
+                  from: q.from || "",
+                  to: q.to || "",
+                  ttMins: q.ttMins ? parseInt(q.ttMins) : undefined,
+                  endTime: q.endTime ? parseInt(q.endTime) : undefined,
+                  nextDay: q.nextDay || "",
+                  checkHrs: q.checkHrs ? parseInt(q.checkHrs) : undefined,
+                  total: q.total || '',
+                  pickFrom: q.pickFrom || "",
+                  formula: q.formula || "",
+                })),
+            }
             : undefined,
         },
       });
@@ -602,23 +604,24 @@ async function updateShiftTemplateItems(tx, newItems, existingData) {
           quater: item?.quater ?? undefined,
           QuarterDetails: item?.quarterDetails?.length
             ? {
-                create: item.quarterDetails.map((q) => ({
-                  day: q.day || "",
-                  oTDetailsId: q.oTDetailsId
-                    ? parseInt(q.oTDetailsId)
-                    : undefined,
-                  ftMins: q.ftMins ? parseInt(q.ftMins) : undefined,
-                  from: q.from || "",
-                  to: q.to || "",
-                  ttMins: q.ttMins ? parseInt(q.ttMins) : undefined,
-                  endTime: q.endTime ? parseInt(q.endTime) : undefined,
-                  nextDay: q.nextDay || "",
-                  checkHrs: q.checkHrs ? parseInt(q.checkHrs) : undefined,
-                  total: q.total ? parseInt(q.total) : undefined,
-                  pickFrom: q.pickFrom || "",
-                  formula: q.formula || "",
-                })),
-              }
+              create: item.quarterDetails?.map((q) => ({
+                day: q.day || "",
+                oTDetailsId: q.oTDetailsId
+                  ? parseInt(q.oTDetailsId)
+                  : undefined,
+                name: q.name || '',
+                ftMins: q.ftMins ? parseInt(q.ftMins) : undefined,
+                from: q.from || "",
+                to: q.to || "",
+                ttMins: q.ttMins ? parseInt(q.ttMins) : undefined,
+                endTime: q.endTime ? parseInt(q.endTime) : undefined,
+                nextDay: q.nextDay || "",
+                checkHrs: q.checkHrs ? parseInt(q.checkHrs) : undefined,
+                total: q.total || '',
+                pickFrom: q.pickFrom || "",
+                formula: q.formula || "",
+              })),
+            }
             : undefined,
         },
       });

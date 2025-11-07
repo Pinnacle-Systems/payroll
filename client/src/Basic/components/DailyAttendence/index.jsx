@@ -59,7 +59,7 @@ const Form = () => {
 
   return (
     <div>
-      <div onKeyDown={handleKeyDown} className="p-1 ">
+      <div onKeyDown={handleKeyDown} className="p-1 h-[70vh]">
 
 
 
@@ -111,12 +111,12 @@ const Form = () => {
                   Emp MId
                 </th>
                 <th
-                  className={`w-[45px]  py-2 text-center font-medium text-[13px] `}
+                  className={`w-[50px]  py-2 text-center font-medium text-[13px] `}
                 >
                   Emp Name
                 </th>
                 <th
-                  className={`w-[35px]  py-2 text-center font-medium text-[13px] `}
+                  className={`w-[30px]  py-2 text-center font-medium text-[13px] `}
                 >
                   Shift
                 </th>
@@ -413,7 +413,7 @@ const Form = () => {
 
                       <input
                         type="number"
-
+                        value={item?.formulaResult}
                         className={`w-full bg-transparent text-right pr-2 focus:outline-none focus:border-transparent  `}
                       />
                     </td>

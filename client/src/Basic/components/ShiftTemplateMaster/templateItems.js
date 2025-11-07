@@ -1375,7 +1375,7 @@ const TemplateItems = ({
                                 </th>
 
                                 <th
-                                  className={`w-8 py-2 text-center font-medium text-[13px] `}
+                                  className={`w-12 py-2 text-center font-medium text-[13px] `}
                                 >
                                   Total
                                 </th>
@@ -1452,13 +1452,20 @@ const TemplateItems = ({
                                               opt.value === val?.oTDetailsId
                                           ) || null
                                         } // ensure not undefined
-                                        onChange={(selected) =>
+                                        onChange={(selected) => {
                                           handleInputChange(
                                             selected?.value || "",
                                             selectedIndex,
                                             "oTDetailsId",
                                             subIndex
-                                          )
+                                          );
+                                          handleInputChange(
+                                            selected?.label || "",
+                                            selectedIndex,
+                                            "name",
+                                            subIndex
+                                          );
+                                        }
                                         }
                                         isDisabled={readOnly || !val?.day}
                                         placeholder="Select "
@@ -1679,8 +1686,9 @@ const TemplateItems = ({
 
                                     <td className="border border-gray-300 text-[12px] py-0.5 item-center ">
                                       <input
-                                        min={"0"}
-                                        type="number"
+                                        min="0"
+                                        type="time" // enforce proper format
+                                        step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
                                         value={val?.total}
                                         onFocus={(e) => e.target.select()}
                                         onChange={(e) =>
@@ -1691,22 +1699,22 @@ const TemplateItems = ({
                                             subIndex
                                           )
                                         }
-                                        onBlur={(e) => {
-                                          const formatted =
-                                            e.target.value === ""
-                                              ? ""
-                                              : Number(e.target.value).toFixed(
-                                                2
-                                              );
-                                          e.target.value = formatted;
-                                          handleInputChange(
-                                            e.target.value,
-                                            selectedIndex,
-                                            "total",
-                                            subIndex
-                                          );
-                                        }}
-                                        className={`w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2 ${readOnly || childRecord.current > 0 
+                                        // onBlur={(e) => {
+                                        //   const formatted =
+                                        //     e.target.value === ""
+                                        //       ? ""
+                                        //       : Number(e.target.value).toFixed(
+                                        //         2
+                                        //       );
+                                        //   e.target.value = formatted;
+                                        //   handleInputChange(
+                                        //     e.target.value,
+                                        //     selectedIndex,
+                                        //     "total",
+                                        //     subIndex
+                                        //   );
+                                        // }}
+                                        className={`w-full bg-transparent   focus:outline-none focus:border-transparent text-right pr-2 ${readOnly || childRecord.current > 0
                                           ? "text-gray-600"
                                           : "text-black"
                                           }`}

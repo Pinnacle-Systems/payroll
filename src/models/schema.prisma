@@ -401,8 +401,8 @@ model EmployeeEducationDetails {
 }
 
 model EmployeeFamilyDetails {
-  id             Int           @id @default(autoincrement())
-  employee       Employee?     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  id             Int          @id @default(autoincrement())
+  employee       Employee?    @relation(fields: [employeeId], references: [id], onDelete: Cascade)
   employeeId     Int?
   name           String?
   dob            DateTime?
@@ -1470,6 +1470,7 @@ model QuarterDetails {
   day                  String?
   OTDetails            OTDetails?          @relation(fields: [oTDetailsId], references: [id])
   oTDetailsId          Int?
+  name                 String?
   ftMins               Int?
   from                 String?
   to                   String?
@@ -1477,7 +1478,7 @@ model QuarterDetails {
   endTime              Int?
   nextDay              String?
   checkHrs             Int?
-  total                Int?
+  total                String?
   pickFrom             String?
   formula              String?
 }
