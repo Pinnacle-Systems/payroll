@@ -237,7 +237,17 @@ SELECT
         )
     ) THEN 'Regular'
     ELSE 'Irregular'
-  END AS status 
+  END AS status ,
+    -- ✅ NEW: Collect all punches into JSON array
+  (
+    SELECT JSON_ARRAYAGG(
+      JSON_OBJECT(
+        'timestamp', p.timestamp
+      )
+    )
+    FROM PythonPunchData p
+    WHERE p.mIdCard = e.mIdCard AND DATE(p.timestamp) = ${date}
+  ) AS punchesArray
 
 FROM Employee e
 LEFT JOIN Attendance a ON e.mIdCard = a.mIdCard
@@ -272,7 +282,11 @@ ORDER BY e.id;
     shiftTemplateId: row.shiftTemplateId || null, // add this
 
     shiftCount: 0, // placeholder, we’ll calculate below
-        formulaResult: 0, // default value
+    formulaResult: 0, // default value
+    punches:
+      typeof row.punchesArray === "string"
+        ? JSON.parse(row.punchesArray)
+        : row.punchesArray || [],
 
 
   }));
@@ -305,9 +319,46 @@ ORDER BY e.id;
       continue;
     }
 
-    const punchesTime = punches.map(p => p.timestamp.toISOString().split("T")[1].substr(0, 8));
+    // const punchesTime = punches.map(p => p.timestamp.toISOString().split("T")[1].substr(0, 8));
+    // ✅ Combine all punches safely, converting Date → HH:MM:SS
+    // const punchesTime = [
+    //   emp.inTime,
+    //   emp.firstBreakIn,
+    //   emp.firstBreakOut,
+    //   emp.lunchBreakIn,
+    //   emp.lunchBreakOut,
+    //   emp.eveningBreakIn,
+    //   emp.eveningBreakOut,
+    //   emp.outTime
+    // ]
+    //   .filter(Boolean) // remove null/undefined
+    //   .map(t => {
+    //     if (t instanceof Date) {
+    //       // Extract HH:MM:SS from Date
+    //       return t.toISOString().split("T")[1].substring(0, 8);
+    //     } else if (typeof t === "string") {
+    //       // In case it's already a string like "09:05:12"
+    //       return t.substring(0, 8);
+    //     } else {
+    //       return String(t).substring(0, 8);
+    //     }
+    //   });
 
-    // const punchesTime = punches.map(p => toISTTimeStr(new Date(p.timestamp)));
+    const punchesTime = (emp.punches || [])
+      .map(p => {
+        const ts = p.timestamp;
+        if (!ts) return null;
+
+        const dateObj = new Date(ts);
+        if (isNaN(dateObj)) return null;
+
+        // ✅ Format in local time (HH:mm:ss)
+        return dateObj.toLocaleTimeString("en-GB", { hour12: false });
+      })
+      .filter(Boolean);
+
+
+    console.log(punchesTime, "punchesTime");
 
     const quarterValues = {};
 
@@ -331,7 +382,7 @@ ORDER BY e.id;
         const workedMins = Math.max(...punchMinsArray) - Math.min(...punchMinsArray);
         const totalMins = timeStrToMinutes(q.total);
 
-        const value = workedMins >= totalMins ? 4.5 : 0;
+        const value = workedMins >= totalMins ? 4 : 0;
         quarterValues[q.name] = value;
         console.log(`Employee ${emp.firstName} - Quarter ${q.name} punches:`, quarterPunches);
 
@@ -341,7 +392,7 @@ ORDER BY e.id;
       } else {
         console.log(`Employee ${emp.firstName} - Quarter ${q.name} has no punches in range`);
         quarterValues[q.name] = 0; // no punches = 0
-      console.log(`${q.name} value = 0`);
+        console.log(`${q.name} value = 0`);
 
       }
 
@@ -359,7 +410,7 @@ ORDER BY e.id;
       }
 
       const formulaResult = safeEval(formulaExpr);
-            emp.formulaResult = formulaResult;
+      emp.formulaResult = formulaResult;
 
       console.log(`Employee ${emp.firstName} - Formula result:`, formulaResult);
     }

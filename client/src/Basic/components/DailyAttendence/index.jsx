@@ -723,7 +723,7 @@ const Form = () => {
 
                       <input
                         type="number"
-
+                        value={item?.formulaResult}
                         className={`w-full bg-transparent text-right pr-2 focus:outline-none focus:border-transparent  `}
                       />
                     </td>

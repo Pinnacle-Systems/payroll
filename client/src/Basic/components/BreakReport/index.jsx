@@ -12,9 +12,17 @@ import { getCommonParams } from "../../../Utils/helper";
 import Swal from "sweetalert2";
 import moment from "moment-timezone";
 import EmployeeBreakRow from './EmployeeBreakRow'
+import { PDFViewer } from "@react-pdf/renderer";
+import PrintFormat from "./PrintFormat";
+import tw from "../../../Utils/tailwind-react-pdf";
+import { FiChevronRight, FiPrinter } from "react-icons/fi";
+import ExcelJS from "exceljs";
+
 const Form = () => {
   const [date, setDate] = useState("");
   const [employeeCategoryId, setEmployeeCategoryId] = useState("");
+  const [printModalOpen, setPrintModalOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const [form, setForm] = useState(true);
   const childRecord = useRef(0);
@@ -76,7 +84,6 @@ const Form = () => {
   const eveningSinglePunchData =
     allData?.data?.filter((item) => item.eveningBreakStatus === "Evening Only One Punch Available") || [];
 
-  console.log("lunchregularData:", lunchregularData);
   const prepareEmployeeData = () => {
     // Get ALL unique employees from ALL data sources
     const allEmployeesMap = new Map();
@@ -168,19 +175,236 @@ const Form = () => {
     lunchregularData, lunchirregularData, lunchSinglePunchData, lunchabsentData,
     eveningregularData, eveningirregularData, eveningSinglePunchData, eveningabsentData
   ]);
+
+
+
+
+  const handleDownloadExcel = async () => {
+    if (!employeeData || employeeData.length === 0) {
+      Swal.fire("No Data", "There is no data to export!", "info");
+      return;
+    }
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet("Break Report");
+
+    // === Helper Functions ===
+    const formatDateISO = (isoStr) => (isoStr ? isoStr.split("T")[0] : "");
+    const formatTimeISO = (isoStr) => {
+      if (!isoStr) return "";
+      const t = isoStr.split("T")[1];
+      return t ? t.split(".")[0] : "";
+    };
+    const formatStatus = (status) => {
+      if (!status) return "";
+      const val = status.toLowerCase();
+      if (val.includes("correct")) return "On Time";
+      if (val.includes("no punches")) return "No Punch";
+      if (val.includes("delayed")) return "Delayed";
+      if (val.includes("only one")) return "One Punch";
+      return status;
+    };
+
+    // === Title Row ===
+    worksheet.mergeCells("A1:R1");
+    const titleCell = worksheet.getCell("A1");
+    titleCell.value = "Employees Break Report";
+    titleCell.alignment = { horizontal: "center", vertical: "middle" };
+    titleCell.font = { bold: true, size: 14 };
+    worksheet.getRow(1).height = 25;
+
+    // === Header Rows ===
+    worksheet.addRow([
+      "S.No", "Emp MID", "Emp Name", "Department", "Designation", "Date",
+      "Morning Tea Break", "", "", "", "Lunch Break", "", "", "",
+      "Evening Tea Break", "", "", ""
+    ]);
+    worksheet.addRow([
+      "", "", "", "", "", "",
+      "Out", "In", "Duration", "Status",
+      "Out", "In", "Duration", "Status",
+      "Out", "In", "Duration", "Status"
+    ]);
+
+    // === Merge parent headers ===
+    worksheet.mergeCells("A2:A3");
+    worksheet.mergeCells("B2:B3");
+    worksheet.mergeCells("C2:C3");
+    worksheet.mergeCells("D2:D3");
+    worksheet.mergeCells("E2:E3");
+    worksheet.mergeCells("F2:F3");
+    worksheet.mergeCells("G2:J2"); // Morning
+    worksheet.mergeCells("K2:N2"); // Lunch
+    worksheet.mergeCells("O2:R2"); // Evening
+
+    // === Style Header Rows (always centered) ===
+    [2, 3].forEach((r) => {
+      const row = worksheet.getRow(r);
+      row.eachCell((cell) => {
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFD9D9D9" },
+        };
+        cell.font = { bold: true, color: { argb: "FF000000" } };
+        cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
+        cell.border = {
+          top: { style: "thin" },
+          left: { style: "thin" },
+          bottom: { style: "thin" },
+          right: { style: "thin" },
+        };
+      });
+    });
+
+    worksheet.getRow(2).height = 22;
+    worksheet.getRow(3).height = 22;
+
+    // === Column Widths ===
+    worksheet.columns = [
+      { width: 10 },
+      { width: 14 },
+      { width: 24 },
+      { width: 20 },
+      { width: 28 },
+      { width: 14 },
+      { width: 12 }, { width: 12 }, { width: 14 }, { width: 14 },
+      { width: 12 }, { width: 12 }, { width: 14 }, { width: 14 },
+      { width: 12 }, { width: 12 }, { width: 14 }, { width: 14 },
+    ];
+
+    // === Data Rows ===
+    employeeData.forEach((emp, index) => {
+      const row = worksheet.addRow([
+        index + 1,
+        emp.mIdCard || "",
+        emp.firstName || "",
+        emp.departmentName || "",
+        emp.designationName || "",
+        formatDateISO(emp.reportDate),
+        formatTimeISO(emp.firstBreakOut),
+        formatTimeISO(emp.firstBreakIn),
+        emp.breakDuration || "",
+        formatStatus(emp.morningBreakStatus),
+        formatTimeISO(emp.lunchBreakOut),
+        formatTimeISO(emp.lunchBreakIn),
+        emp.lunchBreakDuration || "",
+        formatStatus(emp.lunchBreakStatus),
+        formatTimeISO(emp.eveningBreakOut),
+        formatTimeISO(emp.eveningBreakIn),
+        emp.eveningBreakDuration || "",
+        formatStatus(emp.eveningBreakStatus),
+      ]);
+
+      // ✅ Add padding for data cells only
+      row.eachCell((cell) => {
+        cell.alignment = {
+          ...cell.alignment,
+          indent: 1, // adds left/right padding
+          vertical: "middle",
+        };
+      });
+
+      // ✅ Apply status color
+      const statusCells = [row.getCell(10), row.getCell(14), row.getCell(18)];
+      statusCells.forEach((cell) => {
+        const text = (cell.value || "").toLowerCase();
+        let color = null;
+
+        if (text.includes("on time")) color = "FF166534"; // Green
+        else if (text.includes("delayed")) color = "FFF97316"; // Orange
+        else if (text.includes("no punch")) color = "FFEF4444"; // Red
+        else if (text.includes("one punch")) color = "FF2563EB"; // Blue
+
+        if (color) {
+          cell.font = { color: { argb: color }, bold: true };
+        }
+        cell.alignment = { ...cell.alignment, horizontal: "center" };
+      });
+
+      // ✅ Borders
+      row.eachCell((cell) => {
+        cell.border = {
+          top: { style: "thin", color: { argb: "FFDDDDDD" } },
+          left: { style: "thin", color: { argb: "FFDDDDDD" } },
+          bottom: { style: "thin", color: { argb: "FFDDDDDD" } },
+          right: { style: "thin", color: { argb: "FFDDDDDD" } },
+        };
+      });
+
+      // ✅ Alignment per column
+      row.getCell(1).alignment = { horizontal: "center", indent: 1 };
+      row.getCell(2).alignment = { horizontal: "right", indent: 1 };
+      row.getCell(3).alignment = { horizontal: "left", indent: 1 };
+      row.getCell(4).alignment = { horizontal: "left", indent: 1 };
+      row.getCell(5).alignment = { horizontal: "left", indent: 1 };
+      row.getCell(6).alignment = { horizontal: "center", indent: 1 };
+      row.getCell(10).alignment = { horizontal: "left", indent: 1 };
+      row.getCell(14).alignment = { horizontal: "left", indent: 1 };
+      row.getCell(18).alignment = { horizontal: "left", indent: 1 };
+
+    });
+
+    // === Download ===
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Employee_Break_Report_${moment().format("YYYYMMDD_HHmmss")}.xlsx`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  };
+
   return (
     <div>
+      <Modal
+        isOpen={printModalOpen}
+        onClose={() => setPrintModalOpen(false)}
+        widthClass={"w-[90%] h-[90%]"}
+      >
+        <PDFViewer style={tw("w-full h-full")}>
+          <PrintFormat
+            employeeData={employeeData}
+            date={date}
+            reportTitle="Break Time Report"
+            generatedDate={moment().format('YYYY-MM-DD HH:mm')}
+          />
+
+        </PDFViewer>
+      </Modal>
+
       <div onKeyDown={handleKeyDown} className="p-1 ">
         <div className="w-full flex bg-white p-1 justify-between  items-center">
           <h1 className="master-header">DataWise Break Report</h1>
           <div className="flex items-center gap-x-4">
+
+            {/* <div className="flex gap-2 flex-wrap"> */}
+            <button
+              className="bg-white   border  border-black text-black-600 hover:bg-black hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+              onClick={() => setPrintModalOpen(true)}
+            >
+              <FiPrinter className="w-4 h-4" />
+              Print PDF
+            </button>
+            <button
+              className="bg-white   border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+              onClick={handleDownloadExcel}
+            >
+              <FiPrinter className="w-4 h-4" />
+              Download Excel
+            </button>
+            {/* </div> */}
 
             <button
               onClick={() => {
                 setForm(true);
                 OnNew();
               }}
-              className="bg-white w-[110px]  border ms-4 border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+              className="bg-white w-[110px]  border  border-blue-600 text-blue-600 hover:bg-blue-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
             >
               + Generate
             </button>
@@ -188,71 +412,71 @@ const Form = () => {
         </div>
 
 
-        
-          <div className="mt-3 w-full p-2 overflow-x-auto bg-white max-h-[580px]">
-            <table className="w-full  border-collapse table-fixed">
-              <thead className="bg-gray-200 text-gray-800">
-                <tr>
-                  <th className="w-[15px] px-1 text-center font-medium text-[13px]  ">S.No</th>
-                  <th className="w-6 py-2 text-center font-medium text-[13px]  ">Emp MId</th>
-                  <th className="w-[40px] py-2 text-center font-medium text-[13px]  ">Emp Name</th>
-                  <th className="w-[35px] py-2 text-center font-medium text-[13px]  ">Department</th>
-                  <th className="w-[55px] py-2 text-center font-medium text-[13px]  ">Designation</th>
-                  <th className="w-8 py-2 text-center font-medium text-[13px]  border-r border-gray-300">Date</th>
 
-                  {/* Morning Tea Break */}
-                  <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
-                    Morning Tea Break
-                  </th>
+        <div className="mt-3 w-full p-2 overflow-x-auto bg-white max-h-[580px]">
+          <table className="w-full  border-collapse table-fixed">
+            <thead className="bg-gray-200 text-gray-800">
+              <tr>
+                <th className="w-[15px] px-1 text-center font-medium text-[13px]  ">S.No</th>
+                <th className="w-6 py-2 text-center font-medium text-[13px]  ">Emp MId</th>
+                <th className="w-[40px] py-2 text-center font-medium text-[13px]  ">Emp Name</th>
+                <th className="w-[35px] py-2 text-center font-medium text-[13px]  ">Department</th>
+                <th className="w-[55px] py-2 text-center font-medium text-[13px]  ">Designation</th>
+                <th className="w-8 py-2 text-center font-medium text-[13px]  border-r border-gray-300">Date</th>
 
-                  {/* Lunch Break */}
-                  <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
-                    Lunch Break
-                  </th>
+                {/* Morning Tea Break */}
+                <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
+                  Morning Tea Break
+                </th>
 
-                  {/* Evening Tea Break */}
-                  <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
-                    Evening Tea Break
-                  </th>
-                </tr>
+                {/* Lunch Break */}
+                <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
+                  Lunch Break
+                </th>
 
-                {/* Sub-headers for each break */}
-                <tr>
-                  <th colSpan={6} className="border border-gray-300"></th>
+                {/* Evening Tea Break */}
+                <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
+                  Evening Tea Break
+                </th>
+              </tr>
 
-                  {/* Morning Tea Break sub-headers */}
-                  <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
-                  <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
-                  <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
-                  <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
+              {/* Sub-headers for each break */}
+              <tr>
+                <th colSpan={6} className="border border-gray-300"></th>
 
-                  {/* Lunch Break sub-headers */}
-                  <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
-                  <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
-                  <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
-                  <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
+                {/* Morning Tea Break sub-headers */}
+                <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
+                <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
+                <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
+                <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
 
-                  {/* Evening Tea Break sub-headers */}
-                  <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
-                  <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
-                  <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
-                  <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
-                </tr>
-              </thead>
+                {/* Lunch Break sub-headers */}
+                <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
+                <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
+                <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
+                <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
 
-              <tbody>
-                {employeeData?.map((employee, index) => (
-                  <EmployeeBreakRow
-                    key={employee.mIdCard || index}
-                    employee={employee}
-                    index={index}
-                    date={date} // Pass the selected date as prop
+                {/* Evening Tea Break sub-headers */}
+                <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
+                <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
+                <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
+                <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
+              </tr>
+            </thead>
 
-                  />
-                ))}
-              </tbody>
-            </table>
-          </div>
+            <tbody>
+              {employeeData?.map((employee, index) => (
+                <EmployeeBreakRow
+                  key={employee.mIdCard || index}
+                  employee={employee}
+                  index={index}
+                  date={date} // Pass the selected date as prop
+
+                />
+              ))}
+            </tbody>
+          </table>
+        </div>
         {form === true && (
           <Modal
             isOpen={form}
