@@ -132,12 +132,12 @@ const Sidebar = ({ isOpen, setIsOpen, isMainDropdownOpen, setIsMainDropdownOpen 
       groups: mastersGroup,
       pages: masters
     },
-    {
-      heading: 'Transactions',
-      logo: <PanelLeftClose size={24} />,
-      groups: transactionsGroup,
-      pages: transactions
-    },
+    // {
+    //   heading: 'Transactions',
+    //   logo: <PanelLeftClose size={24} />,
+    //   groups: transactionsGroup,
+    //   pages: transactions
+    // },
     {
       heading: 'Reports',
       logo: <PanelLeftClose size={24} />,

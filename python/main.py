@@ -96,7 +96,9 @@ async def fetch_logs(from_date: str = Query(...), to_date: str = Query(...)):
                     #     .first()
                     # )
                     # employeeId = employee.id if employee else None
-                    employeeId = employees.get(str(log.user_id))  # ✅ fast lookup
+                    # employeeId = employees.get(str(log.user_id))  
+                    employeeId = employees.get(int(log.user_id))
+
 
                 #     db.add(PythonPunchData(mIdCard=str(log.user_id), timestamp=log.timestamp,machineIP=MACHINE_IP,machineInOutGridId=machineInOutGridId,
                 #             machineType=machineType,employeeId=employeeId,))
@@ -134,7 +136,8 @@ async def fetch_logs(from_date: str = Query(...), to_date: str = Query(...)):
                         .first()
                     )
                     if not exists:
-                        employeeId = employees.get(str(log.user_id))  # ✅ reuse here too
+                        # employeeId = employees.get(str(log.user_id))  
+                        employeeId = employees.get(int(log.user_id))
 
                         # employee = (
                         #     db.query(Employee)

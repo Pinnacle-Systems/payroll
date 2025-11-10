@@ -15,7 +15,7 @@ import EmployeeBreakRow from './EmployeeBreakRow'
 import { PDFViewer } from "@react-pdf/renderer";
 import PrintFormat from "./PrintFormat";
 import tw from "../../../Utils/tailwind-react-pdf";
-import { FiChevronRight, FiPrinter } from "react-icons/fi";
+import { FiChevronDown, FiChevronRight, FiPrinter, FiDownload  } from "react-icons/fi";
 import ExcelJS from "exceljs";
 
 const Form = () => {
@@ -344,6 +344,26 @@ const Form = () => {
       row.getCell(18).alignment = { horizontal: "left", indent: 1 };
 
     });
+    // === Add Empty Row at the End (same style as header) ===
+    const emptyRow = worksheet.addRow(new Array(18).fill("")); // 18 columns total
+
+    emptyRow.eachCell((cell) => {
+      cell.fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FFD9D9D9" }, // same as header background
+      };
+      cell.border = {
+        top: { style: "thin", color: { argb: "FFDDDDDD" } },
+        left: { style: "thin", color: { argb: "FFDDDDDD" } },
+        bottom: { style: "thin", color: { argb: "FFDDDDDD" } },
+        right: { style: "thin", color: { argb: "FFDDDDDD" } },
+      };
+      cell.alignment = { horizontal: "center", vertical: "middle" };
+    });
+
+    // Optional: set row height for spacing
+    emptyRow.height = 20;
 
     // === Download ===
     const buffer = await workbook.xlsx.writeBuffer();
@@ -370,7 +390,7 @@ const Form = () => {
           <PrintFormat
             employeeData={employeeData}
             date={date}
-            reportTitle="Break Time Report"
+            reportTitle="DataWise Break Report"
             generatedDate={moment().format('YYYY-MM-DD HH:mm')}
           />
 
@@ -394,7 +414,7 @@ const Form = () => {
               className="bg-white   border  border-green-600 text-green-600 hover:bg-green-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
               onClick={handleDownloadExcel}
             >
-              <FiPrinter className="w-4 h-4" />
+              <FiDownload className="w-4 h-4" />
               Download Excel
             </button>
             {/* </div> */}
