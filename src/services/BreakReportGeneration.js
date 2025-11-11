@@ -148,7 +148,7 @@ LunchBreakEval AS (
     COUNT(punchTime) AS lunchPunchCount,
     TIMESTAMPDIFF(MINUTE, MIN(punchTime), MAX(punchTime)) AS lunchBreakDuration
   FROM BreakPunches
-  WHERE TIME(punchTime) BETWEEN lunchBST AND ADDTIME(lunchBET, '01:15:00')
+  WHERE TIME(punchTime) BETWEEN lunchBST AND ADDTIME(lunchBET, '00:30:00')
   GROUP BY empId, mIdCard, firstName, shiftId, lunchBST, lunchBET
 ),
 

@@ -1,0 +1,146 @@
+/* 🔹 General Grid Compact Styling */
+.e-grid {
+    font-size: 8px !important;
+    border-color: #d1d5db !important;
+    /* soft gray border */
+}
+
+/* 🔹 Header Cell (Top Row) */
+.e-grid .e-headercell {
+    padding: 1px 2px !important;
+    /* reduced horizontal padding */
+    line-height: 1.2 !important;
+    height: 25px !important;
+    /* Explicit height for consistency */
+
+    text-align: center !important;
+}
+
+/* 🔹 Header Row Background & Border */
+.e-grid .e-columnheader {
+    background-color: #f3f4f6 !important;
+    color: #111827 !important;
+    font-weight: 600 !important;
+    min-height: 14px !important;
+    border-bottom: 1px solid #d1d5db !important;
+    text-align: center !important;
+    font-size: 11px !important;
+
+}
+
+/* 🔹 Nested Group Headers (like “Morning Tea Break”) */
+.e-grid .e-columnheader .e-headercell {
+    background-color: #e5e7eb !important;
+    font-weight: 500 !important;
+    padding: 1px 3px !important;
+    /* tighter padding for grouped headers */
+}
+
+/* 🔹 Row Hover & Borders */
+
+
+/* 🔹 Column Specific (Optional) */
+.e-grid .col-sno,
+.e-grid .col-mid,
+.e-grid .col-emp,
+.e-grid .col-dept,
+.e-grid .col-desig,
+.e-grid .col-date,
+.e-grid .col-break {
+    padding: 1px 4px !important;
+
+    height: 10px;
+
+}
+
+
+/* Always center all header text */
+.e-grid .e-headercell,
+.e-grid .e-columnheader,
+.e-grid .e-columnheader .e-headercell,
+.e-grid .e-columnheader .e-columnheadercell {
+    text-align: center !important;
+}
+
+/* 🔹 Body cells (tbody) */
+.e-grid .e-rowcell {
+    font-size: 12px !important;
+    /* reduce font size for table body */
+    color: black;
+    padding: 0.5px 6px !important;
+    /* top/bottom padding controls row height */
+    line-height: 0.5 !important;
+    /* background-color: red; */
+}
+
+.text-green-600 {
+    color: #16a34a;
+}
+
+.text-red-600 {
+    color: #dc2626;
+}
+
+.text-orange-600 {
+    color: #ea580c;
+}
+
+.text-blue-600 {
+    color: #2563eb;
+}
+
+.text-gray-600 {
+    color: #4b5563;
+}
+
+.element.style {
+    display: none;
+    background-color: red;
+    color: darkorange;
+}
+div[style*="position: fixed"] {
+    display: none !important;
+}
+
+/* 🔹 Group Drop Area (where you drag columns to group) */
+.e-grid .e-groupdroparea {
+    background-color: #f3f4f6; /* light gray */
+    border: 1px dashed #d1d5db; /* dashed border */
+    padding: 4px 8px;
+    font-size: 12px;
+    color: #111827;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* 🔹 Grouped Header Box */
+.e-grid .e-groupdroparea .e-grouptile {
+    background-color: #e5e7eb; /* slightly darker gray */
+    border-radius: 4px;
+    padding: 2px 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: grab;
+    font-weight: 500;
+}
+
+/* 🔹 Close Icon on grouped header */
+.e-grid .e-groupdroparea .e-icon-close {
+    font-size: 12px;
+    color: #dc2626; /* red */
+    cursor: pointer;
+}
+
+/* 🔹 Sort Arrow in grouped header */
+.e-grid .e-groupdroparea .e-sort {
+    color: #2563eb; /* blue */
+    font-size: 10px;
+}
+
+/* Optional: Hover effect on grouped tile */
+.e-grid .e-groupdroparea .e-grouptile:hover {
+    background-color: #d1d5db;
+}

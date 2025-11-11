@@ -9,6 +9,11 @@ import { Provider } from 'react-redux';
 import { Font } from '@react-pdf/renderer'
 import { Toaster } from 'react-hot-toast';
 
+import '@syncfusion/ej2-base/styles/material.css';
+import '@syncfusion/ej2-buttons/styles/material.css';
+import '@syncfusion/ej2-inputs/styles/material.css';
+import '@syncfusion/ej2-popups/styles/material.css';
+import '@syncfusion/ej2-react-grids/styles/material.css';
 
 
 

@@ -15,14 +15,31 @@ import EmployeeBreakRow from './EmployeeBreakRow'
 import { PDFViewer } from "@react-pdf/renderer";
 import PrintFormat from "./PrintFormat";
 import tw from "../../../Utils/tailwind-react-pdf";
-import { FiChevronDown, FiChevronRight, FiPrinter, FiDownload  } from "react-icons/fi";
+import { FiChevronDown, FiChevronRight, FiPrinter, FiDownload } from "react-icons/fi";
 import ExcelJS from "exceljs";
+import {
+  GridComponent,
+  ColumnsDirective,
+  ColumnDirective,
+  Page,
+  Sort,
+  Filter,
+  Group,
+  Search,
+  Toolbar,
+  ExcelExport,
+  PdfExport,
+  Inject,
+} from "@syncfusion/ej2-react-grids";
+import BreakReportGrid from "./BreakReportGrid";
+import { Header, Icon, HeaderContent } from 'semantic-ui-react'
 
 const Form = () => {
   const [date, setDate] = useState("");
   const [employeeCategoryId, setEmployeeCategoryId] = useState("");
   const [printModalOpen, setPrintModalOpen] = useState(false);
   const [open, setOpen] = useState(false);
+  const [showGrid, setShowGrid] = useState(false);
 
   const [form, setForm] = useState(true);
   const childRecord = useRef(0);
@@ -30,9 +47,11 @@ const Form = () => {
   const [groupBy, setGroupBy] = useState("");
   const designationRef = useRef(null);
 
-  const [triggerReport, { data: allData, isFetching }] =
+  const [triggerReport, { data: allData, isLoading, isSuccess }] =
     useLazyGetbreakReportQuery();
   const { data: employeeCategory } = useGetEmployeeCategoryQuery({ params });
+  const gridRef = useRef(null);
+  const pageSettings = { pageSize: 20 };
 
   // const { data: employeeData } = useGetEmployeeQuery({ params });
 
@@ -403,6 +422,13 @@ const Form = () => {
           <div className="flex items-center gap-x-4">
 
             {/* <div className="flex gap-2 flex-wrap"> */}
+
+            <button
+              className="bg-white   border  border-red text-red-600 hover:bg-red-600 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+              onClick={() => setShowGrid((prev) => !prev)}
+            >
+              {showGrid ? "Show Table View" : "Show Filter View"}
+            </button>
             <button
               className="bg-white   border  border-black text-black-600 hover:bg-black hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
               onClick={() => setPrintModalOpen(true)}
@@ -431,72 +457,81 @@ const Form = () => {
           </div>
         </div>
 
+        {/* ==== Syncfusion Grid View ==== */}
+        {showGrid && (
+          <div className="mt-2">
+
+            <div
+              className="w-[100vw] max-w-[1585px] bg-white p-2 rounded-lg shadow-md border border-gray-200"
+              style={{
+                height: "75vh",          // ✅ fixed height area (viewport-relative)
+                overflow: "auto",        // ✅ both X and Y scrolls inside
+              }}
+            >
+              <BreakReportGrid employeeData={employeeData} />
+            </div>
+          </div>
+        )}
 
 
-        <div className="mt-3 w-full p-2 overflow-x-auto bg-white max-h-[580px]">
-          <table className="w-full  border-collapse table-fixed">
-            <thead className="bg-gray-200 text-gray-800">
-              <tr>
-                <th className="w-[15px] px-1 text-center font-medium text-[13px]  ">S.No</th>
-                <th className="w-6 py-2 text-center font-medium text-[13px]  ">Emp MId</th>
-                <th className="w-[40px] py-2 text-center font-medium text-[13px]  ">Emp Name</th>
-                <th className="w-[35px] py-2 text-center font-medium text-[13px]  ">Department</th>
-                <th className="w-[55px] py-2 text-center font-medium text-[13px]  ">Designation</th>
-                <th className="w-8 py-2 text-center font-medium text-[13px]  border-r border-gray-300">Date</th>
+        {!showGrid && (
+          <div className="mt-3 w-full p-2 overflow-x-auto bg-white max-h-[580px]">
+            <table className="w-full  border-collapse table-fixed">
+              <thead className="bg-gray-200 text-gray-800">
+                <tr>
+                  <th className="w-[15px] px-1 text-center font-medium text-[13px]  ">S.No</th>
+                  <th className="w-6 py-2 text-center font-medium text-[13px]  ">Emp MId</th>
+                  <th className="w-[40px] py-2 text-center font-medium text-[13px]  ">Emp Name</th>
+                  <th className="w-[35px] py-2 text-center font-medium text-[13px]  ">Department</th>
+                  <th className="w-[55px] py-2 text-center font-medium text-[13px]  ">Designation</th>
+                  <th className="w-8 py-2 text-center font-medium text-[13px]  border-r border-gray-300">Date</th>
 
-                {/* Morning Tea Break */}
-                <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
-                  Morning Tea Break
-                </th>
+                  <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
+                    Morning Tea Break
+                  </th>
 
-                {/* Lunch Break */}
-                <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
-                  Lunch Break
-                </th>
+                  <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
+                    Lunch Break
+                  </th>
 
-                {/* Evening Tea Break */}
-                <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
-                  Evening Tea Break
-                </th>
-              </tr>
+                  <th colSpan={4} className="w-28 py-2 text-center font-medium text-[13px] border border-gray-300">
+                    Evening Tea Break
+                  </th>
+                </tr>
 
-              {/* Sub-headers for each break */}
-              <tr>
-                <th colSpan={6} className="border border-gray-300"></th>
+                <tr>
+                  <th colSpan={6} className="border border-gray-300"></th>
 
-                {/* Morning Tea Break sub-headers */}
-                <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
-                <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
-                <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
-                <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
 
-                {/* Lunch Break sub-headers */}
-                <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
-                <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
-                <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
-                <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
 
-                {/* Evening Tea Break sub-headers */}
-                <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
-                <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
-                <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
-                <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
-              </tr>
-            </thead>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">Out</th>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">In</th>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">Duration</th>
+                  <th className="text-center font-medium text-[12px] border border-gray-300">Status</th>
+                </tr>
+              </thead>
 
-            <tbody>
-              {employeeData?.map((employee, index) => (
-                <EmployeeBreakRow
-                  key={employee.mIdCard || index}
-                  employee={employee}
-                  index={index}
-                  date={date} // Pass the selected date as prop
+              <tbody>
+                {employeeData?.map((employee, index) => (
+                  <EmployeeBreakRow
+                    key={employee.mIdCard || index}
+                    employee={employee}
+                    index={index}
+                    date={date}
 
-                />
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>)}
         {form === true && (
           <Modal
             isOpen={form}
@@ -605,6 +640,7 @@ const Form = () => {
                             >
                               Generate Report
                             </button>
+
                           </div>
                         </div>
                       </div>
