@@ -16,39 +16,44 @@ const styles = StyleSheet.create({
     },
     pageBorder: {
         flex: 1,
-        border: '1 solid #000', // black border
+        border: '2 solid #D1D5DB', // black border
         padding: 10,            // inner spacing inside border
         margin: 5,              // small gap between page edge and border
-    },
+        paddingHorizontal: 0, // keep left-right padding if you want
 
+    },
+    horizontalLine: {
+        borderBottomWidth: 2,    // thickness of the line
+        borderBottomColor: '#D1D5DB', // color of the line (black)
+        marginVertical: 6,        // space above/below
+        width: 'auto',     // let it expand based on margins instead of inner 100%
+        // marginLeft: -10,  
+        // marginRight: -10,
+        marginTop: 10
+    },
     header: {
         marginBottom: 15,
         textAlign: 'center',
     },
     title: {
-        fontSize: 16,
+        fontSize: 10,
         fontWeight: 'bold',
-        marginBottom: 8,
 
     },
     reportInfo: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginBottom: 5,
+
         fontSize: 10
     },
 
     table: {
         display: 'table',
-        width: 'auto',
+        width: '100%',           // ✅ fill entire inner width
         borderStyle: "solid",
         borderWidth: 1,
         borderColor: "#D1D5DB",
-        // flexWrap: 'wrap', 
-        // alignContent:'center',
-        // justifyContent:'center'
-        marginTop: 2
-
+        borderRightWidth: 0,    // 👈 hides the right border
+        borderLeftWidth: 0,    // 👈 hides the right border
+        marginTop: 0
     },
     tableRow: {
         flexDirection: 'row',
@@ -65,6 +70,7 @@ const styles = StyleSheet.create({
         borderRightStyle: "solid",
         borderRightWidth: 1,
         borderRightColor: "#D1D5DB",
+
     },
     tableCol: {
         borderRightStyle: "solid",
@@ -158,10 +164,10 @@ const styles = StyleSheet.create({
     logoContainer: {
         width: '100%',
         flexDirection: 'row',
-        justifyContent: 'flex-end', // ✅ push image to right
+        justifyContent: 'flex-start', // ✅ push image to right
         // alignItems: 'center',
         fontSize: 12,
-        marginTop: "-25px",
+        marginTop: "-20px",
         top: 15,
 
         position: 'absolute',
@@ -169,8 +175,8 @@ const styles = StyleSheet.create({
     },
 
     logo: {
-        width: 150,
-        height: 50,
+        width: 140,
+        height: 30,
         fontSize: 12,
         marginTop: "-5px"
 
@@ -181,14 +187,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginBottom: 10,
     },
-    horizontalLine: {
-        borderBottomWidth: 1,    // thickness of the line
-        borderBottomColor: '#000', // color of the line (black)
-        marginVertical: 6,        // space above/below
-        width: 'auto',     // let it expand based on margins instead of inner 100%
-        marginLeft: -10,  // 👈 move line 10 units to the left
-        marginRight: -10
-    },
+
     reportHeaderInfo: {
         marginTop: "-25px",
         fontSize: 12,
@@ -213,8 +212,8 @@ const styles = StyleSheet.create({
     statusGray: { backgroundColor: '#9CA3AF' },   // Default / '-'
     legendContainer: {
         position: 'absolute',
-        bottom: 15,            // distance from bottom edge
-        right: 15,             // distance from right edge
+        top: 32,
+        right: 10,             // distance from right edge
         flexDirection: 'row',  // boxes + text in a row
         gap: 6,                // spacing between items (React-PDF supports gap)
         alignItems: 'center',
@@ -233,7 +232,12 @@ const styles = StyleSheet.create({
         marginRight: 3,
         borderRadius: 4,
     },
-
+    noRightBorder: {
+        borderRightWidth: 0
+    },
+    noLeftBorder: {
+        borderLeftWidth: 0,
+    }
 });
 
 // PrintFormat Component
@@ -251,9 +255,9 @@ const PrintFormat = ({ employeeData, date, reportTitle, generatedDate }) => {
     const StatusBox = ({ status }) => {
         let color = '#9CA3AF'; // default gray
         if (status?.includes('Correct')) color = '#16A34A'; // Green
-        else if (status?.includes('Delayed')) color = '#F59E0B'; // Orange
+        else if (status?.includes('Delayed')) color = '#EF4444'; // Red
         else if (status?.includes('Only One')) color = '#3B82F6'; // Blue
-        else if (status?.includes('No Punches')) color = '#EF4444'; // Red
+        else if (status?.includes('No Punches')) color = '#F59E0B'; // Orange
 
         return (
             <View
@@ -283,14 +287,38 @@ const PrintFormat = ({ employeeData, date, reportTitle, generatedDate }) => {
         }
     };
 
-    const chunkArray = (arr, size) =>
-        arr.reduce((chunks, item, i) => {
-            const chunkIndex = Math.floor(i / size);
-            if (!chunks[chunkIndex]) chunks[chunkIndex] = [];
-            chunks[chunkIndex].push(item);
-            return chunks;
-        }, []);
-    const chunks = chunkArray(employeeData || [], 16);
+    // const chunkArray = (arr, size) =>
+    //     arr?.reduce((chunks, item, i) => {
+    //         const chunkIndex = Math.floor(i / size);
+    //         if (!chunks[chunkIndex]) chunks[chunkIndex] = [];
+    //         chunks[chunkIndex].push(item);
+    //         return chunks;
+    //     }, []);
+    // const chunks = chunkArray(employeeData || [], 17);
+    const chunkArrayVariable = (arr, firstPageSize, otherPageSize) => {
+        if (!arr || arr.length === 0) return [];
+
+        const chunks = [];
+        let startIndex = 0;
+
+        // First page
+        const firstChunk = arr.slice(0, firstPageSize);
+        if (firstChunk.length > 0) {
+            chunks.push(firstChunk);
+            startIndex = firstPageSize;
+        }
+
+        // Remaining pages
+        while (startIndex < arr.length) {
+            chunks.push(arr.slice(startIndex, startIndex + otherPageSize));
+            startIndex += otherPageSize;
+        }
+
+        return chunks;
+    };
+
+    // Usage
+    const chunks = chunkArrayVariable(employeeData || [], 17, 20);
 
     return (
         <Document>
@@ -299,43 +327,56 @@ const PrintFormat = ({ employeeData, date, reportTitle, generatedDate }) => {
                     <View
                         style={[
                             styles.pageBorder,
-                            pageIndex > 0 ? { marginTop: 30 } : null, // ✅ add top margin on 2nd+ pages
+                            pageIndex > 0 ? { marginTop: 30 } : null,
+
                         ]}
                     >
                         {/* Show main header only on first page */}
-                        {pageIndex === 0 && (<View style={styles.header}>
+                        {pageIndex === 0 && (
+                            <>
+                                <View style={[tw("h-16"), styles.header]}>
 
-                            <Text style={[styles.title]}>{'PINNACLE SYSTEMS'}</Text>
 
-                            <View style={[tw("-mt-8"), styles.logoContainer]}>
-                                <Image src={pinnacleogo} style={[tw("-mt-8"), styles.logo]} />
-                            </View>
-                            <View style={styles.horizontalLine} />
+                                    <View style={[tw("-mt-10"), styles.logoContainer]}>
+                                        <Image src={pinnacleogo} style={[tw("-mt-10 -ml-4"), styles.logo]} />
+                                    </View>
+                                    <Text style={[tw(""), styles.title]}>{reportTitle || 'Date Wise Break Report'}</Text>
 
-                        </View>
+                                    <Text style={[tw(" text-right -mt-4  mr-12"), styles.title]}>Report Date: {date || ''}</Text>
 
+
+                                    <View style={styles.horizontalLine} />
+                                    <View style={styles.legendContainer}>
+                                        <View style={styles.legendItem}>
+                                            <View style={[styles.legendColorBox, { backgroundColor: '#16A34A' }]} />
+                                            <Text>On Time</Text>
+                                        </View>
+                                        <View style={styles.legendItem}>
+                                            <View style={[styles.legendColorBox, { backgroundColor: '#3B82F6' }]} />
+                                            <Text>Miss Punch</Text>
+                                        </View>
+                                        <View style={styles.legendItem}>
+                                            <View style={[styles.legendColorBox, { backgroundColor: '#EF4444' }]} />
+                                            <Text>No Punches</Text>
+                                        </View>
+                                        <View style={styles.legendItem}>
+                                            <View style={[styles.legendColorBox, { backgroundColor: '#F59E0B' }]} />
+                                            <Text>Delayed</Text>
+                                        </View>
+                                    </View>
+                                </View>
+
+
+                            </>
                         )}
-
-                        {pageIndex === 0 && (<View style={styles.header}>
-
-                            <Text style={[tw("-mt-4"), styles.title]}>{reportTitle || 'DataWise Break Report'}</Text>
-                            <View style={[tw("-mt-7"), styles.reportInfo]}>
-                                <Text>Report Date: {date || ''}</Text>
-
-                            </View>
-
-                        </View>
-
-                        )}
-
 
 
                         {/* Table */}
-                        <View style={styles.table}>
+                        <View style={[styles.table, tw("-mt-4")]}>
                             {/* First Header Row */}
                             <View style={styles.tableRow}>
                                 {/* Basic Info - These will span 2 rows */}
-                                <View style={[styles.tableColHeader, { width: '3%' }]}>
+                                <View style={[styles.tableColHeader, styles.noLeftBorder, { width: '3%' }]}>
                                     <View style={styles.verticalCenter}>
                                         <Text style={styles.mainHeader}>SNo</Text>
                                     </View>
@@ -377,7 +418,7 @@ const PrintFormat = ({ employeeData, date, reportTitle, generatedDate }) => {
                                 </View>
 
                                 {/* Evening Tea Break Main Header */}
-                                <View style={[styles.tableColHeader, { width: '20%' }]}>
+                                <View style={[styles.tableColHeader, styles.noRightBorder, { width: '20%' }]}>
                                     <Text style={styles.mainHeader}>Evening Tea Break</Text>
                                 </View>
                             </View>
@@ -442,7 +483,7 @@ const PrintFormat = ({ employeeData, date, reportTitle, generatedDate }) => {
                                 <View style={[styles.tableColHeader, { width: '5%' }]}>
                                     <Text style={styles.subHeader}>Duration</Text>
                                 </View>
-                                <View style={[styles.tableColHeader, { width: '4%' }]}>
+                                <View style={[styles.tableColHeader, styles.noRightBorder, { width: '4%' }]}>
                                     <Text style={styles.subHeader}>Status</Text>
                                 </View>
                             </View>
@@ -451,7 +492,7 @@ const PrintFormat = ({ employeeData, date, reportTitle, generatedDate }) => {
                             {chunk?.map((employee, index) => (
                                 <View key={employee.mIdCard || index} style={styles.tableRow} wrap={false}>
                                     {/* Basic Info */}
-                                    <View style={[styles.tableCol, { width: '3%' }]}>
+                                    <View style={[styles.tableCol, styles.noLeftBorder, { width: '3%' }]}>
                                         <Text style={styles.tableCell}>{index + 1}</Text>
                                     </View>
                                     <View style={[styles.tableCol, { width: '4%' }]}>
@@ -468,10 +509,10 @@ const PrintFormat = ({ employeeData, date, reportTitle, generatedDate }) => {
                                     </View>
                                     <View style={[styles.tableCol, { width: '6%' }]}>
                                         <Text style={styles.tableCell}>
-                                            {/* {employee.reportDate
-                                            ? new Date(employee.reportDate).toLocaleDateString()
-                                            : date || '-'} */}
-                                            {date}
+                                            {employee.reportDate
+                                                ? new Date(employee.reportDate).toLocaleDateString()
+                                                : date || '-'}
+                                            {/* {date} */}
                                         </Text>
                                     </View>
 
@@ -530,7 +571,7 @@ const PrintFormat = ({ employeeData, date, reportTitle, generatedDate }) => {
                                         {simplifyStatus(employee.eveningBreakStatus)}
                                     </Text>
                                 </View> */}
-                                    <View style={[styles.tableCol, { width: '4%' }]}>
+                                    <View style={[styles.tableCol, styles.noRightBorder, { width: '4%' }]}>
                                         <View style={[styles.tableCellLeft, { alignItems: 'center' }]}>
                                             <StatusBox status={employee.eveningBreakStatus} />
                                         </View>
@@ -549,62 +590,7 @@ const PrintFormat = ({ employeeData, date, reportTitle, generatedDate }) => {
                             )}
                         </View>
 
-                        {/* <View
-                            style={{
-                                position: 'absolute',
-                                bottom: 10,
-                                right: 20,
-                                flexDirection: 'column',
-                                alignItems: 'flex-start', // left-align text for a neat column
-                                gap: 3, // small vertical space between rows
-                            }}
-                        >
-                            {[
-                                { color: '#00FF00', label: 'On Time' },
-                                { color: '#FFA500', label: 'Delayed' },
-                                { color: '#0000FF', label: 'One Punch' },
-                                { color: '#FF0000', label: 'No Punches' },
-                            ].map((item, index) => (
-                                <View
-                                    key={index}
-                                    style={{
-                                        flexDirection: 'row',
-                                        alignItems: 'center',
-                                        marginBottom: 2,
-                                    }}
-                                >
-                                    <View
-                                        style={{
-                                            width: 10,
-                                            height: 10,
-                                            backgroundColor: item.color,
-                                            marginRight: 5,
-                                            borderRadius: 6
-                                        }}
-                                    />
-                                    <Text style={{ fontSize: 10 }}>{item.label}</Text>
-                                </View>
-                            ))}
-                        </View> */}
-                        {/* === Legend Section === */}
-                        <View style={styles.legendContainer}>
-                            <View style={styles.legendItem}>
-                                <View style={[styles.legendColorBox, { backgroundColor: '#16A34A' }]} />
-                                <Text>On Time</Text>
-                            </View>
-                            <View style={styles.legendItem}>
-                                <View style={[styles.legendColorBox, { backgroundColor: '#3B82F6' }]} />
-                                <Text>One Punch</Text>
-                            </View>
-                            <View style={styles.legendItem}>
-                                <View style={[styles.legendColorBox, { backgroundColor: '#EF4444' }]} />
-                                <Text>No Punches</Text>
-                            </View>
-                            <View style={styles.legendItem}>
-                                <View style={[styles.legendColorBox, { backgroundColor: '#F59E0B' }]} />
-                                <Text>Delayed</Text>
-                            </View>
-                        </View>
+
 
                         <Text
                             style={{

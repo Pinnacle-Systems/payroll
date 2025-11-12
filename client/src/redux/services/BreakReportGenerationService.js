@@ -13,7 +13,7 @@ const BreakReportApi = createApi({
         getbreakReport: builder.query({
             query: ({ searchParams }) => {
                 if (!searchParams) {
-                    throw new Error("searchParams (inDate and groupBy) are required");
+                    throw new Error("searchParams From and To Date  are required");
                 }
 
                 return {

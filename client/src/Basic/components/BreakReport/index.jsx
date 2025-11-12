@@ -35,11 +35,12 @@ import BreakReportGrid from "./BreakReportGrid";
 import { Header, Icon, HeaderContent } from 'semantic-ui-react'
 
 const Form = () => {
-  const [date, setDate] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const [employeeCategoryId, setEmployeeCategoryId] = useState("");
   const [printModalOpen, setPrintModalOpen] = useState(false);
   const [open, setOpen] = useState(false);
-  const [showGrid, setShowGrid] = useState(false);
+  const [showGrid, setShowGrid] = useState(true);
 
   const [form, setForm] = useState(true);
   const childRecord = useRef(0);
@@ -74,7 +75,8 @@ const Form = () => {
     label: val?.name,
   }));
   const OnNew = () => {
-    setDate("");
+    setFromDate("");
+    setToDate("")
     setEmployeeCategoryId("");
     setGroupBy("");
   };
@@ -126,14 +128,16 @@ const Form = () => {
     // First pass: Create unique employees with all fields
     allDataArrays.forEach(employee => {
       if (employee?.mIdCard) {
-        if (!allEmployeesMap.has(employee.mIdCard)) {
-          // Initialize employee with all possible fields
-          allEmployeesMap.set(employee.mIdCard, {
+        const reportDate = employee?.reportDate ? employee.reportDate?.split("T")[0] : "";
+        const uniqueKey = `${employee.mIdCard}_${reportDate}`;
+
+        if (!allEmployeesMap.has(uniqueKey)) {
+          allEmployeesMap.set(uniqueKey, {
             mIdCard: employee.mIdCard,
             firstName: employee.firstName,
             departmentName: employee.departmentName,
             designationName: employee.designationName,
-            reportDate: employee?.reportDate,
+            reportDate,
             // Morning break fields
             firstBreakOut: null,
             firstBreakIn: null,
@@ -155,10 +159,12 @@ const Form = () => {
     });
 
     // Second pass: Populate break data from specific arrays
-    allEmployeesMap?.forEach((employee, mIdCard) => {
+    allEmployeesMap?.forEach((employee, key) => {
+      const [mIdCard, reportDate] = key.split("_");
+
       // Morning Break Data
       const morningEmp = [...regularData, ...irregularData, ...SinglePunchData, ...absentData]
-        .find(emp => emp.mIdCard === mIdCard);
+        .find(emp => `${emp.mIdCard}_${emp.reportDate?.split("T")[0]}` === key);
       if (morningEmp) {
         employee.firstBreakOut = morningEmp.firstBreakOut || employee.firstBreakOut;
         employee.firstBreakIn = morningEmp.firstBreakIn || employee.firstBreakIn;
@@ -168,7 +174,7 @@ const Form = () => {
 
       // Lunch Break Data
       const lunchEmp = [...lunchregularData, ...lunchirregularData, ...lunchSinglePunchData, ...lunchabsentData]
-        .find(emp => emp.mIdCard === mIdCard);
+        .find(emp => `${emp.mIdCard}_${emp.reportDate?.split("T")[0]}` === key);
       if (lunchEmp) {
         employee.lunchBreakOut = lunchEmp.lunchBreakOut || employee.lunchBreakOut;
         employee.lunchBreakIn = lunchEmp.lunchBreakIn || employee.lunchBreakIn;
@@ -178,7 +184,7 @@ const Form = () => {
 
       // Evening Break Data
       const eveningEmp = [...eveningregularData, ...eveningirregularData, ...eveningSinglePunchData, ...eveningabsentData]
-        .find(emp => emp.mIdCard === mIdCard);
+        .find(emp => `${emp.mIdCard}_${emp.reportDate?.split("T")[0]}` === key);
       if (eveningEmp) {
         employee.eveningBreakOut = eveningEmp.eveningBreakOut || employee.eveningBreakOut;
         employee.eveningBreakIn = eveningEmp.eveningBreakIn || employee.eveningBreakIn;
@@ -187,7 +193,11 @@ const Form = () => {
       }
     });
 
-    return Array.from(allEmployeesMap.values());
+    return Array.from(allEmployeesMap.values()).sort((a, b) => {
+      const dateA = new Date(a.reportDate);
+      const dateB = new Date(b.reportDate);
+      return dateA - dateB; // ascending order: fromDate → toDate
+    });
   };
   const employeeData = React.useMemo(() => prepareEmployeeData(), [
     regularData, irregularData, SinglePunchData, absentData,
@@ -223,11 +233,19 @@ const Form = () => {
       if (val.includes("only one")) return "One Punch";
       return status;
     };
-
+    const statusFill = (status) => {
+      if (!status) return { type: "pattern", pattern: "solid", fgColor: { argb: "FFFFFFFF" } }; // white
+      const val = status.toLowerCase();
+      if (val.includes("correct")) return { type: "pattern", pattern: "solid", fgColor: { argb: "FF16A34A" } }; // green
+      if (val.includes("delayed")) return { type: "pattern", pattern: "solid", fgColor: { argb: "FFFFA500" } }; // orange
+      if (val.includes("no punches")) return { type: "pattern", pattern: "solid", fgColor: { argb: "FFFF0000" } }; // red
+      if (val.includes("only one")) return { type: "pattern", pattern: "solid", fgColor: { argb: "FF2563EB" } }; // blue
+      return { type: "pattern", pattern: "solid", fgColor: { argb: "FFFFFFFF" } };
+    };
     // === Title Row ===
     worksheet.mergeCells("A1:R1");
     const titleCell = worksheet.getCell("A1");
-    titleCell.value = "Employees Break Report";
+    titleCell.value = "Date Wise Break Report";
     titleCell.alignment = { horizontal: "center", vertical: "middle" };
     titleCell.font = { bold: true, size: 14 };
     worksheet.getRow(1).height = 25;
@@ -304,15 +322,18 @@ const Form = () => {
         formatTimeISO(emp.firstBreakOut),
         formatTimeISO(emp.firstBreakIn),
         emp.breakDuration || "",
-        formatStatus(emp.morningBreakStatus),
+        // formatStatus(emp.morningBreakStatus),
+        "",
         formatTimeISO(emp.lunchBreakOut),
         formatTimeISO(emp.lunchBreakIn),
         emp.lunchBreakDuration || "",
-        formatStatus(emp.lunchBreakStatus),
+        // formatStatus(emp.lunchBreakStatus),
+        "",
         formatTimeISO(emp.eveningBreakOut),
         formatTimeISO(emp.eveningBreakIn),
         emp.eveningBreakDuration || "",
-        formatStatus(emp.eveningBreakStatus),
+        // formatStatus(emp.eveningBreakStatus),
+        ""
       ]);
 
       // ✅ Add padding for data cells only
@@ -326,21 +347,33 @@ const Form = () => {
 
       // ✅ Apply status color
       const statusCells = [row.getCell(10), row.getCell(14), row.getCell(18)];
-      statusCells.forEach((cell) => {
-        const text = (cell.value || "").toLowerCase();
-        let color = null;
+      // statusCells.forEach((cell) => {
+      //   const text = (cell.value || "").toLowerCase();
+      //   let color = null;
 
-        if (text.includes("on time")) color = "FF166534"; // Green
-        else if (text.includes("delayed")) color = "FFF97316"; // Orange
-        else if (text.includes("no punch")) color = "FFEF4444"; // Red
-        else if (text.includes("one punch")) color = "FF2563EB"; // Blue
+      //   if (text.includes("on time")) color = "FF166534"; // Green
+      //   else if (text.includes("delayed")) color = "FFF97316"; // Orange
+      //   else if (text.includes("no punch")) color = "FFEF4444"; // Red
+      //   else if (text.includes("one punch")) color = "FF2563EB"; // Blue
 
-        if (color) {
-          cell.font = { color: { argb: color }, bold: true };
-        }
-        cell.alignment = { ...cell.alignment, horizontal: "center" };
+      //   if (color) {
+      //     cell.font = { color: { argb: color }, bold: true };
+      //   }
+      //   cell.alignment = { ...cell.alignment, horizontal: "center" };
+      // });
+      const statuses = [emp.morningBreakStatus, emp.lunchBreakStatus, emp.eveningBreakStatus];
+
+      statusCells.forEach((cell, i) => {
+        cell.value = "●"; // round dot
+        cell.font = { color: { argb: statusFill(statuses[i]).fgColor.argb }, bold: true, size: 20 };
+        cell.alignment = { horizontal: "center", vertical: "middle" };
+        cell.border = {
+          top: { style: "thin", color: { argb: "FFDDDDDD" } },
+          left: { style: "thin", color: { argb: "FFDDDDDD" } },
+          bottom: { style: "thin", color: { argb: "FFDDDDDD" } },
+          right: { style: "thin", color: { argb: "FFDDDDDD" } },
+        };
       });
-
       // ✅ Borders
       row.eachCell((cell) => {
         cell.border = {
@@ -358,9 +391,9 @@ const Form = () => {
       row.getCell(4).alignment = { horizontal: "left", indent: 1 };
       row.getCell(5).alignment = { horizontal: "left", indent: 1 };
       row.getCell(6).alignment = { horizontal: "center", indent: 1 };
-      row.getCell(10).alignment = { horizontal: "left", indent: 1 };
-      row.getCell(14).alignment = { horizontal: "left", indent: 1 };
-      row.getCell(18).alignment = { horizontal: "left", indent: 1 };
+      row.getCell(10).alignment = { horizontal: "center",  };
+      row.getCell(14).alignment = { horizontal: "center",  };
+      row.getCell(18).alignment = { horizontal: "center",  };
 
     });
     // === Add Empty Row at the End (same style as header) ===
@@ -393,7 +426,7 @@ const Form = () => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `Employee_Break_Report_${moment().format("YYYYMMDD_HHmmss")}.xlsx`;
+    a.download = `Date Wise Break Report_${moment().format("YYYYMMDD_HHmmss")}.xlsx`;
     a.click();
     window.URL.revokeObjectURL(url);
   };
@@ -405,12 +438,10 @@ const Form = () => {
         onClose={() => setPrintModalOpen(false)}
         widthClass={"w-[90%] h-[90%]"}
       >
-        <PDFViewer style={tw("w-full h-full")}>
+        <PDFViewer style={tw("w-full h-full")} >
           <PrintFormat
             employeeData={employeeData}
-            date={date}
-            reportTitle="DataWise Break Report"
-            generatedDate={moment().format('YYYY-MM-DD HH:mm')}
+            reportTitle="Date Wise Break Report"
           />
 
         </PDFViewer>
@@ -418,17 +449,17 @@ const Form = () => {
 
       <div onKeyDown={handleKeyDown} className="p-1 ">
         <div className="w-full flex bg-white p-1 justify-between  items-center">
-          <h1 className="master-header">DataWise Break Report</h1>
+          <h1 className="master-header">Date Wise Break Report</h1>
           <div className="flex items-center gap-x-4">
 
             {/* <div className="flex gap-2 flex-wrap"> */}
 
-            <button
+            {/* <button
               className="bg-white   border  border-red text-red-600 hover:bg-red-600 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
               onClick={() => setShowGrid((prev) => !prev)}
             >
               {showGrid ? "Show Table View" : "Show Filter View"}
-            </button>
+            </button> */}
             <button
               className="bg-white   border  border-black text-black-600 hover:bg-black hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
               onClick={() => setPrintModalOpen(true)}
@@ -450,9 +481,9 @@ const Form = () => {
                 setForm(true);
                 OnNew();
               }}
-              className="bg-white w-[110px]  border  border-blue-600 text-blue-600 hover:bg-blue-700 hover:text-white text-sm px-2  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+              className="bg-white w-[140px]  border  border-blue-600 text-blue-600 hover:bg-blue-700 hover:text-white text-sm px-1  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
             >
-              + Generate
+              + Report Param
             </button>
           </div>
         </div>
@@ -462,7 +493,7 @@ const Form = () => {
           <div className="mt-2">
 
             <div
-              className="w-[100vw] max-w-[1585px] bg-white p-2 rounded-lg shadow-md border border-gray-200"
+              className="w-[100vw] max-w-[1570px] bg-white p-2 rounded-lg shadow-md border border-gray-200"
               style={{
                 height: "75vh",          // ✅ fixed height area (viewport-relative)
                 overflow: "auto",        // ✅ both X and Y scrolls inside
@@ -470,6 +501,64 @@ const Form = () => {
             >
               <BreakReportGrid employeeData={employeeData} />
             </div>
+            <div className="mt-3 flex items-center gap-4 justify-end text-sm mr-3">
+              {/* On Time */}
+              <div className="flex items-center gap-1">
+                <div
+                  style={{
+                    width: 12,
+                    height: 12,
+                    backgroundColor: "#22C55E",
+                    borderRadius: 6,
+                    alignSelf: "center",
+                  }}
+                />
+                <span>On Time</span>
+              </div>
+              {/* Delayed */}
+              <div className="flex items-center gap-1">
+                <div
+                  style={{
+                    width: 12,
+                    height: 12,
+                    backgroundColor: "red",
+                    borderRadius: 6,
+                    alignSelf: "center",
+                  }}
+                />
+                <span>Delayed</span>
+              </div>
+              {/* Miss Punch */}
+              <div className="flex items-center gap-1">
+                <div
+                  style={{
+                    width: 12,
+                    height: 12,
+                    backgroundColor: "blue",
+                    borderRadius: 6,
+                    alignSelf: "center",
+                  }}
+                />
+                <span>Miss Punch</span>
+              </div>
+
+              {/* No Punches */}
+              <div className="flex items-center gap-1">
+                <div
+                  style={{
+                    width: 12,
+                    height: 12,
+                    backgroundColor: "orange",
+                    borderRadius: 6,
+                    alignSelf: "center",
+                  }}
+                />
+                <span>No Punches</span>
+              </div>
+
+
+            </div>
+
           </div>
         )}
 
@@ -525,7 +614,7 @@ const Form = () => {
                     key={employee.mIdCard || index}
                     employee={employee}
                     index={index}
-                    date={date}
+                  // date={date}
 
                   />
                 ))}
@@ -545,7 +634,7 @@ const Form = () => {
               <div className="border-b py-2 px-4 mx-3 flex mt-4 justify-between items-center sticky top-0 z-10 bg-white">
                 <div className="flex items-center gap-2">
                   <h2 className=" -ml-2   py-0.5 master-header-modal">
-                    BREAK REPORT GENERATION
+                    Date Wise Break Report
                   </h2>
                 </div>
               </div>
@@ -558,66 +647,29 @@ const Form = () => {
                         <div className="flex flex-wrap gap-x-7">
                           <div className="mb-3 ">
                             <DateInput
-                              name="DOC Date"
-                              value={date}
-                              setValue={setDate}
+                              name="From Date"
+                              value={fromDate}
+                              setValue={setFromDate}
                               required={true}
                               disabled={childRecord.current > 0}
                               ref={designationRef}
                             />
                           </div>
-                          {/* <div className="w-52">
-                            <label className="block text-xs font-semibold text-slate-700 mb-1">
-                              Employee Category
-                              <span className="text-red-500">*</span>
-                            </label>
-                            <Select
-                              options={EmployeeOptions}
-                              value={
-                                EmployeeOptions?.find(
-                                  (opt) => opt.value === employeeCategoryId
-                                ) || null
-                              }
-                              onChange={(selected) =>
-                                setEmployeeCategoryId(selected?.value || "")
-                              }
-                              placeholder="Select Employee Category"
-                              isClearable={false} // same as required
-                              isSearchable
-                              menuShouldScrollIntoView={false}
-                              maxMenuHeight={150} // <-- Reduce height here
-                              onInputChange={(value) => value.toUpperCase()}
-                              className="w-full px-1 text-[12px] text-black -ml-1 text-xs rounded-lg
-          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-          transition-all duration-150 shadow-sm"
-                              styles={customSelectStyles}
+                          <div>
+                            <DateInput
+                              name="To Date"
+                              value={toDate}
+                              setValue={setToDate}
+                              required={true}
+                              disabled={childRecord.current > 0}
+                            // ref={toDateRef}
                             />
-                          </div> */}
-                          {/* <div className="mb-3">
-                            {" "}
-                            <label className="block text-xs font-semibold text-slate-700 mb-1">
-                              {" "}
-                              Group By{" "}
-                            </label>{" "}
-                            <select
-                              value={groupBy}
-                              className="w-full px-1 py-0.5 text-xs text-[12px] border border-black rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-150 shadow-sm"
-                              onChange={(e) => setGroupBy(e.target.value)}
-                            >
-                              {" "}
-                              <option value="">Select</option>{" "}
-                              {GroupBy?.map((val, index) => (
-                                <option key={index} value={val?.value}>
-                                  {" "}
-                                  {val?.show}{" "}
-                                </option>
-                              ))}{" "}
-                            </select>{" "}
-                          </div> */}
+                          </div>
+
                           <div>
                             <button
                               onClick={() => {
-                                if (!date) {
+                                if (!toDate && !fromDate) {
                                   Swal.fire({
                                     icon: "error",
                                     title: "Submission error",
@@ -625,10 +677,19 @@ const Form = () => {
                                   });
                                   return;
                                 }
+                                if (new Date(fromDate) > new Date(toDate)) {
+                                  Swal.fire({
+                                    icon: "error",
+                                    title: "Invalid Range",
+                                    text: "From Date cannot be later than To Date.",
+                                  });
+                                  return;
+                                }
 
                                 triggerReport({
                                   searchParams: {
-                                    date,
+                                    fromDate,
+                                    toDate,
                                   },
                                 });
 

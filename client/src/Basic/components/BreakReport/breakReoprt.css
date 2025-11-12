@@ -98,14 +98,17 @@
     background-color: red;
     color: darkorange;
 }
+
 div[style*="position: fixed"] {
     display: none !important;
 }
 
 /* 🔹 Group Drop Area (where you drag columns to group) */
 .e-grid .e-groupdroparea {
-    background-color: #f3f4f6; /* light gray */
-    border: 1px dashed #d1d5db; /* dashed border */
+    background-color: #f3f4f6;
+    /* light gray */
+    border: 1px dashed #d1d5db;
+    /* dashed border */
     padding: 4px 8px;
     font-size: 12px;
     color: #111827;
@@ -117,7 +120,8 @@ div[style*="position: fixed"] {
 
 /* 🔹 Grouped Header Box */
 .e-grid .e-groupdroparea .e-grouptile {
-    background-color: #e5e7eb; /* slightly darker gray */
+    background-color: #e5e7eb;
+    /* slightly darker gray */
     border-radius: 4px;
     padding: 2px 6px;
     display: flex;
@@ -130,17 +134,66 @@ div[style*="position: fixed"] {
 /* 🔹 Close Icon on grouped header */
 .e-grid .e-groupdroparea .e-icon-close {
     font-size: 12px;
-    color: #dc2626; /* red */
+    color: #dc2626;
+    /* red */
     cursor: pointer;
 }
 
 /* 🔹 Sort Arrow in grouped header */
 .e-grid .e-groupdroparea .e-sort {
-    color: #2563eb; /* blue */
+    color: #2563eb;
+    /* blue */
     font-size: 10px;
 }
 
 /* Optional: Hover effect on grouped tile */
 .e-grid .e-groupdroparea .e-grouptile:hover {
     background-color: #d1d5db;
+}
+
+/* ==== Group Drop Area (Draggable Header Section) ==== */
+.e-grid .e-groupdroparea {
+    /* background-color: #f0f4f8;       
+  border: 1px dashed #9ca3af;      */
+    color: black !important;
+    font-size: 15px !important;
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    transition: all 0.2s ease;
+    font-weight: 500 !important;
+    /* background-color: rgb(243, 206, 243) !important; */
+}
+
+/* Hover effect when dragging a column */
+.e-grid .e-groupdroparea.e-hover {
+    background-color: #e0f2fe;
+    /* light blue highlight */
+    border-color: #3b82f6;
+    /* blue border */
+}
+
+/* Text style inside the drop area */
+.e-grid .e-groupdroparea span {
+    font-weight: 500;
+}
+
+/* When a column is grouped */
+.e-grid .e-groupheadercell {
+    background-color: #dbeafe;
+    border-radius: 6px;
+    padding: 4px 8px;
+    margin-right: 6px;
+    color: black;
+    /* Dark gray text */
+
+}
+.e-icons {
+  font-family: "e-icons" !important;
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-variant: normal !important;
+  text-transform: none !important;
+  line-height: 1;
+ 
 }

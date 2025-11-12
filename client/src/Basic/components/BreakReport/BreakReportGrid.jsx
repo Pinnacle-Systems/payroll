@@ -16,6 +16,8 @@ import {
     Inject,
 } from "@syncfusion/ej2-react-grids";
 import breakReoprt from './breakReoprt.css'
+import { CheckCircle, AlertTriangle, XCircle, Info } from "lucide-react";
+
 const BreakReportGrid = ({ employeeData }) => {
     const gridRef = useRef(null);
 
@@ -67,220 +69,234 @@ const BreakReportGrid = ({ employeeData }) => {
         }
     };
 
-const employeeDataWithSno = employeeData?.map((emp, index) => ({
-    ...emp,
-    sno: index + 1
-}));
+    const employeeDataWithSno = employeeData?.map((emp, index) => ({
+        
+        ...emp,
+        sno: index + 1,
+        //   reportDate: new Date(emp.reportDate),
+
+    }));
 
     return (
-        <GridComponent
-            ref={gridRef}
-            // dataSource={employeeData}
-            dataSource={employeeDataWithSno} 
+        <div>
 
-            rowHeight={30}   // <---- controls all body row heigh25
-            pageSettings={{ pageSize: 20 }}
-            allowSorting={true}
-            // allowFiltering={true}
+            <GridComponent
+                ref={gridRef}
+                // dataSource={employeeData}
+                dataSource={employeeDataWithSno}
 
-            allowGrouping={true}
-            groupSettings={{ showDropArea: true }}
-            // toolbar={toolbarOptions}
+                rowHeight={30}   // <---- controls all body row heigh25
+                pageSettings={{ pageSize: 20 }}
+                allowSorting={true}
+                // allowFiltering={true}
 
-            gridLines="Both"
-            height="auto"
-            allowPaging={false}
-        >
-            <ColumnsDirective>
-                {/* ==== EMPLOYEE INFO ==== */}
-                <ColumnDirective
-                    field="sno"
-                    headerText="S.No"
-                    width="40"
-                    textAlign="Center"
-                    headerTextAlign="Center" // header cell alignment
-                    customAttributes={{ class: "col-sno" }}
-                               allowSorting={false}    // Prevent sorting on serial number
+                allowGrouping={true}
+                groupSettings={{ showDropArea: true, 
+//                     showGroupedColumn: true,
+//   showUngroupButton: true
+ }}
+                // toolbar={toolbarOptions}
 
-                />
+                gridLines="Both"
+                height="auto"
+                allowPaging={false}
+            >
+                <ColumnsDirective>
+                    {/* ==== EMPLOYEE INFO ==== */}
+                    <ColumnDirective
+                        field="sno"
+                        headerText="S.No"
+                        width="40"
+                        textAlign="Center"
+                        headerTextAlign="Center" // header cell alignment
+                        customAttributes={{ class: "col-sno" }}
+                        allowSorting={false}    // Prevent sorting on serial number
 
-                <ColumnDirective
-                    field="mIdCard"
-                    headerText="MID"
-                    width="65"
-                    headerTextAlign="Center" // header cell alignment
-                    textAlign="Right"
+                    />
 
-                    customAttributes={{ class: "col-mid" }}   // 👈 add class here
+                    <ColumnDirective
+                        field="mIdCard"
+                        headerText="MID"
+                        width="65"
+                        headerTextAlign="Center" // header cell alignment
+                        textAlign="Right"
+
+                        customAttributes={{ class: "col-mid" }}   // 👈 add class here
 
 
-                />
-                <ColumnDirective
-                    field="firstName"
-                    headerText="Emp Name"
-                    width="115"
-                    headerTextAlign="Center" // header cell alignment
-                    textAlign="left"
+                    />
+                    <ColumnDirective
+                        field="firstName"
+                        headerText="Emp Name"
+                        width="115"
+                        headerTextAlign="Center" // header cell alignment
+                        textAlign="left"
 
-                    customAttributes={{ class: "col-emp" }}
+                        customAttributes={{ class: "col-emp" }}
 
-                />
-                <ColumnDirective
-                    field="departmentName"
-                    headerText="Department"
-                    width="100"
-                    headerTextAlign="Center" // header cell alignment
-                    textAlign="left"
+                    />
+                    <ColumnDirective
+                        field="departmentName"
+                        headerText="Department"
+                        width="100"
+                        headerTextAlign="Center" // header cell alignment
+                        textAlign="left"
 
-                    customAttributes={{ class: "col-dept" }}
+                        customAttributes={{ class: "col-dept" }}
 
-                />
-                <ColumnDirective
-                    field="designationName"
-                    headerText="Designation"
-                    width="165"
-                    headerTextAlign="Center" // header cell alignment
-                    textAlign="left"
+                    />
+                    <ColumnDirective
+                        field="designationName"
+                        headerText="Designation"
+                        width="165"
+                        headerTextAlign="Center" // header cell alignment
+                        textAlign="left"
 
-                    customAttributes={{ class: "col-desig" }}
+                        customAttributes={{ class: "col-desig" }}
 
-                />
-                <ColumnDirective
-                    field="reportDate"
-                    headerText="Date"
-                    width="90"
-                    format="yMd"
-                    headerTextAlign="Center" // header cell alignment
-                    textAlign="center"
+                    />
+                    <ColumnDirective
+                        field="reportDate"
+                        headerText="Date"
+                        width="90"
+                        format="dMy"
+                        headerTextAlign="Center" // header cell alignment
+                        textAlign="center"
 
-                    customAttributes={{ class: "col-date" }}
+                        customAttributes={{ class: "col-date" }}
 
-                />
+                    />
 
-                {/* ==== MORNING BREAK ==== */}
-                <ColumnDirective headerText="Morning Tea Break"  headerTextAlign="Center" customAttributes={{ class: "col-break-header" }} columns={[
-                    {
-                        headerTextAlign: "Center", field: "firstBreakOut",        // ✅ important
-                        headerText: "Out", width: 80, textAlign: "Center",       // ✅ important
-                        valueAccessor: (f, d) => formatTime(d.firstBreakOut), customAttributes: { class: "col-break" }
-                    },
-                    {
-                        headerTextAlign: "Center", headerText: "In", field: "firstBreakIn",        // ✅ important
-                        width: 80, textAlign: "Center", valueAccessor: (f, d) => formatTime(d.firstBreakIn), field: "breakDuration",
-                        customAttributes: { class: "col-break" }
-                    },
-                    { headerTextAlign: "Center", textAlign: "right", field: "breakDuration", headerText: "Duration", width: 75, customAttributes: { class: "col-break" } },
-                    {
-                        headerTextAlign: "Center", textAlign: "Left", headerText: "Status", width: 90, field: "morningBreakStatus",
-
-                        // valueAccessor: (f, d) => simplifyStatus(d.morningBreakStatus), customAttributes: { class: "col-break" } 
-                        template: (props) => {
-                            let status = props.morningBreakStatus || "";
-                            let text = "No Data";
-                            let colorClass = "text-gray-600";
-
-                            if (status.includes("No Punches Available")) {
-                                text = "No Punch";
-                                colorClass = "text-red-600";
-                            } else if (status.includes("Only One Punch Available")) {
-                                text = "One Punch";
-                                colorClass = "text-blue-600";
-                            } else if (status.includes("Correct")) {
-                                text = "On Time";
-                                colorClass = "text-green-600";
-                            } else if (status.includes("Delayed")) {
-                                text = "Delayed";
-                                colorClass = "text-orange-600";
-                            }
-
-                            return <span className={colorClass}>{text}</span>;
-                        }
-
-                    },
-                ]} />
-
-                {/* ==== LUNCH BREAK ==== */}
-                <ColumnDirective headerText="Lunch Break" customAttributes={{ class: "col-break-header" }} columns={[
-                    { headerTextAlign: "Center", field: "lunchBreakOut", headerText: "Out", width: 80, textAlign: "Center", valueAccessor: (f, d) => formatTime(d.lunchBreakOut), customAttributes: { class: "col-break" } },
-                    { headerTextAlign: "Center", field: "lunchBreakIn", headerText: "In", width: 80, textAlign: "Center", valueAccessor: (f, d) => formatTime(d.lunchBreakIn), customAttributes: { class: "col-break" } },
-                    { headerTextAlign: "Center", field: "lunchBreakDuration", textAlign: "right", headerText: "Duration", width: 75, customAttributes: { class: "col-break" } },
-                    {
-                        headerTextAlign: "Center", textAlign: "Left", headerText: "Status", width: 90, field: "lunchBreakStatus",
-                        // valueAccessor: (f, d) => simplifyStatus(d.lunchBreakStatus), 
-                        template: (props) => {
-                            let status = props.lunchBreakStatus || "";
-                            let text = "No Data";
-                            let colorClass = "text-gray-600";
-
-                            if (status.includes("No Punches Available")) {
-                                text = "No Punch";
-                                colorClass = "text-red-600";
-                            } else if (status.includes("Only One Punch Available")) {
-                                text = "One Punch";
-                                colorClass = "text-blue-600";
-                            } else if (status.includes("Correct")) {
-                                text = "On Time";
-                                colorClass = "text-green-600";
-                            } else if (status.includes("Delayed")) {
-                                text = "Delayed";
-                                colorClass = "text-orange-600";
-                            }
-
-                            return <span className={colorClass}>{text}</span>;
+                    {/* ==== MORNING BREAK ==== */}
+                    <ColumnDirective headerText="Morning Tea Break" headerTextAlign="Center" customAttributes={{ class: "col-break-header" }} columns={[
+                        {
+                            headerTextAlign: "Center", field: "firstBreakOut",        // ✅ important
+                            headerText: "Out", width: 80, textAlign: "Center",       // ✅ important
+                            valueAccessor: (f, d) => formatTime(d.firstBreakOut), customAttributes: { class: "col-break" }
                         },
-
-
-                        customAttributes: { class: "col-break" }
-                    },
-                ]} />
-
-                {/* ==== EVENING BREAK ==== */}
-                <ColumnDirective headerText="Evening Tea Break" customAttributes={{ class: "col-break-header" }} columns={[
-                    { headerTextAlign: "Center", field: "eveningBreakOut", headerText: "Out", width: 80, textAlign: "Center", valueAccessor: (f, d) => formatTime(d.eveningBreakOut), customAttributes: { class: "col-break" } },
-                    { headerTextAlign: "Center", field: "eveningBreakIn", headerText: "In", width: 80, textAlign: "Center", valueAccessor: (f, d) => formatTime(d.eveningBreakIn), customAttributes: { class: "col-break" } },
-                    { headerText: "Duration", headerTextAlign: "Center", textAlign: "right", field: "eveningBreakDuration", width: 75, textAlign: "right", customAttributes: { class: "col-break" } },
-                    {
-                        headerTextAlign: "Center", textAlign: "Left", headerText: "Status", width: 90, field: "eveningBreakStatus",
-                        //  valueAccessor: (f, d) => simplifyStatus(d.eveningBreakStatus),
-                        template: (props) => {
-                            let status = props.eveningBreakStatus || "";
-                            let text = "No Data";
-                            let colorClass = "text-gray-600";
-
-                            if (status.includes("No Punches Available")) {
-                                text = "No Punch";
-                                colorClass = "text-red-600";
-                            } else if (status.includes("Only One Punch Available")) {
-                                text = "One Punch";
-                                colorClass = "text-blue-600";
-                            } else if (status.includes("Correct")) {
-                                text = "On Time";
-                                colorClass = "text-green-600";
-                            } else if (status.includes("Delayed")) {
-                                text = "Delayed";
-                                colorClass = "text-orange-600";
-                            }
-
-                            return <span className={colorClass}>{text}</span>;
+                        {
+                            headerTextAlign: "Center", headerText: "In", field: "firstBreakIn",        // ✅ important
+                            width: 80, textAlign: "Center", valueAccessor: (f, d) => formatTime(d.firstBreakIn),
+                            customAttributes: { class: "col-break" }
                         },
-                        customAttributes: { class: "col-break" }
-                    },
-                ]} />
-            </ColumnsDirective>
+                        { headerTextAlign: "Center", textAlign: "right", field: "breakDuration", headerText: "Duration", width: 75, customAttributes: { class: "col-break" } },
+                        {
+                            headerTextAlign: "Center", textAlign: "Left", headerText: "Status", width: 50, field: "morningBreakStatus",
 
-            <Inject
-                services={[
-                    Page,
-                    Sort,
-                    Filter,
-                    Group,
-                    Search,
-                    Toolbar,
-                    ExcelExport,
-                    PdfExport,
-                ]}
-            />
-        </GridComponent>
+                            // valueAccessor: (f, d) => simplifyStatus(d.morningBreakStatus), customAttributes: { class: "col-break" } 
+                            template: (props) => {
+                                let status = props.morningBreakStatus || "";
+                                let color = "#9CA3AF"; // default gray
+
+                                if (status.includes("No Punches Available")) color = "#FB923C"; // orange
+                                else if (status.includes("Only One Punch Available")) color = "#3649f5ff"; // amber
+                                else if (status.includes("Correct")) color = "#22C55E"; // green
+                                else if (status.includes("Delayed")) color = "#EF4444"; // red
+
+                                return (
+                                    <div
+                                        style={{
+                                            width: 13,
+                                            height: 13,
+                                            backgroundColor: color,
+                                            borderRadius: "50%",
+                                            margin: "auto",
+                                        }}
+                                    ></div>
+                                )
+                            },
+
+                        },
+                    ]} />
+
+                    {/* ==== LUNCH BREAK ==== */}
+                    <ColumnDirective headerText="Lunch Break" customAttributes={{ class: "col-break-header" }} columns={[
+                        { headerTextAlign: "Center", field: "lunchBreakOut", headerText: "Out", width: 80, textAlign: "Center", valueAccessor: (f, d) => formatTime(d.lunchBreakOut), customAttributes: { class: "col-break" } },
+                        { headerTextAlign: "Center", field: "lunchBreakIn", headerText: "In", width: 80, textAlign: "Center", valueAccessor: (f, d) => formatTime(d.lunchBreakIn), customAttributes: { class: "col-break" } },
+                        { headerTextAlign: "Center", field: "lunchBreakDuration", textAlign: "right", headerText: "Duration", width: 75, customAttributes: { class: "col-break" } },
+                        {
+                            headerTextAlign: "Center", textAlign: "Left", headerText: "Status", width: 50, field: "lunchBreakStatus",
+                            // valueAccessor: (f, d) => simplifyStatus(d.lunchBreakStatus), 
+                            template: (props) => {
+                                let status = props.lunchBreakStatus || "";
+                                let color = "#9CA3AF"; // default gray
+
+                                if (status.includes("No Punches Available")) color = "#FB923C"; // orange
+                                else if (status.includes("Only One Punch Available")) color = "#3649f5ff"; // amber
+                                else if (status.includes("Correct")) color = "#22C55E"; // green
+                                else if (status.includes("Delayed")) color = "#EF4444"; // red
+
+                                return (
+                                    <div
+                                        style={{
+                                            width: 13,
+                                            height: 13,
+                                            backgroundColor: color,
+                                            borderRadius: "50%",
+                                            margin: "auto",
+                                        }}
+                                    ></div>
+                                )
+                            },
+
+
+                            customAttributes: { class: "col-break" }
+                        },
+                    ]} />
+
+                    {/* ==== EVENING BREAK ==== */}
+                    <ColumnDirective headerText="Evening Tea Break" customAttributes={{ class: "col-break-header" }} columns={[
+                        { headerTextAlign: "Center", field: "eveningBreakOut", headerText: "Out", width: 80, textAlign: "Center", valueAccessor: (f, d) => formatTime(d.eveningBreakOut), customAttributes: { class: "col-break" } },
+                        { headerTextAlign: "Center", field: "eveningBreakIn", headerText: "In", width: 80, textAlign: "Center", valueAccessor: (f, d) => formatTime(d.eveningBreakIn), customAttributes: { class: "col-break" } },
+                        { headerText: "Duration", headerTextAlign: "Center", textAlign: "right", field: "eveningBreakDuration", width: 75, textAlign: "right", customAttributes: { class: "col-break" } },
+                        {
+                            headerTextAlign: "Center", textAlign: "Left", headerText: "Status", width: 50, field: "eveningBreakStatus",
+                            //  valueAccessor: (f, d) => simplifyStatus(d.eveningBreakStatus),
+                            template: (props) => {
+                                let status = props.eveningBreakStatus || "";
+                                let text = "No Data";
+                                let colorClass = "text-gray-600";
+
+                                let color = "#9CA3AF"; // default gray
+
+                                if (status.includes("No Punches Available")) color = "#FB923C"; // orange
+                                else if (status.includes("Only One Punch Available")) color = "#3649f5ff"; // amber
+                                else if (status.includes("Correct")) color = "#22C55E"; // green
+                                else if (status.includes("Delayed")) color = "#EF4444"; // red
+
+                                return (
+                                    <div
+                                        style={{
+                                            width: 13,
+                                            height: 13,
+                                            backgroundColor: color,
+                                            borderRadius: "50%",
+                                            margin: "auto",
+                                        }}
+                                    ></div>
+                                )
+                            },
+                            customAttributes: { class: "col-break" }
+                        },
+                    ]} />
+                </ColumnsDirective>
+
+                <Inject
+                    services={[
+                        Page,
+                        Sort,
+                        Filter,
+                        Group,
+                        Search,
+                        Toolbar,
+                        ExcelExport,
+                        PdfExport,
+                    ]}
+                />
+            </GridComponent>
+
+        </div>
+
     );
 };
 
