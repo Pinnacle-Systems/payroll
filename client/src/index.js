@@ -19,6 +19,7 @@ import '@syncfusion/ej2-dropdowns/styles/material.css';
 import '@syncfusion/ej2-splitbuttons/styles/material.css';
 import '@syncfusion/ej2-navigations/styles/material.css';
 import '@syncfusion/ej2-icons/styles/material.css'; // <-- Add this
+import '@syncfusion/ej2-pdf-export';
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

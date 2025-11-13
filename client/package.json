@@ -18,6 +18,7 @@
     "@reduxjs/toolkit": "^1.9.2",
     "@syncfusion/ej2-base": "^31.2.5",
     "@syncfusion/ej2-icons": "^31.2.2",
+    "@syncfusion/ej2-pdf-export": "^31.2.2",
     "@syncfusion/ej2-react-buttons": "^31.2.3",
     "@syncfusion/ej2-react-grids": "^31.2.5",
     "@testing-library/jest-dom": "^5.16.5",

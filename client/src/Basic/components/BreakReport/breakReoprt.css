@@ -155,7 +155,8 @@ div[style*="position: fixed"] {
 .e-grid .e-groupdroparea {
     /* background-color: #f0f4f8;       
   border: 1px dashed #9ca3af;      */
-    color: black !important;
+    /* color: black !important; */
+
     font-size: 15px !important;
     padding: 8px 10px;
     border-radius: 8px;
@@ -184,16 +185,97 @@ div[style*="position: fixed"] {
     border-radius: 6px;
     padding: 4px 8px;
     margin-right: 6px;
-    color: black;
+    /* color: black; */
     /* Dark gray text */
 
 }
+
 .e-icons {
-  font-family: "e-icons" !important;
-  font-style: normal !important;
-  font-weight: normal !important;
-  font-variant: normal !important;
-  text-transform: none !important;
-  line-height: 1;
- 
+    font-family: "e-icons" !important;
+    font-style: normal !important;
+    font-weight: normal !important;
+    font-variant: normal !important;
+    text-transform: none !important;
+    line-height: 1;
+
+}
+
+
+.e-grid .e-toolbar {
+    background-color: transparent !important;
+
+    position: absolute !important;
+    top: 6px !important;
+    right: 8px !important;
+    /* same as group drop area */
+    border: none !important;
+    box-shadow: none !important;
+    height: 8px !important;
+    z-index: 10 !important;
+    display: flex !important;
+    gap: 3px !important;
+    align-items: center !important;
+}
+.e-grid .e-toolbar .e-toolbar-items{
+    background-color: transparent !important;
+
+}
+/* Make space in drag area for toolbar */
+.e-grid .e-groupdroparea {
+    position: relative !important;
+    padding-right: 80px !important;
+    
+}
+
+/* === Export Buttons === */
+.e-grid .e-toolbar .e-btn {
+    /* blue for Excel */
+
+    border: none !important;
+    color: #ffffff !important;
+    /* white text */
+    font-size: 6px !important;
+    /* padding: 2px 6px !important; */
+    border-radius: 6px !important;
+    font-weight: 500 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 3px !important;
+    transition: all 0.2s ease;
+}
+.e-toolbar .e-toolbar-item:first-child .e-btn {
+    background-color: #16a34a !important; /* green */
+
+}
+
+/* PDF button (second one) */
+.e-toolbar .e-toolbar-item:nth-child(2) .e-btn {
+      background-color: #2563eb !important; /* blue */
+
+}
+
+/* Hover effect */
+/* .e-grid .e-toolbar .e-btn:hover {
+    opacity: 0.85 !important;
+    transform: translateY(-1px);
+} */
+
+/* White icons */
+.e-grid .e-toolbar .e-btn .e-icons {
+    font-size: 14px !important;
+    color: #ffffff !important;
+    vertical-align: middle;
+}
+
+/* Hide separators */
+.e-grid .e-toolbar .e-separator {
+    display: none !important;
+}
+
+.e-grid .e-toolbar .e-btn,
+.e-grid .e-toolbar .e-btn span,
+.e-grid .e-toolbar .e-btn .e-tbar-btn-text,
+.e-grid .e-toolbar .e-btn .e-icons {
+    color: #ffffff !important;
+    /* always white text & icons */
 }

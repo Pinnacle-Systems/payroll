@@ -490,7 +490,7 @@ const Form = () => {
 
         {/* ==== Syncfusion Grid View ==== */}
         {showGrid && (
-          <div className="mt-2">
+          <div className="mt-2 ">
 
             <div
               className="w-[100vw] max-w-[1570px] bg-white p-2 rounded-lg shadow-md border border-gray-200"
