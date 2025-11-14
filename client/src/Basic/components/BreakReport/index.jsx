@@ -474,14 +474,13 @@ const Form = () => {
               <FiDownload className="w-4 h-4" />
               Download Excel
             </button>
-            {/* </div> */}
 
             <button
               onClick={() => {
                 setForm(true);
                 OnNew();
               }}
-              className="bg-white w-[140px]  border  border-blue-600 text-blue-600 hover:bg-blue-700 hover:text-white text-sm px-1  rounded-md shadow transition-colors duration-200 flex items-center gap-2"
+              className="bg-white w-[130px] pl-1 border  border-blue-600 text-blue-600 hover:bg-blue-700 hover:text-white text-sm   rounded-md shadow transition-colors duration-200 flex items-center gap-2"
             >
               + Report Param
             </button>

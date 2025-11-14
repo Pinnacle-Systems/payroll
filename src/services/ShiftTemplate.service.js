@@ -196,10 +196,10 @@ async function create(body) {
                             ? parseInt(q.oTDetailsId)
                             : undefined,
                           name: q.name || '',
-                          ftMins: q.ftMins ? parseInt(q.ftMins) : undefined,
+                          ftMins: q.ftMins ? parseInt(q.ftMins) : null,
                           from: q.from || "",
                           to: q.to || "",
-                          ttMins: q.ttMins ? parseInt(q.ttMins) : undefined,
+                          ttMins: q.ttMins ? parseInt(q.ttMins) : null,
                           endTime: q.endTime
                             ? parseInt(q.endTime)
                             : undefined,
@@ -539,10 +539,10 @@ async function updateShiftTemplateItems(tx, newItems, existingData) {
                       : undefined,
                     name: q.name || '',
 
-                    ftMins: q.ftMins ? parseInt(q.ftMins) : undefined,
+                    ftMins: q.ftMins ? parseInt(q.ftMins) : null,
                     from: q.from || "",
                     to: q.to || "",
-                    ttMins: q.ttMins ? parseInt(q.ttMins) : undefined,
+                    ttMins: q.ttMins ? parseInt(q.ttMins) : null,
                     endTime: q.endTime ? parseInt(q.endTime) : undefined,
                     nextDay: q.nextDay || "",
                     checkHrs: q.checkHrs ? parseInt(q.checkHrs) : undefined,
@@ -557,10 +557,10 @@ async function updateShiftTemplateItems(tx, newItems, existingData) {
                     ? parseInt(q.oTDetailsId)
                     : undefined,
                   name: q.name || '',
-                  ftMins: q.ftMins ? parseInt(q.ftMins) : undefined,
+                  ftMins: q.ftMins ? parseInt(q.ftMins) : null,
                   from: q.from || "",
                   to: q.to || "",
-                  ttMins: q.ttMins ? parseInt(q.ttMins) : undefined,
+                  ttMins: q.ttMins ? parseInt(q.ttMins) : null,
                   endTime: q.endTime ? parseInt(q.endTime) : undefined,
                   nextDay: q.nextDay || "",
                   checkHrs: q.checkHrs ? parseInt(q.checkHrs) : undefined,
@@ -610,10 +610,10 @@ async function updateShiftTemplateItems(tx, newItems, existingData) {
                   ? parseInt(q.oTDetailsId)
                   : undefined,
                 name: q.name || '',
-                ftMins: q.ftMins ? parseInt(q.ftMins) : undefined,
+                ftMins: q.ftMins ? parseInt(q.ftMins) : null,
                 from: q.from || "",
                 to: q.to || "",
-                ttMins: q.ttMins ? parseInt(q.ttMins) : undefined,
+                ttMins: q.ttMins ? parseInt(q.ttMins) : null,
                 endTime: q.endTime ? parseInt(q.endTime) : undefined,
                 nextDay: q.nextDay || "",
                 checkHrs: q.checkHrs ? parseInt(q.checkHrs) : undefined,

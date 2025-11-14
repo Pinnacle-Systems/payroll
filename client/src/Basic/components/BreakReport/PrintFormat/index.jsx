@@ -40,6 +40,11 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
 
     },
+    dateField: {
+        fontSize: 9,
+        fontWeight: 'bold',
+
+    },
     reportInfo: {
 
         fontSize: 10
@@ -320,6 +325,39 @@ const PrintFormat = ({ employeeData, date, reportTitle, generatedDate }) => {
     // Usage
     const chunks = chunkArrayVariable(employeeData || [], 17, 20);
 
+    const reportDates = [
+        ...new Set(
+            employeeData?.map(emp =>
+                emp?.reportDate
+                    ? new Date(emp.reportDate).toISOString().split("T")[0]  // Use ISO for sorting
+                    : date || "-"
+            ) || []
+        )
+    ];
+
+    console.log(reportDates, "unique report dates");
+
+
+    // Convert to actual Date objects and sort
+    const sortedDates = reportDates
+        .filter(d => d !== "-")
+        .map(d => new Date(d))
+        .sort((a, b) => a - b);
+
+    let reportDateDisplay = "";
+
+    if (sortedDates.length === 1) {
+        // Only one date → show normally
+        reportDateDisplay = sortedDates[0].toLocaleDateString();
+    } else if (sortedDates.length > 1) {
+        // Multiple dates → show range
+        const first = sortedDates[0].toLocaleDateString();
+        const last = sortedDates[sortedDates.length - 1].toLocaleDateString();
+        reportDateDisplay = `${first} - ${last}`;
+    } else {
+        reportDateDisplay = date || "-";
+    }
+
     return (
         <Document>
             {chunks?.map((chunk, pageIndex) => (
@@ -342,7 +380,7 @@ const PrintFormat = ({ employeeData, date, reportTitle, generatedDate }) => {
                                     </View>
                                     <Text style={[tw(""), styles.title]}>{reportTitle || 'Date Wise Break Report'}</Text>
 
-                                    <Text style={[tw(" text-right -mt-4  mr-12"), styles.title]}>Report Date: {date || ''}</Text>
+                                    <Text style={[tw(" text-right -mt-4  mr-12"), styles.dateField]}>Report Date:  {reportDateDisplay || ''}</Text>
 
 
                                     <View style={styles.horizontalLine} />

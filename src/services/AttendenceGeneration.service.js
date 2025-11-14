@@ -59,6 +59,13 @@ function getLocalTimeStr(timestamp) {
   const s = istTime.getUTCSeconds().toString().padStart(2, "0");
   return `${h}:${m}:${s}`;
 }
+function timeStrToHours(timeStr) {
+  const [h, m, s] = timeStr.split(":")?.map(Number);
+  return h + m / 60 + (s ? s / 3600 : 0);
+}
+function roundToHalf(value) {
+  return Math.round(value * 2) / 2;
+}
 
 async function get(searchParams) {
   const { date } = searchParams;
@@ -288,7 +295,7 @@ ORDER BY e.id;
         ? JSON.parse(row.punchesArray)
         : row.punchesArray || [],
 
-
+    hourlyFormulaResult: 0
   }));
   for (const emp of data) {
     if (!emp.shiftTemplateId) continue; // skip if no shift template
@@ -344,23 +351,23 @@ ORDER BY e.id;
     //     }
     //   });
 
-    const punchesTime = (emp.punches || [])
-      .map(p => {
-        const ts = p.timestamp;
-        if (!ts) return null;
+    const punchesTime = (emp?.punches || [])?.map(p => {
+      const ts = p.timestamp;
+      if (!ts) return null;
 
-        const dateObj = new Date(ts);
-        if (isNaN(dateObj)) return null;
+      const dateObj = new Date(ts);
+      if (isNaN(dateObj)) return null;
 
-        // ✅ Format in local time (HH:mm:ss)
-        return dateObj.toLocaleTimeString("en-GB", { hour12: false });
-      })
-      .filter(Boolean);
+      // ✅ Format in local time (HH:mm:ss)
+      return dateObj.toLocaleTimeString("en-GB", { hour12: false });
+    })?.filter(Boolean);
 
 
     console.log(punchesTime, "punchesTime");
 
     const quarterValues = {};
+    const hourlyValues = {};  // hourly formula values
+    
 
     // Loop through each quarter and filter punches
     for (const q of emp.quarters) {
@@ -369,7 +376,7 @@ ORDER BY e.id;
 
 
       const fromMins = timeStrToMinutes(q.from) - 30;
-      const toMins = timeStrToMinutes(q.to) + 30;
+      const toMins = timeStrToMinutes(q.to) + 15;
 
       const quarterPunches = punchesTime.filter(time => {
         const punchMins = timeStrToMinutes(time);
@@ -377,43 +384,80 @@ ORDER BY e.id;
 
         return punchMins >= fromMins && punchMins <= toMins;
       })
-      if (quarterPunches.length) {
-        const punchMinsArray = quarterPunches.map(timeStrToMinutes);
+      if (quarterPunches?.length) {
+        const punchMinsArray = quarterPunches?.map(timeStrToMinutes);
         const workedMins = Math.max(...punchMinsArray) - Math.min(...punchMinsArray);
-        const totalMins = timeStrToMinutes(q.total);
+        // const totalMins = timeStrToMinutes(q.total);
+        // const value = workedMins >= totalMins ? 4 : 0;
+        // quarterValues[q.name] = value;
+        // console.log(`Employee ${emp.firstName} - Quarter ${q.name} punches:`, quarterPunches);
+        // console.log(`${q.name} value = ${value}`);
 
-        const value = workedMins >= totalMins ? 4 : 0;
-        quarterValues[q.name] = value;
-        console.log(`Employee ${emp.firstName} - Quarter ${q.name} punches:`, quarterPunches);
+        const totalHours = timeStrToHours(q.total); // e.g., "04:30:00" → 4.5
+        const totalMins = totalHours * 60;
+
+        // Return total hours if workedMins >= totalMins, else 0
+        const value = workedMins >= totalMins ? totalHours : 0;
+        const finalValue = roundToHalf(value);
+        console.log(`Employee ${emp.firstName} - Quarter ${q.name} value = ${finalValue}`);
+        quarterValues[q.name] = finalValue;
 
 
-        console.log(`${q.name} value = ${value}`);
+        let workedMinsPairwise = 0;
+        const sortedMins = punchMinsArray.sort((a, b) => a - b);
 
+        for (let i = 0; i < sortedMins.length - 1; i += 2) {
+          workedMinsPairwise += sortedMins[i + 1] - sortedMins[i];
+        }
+
+        // Round totalHours to nearest 0.5
+        const valuePairwise = workedMinsPairwise >= totalMins ? totalHours : 0;
+        const finalValuePairwise = roundToHalf(valuePairwise);
+        // const finalValuePairwise = workedMinsPairwise > 0 ? roundToHalf(totalHours) : 0;
+
+        console.log(`Employee ${emp.firstName} - Hourly  ${q.name} value (pairwise) = ${finalValuePairwise}`);
+        hourlyValues[q.name] = finalValuePairwise; // new pairwise
       } else {
         console.log(`Employee ${emp.firstName} - Quarter ${q.name} has no punches in range`);
         quarterValues[q.name] = 0; // no punches = 0
         console.log(`${q.name} value = 0`);
+        hourlyValues[q.name] = 0;
+
 
       }
 
     }
-    const formulas = emp.quarters
-      .filter(q => q.formula)
-      .map(q => q.formula);
+
+
+    const formulas = emp.quarters?.filter(q => q?.formula)?.map(q => q?.formula);
 
     if (formulas.length) {
       // Combine formulas if multiple, or just take the first one
-      let formulaExpr = formulas.join(";");
-      for (const [qName, val] of Object.entries(quarterValues)) {
+      let formulaExpr = formulas?.join(";");
+      for (const [qName, val] of Object?.entries(quarterValues)) {
         const re = new RegExp(`\\b${qName}\\b`, "g");
         formulaExpr = formulaExpr.replace(re, val);
       }
 
       const formulaResult = safeEval(formulaExpr);
       emp.formulaResult = formulaResult;
-
       console.log(`Employee ${emp.firstName} - Formula result:`, formulaResult);
+
+
     }
+    const hourlyFormulas = emp.quarters?.filter(q => q?.formula)?.map(q => q?.formula);
+    if (hourlyFormulas.length) {
+      let formulaExpr = hourlyFormulas?.join(";");
+      for (const [qName, val] of Object.entries(hourlyValues)) {
+        formulaExpr = formulaExpr.replace(new RegExp(`\\b${qName}\\b`, "g"), val);
+      }
+      // emp.hourlyFormulaResult = safeEval(formulaExpr);
+      const hourlyFormulaResult = safeEval(formulaExpr);
+      emp.hourlyFormulaResult = hourlyFormulaResult;
+      console.log(`Employee ${emp.firstName} - Formula result:`, hourlyFormulaResult);
+    }
+
+
 
 
 
