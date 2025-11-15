@@ -15,7 +15,6 @@ async function getNextDocId(
   endTime,
   isTaxBill
 ) {
-  console.log("argumnts : ", branchId, shortCode, startTime, endTime, isTaxBill);
 
   let lastObject = await prisma.shift.findFirst({
     where: {
@@ -26,7 +25,6 @@ async function getNextDocId(
     },
   });
 
-  console.log(lastObject,"lastObject");
   
 
   const code = "SHF";
@@ -59,7 +57,6 @@ async function get(req) {
   });
   let finYearDate = await getFinYearStartTimeEndTime(finYearId);
  
-   console.log(finYearDate,"finyear--");
    
 
   const shortCode = finYearDate

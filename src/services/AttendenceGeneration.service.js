@@ -9,7 +9,7 @@ function timeToMinutes(timeStr) {
 
 function parseDuration(duration) {
   if (!duration) return 0;
-  const [h, m, s] = duration.split(":").map(Number);
+  const [h, m, s] = duration?.split(":").map(Number);
   return h * 60 + m + (s ? s / 60 : 0);
 }
 function safeEval(expr) {
@@ -19,8 +19,17 @@ function safeEval(expr) {
     return 0;
   }
 }
+function secondsToHms(d) {
+  d = Number(d);
+  const h = Math.floor(d / 3600);
+  const m = Math.floor((d % 3600) / 60);
+  const s = Math.floor(d % 60);
+
+  return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+}
+
 function timeStrToMinutes(timeStr) {
-  const [h, m, s] = timeStr.split(":").map(Number);
+  const [h, m, s] = timeStr?.split(":").map(Number);
   return h * 60 + m + (s ? s / 60 : 0);
 }
 
@@ -66,7 +75,12 @@ function timeStrToHours(timeStr) {
 function roundToHalf(value) {
   return Math.round(value * 2) / 2;
 }
-
+const formatTime = (totalSec) => {
+  const hours = Math.floor(totalSec / 3600);
+  const mins = Math.floor((totalSec % 3600) / 60);
+  const secs = totalSec % 60;
+  return `${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+};
 async function get(searchParams) {
   const { date } = searchParams;
   if (!date) throw new Error("Date is required");
@@ -288,14 +302,12 @@ ORDER BY e.id;
     otHours: row.otHours || 0,
     shiftTemplateId: row.shiftTemplateId || null, // add this
 
-    shiftCount: 0, // placeholder, we’ll calculate below
     formulaResult: 0, // default value
     punches:
       typeof row.punchesArray === "string"
         ? JSON.parse(row.punchesArray)
         : row.punchesArray || [],
 
-    hourlyFormulaResult: 0
   }));
   for (const emp of data) {
     if (!emp.shiftTemplateId) continue; // skip if no shift template
@@ -367,18 +379,44 @@ ORDER BY e.id;
 
     const quarterValues = {};
     const hourlyValues = {};  // hourly formula values
-    
+
 
     // Loop through each quarter and filter punches
-    for (const q of emp.quarters) {
-      if (q.pickFrom !== "SHIFTCALC") continue; // ignore formulas for now
+    emp.quarters?.forEach((q, index) => {
+      if (q.pickFrom !== "SHIFTCALC") return;
 
 
+      const fromMinutes = timeStrToMinutes(q.from);
+      const toMinutes = timeStrToMinutes(q.to);
+      const ftGrace = q.ftMins ?? 0; // nullish coalescing operator
+      const ttGrace = q.ttMins ?? 0;
+      const fromMins = fromMinutes - ftGrace;
+      let toMins = toMinutes + ttGrace;
 
-      const fromMins = timeStrToMinutes(q.from) - 30;
-      const toMins = timeStrToMinutes(q.to) + 15;
+      // If this is the last quarter, allow unlimited late punches
+      const isLastQuarter = index === emp.quarters.length - 2;
+      console.log(isLastQuarter, "isLastQuarter");
 
-      const quarterPunches = punchesTime.filter(time => {
+      if (isLastQuarter) {
+        toMins = Infinity; // or a reasonable cap if needed
+        console.log(`  (Last Quarter) Extended tolerance: now accepting punches up until ANY time`);
+      }
+      // const fromMins = timeStrToMinutes(q.from) - 30;
+      // const toMins = timeStrToMinutes(q.to) + 15;
+      // Convert to readable time strings
+      const originalFromStr = q.from;
+      const originalToStr = q.to;
+      const toleratedFromStr = minutesToTimeStr(fromMins);
+      const toleratedToStr = minutesToTimeStr(toMins);
+
+      console.log(`Employee ${emp.firstName} - Quarter ${q.name}:`);
+      console.log(`Original window: ${originalFromStr} to ${originalToStr}`);
+      console.log(`Window: ${minutesToTimeStr(fromMins)} to ${isLastQuarter ? "∞" : minutesToTimeStr(toMins)}`);
+      console.log(`Tolerance applied: -${ftGrace} mins, +${ttGrace} mins`);
+      console.log(`New window with tolerance: ${toleratedFromStr} to ${toleratedToStr}`);
+
+
+      const quarterPunches = punchesTime?.filter(time => {
         const punchMins = timeStrToMinutes(time);
 
 
@@ -386,12 +424,21 @@ ORDER BY e.id;
       })
       if (quarterPunches?.length) {
         const punchMinsArray = quarterPunches?.map(timeStrToMinutes);
-        const workedMins = Math.max(...punchMinsArray) - Math.min(...punchMinsArray);
-        // const totalMins = timeStrToMinutes(q.total);
-        // const value = workedMins >= totalMins ? 4 : 0;
-        // quarterValues[q.name] = value;
-        // console.log(`Employee ${emp.firstName} - Quarter ${q.name} punches:`, quarterPunches);
-        // console.log(`${q.name} value = ${value}`);
+        const minPunch = Math.min(...punchMinsArray);
+        const maxPunch = Math.max(...punchMinsArray);
+        const workedMins = maxPunch - minPunch;
+
+        // Log the punches used
+        const minPunchStr = minutesToTimeStr(minPunch);
+        const maxPunchStr = minutesToTimeStr(maxPunch);
+        console.log(`Employee ${emp.firstName} - Quarter ${q.name}:`);
+        console.log(`Punches within window: ${quarterPunches.join(", ")}`);
+        console.log(`First punch: ${minPunchStr}`);
+        console.log(`Last punch: ${maxPunchStr}`);
+        const workedSeconds = Math.round(workedMins * 60);
+        const durationStr = secondsToHms(workedSeconds);
+        console.log(`  Worked duration: ${durationStr} (${workedMins.toFixed(2)} mins)`);
+
 
         const totalHours = timeStrToHours(q.total); // e.g., "04:30:00" → 4.5
         const totalMins = totalHours * 60;
@@ -402,36 +449,17 @@ ORDER BY e.id;
         console.log(`Employee ${emp.firstName} - Quarter ${q.name} value = ${finalValue}`);
         quarterValues[q.name] = finalValue;
 
-
-        let workedMinsPairwise = 0;
-        const sortedMins = punchMinsArray.sort((a, b) => a - b);
-
-        for (let i = 0; i < sortedMins.length - 1; i += 2) {
-          workedMinsPairwise += sortedMins[i + 1] - sortedMins[i];
-        }
-
-        // Round totalHours to nearest 0.5
-        const valuePairwise = workedMinsPairwise >= totalMins ? totalHours : 0;
-        const finalValuePairwise = roundToHalf(valuePairwise);
-        // const finalValuePairwise = workedMinsPairwise > 0 ? roundToHalf(totalHours) : 0;
-
-        console.log(`Employee ${emp.firstName} - Hourly  ${q.name} value (pairwise) = ${finalValuePairwise}`);
-        hourlyValues[q.name] = finalValuePairwise; // new pairwise
       } else {
         console.log(`Employee ${emp.firstName} - Quarter ${q.name} has no punches in range`);
         quarterValues[q.name] = 0; // no punches = 0
-        console.log(`${q.name} value = 0`);
-        hourlyValues[q.name] = 0;
-
 
       }
 
-    }
-
+    })
 
     const formulas = emp.quarters?.filter(q => q?.formula)?.map(q => q?.formula);
 
-    if (formulas.length) {
+    if (formulas?.length) {
       // Combine formulas if multiple, or just take the first one
       let formulaExpr = formulas?.join(";");
       for (const [qName, val] of Object?.entries(quarterValues)) {
@@ -442,23 +470,78 @@ ORDER BY e.id;
       const formulaResult = safeEval(formulaExpr);
       emp.formulaResult = formulaResult;
       console.log(`Employee ${emp.firstName} - Formula result:`, formulaResult);
-
-
     }
-    const hourlyFormulas = emp.quarters?.filter(q => q?.formula)?.map(q => q?.formula);
-    if (hourlyFormulas.length) {
-      let formulaExpr = hourlyFormulas?.join(";");
-      for (const [qName, val] of Object.entries(hourlyValues)) {
-        formulaExpr = formulaExpr.replace(new RegExp(`\\b${qName}\\b`, "g"), val);
+
+    // Before hourly calculation
+
+    // Before hourly calculation
+    if (!shiftItem) {
+      console.log(`No shiftTemplateItem found for employee ${emp.firstName}`);
+      emp.hourlyWorkedTime = "00:00:00";
+      emp.rawWorkedTime = "00:00:00"; // also set raw
+      continue; // skip hourly calculation
+    }
+
+    // Attach it to employee
+    emp.shiftTemplateItem = shiftItem;
+
+    if (punchesTime?.length) {
+      const timeToSeconds = (timeStr) => {
+        const [h, m, s] = timeStr?.split(':')?.map(Number);
+        return h * 3600 + m * 60 + s;
+      };
+
+      // ---- 1️⃣ Raw worked time (without breaks) ----
+      let rawSeconds = 0;
+      for (let i = 0; i < punchesTime.length - 1; i += 2) {
+        const inTime = punchesTime[i];
+        const outTime = punchesTime[i + 1];
+        const inSecs = timeToSeconds(inTime);
+        const outSecs = timeToSeconds(outTime);
+        if (outSecs > inSecs) rawSeconds += outSecs - inSecs;
       }
-      // emp.hourlyFormulaResult = safeEval(formulaExpr);
-      const hourlyFormulaResult = safeEval(formulaExpr);
-      emp.hourlyFormulaResult = hourlyFormulaResult;
-      console.log(`Employee ${emp.firstName} - Formula result:`, hourlyFormulaResult);
+      emp.rawWorkedTime = formatTime(rawSeconds); // store raw worked time
+
+      // ---- 2️⃣ Hourly worked time (with breaks applied) ----
+      let totalSeconds = rawSeconds; // start from raw worked seconds
+
+      const breaks = [
+        { out: emp.shiftTemplateItem.fbOut, in: emp.shiftTemplateItem.fbIn }, // morning
+        { out: emp.shiftTemplateItem.lunchBst, in: emp.shiftTemplateItem.lunchBET }, // lunch
+        { out: emp.shiftTemplateItem.sbOut, in: emp.shiftTemplateItem.sbIn } // evening
+      ];
+
+      // Only add breaks if employee has punches
+      if (punchesTime.length) {
+        breaks.forEach((brk) => {
+          if (!brk.out || !brk.in) return; // skip if no break defined
+          const breakStart = timeToSeconds(brk.out);
+          const breakEnd = timeToSeconds(brk.in);
+          const breakDuration = breakEnd - breakStart;
+
+          // Check if any punch overlaps with break window
+          const hasPunchDuringShift = punchesTime.some(t => {
+            const secs = timeToSeconds(t);
+            return secs <= breakEnd; // any punch before or during break
+          });
+
+          if (hasPunchDuringShift) {
+            totalSeconds += breakDuration; // always add full break
+          }
+          // else: no punches → skip break
+        });
+      }
+      const formattedTime = formatTime(totalSeconds);
+      console.log(`Employee ${emp.firstName} - Worked Time with breaks = ${formattedTime}`);
+      console.log(`Employee ${emp.firstName} - Raw Worked Time = ${emp.rawWorkedTime}`);
+
+      // Save directly on employee object
+      emp.hourlyWorkedTime = formattedTime;
+    } else {
+      console.log(`Employee ${emp.firstName} has no punches`);
+      emp.hourlyWorkedTime = "00:00:00";
+      emp.rawWorkedTime = "00:00:00";
     }
-
-
-
 
 
   }
