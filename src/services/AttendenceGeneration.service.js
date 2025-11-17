@@ -2,22 +2,19 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 // Utility functions
-function timeToMinutes(timeStr) {
-  const [h, m, s] = timeStr.split(":").map(Number);
-  return h * 60 + m + (s ? s / 60 : 0);
-}
 
-function parseDuration(duration) {
-  if (!duration) return 0;
-  const [h, m, s] = duration?.split(":").map(Number);
-  return h * 60 + m + (s ? s / 60 : 0);
-}
 function safeEval(expr) {
   try {
     return Function(`"use strict"; return (${expr})`)();
   } catch {
     return 0;
   }
+}
+function minutesToHMS(minutes) {
+  if (typeof minutes !== "number") return minutes; // keep "single punch" as is
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  return [h, m, 0].map(v => String(v).padStart(2, "0")).join(":");
 }
 function secondsToHms(d) {
   d = Number(d);
@@ -39,35 +36,8 @@ function minutesToTimeStr(mins) {
   const s = Math.floor((mins % 1) * 60).toString().padStart(2, "0");
   return `${h}:${m}:${s}`;
 }
-function toISTTimeStr(date) {
-  const istOffset = 5.5 * 60; // IST in minutes
-  const utcMinutes = date.getUTCMinutes() + date.getUTCHours() * 60;
-  const istTotalMinutes = utcMinutes + istOffset;
 
-  const h = Math.floor(istTotalMinutes / 60) % 24;
-  const m = Math.floor(istTotalMinutes % 60);
-  const s = date.getUTCSeconds();
 
-  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-}
-function minutesToHHMMSS(minutes) {
-  const totalSeconds = Math.floor(minutes * 60);
-  const hours = Math.floor(totalSeconds / 3600);
-  const mins = Math.floor((totalSeconds % 3600) / 60);
-  const secs = totalSeconds % 60;
-  return `${String(hours).padStart(2, "0")}:${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-}
-function getLocalTimeStr(timestamp) {
-  const ts = new Date(timestamp);
-  // Convert to IST (+05:30)
-  const istOffset = 5 * 60 + 30; // 5 hours 30 mins
-  const istTime = new Date(ts.getTime() + istOffset * 60 * 1000);
-
-  const h = istTime.getUTCHours().toString().padStart(2, "0");
-  const m = istTime.getUTCMinutes().toString().padStart(2, "0");
-  const s = istTime.getUTCSeconds().toString().padStart(2, "0");
-  return `${h}:${m}:${s}`;
-}
 function timeStrToHours(timeStr) {
   const [h, m, s] = timeStr.split(":")?.map(Number);
   return h + m / 60 + (s ? s / 3600 : 0);
@@ -378,7 +348,6 @@ ORDER BY e.id;
     console.log(punchesTime, "punchesTime");
 
     const quarterValues = {};
-    const hourlyValues = {};  // hourly formula values
 
 
     // Loop through each quarter and filter punches
@@ -504,44 +473,131 @@ ORDER BY e.id;
 
       // ---- 2️⃣ Hourly worked time (with breaks applied) ----
       let totalSeconds = rawSeconds; // start from raw worked seconds
+      let breakSeconds = 0;
 
       const breaks = [
         { out: emp.shiftTemplateItem.fbOut, in: emp.shiftTemplateItem.fbIn }, // morning
         { out: emp.shiftTemplateItem.lunchBst, in: emp.shiftTemplateItem.lunchBET }, // lunch
         { out: emp.shiftTemplateItem.sbOut, in: emp.shiftTemplateItem.sbIn } // evening
       ];
+      console.log(breaks, "breaks");
 
-      // Only add breaks if employee has punches
-      if (punchesTime.length) {
-        breaks.forEach((brk) => {
-          if (!brk.out || !brk.in) return; // skip if no break defined
-          const breakStart = timeToSeconds(brk.out);
-          const breakEnd = timeToSeconds(brk.in);
-          const breakDuration = breakEnd - breakStart;
+      if (punchesTime.length > 1) {
+        const [morningBreak, lunchBreak, eveningBreak] = breaks;
+        const GRACE_MINUTES = 10;
 
-          // Check if any punch overlaps with break window
-          const hasPunchDuringShift = punchesTime.some(t => {
-            const secs = timeToSeconds(t);
-            return secs <= breakEnd; // any punch before or during break
-          });
+        emp.breakSummary = {};
 
-          if (hasPunchDuringShift) {
-            totalSeconds += breakDuration; // always add full break
+        // Initialize delay object
+
+        let totalBreakDelaySeconds = 0; // sum of all delays
+
+        const calculateBreak = (breakItem, key) => {
+
+          if (!breakItem.out || !breakItem.in) {
+            emp.breakSummary[key] = {
+              status: "no punch",
+              punches: { out: null, in: null },
+              breakDuration: "00:00:00",
+              delay: "00:00:00"
+            };
+            return 0;
           }
-          // else: no punches → skip break
-        });
-      }
-      const formattedTime = formatTime(totalSeconds);
-      console.log(`Employee ${emp.firstName} - Worked Time with breaks = ${formattedTime}`);
-      console.log(`Employee ${emp.firstName} - Raw Worked Time = ${emp.rawWorkedTime}`);
 
-      // Save directly on employee object
-      emp.hourlyWorkedTime = formattedTime;
-    } else {
-      console.log(`Employee ${emp.firstName} has no punches`);
-      emp.hourlyWorkedTime = "00:00:00";
-      emp.rawWorkedTime = "00:00:00";
+
+          const breakStart = timeToSeconds(breakItem.out);
+          const breakEnd = timeToSeconds(breakItem.in);
+          const graceEnd = breakEnd + GRACE_MINUTES * 60;
+
+          // Filter punches within break + grace
+          const punchesInBreak = punchesTime?.map(t => timeToSeconds(t))?.filter(secs => secs >= breakStart && secs <= graceEnd)
+            ?.sort((a, b) => a - b);
+
+          if (punchesInBreak.length === 0) {
+            // No punches → ignore break
+
+            emp.breakSummary[key] = {
+              status: "No punches",
+              punches: { out: null, in: null },
+              breakDuration: "00:00:00",
+              delay: "00:00:00"
+            };
+
+            return 0;
+          }
+
+          if (punchesInBreak.length === 1) {
+            // Single punch → ignore break, store punch
+            const singleTime = formatTime(punchesInBreak[0]);
+
+
+            emp.breakSummary[key] = {
+              status: "Miss punch",
+              punch: singleTime,       // actual punch time
+              breakDuration: "00:00:00",
+              delay: "00:00:00"
+            };
+
+            return 0;
+          }
+          const outSecs = punchesInBreak[0];
+          const inSecs = punchesInBreak[1];
+          const delay = inSecs > breakEnd ? inSecs - breakEnd : 0;
+
+          // Two punches → calculate actual break duration
+
+          // Store the actual out/in times
+
+          // Break duration cannot exceed official break
+          const actualBreak = Math.min(inSecs - outSecs, breakEnd - breakStart);
+
+          // Delay if returned after official break
+          totalBreakDelaySeconds += delay;
+          emp.breakSummary[key] = {
+            status: "On Time",
+            punches: { out: formatTime(outSecs), in: formatTime(inSecs) },
+            breakDuration: formatTime(actualBreak),
+            delay: formatTime(delay)  // ← use seconds here instead of minutes
+          };
+          return actualBreak > 0 ? actualBreak : 0;
+        };
+
+
+        // ---- Morning Break ----
+        breakSeconds += calculateBreak(morningBreak, "morning");
+
+        // ---- Lunch Break ----
+        breakSeconds += calculateBreak(lunchBreak, "lunch");
+
+        // ---- Evening Break ----
+        breakSeconds += calculateBreak(eveningBreak, "evening");
+
+        // Add breakSeconds to raw worked time and subtract delays
+        totalSeconds = rawSeconds + breakSeconds - totalBreakDelaySeconds;
+
+        const formattedTime = formatTime(totalSeconds);
+        console.log(`Employee ${emp.firstName} - Worked Time with breaks = ${formattedTime}`);
+        console.log(`Employee ${emp.firstName} - Raw Worked Time = ${emp.rawWorkedTime}`);
+
+        console.log(`Employee ${emp.firstName} - Break Summary =`, emp.breakSummary);
+        emp.hourlyWorkedTime = formattedTime;
+      } else {
+        console.log(`Employee ${emp.firstName} has no punches`);
+        emp.hourlyWorkedTime = "00:00:00";
+        emp.rawWorkedTime = "00:00:00";
+        emp.breakSummary = {
+          morning: { status: "no punch", punches: { out: null, in: null }, breakDuration: "00:00:00", delay: "00:00:00" },
+          lunch: { status: "no punch", punches: { out: null, in: null }, breakDuration: "00:00:00", delay: "00:00:00" },
+          evening: { status: "no punch", punches: { out: null, in: null }, breakDuration: "00:00:00", delay: "00:00:00" }
+        };
+      }
+
+
+
     }
+
+
+
 
 
   }

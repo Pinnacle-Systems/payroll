@@ -118,13 +118,13 @@ export default function Approval() {
 
             <div className="mt-3 ml-3">
                 <div className=' flex justify-between mb-2 items-center px-0.5 text-[14px] font-semibold'>
-                    <h5 className='my-1 bg-gray-300 px-1 rounded'>Select Shift Type</h5>
+                    <h5 className='my-1 bg-gray-300 px-1 rounded'>Select Attendence Type</h5>
 
                 </div>
 
                 <div className=" flex flex-col   items-start gap-3 ">
                     <div className="p-4 w-[20rem] bg-white rounded-xl shadow-md">
-                        <h2 className="text-lg font-semibold mb-4">Shift Type</h2>
+                        <h2 className="text-lg font-semibold mb-4">Attendence Type</h2>
                         <form>
                             {ShiftType?.map((shiftType, index) => (
                                 <>
@@ -145,7 +145,7 @@ export default function Approval() {
                         </form>
                         {selectedShiftType && (
                             <div className="w-full flex pr-1">
-                                <span>     Selected Shift: </span>
+                                <span>     Selected Attendence Type: </span>
                                 <p className=" text-green-600 font-medium px-1">
                                     {selectedShiftType}
                                 </p>

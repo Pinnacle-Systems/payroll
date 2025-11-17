@@ -4,10 +4,10 @@ import ExcessQty from './ExcessQty';
 import Approval from './Approval';
 import ShiftType from './ShiftType';
 const UserRoles = () => {
-    const [activeNavBar, setActiveNavBar] = useState("ShiftType");
+    const [activeNavBar, setActiveNavBar] = useState("Attendence Type");
 
     const subMenus = [
-        "ShiftType",
+        "Attendence Type",
 
         // "Id Card Settings",
         //     "Excess Qty",
@@ -16,7 +16,7 @@ const UserRoles = () => {
 
     const getShowSubMenu = () => {
         switch (activeNavBar) {
-            case "ShiftType":
+            case "Attendence Type":
                 return <ShiftType />
             // case "Id Card Settings":
             //     return <BranchIdSettings />

@@ -10,6 +10,10 @@ import { GroupBy } from "../../../Utils/DropdownData";
 import { getCommonParams } from "../../../Utils/helper";
 import Swal from "sweetalert2";
 import moment from "moment-timezone";
+import {
+  useGetshiftTypeQuery,
+} from "../../../redux/uniformService/shiftTYpeService";
+
 const Form = () => {
   const [date, setDate] = useState("");
   const [employeeCategoryId, setEmployeeCategoryId] = useState("");
@@ -19,10 +23,22 @@ const Form = () => {
   const params = getCommonParams();
   const [groupBy, setGroupBy] = useState("");
   const designationRef = useRef(null);
+  const [showModal, setShowModal] = React.useState(false);
+  const [selectedBreakSummary, setSelectedBreakSummary] = React.useState(null);
 
+  const openModal = (breakSummary) => {
+    setSelectedBreakSummary(breakSummary);
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setSelectedBreakSummary(null);
+    setShowModal(false);
+  };
   const [triggerReport, { data: allData, isFetching }] =
     useLazyGetAttendenceGenerationQuery();
   const { data: employeeCategory } = useGetEmployeeCategoryQuery({ params });
+  const { data: shiftTypeData } = useGetshiftTypeQuery({ params })
 
   const { data: employeeData } = useGetEmployeeQuery({ params });
 
@@ -55,6 +71,7 @@ const Form = () => {
     allData?.data?.filter((item) => item.status === "Regular") || [];
   const irregularData =
     allData?.data?.filter((item) => item.status === "Irregular") || [];
+  const selectedShiftType = shiftTypeData?.data?.find(val => val?.selectedShiftType)?.selectedShiftType;
 
 
   return (
@@ -93,9 +110,9 @@ const Form = () => {
 
 
         <div
-          className={` mt-3  p-2 overflow-scroll bg-white max-h-[600px]`}
+          className={` mt-3  p-2  bg-white max-h-[600px]  overflow-x-auto overflow-y-auto`}
         >
-          <table className="w-full border-collapse table-fixed ">
+          <table className="w-[100vw] border-collapse table-fixed">
 
             <thead className="bg-gray-200 text-gray-800 ">
               <tr>
@@ -106,9 +123,9 @@ const Form = () => {
                 </th>
 
                 <th
-                  className={`w-8  py-2 text-center font-medium text-[13px] `}
+                  className={`w-6  py-2 text-center font-medium text-[13px] `}
                 >
-                  Emp MId
+                  MId
                 </th>
                 <th
                   className={`w-[50px]  py-2 text-center font-medium text-[13px] `}
@@ -154,19 +171,32 @@ const Form = () => {
                 </th>
 
 
+                {selectedShiftType === "Hourly" ? (<th className={`w-8 py-2 item-center font-medium text-[13px] `}>
+                  Permissions
+                </th>) : ""}
+
+
                 <th className={`w-[45px] py-2 item-center font-medium text-[13px] `}>
-                  worked Hours
+                  {selectedShiftType === "Hourly" ? "worked Hours (with Break)" : "worked Hours"}
+
                 </th>
                 <th className={`w-[40px] py-2 item-center font-medium text-[13px] `}>
-                  OT Hours
+                  {selectedShiftType === "Hourly" ? "worked Hours (without Break)" : "OT Hours"}
+
+
                 </th>
-                <th className={`w-[40px] py-2 item-center font-medium text-[13px] `}>
-                  Shift Count
-                </th>
+                {
+                  selectedShiftType === "Hourly" ? (<th className={`w-[40px] py-2 item-center font-medium text-[13px] `}>
+                    OT Hours
+                  </th>) : (<th className={`w-[40px] py-2 item-center font-medium text-[13px] `}>
+                    Shift Count
+                  </th>)
+                }
+
+
 
               </tr>
-              {/*
-               */}
+
             </thead>
 
             <p className=" z-10 w-[100px] text-sm px-1 py-0.5  ">REGULAR</p>
@@ -378,11 +408,49 @@ const Form = () => {
                         </td>
                       </>
                     )}
+
+                    {
+                      selectedShiftType === "Hourly" ? (<td
+                        rowSpan={2}
+                        className="  border border-gray-300 text-[12px] py-0.5 text-center item-center"
+                      >
+                        <button
+                          className="text-blue-600 text-center text-blue  bg-blue-50 rounded"
+                          onClick={() => openModal(item.breakSummary)}
+
+                          title="Open"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                            <path
+                              fillRule="evenodd"
+                              d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      </td>) : ""
+                    }
+
                     <td
                       rowSpan={2}
                       className="  border border-gray-300 text-[12px] py-0.5 item-center"
                     >
-                      <input
+
+                      {selectedShiftType === "Hourly" ? (<input
+                        type="text"
+                        value={
+                          item.hourlyWorkedTime || ''
+
+
+                        }
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />) : (<input
                         type="text"
                         value={
                           item.totalWorkedTime || ''
@@ -390,23 +458,44 @@ const Form = () => {
 
                         }
                         className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                      />
+                      />)}
+
                     </td>
+
+
                     <td
                       rowSpan={2}
                       className="  border border-gray-300 text-[12px] py-0.5 item-center"
                     >
+                      {selectedShiftType === "Hourly" ? (<input
+                        type="text"
+                        value={
+                          item.rawWorkedTime || ''
+
+
+                        }
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />) : (<input
+                        type="text"
+                        value={
+                          item.otHours || ''
+
+                        }
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />)}
+                    </td>
+
+                    {selectedShiftType === "Hourly" ? (<td rowSpan={2}
+                      className="  border border-gray-300 text-[12px] py-0.5 item-center">
                       <input
                         type="text"
                         value={
                           item.otHours || ''
 
-
                         }
                         className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                       />
-                    </td>
-                    <td
+                    </td>) : (<td
                       rowSpan={2}
                       className="  border border-gray-300 text-[12px] py-0.5 item-center"
                     >
@@ -416,7 +505,9 @@ const Form = () => {
                         value={item?.formulaResult}
                         className={`w-full bg-transparent text-right pr-2 focus:outline-none focus:border-transparent  `}
                       />
-                    </td>
+                    </td>)}
+
+
 
                   </tr>
 
@@ -687,12 +778,47 @@ const Form = () => {
                         </td>
                       </>
                     )}
+                    {
+                      selectedShiftType === "Hourly" ? (<td
+                        rowSpan={2}
+                        className="  border border-gray-300 text-[12px] text-center py-0.5 item-center"
+                      >
+                        <button
+                          className="text-blue-600 text-center text-blue  bg-blue-50 rounded"
+                          onClick={() => openModal(item.breakSummary)}
 
+                          title="Open"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                          >
+                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                            <path
+                              fillRule="evenodd"
+                              d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      </td>) : ""
+                    }
                     <td
                       rowSpan={2}
                       className="  border border-gray-300 text-[12px] py-0.5 item-center"
                     >
-                      <input
+
+                      {selectedShiftType === "Hourly" ? (<input
+                        type="text"
+                        value={
+                          item.hourlyWorkedTime || ''
+
+
+                        }
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />) : (<input
                         type="text"
                         value={
                           item.totalWorkedTime || ''
@@ -700,23 +826,44 @@ const Form = () => {
 
                         }
                         className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                      />
+                      />)}
+
                     </td>
+
+
                     <td
                       rowSpan={2}
                       className="  border border-gray-300 text-[12px] py-0.5 item-center"
                     >
+                      {selectedShiftType === "Hourly" ? (<input
+                        type="text"
+                        value={
+                          item.rawWorkedTime || ''
+
+
+                        }
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />) : (<input
+                        type="text"
+                        value={
+                          item.otHours || ''
+
+                        }
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />)}
+                    </td>
+
+                    {selectedShiftType === "Hourly" ? (<td rowSpan={2}
+                      className="  border border-gray-300 text-[12px] py-0.5 item-center">
                       <input
                         type="text"
                         value={
                           item.otHours || ''
 
-
                         }
                         className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                       />
-                    </td>
-                    <td
+                    </td>) : (<td
                       rowSpan={2}
                       className="  border border-gray-300 text-[12px] py-0.5 item-center"
                     >
@@ -726,7 +873,7 @@ const Form = () => {
                         value={item?.formulaResult}
                         className={`w-full bg-transparent text-right pr-2 focus:outline-none focus:border-transparent  `}
                       />
-                    </td>
+                    </td>)}
                   </tr>
 
                   {/* Row 2 - Evening + Out */}
@@ -817,6 +964,60 @@ const Form = () => {
               ))}
             </tbody>
           </table>
+          {showModal && selectedBreakSummary && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50 overscroll-y-hidden">
+              <div className={`relative bg-white rounded-lg p-7 w-[800px] h-[300px]`}>
+                
+                  <button
+                    className="absolute top-0 right-0 m-1 text-gray-600 hover:text-gray-800 hover:bg-red-400 rounded focus:outline-none "
+                    onClick={closeModal}
+                  >
+                    <svg
+                      className="h-6 w-6 fill-current"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <title>Close</title>
+                      <path
+                        d="M14.348 5.652a.999.999 0 00-1.414 0L10 8.586l-2.93-2.93a.999.999 0 10-1.414 1.414L8.586 10l-2.93 2.93a.999.999 0 101.414 1.414L10 11.414l2.93 2.93a.999.999 0 101.414-1.414L11.414 10l2.93-2.93a.999.999 0 000-1.414z"
+                        fillRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                <h2 className="text-lg font-semibold mb-4">Break Summary</h2>
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr>
+                      <th className="border px-2 py-1 text-left">Break</th>
+                      <th className="border px-2 py-1 text-left">Status</th>
+                      <th className="border px-2 py-1 text-left">Punch</th>
+                      <th className="border px-2 py-1 text-left">Break Duration</th>
+                      <th className="border px-2 py-1 text-left">Permission</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {["morning", "lunch", "evening"].map((key) => {
+                      const breakItem = selectedBreakSummary[key];
+                      return (
+                        <tr key={key}>
+                          <td className="border px-2 py-1 capitalize">{key}</td>
+                          <td className="border px-2 py-1">{breakItem?.status || "-"}</td>
+                          <td className="border px-2 py-1">
+                            {breakItem?.punch || breakItem?.punches?.in
+                              ? breakItem?.punch || `${breakItem.punches.out} - ${breakItem.punches.in} `
+                              : "-"}
+                          </td>
+                          <td className="border px-2 py-1">{breakItem?.breakDuration || "-"}</td>
+                          <td className="border px-2 py-1">{breakItem?.delay || "-"}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+
+              </div>
+            </div>
+          )}
 
         </div>
         {form === true && (

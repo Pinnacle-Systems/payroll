@@ -16,7 +16,6 @@ import Swal from "sweetalert2";
 import { useDispatch } from "react-redux";
 import {
   useGetshiftTypeQuery,
-  useGetshiftTypeByIdQuery,
 } from "../../../redux/uniformService/shiftTYpeService";
 import Loader from "../Loader";
 
