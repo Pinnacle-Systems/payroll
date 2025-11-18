@@ -624,7 +624,7 @@ const Form = () => {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[30%]  h-[55%]"}
+            widthClass={"w-[40%]  h-[45%]"}
             onClose={() => {
               setForm(false);
             }}

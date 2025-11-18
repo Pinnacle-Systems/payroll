@@ -783,7 +783,7 @@ const TemplateItems = ({
                     </td>
                     <td className="text-center border border-gray-300">
                       <button
-                        className={`${selectedShiftType ? "text-blue-600 text-center   bg-blue-50 rounded" : "text-blue-600 text-center   bg-blue-50 rounded cursor-not-allowed"} `}
+                        className={`${selectedShiftType ==="Hourly" ?  "text-blue-600 text-center   bg-blue-50 rounded cursor-not-allowed" :"text-blue-600 text-center   bg-blue-50 rounded" } `}
                         onClick={() => {
                           if (selectedShiftType) {
                             handleOpenQuarterModal(index)
@@ -792,7 +792,7 @@ const TemplateItems = ({
                         }
                         }
                         title="Open"
-                        disabled={!selectedShiftType}
+                        disabled={selectedShiftType ==="Hourly"}
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"

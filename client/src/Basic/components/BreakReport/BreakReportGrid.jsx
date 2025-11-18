@@ -1,5 +1,3 @@
-
-
 import React, { useRef, useEffect } from "react";
 import {
     GridComponent,
@@ -58,11 +56,13 @@ const BreakReportGrid = ({ employeeData }) => {
 
     const employeeDataWithSno = employeeData?.map((emp, index) => {
         const date = emp.reportDate ? new Date(emp.reportDate) : null;
-        if (date) date.setHours(0, 0, 0, 0); // Normalize time
+        // if (date) date.setHours(0, 0, 0, 0)
         return {
             ...emp,
             sno: index + 1,
-            reportDate: date,
+            // reportDate: date,
+            reportDate: date ? date.toLocaleDateString("en-GB") : "",
+
         };
     });
     ;
@@ -113,13 +113,14 @@ const BreakReportGrid = ({ employeeData }) => {
                 fontColor: dotColor, // ✅ correct property for Excel export
                 hAlign: "Center",
                 vAlign: "Center",
-                bold: true,
-                fontSize: 16, // bigger for dot
+                // bold: true,
+
+                fontSize: 11, // bigger for dot
                 backColor: "#FFFFFF", // keep background white
             };
 
             // Put the dot
-            args.value = "●";
+            args.value = "⬤";
         }
 
     };
@@ -194,7 +195,7 @@ const BreakReportGrid = ({ employeeData }) => {
                                     value: "Date Wise Break Report",
                                     style: {
                                         fontSize: 12,
-                                        bold: true,
+                                        // bold: true,
                                         hAlign: "Center",
                                         vAlign: "Center",
                                         fontColor: "#111827",
@@ -276,7 +277,7 @@ const BreakReportGrid = ({ employeeData }) => {
                     header: {
                         fontColor: "#111827",
                         backColor: "#E5E7EB",
-                        bold: true,
+                        bold: false,
                         fontSize: 10,
                         fontName: "Poppins", // ✅ Change here
                         hAlign: "Center",
@@ -297,6 +298,22 @@ const BreakReportGrid = ({ employeeData }) => {
                         fontSize: 9, // smaller font for grouped rows in Excel
                         bold: false,
                     },
+                },
+                footer: {
+                    footerRows: 1,
+                    rows: [
+                        {
+                            cells: [
+                                {
+                                    colSpan: 18, // Total number of columns
+                                    value: "",   // Empty row
+                                    style: {
+                                        backColor: "#E5E7EB", // Light gray, similar to header
+                                    }
+                                }
+                            ]
+                        }
+                    ]
                 },
                 rowHeight: 12, // <-- reduce this value to make rows smaller
 
@@ -358,6 +375,7 @@ const BreakReportGrid = ({ employeeData }) => {
                         fontColor: "#111827",
                     }
                 },
+
 
                 allowHorizontalOverflow: true,
                 fitColumns: false
@@ -453,10 +471,10 @@ const BreakReportGrid = ({ employeeData }) => {
                         field="reportDate"
                         headerText="Date"
                         width="90"
-                        format="dd/MM/yyyy"
+                        format="dd-MM-yyyy" // safer for Excel
                         headerTextAlign="Center" // header cell alignment
                         textAlign="center"
-                        type="date"
+                        // type="date"
 
                         customAttributes={{ class: "col-date" }}
 

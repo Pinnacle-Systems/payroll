@@ -112,83 +112,91 @@ const Form = () => {
         <div
           className={` mt-3  p-2  bg-white max-h-[600px]  overflow-x-auto overflow-y-auto`}
         >
-          <table className="w-[100vw] border-collapse table-fixed">
+          <table className={` ${selectedShiftType === "Hourly" ? "w-[105vw]" : "w-[100vw]"   }  border-collapse table-fixed`}>
 
-            <thead className="bg-gray-200 text-gray-800 ">
+            <thead className="bg-gray-200 text-gray-800 border border-gray-400">
               <tr>
                 <th
-                  className={`w-[15px] px-1 text-center font-medium text-[13px] `}
+                  className={`w-[15px] px-1 text-center font-medium text-[13px]  border border-gray-300`}
                 >
                   S.No
                 </th>
 
                 <th
-                  className={`w-6  py-2 text-center font-medium text-[13px] `}
+                  className={`w-6  py-2 text-center font-medium text-[13px]  border border-gray-300`}
                 >
                   MId
                 </th>
                 <th
-                  className={`w-[50px]  py-2 text-center font-medium text-[13px] `}
+                  className={`w-[50px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
                 >
                   Emp Name
                 </th>
                 <th
-                  className={`w-[30px]  py-2 text-center font-medium text-[13px] `}
+                  className={`w-[30px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
                 >
                   Shift
                 </th>
                 <th
-                  className={`w-[45px]  py-2 text-center font-medium text-[13px] `}
+                  className={`w-[45px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
                 >
                   Department
                 </th>
                 <th
-                  className={`w-[65px]  py-2 text-center font-medium text-[13px] `}
+                  className={`w-[65px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
                 >
                   Designation
                 </th>
                 <th
-                  className={`w-8  py-2 item-center font-medium text-[13px] `}
+                  className={`w-8  py-2 item-center font-medium text-[13px]  border border-gray-300`}
                 >
                   In Date
                 </th>
-                <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
+                <th className={`w-8 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
                   In
                 </th>
                 <th
-                  className={`w-8 py-2 item-center font-medium text-[13px] `}
+                  className={`w-8 py-2 item-center font-medium text-[13px]  border border-gray-300`}
                 >
                   Out Date
                 </th>
-                <th className={`w-8 py-2 item-center font-medium text-[13px] `}>
+                <th className={`w-8 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
                   Out
                 </th>
 
                 <th
                   colSpan={reportView === "Seperate" ? 4 : 2}
-                  className={`${reportView === "Single" ? "w-32" : "w-40"} py-2 text-center font-medium text-[13px]`}                >
+                  className={`${reportView === "Single" ? "w-32" : "w-36"} py-2 text-center font-medium text-[13px]  border border-gray-300`}                >
                   Other Punches
                 </th>
 
 
-                {selectedShiftType === "Hourly" ? (<th className={`w-8 py-2 item-center font-medium text-[13px] `}>
-                  Permissions
+                {selectedShiftType === "Hourly" ? (<th className={`w-[40px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                  Permission
                 </th>) : ""}
 
 
-                <th className={`w-[45px] py-2 item-center font-medium text-[13px] `}>
+                {selectedShiftType === "Hourly" ? (<th className={`w-[45px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>worked Hours (with Break)</th>) : (<th className={`w-[35px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>worked Hours</th>)}
+
+
+                {/* <th className={`w-[45px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>
                   {selectedShiftType === "Hourly" ? "worked Hours (with Break)" : "worked Hours"}
 
-                </th>
-                <th className={`w-[40px] py-2 item-center font-medium text-[13px] `}>
+                </th> */}
+
+                {selectedShiftType === "Hourly" ? (<th className={`w-[40px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>worked Hours (without Break)</th>) : (<th className={`w-[35px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>OT Hours</th>)}
+
+
+
+                {/* <th className={`w-[40px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>
                   {selectedShiftType === "Hourly" ? "worked Hours (without Break)" : "OT Hours"}
 
 
-                </th>
+                </th> */}
                 {
-                  selectedShiftType === "Hourly" ? (<th className={`w-[40px] py-2 item-center font-medium text-[13px] `}>
+                  selectedShiftType === "Hourly" ? (<th className={`w-[40px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>
                     OT Hours
-                  </th>) : (<th className={`w-[40px] py-2 item-center font-medium text-[13px] `}>
+                  </th>) : (<th className={`w-[30px] py-2 item-center font-medium text-[13px] border border-gray-300`}>
                     Shift Count
                   </th>)
                 }
@@ -276,7 +284,7 @@ const Form = () => {
                         type="text"
                         value={
                           item.inTime
-                            ? moment.utc(item.inTime).format("YYYY-MM-DD")
+                            ? moment.utc(item.inTime).format("DD-MM-YYYY")
                             : ""
                         }
                         className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
@@ -309,7 +317,7 @@ const Form = () => {
                         type="text"
                         value={
                           item.outTime
-                            ? moment.utc(item.outTime).format("YYYY-MM-DD")
+                            ? moment.utc(item.outTime).format("DD-MM-YYYY")
                             : ""
                         }
                         className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
@@ -645,7 +653,7 @@ const Form = () => {
                         type="text"
                         value={
                           item.inTime
-                            ? moment.utc(item.inTime).format("YYYY-MM-DD")
+                            ? moment.utc(item.inTime).format("DD-MM-YYYY")
                             : ""
                         }
                         className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
@@ -678,7 +686,7 @@ const Form = () => {
                         type="text"
                         value={
                           item.outTime
-                            ? moment.utc(item.outTime).format("YYYY-MM-DD")
+                            ? moment.utc(item.outTime).format("DD-MM-YYYY")
                             : ""
                         }
                         className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent`}
@@ -966,33 +974,33 @@ const Form = () => {
           </table>
           {showModal && selectedBreakSummary && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50 overscroll-y-hidden">
-              <div className={`relative bg-white rounded-lg p-7 w-[800px] h-[300px]`}>
-                
-                  <button
-                    className="absolute top-0 right-0 m-1 text-gray-600 hover:text-gray-800 hover:bg-red-400 rounded focus:outline-none "
-                    onClick={closeModal}
+              <div className={`relative bg-white rounded-lg p-7 w-[700px] h-[250px]`}>
+
+                <button
+                  className="absolute top-0 right-0 m-1 text-gray-600 hover:text-gray-800 hover:bg-red-400 rounded focus:outline-none "
+                  onClick={closeModal}
+                >
+                  <svg
+                    className="h-6 w-6 fill-current"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    <svg
-                      className="h-6 w-6 fill-current"
-                      viewBox="0 0 20 20"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <title>Close</title>
-                      <path
-                        d="M14.348 5.652a.999.999 0 00-1.414 0L10 8.586l-2.93-2.93a.999.999 0 10-1.414 1.414L8.586 10l-2.93 2.93a.999.999 0 101.414 1.414L10 11.414l2.93 2.93a.999.999 0 101.414-1.414L11.414 10l2.93-2.93a.999.999 0 000-1.414z"
-                        fillRule="evenodd"
-                      />
-                    </svg>
-                  </button>
-                <h2 className="text-lg font-semibold mb-4">Break Summary</h2>
+                    <title>Close</title>
+                    <path
+                      d="M14.348 5.652a.999.999 0 00-1.414 0L10 8.586l-2.93-2.93a.999.999 0 10-1.414 1.414L8.586 10l-2.93 2.93a.999.999 0 101.414 1.414L10 11.414l2.93 2.93a.999.999 0 101.414-1.414L11.414 10l2.93-2.93a.999.999 0 000-1.414z"
+                      fillRule="evenodd"
+                    />
+                  </svg>
+                </button>
+                <h2 className="text-[15px] font-semibold mb-4">Permission Summary</h2>
                 <table className="w-full border-collapse">
-                  <thead>
+                  <thead className="bg-gray-200 text-gray-800 ">
                     <tr>
-                      <th className="border px-2 py-1 text-left">Break</th>
-                      <th className="border px-2 py-1 text-left">Status</th>
-                      <th className="border px-2 py-1 text-left">Punch</th>
-                      <th className="border px-2 py-1 text-left">Break Duration</th>
-                      <th className="border px-2 py-1 text-left">Permission</th>
+                      <th className="px-1 py-1 text-center font-medium text-[13px]">Break</th>
+                      <th className="px-1 text-center font-medium text-[13px]">Status</th>
+                      <th className="px-1 text-center font-medium text-[13px]">Punch</th>
+                      <th className="px-1 text-center font-medium text-[13px]">Break Duration</th>
+                      <th className="px-1 text-center font-medium text-[13px]">Permission</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1000,15 +1008,15 @@ const Form = () => {
                       const breakItem = selectedBreakSummary[key];
                       return (
                         <tr key={key}>
-                          <td className="border px-2 py-1 capitalize">{key}</td>
-                          <td className="border px-2 py-1">{breakItem?.status || "-"}</td>
-                          <td className="border px-2 py-1">
+                          <td className="border border-gray-300 py-1 text-[12px]  text-left px-1 capitalize">{key}</td>
+                          <td className="border border-gray-300 py-1 text-[12px]  text-left px-1">{breakItem?.status || "-"}</td>
+                          <td className="border border-gray-300 py-1 text-[12px]  text-center px-1">
                             {breakItem?.punch || breakItem?.punches?.in
                               ? breakItem?.punch || `${breakItem.punches.out} - ${breakItem.punches.in} `
                               : "-"}
                           </td>
-                          <td className="border px-2 py-1">{breakItem?.breakDuration || "-"}</td>
-                          <td className="border px-2 py-1">{breakItem?.delay || "-"}</td>
+                          <td className="border border-gray-300 py-1 text-[12px]  text-center px-1">{breakItem?.breakDuration || "-"}</td>
+                          <td className="border border-gray-300 py-1 text-[12px]  text-center px-1">{breakItem?.delay || "-"}</td>
                         </tr>
                       );
                     })}
@@ -1024,7 +1032,7 @@ const Form = () => {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[30%]  h-[55%]"}
+            widthClass={"w-[30%]  h-[45%]"}
             onClose={() => {
               setForm(false);
             }}
@@ -1046,7 +1054,7 @@ const Form = () => {
                         <div className="flex flex-wrap gap-x-7">
                           <div className="mb-3 ">
                             <DateInput
-                              name="DOC Date"
+                              name="Date"
                               value={date}
                               setValue={setDate}
                               required={true}

@@ -247,7 +247,7 @@ LEFT JOIN Designation des ON e.designationId = des.id
 LEFT JOIN ShiftTemplateItems sti ON sti.shiftCommonTemplateId = e.shiftCommonTemplateId
 LEFT JOIN Shift sh ON sh.id = sti.shiftId
 
-ORDER BY e.id;
+ORDER BY e.mIdCard;
 
 `;
 
@@ -411,18 +411,58 @@ ORDER BY e.id;
 
         const totalHours = timeStrToHours(q.total); // e.g., "04:30:00" → 4.5
         const totalMins = totalHours * 60;
+        const halfMins = totalMins / 2;
+        const halfHours = totalHours / 2;
 
         // Return total hours if workedMins >= totalMins, else 0
-        const value = workedMins >= totalMins ? totalHours : 0;
-        const finalValue = roundToHalf(value);
+        // const value = workedMins >= totalMins ? totalHours : 0;
+        // const finalValue = roundToHalf(value);
+
+        let value = 0;
+
+        if (workedMins >= totalMins) {
+          value = totalHours;
+        } else if (workedMins > halfMins) {
+          value = halfHours; // e.g. 2.25
+        } else {
+          value = 0;
+        }
+
+        // keep precision (2 decimals)
+        const finalValue = Number(value.toFixed(2));
+
+
+
         console.log(`Employee ${emp.firstName} - Quarter ${q.name} value = ${finalValue}`);
         quarterValues[q.name] = finalValue;
 
-      } else {
+      }
+      // if (quarterPunches?.length) {
+      //   const punchMinsArray = quarterPunches?.map(timeStrToMinutes);
+      //   const minPunch = Math.min(...punchMinsArray);
+      //   const maxPunch = Math.max(...punchMinsArray);
+      //   const workedMins = maxPunch - minPunch;
+
+      //   const workedHours = workedMins / 60;
+      //   const totalHours = timeStrToHours(q.total); // e.g., 4.5 for "04:30:00"
+
+      //   // Capping quarter value
+      //   const quarterValue = Math.min(workedHours, totalHours);
+
+      //   // Log details
+      //   console.log(`Employee ${emp.firstName} - Quarter ${q.name}:`);
+      //   console.log(`  Worked duration: ${secondsToHms(workedMins * 60)} (${workedHours.toFixed(2)} hrs)`);
+      //   console.log(`  Quarter value (hours): ${quarterValue.toFixed(2)} / ${totalHours}`);
+
+      //   quarterValues[q.name] = quarterValue;
+      // } 
+
+      else {
         console.log(`Employee ${emp.firstName} - Quarter ${q.name} has no punches in range`);
         quarterValues[q.name] = 0; // no punches = 0
-
       }
+
+
 
     })
 
@@ -441,7 +481,27 @@ ORDER BY e.id;
       console.log(`Employee ${emp.firstName} - Formula result:`, formulaResult);
     }
 
-    // Before hourly calculation
+
+
+    // if (formulas?.length) {
+    //   let formulaExpr = formulas.join(";");
+
+    //   // Replace quarter names in formula with ACTUAL hours (numbers)
+    //   for (const [qName, val] of Object.entries(quarterValues)) {
+    //     const re = new RegExp(`\\b${qName}\\b`, "g");
+    //     formulaExpr = formulaExpr.replace(re, val);
+    //   }
+
+    //   // Calculate raw result
+    //   let rawResult = safeEval(formulaExpr); // e.g., (4.5 + 2.25) / 9 = 0.75
+    //   if (isNaN(rawResult)) rawResult = 0;
+
+    //   // Convert to fraction (0, 0.25, 0.5, 0.75, 1)
+    //   emp.formulaResult = (Math.round(rawResult * 4) / 4).toFixed(2);
+
+    //   console.log(`Employee ${emp.firstName} - Formula result: ${emp.formulaResult}`);
+    // }
+
 
     // Before hourly calculation
     if (!shiftItem) {
@@ -453,6 +513,7 @@ ORDER BY e.id;
 
     // Attach it to employee
     emp.shiftTemplateItem = shiftItem;
+            emp.breakSummary = {};
 
     if (punchesTime?.length) {
       const timeToSeconds = (timeStr) => {
@@ -474,19 +535,94 @@ ORDER BY e.id;
       // ---- 2️⃣ Hourly worked time (with breaks applied) ----
       let totalSeconds = rawSeconds; // start from raw worked seconds
       let breakSeconds = 0;
+      let earlySeconds = 0;
+      let lateSeconds = 0;
 
+      const moriningInFromTolerance = emp.shiftTemplateItem.toleranceInBeforeStart
+      const morningIn = emp.shiftTemplateItem.startTime
+      const moriningInToTolerance = emp.shiftTemplateItem.toleranceInAfterEnd
+      const eveningInFromTolerance = emp.shiftTemplateItem.toleranceOutBeforeStart
+      const eveningIn = emp.shiftTemplateItem.endTime
+      const eveningInToTolerance = emp.shiftTemplateItem.toleranceOutAfterEnd
+      const morningInFromTol = timeToSeconds(moriningInFromTolerance);
+      const morningInSec = timeToSeconds(morningIn);
+      const morningInToTol = timeToSeconds(moriningInToTolerance);
+
+      const eveningOutFromTol = timeToSeconds(eveningInFromTolerance);
+      const eveningOutSec = timeToSeconds(eveningIn);
+      const eveningOutToTol = timeToSeconds(eveningInToTolerance);
+      const punchesInSeconds = punchesTime?.map(timeToSeconds);
+      // Morning In Punch
+      const firstPunch = punchesInSeconds[0];
+
+      let morningStatus;
+      if (firstPunch >= morningInFromTol && firstPunch < morningInSec) {
+        earlySeconds = morningInSec - firstPunch;
+        morningStatus = {
+          status: "Early",
+          punch: formatTime(firstPunch),
+          adjustment: formatTime(earlySeconds)
+        };
+      } else if (firstPunch > morningInSec && firstPunch <= morningInToTol) {
+        lateSeconds = firstPunch - morningInSec;
+        morningStatus = {
+          status: "Late",
+          punch: formatTime(firstPunch),
+          adjustment: formatTime(lateSeconds)
+        };
+      } else {
+        morningStatus = {
+          status: "On Time",
+          punch: formatTime(firstPunch),
+          adjustment: "00:00:00"
+        };
+      }
+      emp.breakSummary.morningInOut = morningStatus;
+
+      // Evening Out Punch
+      const lastPunch = punchesInSeconds[punchesInSeconds.length - 1];
+      let eveningStatus;
+      let eveningEarlySeconds = 0;
+      let eveningExtraSeconds = 0;
+      if (lastPunch >= eveningOutFromTol && lastPunch < eveningOutSec) {
+        // Left early
+        eveningEarlySeconds = eveningOutSec - lastPunch;
+        eveningStatus = {
+          status: "Early Out",
+          punch: formatTime(lastPunch),
+          extraWorked: "00:00:00",
+          early: formatTime(eveningEarlySeconds)
+        };
+      } else if (lastPunch > eveningOutSec && lastPunch <= eveningOutToTol) {
+        // Worked extra, but don't add to totalSeconds
+        eveningExtraSeconds = lastPunch - eveningOutSec;
+        eveningStatus = {
+          status: "Extra Work",
+          punch: formatTime(lastPunch),
+          extraWorked: formatTime(eveningExtraSeconds),
+          early: "00:00:00"
+        };
+      } else {
+        // On time or out of bounds - no adjustment
+        eveningStatus = {
+          status: "On Time",
+          punch: formatTime(lastPunch),
+          extraWorked: "00:00:00",
+          early: "00:00:00"
+        };
+      }
+      emp.breakSummary.eveningInOut = eveningStatus;
       const breaks = [
+
         { out: emp.shiftTemplateItem.fbOut, in: emp.shiftTemplateItem.fbIn }, // morning
         { out: emp.shiftTemplateItem.lunchBst, in: emp.shiftTemplateItem.lunchBET }, // lunch
         { out: emp.shiftTemplateItem.sbOut, in: emp.shiftTemplateItem.sbIn } // evening
       ];
-      console.log(breaks, "breaks");
 
       if (punchesTime.length > 1) {
         const [morningBreak, lunchBreak, eveningBreak] = breaks;
         const GRACE_MINUTES = 10;
 
-        emp.breakSummary = {};
 
         // Initialize delay object
 
@@ -542,19 +678,16 @@ ORDER BY e.id;
           }
           const outSecs = punchesInBreak[0];
           const inSecs = punchesInBreak[1];
-          const delay = inSecs > breakEnd ? inSecs - breakEnd : 0;
-
-          // Two punches → calculate actual break duration
-
-          // Store the actual out/in times
-
-          // Break duration cannot exceed official break
-          const actualBreak = Math.min(inSecs - outSecs, breakEnd - breakStart);
-
+          // const delay = inSecs > breakEnd ? inSecs - breakEnd : 0;
+          // const actualBreak = Math.min(inSecs - outSecs, breakEnd - breakStart);
+          const actualBreak = inSecs - outSecs; // real break duration
+          const standardBreak = breakEnd - breakStart; // allowed break duration
+          const delay = Math.max(0, actualBreak - standardBreak); // delay if any
           // Delay if returned after official break
           totalBreakDelaySeconds += delay;
+          const status = inSecs <= breakEnd ? "On Time" : "Delayed";
           emp.breakSummary[key] = {
-            status: "On Time",
+            status,
             punches: { out: formatTime(outSecs), in: formatTime(inSecs) },
             breakDuration: formatTime(actualBreak),
             delay: formatTime(delay)  // ← use seconds here instead of minutes
@@ -573,14 +706,18 @@ ORDER BY e.id;
         breakSeconds += calculateBreak(eveningBreak, "evening");
 
         // Add breakSeconds to raw worked time and subtract delays
-        totalSeconds = rawSeconds + breakSeconds - totalBreakDelaySeconds;
+        totalSeconds = rawSeconds + breakSeconds - totalBreakDelaySeconds - lateSeconds - eveningEarlySeconds;
+
 
         const formattedTime = formatTime(totalSeconds);
         console.log(`Employee ${emp.firstName} - Worked Time with breaks = ${formattedTime}`);
         console.log(`Employee ${emp.firstName} - Raw Worked Time = ${emp.rawWorkedTime}`);
-
         console.log(`Employee ${emp.firstName} - Break Summary =`, emp.breakSummary);
         emp.hourlyWorkedTime = formattedTime;
+        emp.breakSummary.earlySeconds = formatTime(earlySeconds);
+        emp.breakSummary.lateSeconds = formatTime(lateSeconds);
+        emp.breakSummary.eveningEarlySeconds = formatTime(eveningEarlySeconds);
+        emp.breakSummary.eveningExtraSeconds = formatTime(eveningExtraSeconds);
       } else {
         console.log(`Employee ${emp.firstName} has no punches`);
         emp.hourlyWorkedTime = "00:00:00";
@@ -591,15 +728,7 @@ ORDER BY e.id;
           evening: { status: "no punch", punches: { out: null, in: null }, breakDuration: "00:00:00", delay: "00:00:00" }
         };
       }
-
-
-
     }
-
-
-
-
-
   }
   return { data };
 }
