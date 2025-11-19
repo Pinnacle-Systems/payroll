@@ -333,8 +333,8 @@ ORDER BY e.mIdCard;
     //     }
     //   });
 
-    const punchesTime = (emp?.punches || [])?.map(p => {
-      const ts = p.timestamp;
+    let punchesTime = (emp?.punches || [])?.map(p => {
+      const ts = p.timestamp
       if (!ts) return null;
 
       const dateObj = new Date(ts);
@@ -513,14 +513,36 @@ ORDER BY e.mIdCard;
 
     // Attach it to employee
     emp.shiftTemplateItem = shiftItem;
-            emp.breakSummary = {};
+    emp.breakSummary = {};
 
     if (punchesTime?.length) {
       const timeToSeconds = (timeStr) => {
         const [h, m, s] = timeStr?.split(':')?.map(Number);
         return h * 3600 + m * 60 + s;
       };
+      let punchesInSeconds = punchesTime?.map(timeToSeconds);
 
+      // Morning In Punch
+      const morningIn = emp.shiftTemplateItem.startTime
+
+      const morningInSec = timeToSeconds(morningIn);
+      let actualSeconds = 0;
+
+      if (punchesTime?.length) {
+        for (let i = 0; i < punchesTime.length - 1; i += 2) {
+          const inSecs = timeToSeconds(punchesTime[i]);
+          const outSecs = timeToSeconds(punchesTime[i + 1]);
+          if (outSecs > inSecs) actualSeconds += (outSecs - inSecs);
+        }
+      }
+
+      emp.actualWorkedTime = formatTime(actualSeconds);
+
+      let firstPunch = punchesInSeconds[0];
+      if (punchesInSeconds[0] < morningInSec) {
+        punchesInSeconds[0] = morningInSec;
+        punchesTime[0] = formatTime(morningInSec);
+      }
       // ---- 1️⃣ Raw worked time (without breaks) ----
       let rawSeconds = 0;
       for (let i = 0; i < punchesTime.length - 1; i += 2) {
@@ -530,7 +552,17 @@ ORDER BY e.mIdCard;
         const outSecs = timeToSeconds(outTime);
         if (outSecs > inSecs) rawSeconds += outSecs - inSecs;
       }
+      const empOTHours = timeToSeconds(emp.otHours)
+      console.log(empOTHours, "empOTHours");
+      //  SUBTRACT OT HOURS HERE
+      rawSeconds = rawSeconds - empOTHours;
+      if (rawSeconds < 0) rawSeconds = 0;
+
+      // store adjusted raw worked time
       emp.rawWorkedTime = formatTime(rawSeconds); // store raw worked time
+
+
+
 
       // ---- 2️⃣ Hourly worked time (with breaks applied) ----
       let totalSeconds = rawSeconds; // start from raw worked seconds
@@ -539,79 +571,62 @@ ORDER BY e.mIdCard;
       let lateSeconds = 0;
 
       const moriningInFromTolerance = emp.shiftTemplateItem.toleranceInBeforeStart
-      const morningIn = emp.shiftTemplateItem.startTime
       const moriningInToTolerance = emp.shiftTemplateItem.toleranceInAfterEnd
       const eveningInFromTolerance = emp.shiftTemplateItem.toleranceOutBeforeStart
       const eveningIn = emp.shiftTemplateItem.endTime
       const eveningInToTolerance = emp.shiftTemplateItem.toleranceOutAfterEnd
       const morningInFromTol = timeToSeconds(moriningInFromTolerance);
-      const morningInSec = timeToSeconds(morningIn);
       const morningInToTol = timeToSeconds(moriningInToTolerance);
-
       const eveningOutFromTol = timeToSeconds(eveningInFromTolerance);
       const eveningOutSec = timeToSeconds(eveningIn);
       const eveningOutToTol = timeToSeconds(eveningInToTolerance);
-      const punchesInSeconds = punchesTime?.map(timeToSeconds);
-      // Morning In Punch
-      const firstPunch = punchesInSeconds[0];
+
+
 
       let morningStatus;
-      if (firstPunch >= morningInFromTol && firstPunch < morningInSec) {
-        earlySeconds = morningInSec - firstPunch;
-        morningStatus = {
-          status: "Early",
-          punch: formatTime(firstPunch),
-          adjustment: formatTime(earlySeconds)
-        };
-      } else if (firstPunch > morningInSec && firstPunch <= morningInToTol) {
-        lateSeconds = firstPunch - morningInSec;
+
+      if (firstPunch > morningInToTol) {
+        // Arrived late → keep this logic
+        const lateSeconds = firstPunch - morningInToTol;
         morningStatus = {
           status: "Late",
           punch: formatTime(firstPunch),
-          adjustment: formatTime(lateSeconds)
+          delay: formatTime(lateSeconds)
         };
+
       } else {
+        // On time or early → always treated as ON TIME (early logic removed)
         morningStatus = {
           status: "On Time",
           punch: formatTime(firstPunch),
-          adjustment: "00:00:00"
+          delay: "00:00:00"
         };
       }
+
       emp.breakSummary.morningInOut = morningStatus;
 
+
       // Evening Out Punch
+      // Evening Out Punch (no more Extra Work concept)
       const lastPunch = punchesInSeconds[punchesInSeconds.length - 1];
-      let eveningStatus;
-      let eveningEarlySeconds = 0;
-      let eveningExtraSeconds = 0;
-      if (lastPunch >= eveningOutFromTol && lastPunch < eveningOutSec) {
-        // Left early
-        eveningEarlySeconds = eveningOutSec - lastPunch;
-        eveningStatus = {
-          status: "Early Out",
-          punch: formatTime(lastPunch),
-          extraWorked: "00:00:00",
-          early: formatTime(eveningEarlySeconds)
-        };
-      } else if (lastPunch > eveningOutSec && lastPunch <= eveningOutToTol) {
-        // Worked extra, but don't add to totalSeconds
-        eveningExtraSeconds = lastPunch - eveningOutSec;
-        eveningStatus = {
-          status: "Extra Work",
-          punch: formatTime(lastPunch),
-          extraWorked: formatTime(eveningExtraSeconds),
-          early: "00:00:00"
-        };
+      let eveningStatus = {
+        punch: formatTime(lastPunch),
+        delay: "00:00:00"
+      };
+
+      if (lastPunch < eveningOutSec) {
+        // Employee left early → count as delay
+        const delaySeconds = eveningOutSec - lastPunch;
+        eveningStatus.status = "Delayed Out";
+        eveningStatus.delay = formatTime(delaySeconds);
       } else {
-        // On time or out of bounds - no adjustment
-        eveningStatus = {
-          status: "On Time",
-          punch: formatTime(lastPunch),
-          extraWorked: "00:00:00",
-          early: "00:00:00"
-        };
+        // On-time or after – no extra work concept
+        eveningStatus.status = "On Time";
       }
+
+      // Store it
       emp.breakSummary.eveningInOut = eveningStatus;
+
       const breaks = [
 
         { out: emp.shiftTemplateItem.fbOut, in: emp.shiftTemplateItem.fbIn }, // morning
@@ -632,7 +647,7 @@ ORDER BY e.mIdCard;
 
           if (!breakItem.out || !breakItem.in) {
             emp.breakSummary[key] = {
-              status: "no punch",
+              status: "No punches",
               punches: { out: null, in: null },
               breakDuration: "00:00:00",
               delay: "00:00:00"
@@ -705,8 +720,10 @@ ORDER BY e.mIdCard;
         // ---- Evening Break ----
         breakSeconds += calculateBreak(eveningBreak, "evening");
 
+
         // Add breakSeconds to raw worked time and subtract delays
-        totalSeconds = rawSeconds + breakSeconds - totalBreakDelaySeconds - lateSeconds - eveningEarlySeconds;
+        // totalSeconds = rawSeconds + breakSeconds - totalBreakDelaySeconds;
+        totalSeconds = rawSeconds + breakSeconds ;
 
 
         const formattedTime = formatTime(totalSeconds);
@@ -714,10 +731,10 @@ ORDER BY e.mIdCard;
         console.log(`Employee ${emp.firstName} - Raw Worked Time = ${emp.rawWorkedTime}`);
         console.log(`Employee ${emp.firstName} - Break Summary =`, emp.breakSummary);
         emp.hourlyWorkedTime = formattedTime;
-        emp.breakSummary.earlySeconds = formatTime(earlySeconds);
-        emp.breakSummary.lateSeconds = formatTime(lateSeconds);
-        emp.breakSummary.eveningEarlySeconds = formatTime(eveningEarlySeconds);
-        emp.breakSummary.eveningExtraSeconds = formatTime(eveningExtraSeconds);
+        // emp.breakSummary.earlySeconds = formatTime(earlySeconds);
+        // emp.breakSummary.lateSeconds = formatTime(lateSeconds);
+        // emp.breakSummary.eveningEarlySeconds = formatTime(eveningEarlySeconds);
+        // emp.breakSummary.eveningExtraSeconds = formatTime(eveningExtraSeconds);
       } else {
         console.log(`Employee ${emp.firstName} has no punches`);
         emp.hourlyWorkedTime = "00:00:00";
