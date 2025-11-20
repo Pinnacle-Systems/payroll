@@ -185,13 +185,13 @@ SELECT
                 ),
                 '%H:%i:%s'
               )
-            ELSE '00:00:00'
+            ELSE NULL
           END
         FROM ShiftTemplateItems s
         WHERE s.shiftCommonTemplateId = e.shiftCommonTemplateId
         LIMIT 1
       )
-    ELSE '00:00:00'
+    ELSE NULL
   END AS otHours,
 
 
@@ -506,8 +506,8 @@ ORDER BY e.mIdCard;
     // Before hourly calculation
     if (!shiftItem) {
       console.log(`No shiftTemplateItem found for employee ${emp.firstName}`);
-      emp.hourlyWorkedTime = "00:00:00";
-      emp.rawWorkedTime = "00:00:00"; // also set raw
+      // emp.hourlyWorkedTime = "00:00:00";
+      // emp.rawWorkedTime = "00:00:00"; // also set raw
       continue; // skip hourly calculation
     }
 
@@ -517,6 +517,8 @@ ORDER BY e.mIdCard;
 
     if (punchesTime?.length) {
       const timeToSeconds = (timeStr) => {
+        if (!timeStr) return 0; // handle null, undefined, or empty string
+
         const [h, m, s] = timeStr?.split(':')?.map(Number);
         return h * 3600 + m * 60 + s;
       };
@@ -540,6 +542,8 @@ ORDER BY e.mIdCard;
 
       let firstPunch = punchesInSeconds[0];
       if (punchesInSeconds[0] < morningInSec) {
+        firstPunch = morningInSec;              // <-- IMPORTANT
+
         punchesInSeconds[0] = morningInSec;
         punchesTime[0] = formatTime(morningInSec);
       }
@@ -580,28 +584,36 @@ ORDER BY e.mIdCard;
       const eveningOutFromTol = timeToSeconds(eveningInFromTolerance);
       const eveningOutSec = timeToSeconds(eveningIn);
       const eveningOutToTol = timeToSeconds(eveningInToTolerance);
-
+      const fbout = timeToSeconds(emp.shiftTemplateItem.fbOut)
 
 
       let morningStatus;
 
-      if (firstPunch > morningInToTol) {
-        // Arrived late → keep this logic
-        const lateSeconds = firstPunch - morningInToTol;
-        morningStatus = {
-          status: "Late",
-          punch: formatTime(firstPunch),
-          delay: formatTime(lateSeconds)
-        };
-
-      } else {
-        // On time or early → always treated as ON TIME (early logic removed)
+      if (firstPunch >= morningInSec && firstPunch <= morningInToTol) {
         morningStatus = {
           status: "On Time",
           punch: formatTime(firstPunch),
-          delay: "00:00:00"
+          delay: "00:00:00",
         };
       }
+
+      // 2. Late (after tolerance but BEFORE break start)
+      else if (firstPunch > morningInToTol && firstPunch < fbout) {
+        const lateSeconds = firstPunch - morningInToTol;
+
+        morningStatus = {
+          status: "Late",
+          punch: formatTime(firstPunch),
+          delay: formatTime(lateSeconds),
+        };
+      } else if (firstPunch >= fbout) {
+        morningStatus = {
+          status: "Late",
+          punch: formatTime(firstPunch),
+          delay: "00:00:00",  // No delay after break start
+        };
+      }
+
 
       emp.breakSummary.morningInOut = morningStatus;
 
@@ -617,7 +629,7 @@ ORDER BY e.mIdCard;
       if (lastPunch < eveningOutSec) {
         // Employee left early → count as delay
         const delaySeconds = eveningOutSec - lastPunch;
-        eveningStatus.status = "Delayed Out";
+        eveningStatus.status = "Out Early";
         eveningStatus.delay = formatTime(delaySeconds);
       } else {
         // On-time or after – no extra work concept
@@ -634,7 +646,7 @@ ORDER BY e.mIdCard;
         { out: emp.shiftTemplateItem.sbOut, in: emp.shiftTemplateItem.sbIn } // evening
       ];
 
-      if (punchesTime.length > 1) {
+      if (punchesTime.length >= 1) {
         const [morningBreak, lunchBreak, eveningBreak] = breaks;
         const GRACE_MINUTES = 10;
 
@@ -647,7 +659,7 @@ ORDER BY e.mIdCard;
 
           if (!breakItem.out || !breakItem.in) {
             emp.breakSummary[key] = {
-              status: "No punches",
+              status: "Break Punch timing not available",
               punches: { out: null, in: null },
               breakDuration: "00:00:00",
               delay: "00:00:00"
@@ -693,8 +705,7 @@ ORDER BY e.mIdCard;
           }
           const outSecs = punchesInBreak[0];
           const inSecs = punchesInBreak[1];
-          // const delay = inSecs > breakEnd ? inSecs - breakEnd : 0;
-          // const actualBreak = Math.min(inSecs - outSecs, breakEnd - breakStart);
+
           const actualBreak = inSecs - outSecs; // real break duration
           const standardBreak = breakEnd - breakStart; // allowed break duration
           const delay = Math.max(0, actualBreak - standardBreak); // delay if any
@@ -723,7 +734,7 @@ ORDER BY e.mIdCard;
 
         // Add breakSeconds to raw worked time and subtract delays
         // totalSeconds = rawSeconds + breakSeconds - totalBreakDelaySeconds;
-        totalSeconds = rawSeconds + breakSeconds ;
+        totalSeconds = rawSeconds + breakSeconds;
 
 
         const formattedTime = formatTime(totalSeconds);
@@ -737,8 +748,8 @@ ORDER BY e.mIdCard;
         // emp.breakSummary.eveningExtraSeconds = formatTime(eveningExtraSeconds);
       } else {
         console.log(`Employee ${emp.firstName} has no punches`);
-        emp.hourlyWorkedTime = "00:00:00";
-        emp.rawWorkedTime = "00:00:00";
+        emp.hourlyWorkedTime = ""
+        emp.rawWorkedTime = "";
         emp.breakSummary = {
           morning: { status: "no punch", punches: { out: null, in: null }, breakDuration: "00:00:00", delay: "00:00:00" },
           lunch: { status: "no punch", punches: { out: null, in: null }, breakDuration: "00:00:00", delay: "00:00:00" },
