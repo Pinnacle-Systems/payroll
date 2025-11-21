@@ -9,7 +9,7 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
 
                     {/* Modal Header */}
                     <div className="flex justify-between items-center border-b pb-2">
-                        <h2 className="text-lg font-semibold">Permission Table</h2>
+                        <h2 className="text-lg font-semibold">Permission</h2>
                         <button
                             onClick={onClose}
                             className="ext-gray-600 hover:text-gray-800 hover:bg-red-400 rounded focus:outline-none"
@@ -24,7 +24,8 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                                     d="M14.348 5.652a.999.999 0 00-1.414 0L10 8.586l-2.93-2.93a.999.999 0 10-1.414 1.414L8.586 10l-2.93 2.93a.999.999 0 101.414 1.414L10 11.414l2.93 2.93a.999.999 0 101.414-1.414L11.414 10l2.93-2.93a.999.999 0 000-1.414z"
                                     fillRule="evenodd"
                                 />
-                            </svg>                        </button>
+                            </svg>
+                        </button>
                     </div>
                     <div
                         className={` mt-3  p-2  bg-white max-h-[600px]  overflow-x-auto overflow-y-auto`}
@@ -104,7 +105,7 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
 
                                             {/* 2. worked Hours (without Break and OT) */}
                                             <th className="w-[40px] py-2 item-center font-medium text-[13px] border border-gray-300">
-                                                worked Hours (without Break and OT)
+                                                worked Hours (without Break)
                                             </th>
 
                                             {/* 3. OT Hours */}

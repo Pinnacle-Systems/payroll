@@ -32,8 +32,9 @@ const Form = () => {
   const [openAbsentModal, setOpenAbsentModal] = useState(false);
   const [openDutyModal, setOpenDutyModal] = useState(false)
   const [openPermissionModal, setOpenPermissionModal] = useState(false)
-
-
+  const [absentData, setAbsentData] = useState([]);
+  const [regularData, setRegularData] = useState([]);
+  const [irregularData, setIrregularData] = useState([]);
 
   const openModal = (breakSummary) => {
     setSelectedBreakSummary(breakSummary);
@@ -63,8 +64,6 @@ const Form = () => {
       event.preventDefault();
     }
   };
-
-
   const EmployeeOptions = employeeCategory?.data?.map((val) => ({
     value: val?.id,
     label: val?.name,
@@ -74,34 +73,99 @@ const Form = () => {
     setEmployeeCategoryId("");
     setGroupBy("");
   };
-  const absentData =
-    allData?.data?.filter((item) => item.status === "Absent") || [];
-  const regularData =
-    allData?.data?.filter((item) => item.status === "Regular") || [];
-  const irregularData =
-    allData?.data?.filter((item) => item.status === "Irregular") || [];
+  useEffect(() => {
+    if (!allData) return;
+
+    const absent = allData?.data?.filter(i => i.status === "Absent") || [];
+    const regular = allData?.data?.filter(i => i.status === "Regular") || [];
+    const irregular = allData?.data?.filter(i => i.status === "Irregular") || [];
+
+    setAbsentData(absent);
+    setRegularData(regular);
+    setIrregularData(irregular);
+  }, [allData]);
+
+
+  const determineStatus = (emp) => {
+    //  Replace with your real breakSummary logic later
+    return "Regular";
+  }
+
+  const handleAbsentUpdate = (index, field, value) => {
+    setAbsentData(prev => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+  const makeTimestamp = (date, time) => {
+    return moment(`${date} ${time}`, "YYYY-MM-DD HH:mm:ss")
+      .format("YYYY-MM-DD HH:mm:ss");   // EXACT DB format
+  };
+
+  const handleSaveAllAbsent = () => {
+    let movedRegular = [];
+    let movedIrregular = [];
+    let remainingAbsent = [];
+
+    absentData.forEach(emp => {
+      // If not fully entered → keep in Absent table
+      if (!emp.inDate || !emp.inTimeEdit || !emp.outTimeEdit) {
+        remainingAbsent.push(emp);
+        return;
+      }
+
+      // Save as LOCAL datetime (NOT UTC)
+      const finalInTime = makeTimestamp(emp.inDate, emp.inTimeEdit);
+      const finalOutTime = makeTimestamp(emp.inDate, emp.outTimeEdit);
+
+
+      const finalEmp = {
+        ...emp,
+        inTime: finalInTime,
+        outTime: finalOutTime,
+      };
+
+      const newStatus = determineStatus(finalEmp); // You will update logic later
+
+      if (newStatus === "Regular") {
+        movedRegular.push(finalEmp);
+      } else {
+        movedIrregular.push(finalEmp);
+      }
+    });
+
+    // Update all 3 tables in ONE step
+    setRegularData(prev => [...prev, ...movedRegular]);
+    setIrregularData(prev => [...prev, ...movedIrregular]);
+    setAbsentData(remainingAbsent);
+  };
+
   const selectedShiftType = shiftTypeData?.data?.find(val => val?.selectedShiftType)?.selectedShiftType;
 
-  const permissionTableData =
-    allData?.data?.filter((item) => {
-      const bs = item.breakSummary;
+  const permissionTableData = allData?.data?.filter((item) => {
+    const bs = item.breakSummary;
 
-      if (!bs) return false;
+    if (!bs) return false;
 
-      // collect all status values
-      const statuses = [
-        bs.morningInOut?.status,
-        bs.morning?.status,
-        bs.lunch?.status,
-        bs.evening?.status,
-        bs.eveningInOut?.status
-      ].filter(Boolean);
+    // collect all status values
+    const statuses = [
+      bs.morningInOut?.status,
+      bs.morning?.status,
+      bs.lunch?.status,
+      bs.evening?.status,
+      bs.eveningInOut?.status
+    ]?.filter(Boolean);
 
-      // return true if ANY matches these
-      return statuses.some((s) =>
-        ["Late", "Out Early", "Delayed", "Miss punch","No punches"].includes(s)
-      );
-    }) || [];
+    // return true if ANY matches these
+    return statuses?.some((s) =>
+      ["Late", "Out Early", "Delayed", "Miss punch", "No punches"].includes(s)
+    );
+  }) || [];
+
+
+
+
   const nonDelayedList =
     allData?.data?.filter((item) => {
       const bs = item.breakSummary;
@@ -192,7 +256,10 @@ const Form = () => {
         }
 
         {
-          openAbsentModal && (<AbsentTable absentData={absentData} reportView={reportView} selectedShiftType={selectedShiftType} onClose={() => setOpenAbsentModal(false)}
+          openAbsentModal && (<AbsentTable onUpdate={handleAbsentUpdate} onSaveAll={handleSaveAllAbsent}
+
+
+            absentData={absentData} reportView={reportView} selectedShiftType={selectedShiftType} onClose={() => setOpenAbsentModal(false)}
           />
           )
         }
@@ -296,7 +363,7 @@ const Form = () => {
 
                     {/* 2. worked Hours (without Break and OT) */}
                     <th className="w-[40px] py-2 item-center font-medium text-[13px] border border-gray-300">
-                      worked Hours (without Break and OT)
+                      worked Hours (without Break)
                     </th>
 
                     {/* 3. OT Hours */}
@@ -311,9 +378,7 @@ const Form = () => {
                   </>
                 )}
 
-                {/* ================================
-    NON-HOURLY COLUMNS
-================================== */}
+                {/* ================================ NON-HOURLY COLUMNS ================================== */}
                 {selectedShiftType !== "Hourly" && (
                   <>
                     {/* 1. worked Hours */}

@@ -14,7 +14,7 @@ function minutesToHMS(minutes) {
   if (typeof minutes !== "number") return minutes; // keep "single punch" as is
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
-  return [h, m, 0].map(v => String(v).padStart(2, "0")).join(":");
+  return [h, m, 0]?.map(v => String(v).padStart(2, "0"))?.join(":");
 }
 function secondsToHms(d) {
   d = Number(d);
@@ -524,29 +524,25 @@ ORDER BY e.mIdCard;
       };
       let punchesInSeconds = punchesTime?.map(timeToSeconds);
 
-      // Morning In Punch
-      const morningIn = emp.shiftTemplateItem.startTime
+      const morningInSec = timeToSeconds(emp.shiftTemplateItem.startTime);
 
-      const morningInSec = timeToSeconds(morningIn);
+      // Adjust the first punch
+      if (punchesInSeconds[0] < morningInSec) {
+        punchesInSeconds[0] = morningInSec;
+        punchesTime[0] = formatTime(morningInSec);
+      }
+      let firstPunch = punchesInSeconds[0];
+
+      // Now calculate actual worked time using adjusted punches
       let actualSeconds = 0;
-
-      if (punchesTime?.length) {
-        for (let i = 0; i < punchesTime.length - 1; i += 2) {
-          const inSecs = timeToSeconds(punchesTime[i]);
-          const outSecs = timeToSeconds(punchesTime[i + 1]);
-          if (outSecs > inSecs) actualSeconds += (outSecs - inSecs);
-        }
+      for (let i = 0; i < punchesTime.length - 1; i += 2) {
+        const inSecs = timeToSeconds(punchesTime[i]);
+        const outSecs = timeToSeconds(punchesTime[i + 1]);
+        if (outSecs > inSecs) actualSeconds += (outSecs - inSecs);
       }
 
       emp.actualWorkedTime = formatTime(actualSeconds);
 
-      let firstPunch = punchesInSeconds[0];
-      if (punchesInSeconds[0] < morningInSec) {
-        firstPunch = morningInSec;              // <-- IMPORTANT
-
-        punchesInSeconds[0] = morningInSec;
-        punchesTime[0] = formatTime(morningInSec);
-      }
       // ---- 1️⃣ Raw worked time (without breaks) ----
       let rawSeconds = 0;
       for (let i = 0; i < punchesTime.length - 1; i += 2) {
@@ -711,7 +707,7 @@ ORDER BY e.mIdCard;
           const delay = Math.max(0, actualBreak - standardBreak); // delay if any
           // Delay if returned after official break
           totalBreakDelaySeconds += delay;
-          const status = inSecs <= breakEnd ? "On Time" : "Delayed";
+          const status = inSecs <= graceEnd ? "On Time" : "Delayed";
           emp.breakSummary[key] = {
             status,
             punches: { out: formatTime(outSecs), in: formatTime(inSecs) },
