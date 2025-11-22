@@ -4,7 +4,7 @@ import { ReusableTable, DateInput, customSelectStyles } from "../../../Inputs";
 import Select from "react-select";
 import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCategoryMasterService";
 import { useGetEmployeeQuery } from "../../../redux/services/EmployeeMasterService";
-import { useLazyGetAttendenceGenerationQuery } from "../../../redux/services/AttenedenceGeneration";
+import { useLazyGetAttendenceGenerationQuery, useAddmanualPunchMutation } from "../../../redux/services/AttenedenceGeneration";
 import Modal from "../../../UiComponents/Modal";
 import { GroupBy } from "../../../Utils/DropdownData";
 import { getCommonParams } from "../../../Utils/helper";
@@ -51,6 +51,7 @@ const Form = () => {
   const { data: shiftTypeData } = useGetshiftTypeQuery({ params })
 
   const { data: employeeData } = useGetEmployeeQuery({ params });
+  const [manualPunch] = useAddmanualPunchMutation();
 
   useEffect(() => {
     if (form && designationRef.current) {
@@ -69,7 +70,6 @@ const Form = () => {
     label: val?.name,
   }));
   const OnNew = () => {
-    setDate("");
     setEmployeeCategoryId("");
     setGroupBy("");
   };
@@ -86,10 +86,6 @@ const Form = () => {
   }, [allData]);
 
 
-  const determineStatus = (emp) => {
-    //  Replace with your real breakSummary logic later
-    return "Regular";
-  }
 
   const handleAbsentUpdate = (index, field, value) => {
     setAbsentData(prev => {
@@ -99,47 +95,112 @@ const Form = () => {
     });
   };
   const makeTimestamp = (date, time) => {
-    return moment(`${date} ${time}`, "YYYY-MM-DD HH:mm:ss")
-      .format("YYYY-MM-DD HH:mm:ss");   // EXACT DB format
+    if (!date || !time) return null;
+
+    const full = `${date} ${time}`; // "2024-11-29 09:00:00"
+
+    return moment(full, "YYYY-MM-DD HH:mm:ss", true) // strict parse
+      .format("YYYY-MM-DD HH:mm:ss");
   };
 
-  const handleSaveAllAbsent = () => {
-    let movedRegular = [];
-    let movedIrregular = [];
+  const handleSaveAllAbsent = async () => {
     let remainingAbsent = [];
 
-    absentData.forEach(emp => {
-      // If not fully entered → keep in Absent table
-      if (!emp.inDate || !emp.inTimeEdit || !emp.outTimeEdit) {
-        remainingAbsent.push(emp);
-        return;
+    let updatedAttendence = []; //  collect punches to insert
+
+    // Check if at least one inTimeEdit or outTimeEdit exists in the whole absentData
+    const hasAtLeastOnePunch = absentData?.some(emp => emp.inTimeEdit || emp.outTimeEdit);
+    if (!hasAtLeastOnePunch) {
+      Swal.fire({
+        icon: "warning",
+        title: "No punches",
+        text: "Please enter at least one In or Out time before updating.",
+        timer: 2000,
+
+      });
+      return; // Stop execution
+    }
+    absentData?.forEach(emp => {
+      const { inDate, inTimeEdit, outTimeEdit } = emp;
+      const reportDate = date;
+      const inDateVal = emp.inDate || reportDate;
+
+
+      // Build timestamps only if values exist
+      const punches = [];
+
+      // Only push in-time if present
+      if (inTimeEdit) {
+        const finalInTime = makeTimestamp(inDateVal, inTimeEdit);
+        if (finalInTime) {
+          punches.push({
+            employeeId: emp.employeeId,
+            mIdCard: emp.mIdCard,
+            timestamp: finalInTime,
+            machineType: "IN / OUT",
+            machineIP: "192.168.1.50",
+            machineInOutGridId: 9
+          });
+        }
       }
 
-      // Save as LOCAL datetime (NOT UTC)
-      const finalInTime = makeTimestamp(emp.inDate, emp.inTimeEdit);
-      const finalOutTime = makeTimestamp(emp.inDate, emp.outTimeEdit);
+      // Only push out-time if present
+      if (outTimeEdit) {
+        const finalOutTime = makeTimestamp(inDateVal, outTimeEdit);
+        if (finalOutTime) {
+          punches.push({
+            employeeId: emp.employeeId,
+            mIdCard: emp.mIdCard,
+            timestamp: finalOutTime,
+            machineType: "IN / OUT",
+            machineIP: "192.168.1.50",
+            machineInOutGridId: 9
+          });
+        }
+      }
 
-
-      const finalEmp = {
-        ...emp,
-        inTime: finalInTime,
-        outTime: finalOutTime,
-      };
-
-      const newStatus = determineStatus(finalEmp); // You will update logic later
-
-      if (newStatus === "Regular") {
-        movedRegular.push(finalEmp);
+      // Push valid punches to main array
+      if (punches.length > 0) {
+        updatedAttendence.push(...punches);
       } else {
-        movedIrregular.push(finalEmp);
+        // If neither in nor out exists, keep in remainingAbsent
+        remainingAbsent.push(emp);
       }
     });
+    const data = { updatedAttendence }
+    // 5️⃣ SEND TO BACKEND
+    try {
+      await manualPunch(data).unwrap();
 
-    // Update all 3 tables in ONE step
-    setRegularData(prev => [...prev, ...movedRegular]);
-    setIrregularData(prev => [...prev, ...movedIrregular]);
-    setAbsentData(remainingAbsent);
+      // Remove saved entries from AbsentData
+      setAbsentData(remainingAbsent);
+
+      // 🔁 REFRESH attendance report AFTER state update
+      await triggerReport({
+        searchParams: {
+          date,
+        },
+      });
+      // ✅ Show success alert
+      Swal.fire({
+        icon: "success",
+        title: "Updated!",
+        text: "Attendance punches have been successfully updated.",
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } catch (err) {
+      console.error("Error saving punches:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to update attendance punches.",
+      });
+      return;
+    }
+
   };
+
 
   const selectedShiftType = shiftTypeData?.data?.find(val => val?.selectedShiftType)?.selectedShiftType;
 
@@ -257,14 +318,15 @@ const Form = () => {
 
         {
           openAbsentModal && (<AbsentTable onUpdate={handleAbsentUpdate} onSaveAll={handleSaveAllAbsent}
-
+            date={date}
 
             absentData={absentData} reportView={reportView} selectedShiftType={selectedShiftType} onClose={() => setOpenAbsentModal(false)}
           />
           )
         }
         {
-          openDutyModal && (<OnDutyTable absentData={absentData} reportView={reportView} selectedShiftType={selectedShiftType} onClose={() => setOpenDutyModal(false)} />
+          openDutyModal && (<OnDutyTable absentData={absentData} onUpdate={handleAbsentUpdate} onSaveAll={handleSaveAllAbsent} reportView={reportView} selectedShiftType={selectedShiftType} onClose={() => setOpenDutyModal(false)} date={date}
+          />
           )
         }
         {tableShow === "Final" && (<div

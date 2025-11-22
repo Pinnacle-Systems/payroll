@@ -50,6 +50,19 @@ const AttendenceGenerationApi = createApi({
       }),
       invalidatesTags: ["attendenceGeneration"],
     }),
+    addmanualPunch: builder.mutation({
+      query: (payload) => ({
+        url: ATTENDENCE_GENERATION,
+        method: "POST",
+        body: payload,
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+      }),
+      invalidatesTags: ["attendenceGeneration"],
+
+    }),
+
     updateAttendenceGeneration: builder.mutation({
       query: (payload) => {
         const { id, ...body } = payload;
@@ -78,6 +91,7 @@ export const {
   useAddAttendenceGenerationMutation,
   useUpdateAttendenceGenerationMutation,
   useDeleteAttendenceGenerationMutation,
+  useAddmanualPunchMutation
 } = AttendenceGenerationApi;
 
 export default AttendenceGenerationApi;

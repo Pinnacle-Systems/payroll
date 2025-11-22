@@ -107,7 +107,7 @@ Attendance AS (
   GROUP BY mIdCard
 )
 SELECT
-  e.id,
+  e.id AS employeeId,
   e.mIdCard,
   e.firstName,
     d.name AS departmentName,
@@ -253,6 +253,7 @@ ORDER BY e.mIdCard;
 
   const data = rawData?.map((row) => ({
     mIdCard: row.mIdCard,
+    employeeId: row.employeeId || null,
     firstName: row.firstName,
     departmentName: row.departmentName || null,
     designationName: row.designationName || null,
@@ -304,7 +305,7 @@ ORDER BY e.mIdCard;
     });
 
     if (!punches.length) {
-      console.log(`Employee ${emp.firstName} has no punches on ${date}`);
+      // console.log(`Employee ${emp.firstName} has no punches on ${date}`);
       continue;
     }
 
@@ -345,7 +346,7 @@ ORDER BY e.mIdCard;
     })?.filter(Boolean);
 
 
-    console.log(punchesTime, "punchesTime");
+    // console.log(punchesTime, "punchesTime");
 
     const quarterValues = {};
 
@@ -364,11 +365,11 @@ ORDER BY e.mIdCard;
 
       // If this is the last quarter, allow unlimited late punches
       const isLastQuarter = index === emp.quarters.length - 2;
-      console.log(isLastQuarter, "isLastQuarter");
+      // console.log(isLastQuarter, "isLastQuarter");
 
       if (isLastQuarter) {
         toMins = Infinity; // or a reasonable cap if needed
-        console.log(`  (Last Quarter) Extended tolerance: now accepting punches up until ANY time`);
+        // console.log(`  (Last Quarter) Extended tolerance: now accepting punches up until ANY time`);
       }
       // const fromMins = timeStrToMinutes(q.from) - 30;
       // const toMins = timeStrToMinutes(q.to) + 15;
@@ -378,11 +379,11 @@ ORDER BY e.mIdCard;
       const toleratedFromStr = minutesToTimeStr(fromMins);
       const toleratedToStr = minutesToTimeStr(toMins);
 
-      console.log(`Employee ${emp.firstName} - Quarter ${q.name}:`);
-      console.log(`Original window: ${originalFromStr} to ${originalToStr}`);
-      console.log(`Window: ${minutesToTimeStr(fromMins)} to ${isLastQuarter ? "∞" : minutesToTimeStr(toMins)}`);
-      console.log(`Tolerance applied: -${ftGrace} mins, +${ttGrace} mins`);
-      console.log(`New window with tolerance: ${toleratedFromStr} to ${toleratedToStr}`);
+      // console.log(`Employee ${emp.firstName} - Quarter ${q.name}:`);
+      // console.log(`Original window: ${originalFromStr} to ${originalToStr}`);
+      // console.log(`Window: ${minutesToTimeStr(fromMins)} to ${isLastQuarter ? "∞" : minutesToTimeStr(toMins)}`);
+      // console.log(`Tolerance applied: -${ftGrace} mins, +${ttGrace} mins`);
+      // console.log(`New window with tolerance: ${toleratedFromStr} to ${toleratedToStr}`);
 
 
       const quarterPunches = punchesTime?.filter(time => {
@@ -400,13 +401,13 @@ ORDER BY e.mIdCard;
         // Log the punches used
         const minPunchStr = minutesToTimeStr(minPunch);
         const maxPunchStr = minutesToTimeStr(maxPunch);
-        console.log(`Employee ${emp.firstName} - Quarter ${q.name}:`);
-        console.log(`Punches within window: ${quarterPunches.join(", ")}`);
-        console.log(`First punch: ${minPunchStr}`);
-        console.log(`Last punch: ${maxPunchStr}`);
+        // console.log(`Employee ${emp.firstName} - Quarter ${q.name}:`);
+        // console.log(`Punches within window: ${quarterPunches.join(", ")}`);
+        // console.log(`First punch: ${minPunchStr}`);
+        // console.log(`Last punch: ${maxPunchStr}`);
         const workedSeconds = Math.round(workedMins * 60);
         const durationStr = secondsToHms(workedSeconds);
-        console.log(`  Worked duration: ${durationStr} (${workedMins.toFixed(2)} mins)`);
+        // console.log(`  Worked duration: ${durationStr} (${workedMins.toFixed(2)} mins)`);
 
 
         const totalHours = timeStrToHours(q.total); // e.g., "04:30:00" → 4.5
@@ -433,7 +434,7 @@ ORDER BY e.mIdCard;
 
 
 
-        console.log(`Employee ${emp.firstName} - Quarter ${q.name} value = ${finalValue}`);
+        // console.log(`Employee ${emp.firstName} - Quarter ${q.name} value = ${finalValue}`);
         quarterValues[q.name] = finalValue;
 
       }
@@ -458,7 +459,7 @@ ORDER BY e.mIdCard;
       // } 
 
       else {
-        console.log(`Employee ${emp.firstName} - Quarter ${q.name} has no punches in range`);
+        // console.log(`Employee ${emp.firstName} - Quarter ${q.name} has no punches in range`);
         quarterValues[q.name] = 0; // no punches = 0
       }
 
@@ -478,7 +479,7 @@ ORDER BY e.mIdCard;
 
       const formulaResult = safeEval(formulaExpr);
       emp.formulaResult = formulaResult;
-      console.log(`Employee ${emp.firstName} - Formula result:`, formulaResult);
+      // console.log(`Employee ${emp.firstName} - Formula result:`, formulaResult);
     }
 
 
@@ -505,7 +506,7 @@ ORDER BY e.mIdCard;
 
     // Before hourly calculation
     if (!shiftItem) {
-      console.log(`No shiftTemplateItem found for employee ${emp.firstName}`);
+      // console.log(`No shiftTemplateItem found for employee ${emp.firstName}`);
       // emp.hourlyWorkedTime = "00:00:00";
       // emp.rawWorkedTime = "00:00:00"; // also set raw
       continue; // skip hourly calculation
@@ -553,7 +554,7 @@ ORDER BY e.mIdCard;
         if (outSecs > inSecs) rawSeconds += outSecs - inSecs;
       }
       const empOTHours = timeToSeconds(emp.otHours)
-      console.log(empOTHours, "empOTHours");
+      // console.log(empOTHours, "empOTHours");
       //  SUBTRACT OT HOURS HERE
       rawSeconds = rawSeconds - empOTHours;
       if (rawSeconds < 0) rawSeconds = 0;
@@ -734,16 +735,16 @@ ORDER BY e.mIdCard;
 
 
         const formattedTime = formatTime(totalSeconds);
-        console.log(`Employee ${emp.firstName} - Worked Time with breaks = ${formattedTime}`);
-        console.log(`Employee ${emp.firstName} - Raw Worked Time = ${emp.rawWorkedTime}`);
-        console.log(`Employee ${emp.firstName} - Break Summary =`, emp.breakSummary);
+        // console.log(`Employee ${emp.firstName} - Worked Time with breaks = ${formattedTime}`);
+        // console.log(`Employee ${emp.firstName} - Raw Worked Time = ${emp.rawWorkedTime}`);
+        // console.log(`Employee ${emp.firstName} - Break Summary =`, emp.breakSummary);
         emp.hourlyWorkedTime = formattedTime;
         // emp.breakSummary.earlySeconds = formatTime(earlySeconds);
         // emp.breakSummary.lateSeconds = formatTime(lateSeconds);
         // emp.breakSummary.eveningEarlySeconds = formatTime(eveningEarlySeconds);
         // emp.breakSummary.eveningExtraSeconds = formatTime(eveningExtraSeconds);
       } else {
-        console.log(`Employee ${emp.firstName} has no punches`);
+        // console.log(`Employee ${emp.firstName} has no punches`);
         emp.hourlyWorkedTime = ""
         emp.rawWorkedTime = "";
         emp.breakSummary = {
@@ -757,4 +758,35 @@ ORDER BY e.mIdCard;
   return { data };
 }
 
-export { get };
+
+
+
+async function addAbsentPunches(body) {
+  const { updatedAttendence } = body;
+  console.log("Received punches:", updatedAttendence);
+
+  const formatted = updatedAttendence.map(item => {
+    const local = new Date(item.timestamp.replace(" ", "T"));
+    local.setMinutes(local.getMinutes() - local.getTimezoneOffset()); // 👈 FREEZE TIME
+    return {
+      employeeId: item.employeeId ?? undefined,
+      mIdCard: item.mIdCard,
+      timestamp: local,   // ✔ exact time saved
+      machineType: item.machineType || undefined,
+      machineIP: item.machineIP || undefined,
+      machineInOutGridId: item.machineInOutGridId || undefined,
+    }
+
+  });
+  const data = await prisma.pythonPunchData.createMany({
+    data:
+      formatted,
+    skipDuplicates: true,
+
+
+  });
+  return { statusCode: 0, data };
+}
+
+
+export { get, addAbsentPunches };
