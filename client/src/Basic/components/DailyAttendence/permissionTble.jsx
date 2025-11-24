@@ -34,7 +34,7 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                             </div>
                         </div>
                         <div
-                            className={` mt-3  p-2  bg-white h-[450px]  overflow-x-auto overflow-y-auto`}
+                            className={` mt-3  p-2  bg-white h-[500px]  overflow-x-auto overflow-y-auto`}
                         >
                             <table className={` ${selectedShiftType === "Hourly" ? "w-[110vw]" : "w-[100vw]"}  border-collapse table-fixed`}>
 
@@ -95,9 +95,9 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                                         </th>
 
 
-                                        {selectedShiftType === "Hourly" ? (<th className={`w-[40px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                                        {/* {selectedShiftType === "Hourly" ? (<th className={`w-[40px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>
                                             Status
-                                        </th>) : ""}
+                                        </th>) : ""} */}
                                         {/* ================================
     HOURLY COLUMNS
 ================================== */}
@@ -363,7 +363,7 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                                                     </>
                                                 )}
 
-                                                {
+                                                {/* {
                                                     selectedShiftType === "Hourly" ? (<td
                                                         rowSpan={2}
                                                         className="  border border-gray-300 text-[12px] py-0.5 text-center item-center"
@@ -389,7 +389,7 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                                                             </svg>
                                                         </button>
                                                     </td>) : ""
-                                                }
+                                                } */}
 
 
                                                 {selectedShiftType === "Hourly" && (

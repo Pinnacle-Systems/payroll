@@ -2,7 +2,10 @@ import moment from "moment-timezone";
 import React, { useEffect, useState, useRef } from "react";
 
 
-const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpdate, onSaveAll, date }) => {
+const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpdate, onSaveAll, date, shiftData }) => {
+
+    console.log(shiftData, "shiftData");
+
     return (
         <>
             <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
@@ -38,9 +41,9 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                         </div>
 
                         <div
-                            className={` mt-3  p-2  bg-white h-[450px]  overflow-x-auto overflow-y-auto`}
+                            className={` mt-3  p-2  bg-white h-[500px]  overflow-x-auto overflow-y-auto`}
                         >
-                            <table className={` w-[65vw]  border-collapse table-fixed`}>
+                            <table className={` w-[70vw]  border-collapse table-fixed`}>
 
                                 <thead className="bg-gray-200 text-gray-800 border border-gray-400">
                                     <tr>
@@ -61,7 +64,7 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                             Emp Name
                                         </th>
                                         <th
-                                            className={`w-[30px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-[40px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
                                         >
                                             Shift
                                         </th>
@@ -78,10 +81,13 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                         <th
                                             className={`w-12  py-2 item-center font-medium text-[13px]  border border-gray-300`}
                                         >
-                                            Date
+                                            In Date
                                         </th>
                                         <th className={`w-12 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
                                             In
+                                        </th>
+                                        <th className={`w-12 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                                            Out Date
                                         </th>
 
                                         <th className={`w-12 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
@@ -126,7 +132,7 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                                         className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
                                                     />
                                                 </td>
-                                                <td
+                                                {/* <td
                                                     rowSpan={2}
                                                     className="border border-gray-300 text-[12px] py-0.5 item-center"
                                                 >
@@ -135,7 +141,25 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                                         value={item?.shiftName}
                                                         className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
                                                     />
+                                                </td> */}
+                                                <td
+                                                    rowSpan={2}
+                                                    className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                >
+                                                    <select
+                                                        value={item.shiftName || ""}
+                                                        onChange={(e) => onUpdate(index, "shiftName", e.target.value)}
+                                                        className="w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent"
+                                                    >
+                                                        <option value="">Select</option>
+                                                        {shiftData?.data?.map((shift) => (
+                                                            <option key={shift.id} value={shift.name}>
+                                                                {shift.name}
+                                                            </option>
+                                                        ))}
+                                                    </select>
                                                 </td>
+
                                                 <td
                                                     rowSpan={2}
                                                     className="border border-gray-300 text-[12px] py-0.5 item-center"
@@ -147,6 +171,7 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                                         className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
                                                     />
                                                 </td>
+
                                                 <td
                                                     rowSpan={2}
                                                     className="border border-gray-300 text-[12px] py-0.5 item-center"
@@ -196,7 +221,20 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                                         className={`w-full bg-transparent  text-center focus:outline-none focus:border-transparent  `}
                                                     />
                                                 </td>
+                                                {/* out Date */}
+                                                <td
+                                                    rowSpan={2}
+                                                    className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                                                >
+                                                    <input
+                                                        type="date"
+                                                        value={item.outDate || date}
 
+                                                        onChange={(e) => onUpdate(index, "outDate", e.target.value)}
+
+                                                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                                                    />
+                                                </td>
 
                                                 <td
                                                     rowSpan={2}

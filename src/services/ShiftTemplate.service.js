@@ -95,6 +95,8 @@ async function getOne(id) {
     },
   });
   if (!data) return NoRecordFound("ShiftTemplate");
+  console.log(data, "datashifttemplatesending");
+
   return { statusCode: 0, data };
 }
 
@@ -375,103 +377,104 @@ async function create(body) {
 //   return Promise.all(promises);
 // }
 
-// async function update(id, body) {
-//   const { branchId, companyId, active, categoryId, docId, ShiftTemplateItems } =
-//     await body;
-//   const dataFound = await prisma.shiftTemplate.findUnique({
-//     where: {
-//       id: parseInt(id),
-//     },
-//   });
-//   if (!dataFound) return NoRecordFound("shiftTempalte");
+async function update(id, body) {
+  const { branchId, companyId, active, categoryId, docId, ShiftTemplateItems } =
+    await body;
+  const dataFound = await prisma.shiftTemplate.findUnique({
+    where: {
+      id: parseInt(id),
+    },
+  });
+  if (!dataFound) return NoRecordFound("shiftTempalte");
 
-//   let data;
-//   await prisma.$transaction(async (tx) => {
-//     data = await tx.shiftTemplate.update({
-//       where: {
-//         id: parseInt(id),
-//       },
-//       data: {
-//         docId: docId,
+  let data;
+  await prisma.$transaction(async (tx) => {
+    data = await tx.shiftTemplate.update({
+      where: {
+        id: parseInt(id),
+      },
+      data: {
+        docId: docId,
 
-//         branchId: branchId ? parseInt(branchId) : undefined,
-//         companyId: companyId ? parseInt(companyId) : undefined,
-//         active: active ? Boolean(active) : undefined,
-//         category: categoryId ? categoryId : "",
-//         ShiftTemplateItems: {
-//           deleteMany: {},
-//           create:
-//             ShiftTemplateItems?.length > 0
-//               ? ShiftTemplateItems?.map((item) => ({
-//                   date: item?.date ? new Date(item?.date) : null,
-//                   shiftCommonTemplateId: item?.shiftCommonTemplateId
-//                     ? parseInt(item.shiftCommonTemplateId)
-//                     : undefined,
-//                   shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
-//                   shiftFrom: item?.shiftFrom ? item?.shiftFrom : "",
-//                   shiftTo: item?.shiftTo ? item?.shiftTo : "",
-//                   inNextDay: item?.inNextDay ? item.inNextDay : undefined,
-//                   toleranceInBeforeStart: item?.toleranceInBeforeStart
-//                     ? item.toleranceInBeforeStart
-//                     : undefined,
-//                   startTime: item?.startTime ? item.startTime : undefined,
-//                   toleranceInAfterEnd: item?.toleranceInAfterEnd
-//                     ? item.toleranceInAfterEnd
-//                     : undefined,
-//                   fbOut: item?.fbOut ? item.fbOut : undefined,
-//                   fbIn: item?.fbIn ? item.fbIn : undefined,
-//                   lunchBst: item?.lunchBst ? item.lunchBst : undefined,
-//                   lBSNDay: item?.lBSNDay ? item.lBSNDay : undefined,
-//                   lunchBET: item?.lunchBET ? item.lunchBET : undefined,
-//                   lBEnday: item?.lBEnday ? item.lBEnday : undefined,
-//                   sbOut: item?.sbOut ? item.sbOut : undefined,
-//                   sbIn: item?.sbIn ? item.sbIn : undefined,
-//                   toleranceOutBeforeStart: item?.toleranceOutBeforeStart
-//                     ? item.toleranceOutBeforeStart
-//                     : undefined,
-//                   endTime: item?.endTime ? item.endTime : undefined,
-//                   toleranceOutAfterEnd: item?.toleranceOutAfterEnd
-//                     ? item.toleranceOutAfterEnd
-//                     : undefined,
-//                   outNxtDay: item?.outNxtDay ? item.outNxtDay : undefined,
-//                   shiftTimeHrs: item?.shiftTimeHrs
-//                     ? item.shiftTimeHrs
-//                     : undefined,
-//                   otHrs: item?.otHrs ? item.otHrs : undefined,
-//                   quater: item?.quater ? item.quater : undefined,
-//                   QuarterDetails: {
-//                     createMany: {
-//                       data: item?.quarterDetails?.map((q) => ({
-//                         day: q.day || "",
-//                         oTDetailsId: q.oTDetailsId
-//                           ? parseInt(q.oTDetailsId)
-//                           : undefined,
-//                         ftMins: q.ftMins ? parseInt(q.ftMins) : undefined,
-//                         from: q.from || "",
-//                         to: q.to || "",
-//                         ttMins: q.ttMins ? parseInt(q.ttMins) : undefined,
-//                         endTime: q.endTime ? parseInt(q.endTime) : undefined,
-//                         nextDay: q.nextDay || "",
-//                         checkHrs: q.checkHrs ? parseInt(q.checkHrs) : undefined,
-//                         total: q.total ? parseInt(q.total) : undefined,
-//                         pickFrom: q.pickFrom || "",
-//                         formula: q.formula || "",
-//                       })),
-//                     },
-//                   },
-//                 }))
-//               : undefined,
-//         },
-//       },
+        branchId: branchId ? parseInt(branchId) : undefined,
+        companyId: companyId ? parseInt(companyId) : undefined,
+        active: active ? Boolean(active) : undefined,
+        category: categoryId ? categoryId : "",
+        ShiftTemplateItems: {
+          deleteMany: {},
+          create:
+            ShiftTemplateItems?.length > 0
+              ? ShiftTemplateItems?.map((item) => ({
+                date: item?.date ? new Date(item?.date) : null,
+                shiftCommonTemplateId: item?.shiftCommonTemplateId
+                  ? parseInt(item.shiftCommonTemplateId)
+                  : undefined,
+                shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
+                shiftFrom: item?.shiftFrom ? item?.shiftFrom : "",
+                shiftTo: item?.shiftTo ? item?.shiftTo : "",
+                inNextDay: item?.inNextDay ? item.inNextDay : undefined,
+                toleranceInBeforeStart: item?.toleranceInBeforeStart
+                  ? item.toleranceInBeforeStart
+                  : undefined,
+                startTime: item?.startTime ? item.startTime : undefined,
+                toleranceInAfterEnd: item?.toleranceInAfterEnd
+                  ? item.toleranceInAfterEnd
+                  : undefined,
+                fbOut: item?.fbOut ? item.fbOut : undefined,
+                fbIn: item?.fbIn ? item.fbIn : undefined,
+                lunchBst: item?.lunchBst ? item.lunchBst : undefined,
+                lBSNDay: item?.lBSNDay ? item.lBSNDay : undefined,
+                lunchBET: item?.lunchBET ? item.lunchBET : undefined,
+                lBEnday: item?.lBEnday ? item.lBEnday : undefined,
+                sbOut: item?.sbOut ? item.sbOut : undefined,
+                sbIn: item?.sbIn ? item.sbIn : undefined,
+                toleranceOutBeforeStart: item?.toleranceOutBeforeStart
+                  ? item.toleranceOutBeforeStart
+                  : undefined,
+                endTime: item?.endTime ? item.endTime : undefined,
+                toleranceOutAfterEnd: item?.toleranceOutAfterEnd
+                  ? item.toleranceOutAfterEnd
+                  : undefined,
+                outNxtDay: item?.outNxtDay ? item.outNxtDay : undefined,
+                shiftTimeHrs: item?.shiftTimeHrs
+                  ? item.shiftTimeHrs
+                  : undefined,
+                otHrs: item?.otHrs ? item.otHrs : undefined,
+                quater: item?.quater ? item.quater : undefined,
+                QuarterDetails: {
+                  createMany: {
+                    data: item?.quarterDetails?.map((q) => ({
+                      day: q.day || "",
+                      oTDetailsId: q.oTDetailsId
+                        ? parseInt(q.oTDetailsId)
+                        : undefined,
+                      name: q.name || '',
+                      ftMins: q.ftMins ? parseInt(q.ftMins) : null,
+                      from: q.from || "",
+                      to: q.to || "",
+                      ttMins: q.ttMins ? parseInt(q.ttMins) : null,
+                      endTime: q.endTime ? parseInt(q.endTime) : undefined,
+                      nextDay: q.nextDay || "",
+                      checkHrs: q.checkHrs ? parseInt(q.checkHrs) : undefined,
+                      total: q.total || '',
+                      pickFrom: q.pickFrom || "",
+                      formula: q.formula || "",
+                    })),
+                  },
+                },
+              }))
+              : undefined,
+        },
+      },
 
-//       // include: {
-//       //   ShiftTemplateItems: true,
-//       // },
-//     });
-//     // await updateShiftTemplateItems(tx, ShiftTemplateItems, data);
-//   });
-//   return { statusCode: 0, data };
-// }
+      // include: {
+      //   ShiftTemplateItems: true,
+      // },
+    });
+    // await updateShiftTemplateItems(tx, ShiftTemplateItems, data);
+  });
+  return { statusCode: 0, data };
+}
 async function updateShiftTemplateItems(tx, newItems, existingData) {
   // find items removed from frontend
   const removedItems = existingData?.ShiftTemplateItems?.filter((oldItem) => {
@@ -497,6 +500,7 @@ async function updateShiftTemplateItems(tx, newItems, existingData) {
           shiftCommonTemplateId: item?.shiftCommonTemplateId
             ? parseInt(item.shiftCommonTemplateId)
             : undefined,
+          shiftTemplateId: item?.shiftTemplateId ? parseInt(shiftTemplateId) : undefined,
           shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
           shiftFrom: item?.shiftFrom || "",
           shiftTo: item?.shiftTo || "",
@@ -552,22 +556,22 @@ async function updateShiftTemplateItems(tx, newItems, existingData) {
                   },
                 })),
               create: item.quarterDetails?.filter((q) => !q.id)?.map((q) => ({
-                  day: q.day || "",
-                  oTDetailsId: q.oTDetailsId
-                    ? parseInt(q.oTDetailsId)
-                    : undefined,
-                  name: q.name || '',
-                  ftMins: q.ftMins ? parseInt(q.ftMins) : null,
-                  from: q.from || "",
-                  to: q.to || "",
-                  ttMins: q.ttMins ? parseInt(q.ttMins) : null,
-                  endTime: q.endTime ? parseInt(q.endTime) : undefined,
-                  nextDay: q.nextDay || "",
-                  checkHrs: q.checkHrs ? parseInt(q.checkHrs) : undefined,
-                  total: q.total || '',
-                  pickFrom: q.pickFrom || "",
-                  formula: q.formula || "",
-                })),
+                day: q.day || "",
+                oTDetailsId: q.oTDetailsId
+                  ? parseInt(q.oTDetailsId)
+                  : undefined,
+                name: q.name || '',
+                ftMins: q.ftMins ? parseInt(q.ftMins) : null,
+                from: q.from || "",
+                to: q.to || "",
+                ttMins: q.ttMins ? parseInt(q.ttMins) : null,
+                endTime: q.endTime ? parseInt(q.endTime) : undefined,
+                nextDay: q.nextDay || "",
+                checkHrs: q.checkHrs ? parseInt(q.checkHrs) : undefined,
+                total: q.total || '',
+                pickFrom: q.pickFrom || "",
+                formula: q.formula || "",
+              })),
             }
             : undefined,
         },
@@ -576,11 +580,13 @@ async function updateShiftTemplateItems(tx, newItems, existingData) {
       // ➕ create new item
       return await tx.shiftTemplateItems.create({
         data: {
-          shiftshiftCommonTemplateId: existingData.id,
+          shiftCommonTemplateId: existingData.id,
           shiftCommonTemplateId: item?.shiftCommonTemplateId
             ? parseInt(item.shiftCommonTemplateId)
             : undefined,
           shiftId: item?.shiftId ? parseInt(item.shiftId) : undefined,
+          shiftTemplateId: item?.shiftTemplateId ? parseInt(shiftTemplateId) : undefined,
+
           shiftFrom: item?.shiftFrom || "",
           shiftTo: item?.shiftTo || "",
           inNextDay: item?.inNextDay ?? undefined,
@@ -631,35 +637,35 @@ async function updateShiftTemplateItems(tx, newItems, existingData) {
   await Promise.all(promises);
 }
 
-async function update(id, body) {
-  const { branchId, companyId, active, categoryId, docId, ShiftTemplateItems } =
-    body;
+// async function update(id, body) {
+//   const { branchId, companyId, active, categoryId, docId, ShiftTemplateItems } =
+//     body;
 
-  const dataFound = await prisma.shiftTemplate.findUnique({
-    where: { id: parseInt(id) },
-    include: { ShiftTemplateItems: true },
-  });
-  if (!dataFound) return NoRecordFound("shiftTemplate");
+//   const dataFound = await prisma.shiftTemplate.findUnique({
+//     where: { id: parseInt(id) },
+//     include: { ShiftTemplateItems: true },
+//   });
+//   if (!dataFound) return NoRecordFound("shiftTemplate");
 
-  let data;
-  await prisma.$transaction(async (tx) => {
-    data = await tx.shiftTemplate.update({
-      where: { id: parseInt(id) },
-      data: {
-        docId,
-        branchId: branchId ? parseInt(branchId) : undefined,
-        companyId: companyId ? parseInt(companyId) : undefined,
-        active: active ? Boolean(active) : undefined,
-        category: categoryId || "",
-      },
-    });
+//   let data;
+//   await prisma.$transaction(async (tx) => {
+//     data = await tx.shiftTemplate.update({
+//       where: { id: parseInt(id) },
+//       data: {
+//         docId,
+//         branchId: branchId ? parseInt(branchId) : undefined,
+//         companyId: companyId ? parseInt(companyId) : undefined,
+//         active: active ? Boolean(active) : undefined,
+//         category: categoryId || "",
+//       },
+//     });
 
-    // 🔁 Update items after parent update
-    await updateShiftTemplateItems(tx, ShiftTemplateItems, dataFound);
-  });
+//     // 🔁 Update items after parent update
+//     await updateShiftTemplateItems(tx, ShiftTemplateItems, dataFound);
+//   });
 
-  return { statusCode: 0, data };
-}
+//   return { statusCode: 0, data };
+// }
 
 async function remove(id) {
   const data = await prisma.shiftTemplate.delete({

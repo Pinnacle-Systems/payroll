@@ -37,7 +37,7 @@ const OnDutyTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                         </div>
 
                         <div
-                            className={` mt-3  p-2  bg-white h-[450px]  overflow-x-auto overflow-y-auto`}
+                            className={` mt-3  p-2  bg-white h-[500px]  overflow-x-auto overflow-y-auto`}
                         >
                             <table className={` w-[65vw]  border-collapse table-fixed`}>
 
@@ -77,10 +77,13 @@ const OnDutyTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                         <th
                                             className={`w-12  py-2 item-center font-medium text-[13px]  border border-gray-300`}
                                         >
-                                            Date
+                                            In Date
                                         </th>
                                         <th className={`w-12 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
                                             In
+                                        </th>
+                                        <th className={`w-12 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                                            Out Date
                                         </th>
 
                                         <th className={`w-12 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
@@ -195,7 +198,20 @@ const OnDutyTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                                         className={`w-full bg-transparent  text-center focus:outline-none focus:border-transparent  `}
                                                     />
                                                 </td>
+                                                {/* out Date */}
+                                                <td
+                                                    rowSpan={2}
+                                                    className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                                                >
+                                                    <input
+                                                        type="date"
+                                                        value={item.outDate || date}
 
+                                                        onChange={(e) => onUpdate(index, "outDate", e.target.value)}
+
+                                                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                                                    />
+                                                </td>
 
                                                 <td
                                                     rowSpan={2}

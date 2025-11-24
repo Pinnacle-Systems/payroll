@@ -13,6 +13,8 @@ import moment from "moment-timezone";
 import {
   useGetshiftTypeQuery,
 } from "../../../redux/uniformService/shiftTYpeService";
+import { useGetshiftMasterQuery } from "../../../redux/services/ShiftMasterService";
+
 import Permissiontable from "./permissionTble";
 import AbsentTable from "./AbsentTable";
 import OnDutyTable from "./OnDutyTable";
@@ -35,7 +37,10 @@ const Form = () => {
   const [absentData, setAbsentData] = useState([]);
   const [regularData, setRegularData] = useState([]);
   const [irregularData, setIrregularData] = useState([]);
+  const { data: shiftData } = useGetshiftMasterQuery({
+    params,
 
+  });
   const openModal = (breakSummary) => {
     setSelectedBreakSummary(breakSummary);
     setShowModal(true);
@@ -87,19 +92,122 @@ const Form = () => {
 
 
 
+  // const handleAbsentUpdate = (index, field, value) => {
+  //   const updated = structuredClone(absentData); // Safe deep clone
+
+  //   // -----------------------------
+  //   //  OUT DATE VALIDATION
+  //   // -----------------------------
+  //   if (field === "outDate") {
+  //     const inDate = updated[index].inDate || date; // Fallback to reportDate
+
+  //     const inD = new Date(inDate);
+  //     const outD = new Date(value);
+
+  //     // ❌ Out Date cannot be earlier than In Date
+  //     if (outD < inD) {
+  //       Swal.fire({
+  //         icon: "warning",
+  //         title: "Invalid Out Date",
+  //         text: "Out Date cannot be earlier than In Date.",
+  //         timer: 1800,
+  //       });
+  //       return; // Block update
+  //     }
+
+  //     // ✅ If you want Out Date MUST be at least +1 day:
+  //     // (Enable by uncommenting)
+
+  //     const oneDayLater = new Date(inD);
+  //     oneDayLater.setDate(oneDayLater.getDate() + 1);
+
+  //     if (outD <= oneDayLater) {
+  //       Swal.fire({
+  //         icon: "warning",
+  //         title: "Invalid Out Date",
+  //         text: "Out Date must be at least one day after In Date.",
+  //         timer: 2000,
+  //       });
+  //       return;
+  //     }
+
+  //   }
+
+  //   // -----------------------------
+  //   //  SAVE THE UPDATED FIELD
+  //   // -----------------------------
+  //   updated[index][field] = value;
+  //   setAbsentData(updated);
+
+  // };
+ 
+ 
+ 
+ 
+ 
+ 
   const handleAbsentUpdate = (index, field, value) => {
-    setAbsentData(prev => {
-      const updated = [...prev];
-      updated[index] = { ...updated[index], [field]: value };
-      return updated;
-    });
+    const updated = structuredClone(absentData);
+    if (field === "shiftName") {
+      const selectedShift = shiftData?.data?.find(s => s.name === value);
+      updated[index].shiftName = value;
+
+      if (selectedShift) {
+        updated[index].inTimeEdit = selectedShift.from;  // Auto-fill based on shift
+        updated[index].outTimeEdit = selectedShift.to;   // Auto-fill based on shift
+      }
+
+      setAbsentData(updated);
+      return;
+    }
+
+    if (field === "outDate") {
+      const inDate = updated[index].inDate || date;
+
+      let inD = new Date(inDate);
+      let outD = new Date(value);
+
+      // Normalize to midnight (fix timezone issues)
+      inD.setHours(0, 0, 0, 0);
+      outD.setHours(0, 0, 0, 0);
+
+      if (outD < inD) {
+        Swal.fire({
+          icon: "warning",
+          title: "Invalid Out Date",
+          text: "Out Date cannot be earlier than In Date.",
+          timer: 1500,
+        });
+        return;
+      }
+
+      let oneDayLater = new Date(inD);
+      oneDayLater.setDate(oneDayLater.getDate() + 1);
+      oneDayLater.setHours(0, 0, 0, 0);
+
+      if (outD > oneDayLater) {
+        Swal.fire({
+          icon: "warning",
+          title: "Invalid Out Date",
+          text: "Out Date can only be same day or exactly the next day.",
+          timer: 1500,
+        });
+        return;
+      }
+    }
+
+    updated[index][field] = value;
+    setAbsentData(updated);
   };
+
+
+
   const makeTimestamp = (date, time) => {
     if (!date || !time) return null;
 
-    const full = `${date} ${time}`; // "2024-11-29 09:00:00"
+    const full = `${date} ${time}`; 
 
-    return moment(full, "YYYY-MM-DD HH:mm:ss", true) // strict parse
+    return moment(full, "YYYY-MM-DD HH:mm:ss", true) 
       .format("YYYY-MM-DD HH:mm:ss");
   };
 
@@ -120,18 +228,20 @@ const Form = () => {
       });
       return; // Stop execution
     }
+    const reportDate = date;
+
     absentData?.forEach(emp => {
-      const { inDate, inTimeEdit, outTimeEdit } = emp;
-      const reportDate = date;
-      const inDateVal = emp.inDate || reportDate;
-
-
-      // Build timestamps only if values exist
       const punches = [];
 
-      // Only push in-time if present
-      if (inTimeEdit) {
-        const finalInTime = makeTimestamp(inDateVal, inTimeEdit);
+      // IN DATE – if not changed, fallback to report date
+      const inDateFinal = emp.inDate || reportDate;
+
+      // OUT DATE – if not changed, fallback to report date
+      const outDateFinal = emp.outDate || reportDate;
+
+      // ---------- IN TIME ----------
+      if (emp.inTimeEdit) {
+        const finalInTime = makeTimestamp(inDateFinal, emp.inTimeEdit);
         if (finalInTime) {
           punches.push({
             employeeId: emp.employeeId,
@@ -139,14 +249,14 @@ const Form = () => {
             timestamp: finalInTime,
             machineType: "IN / OUT",
             machineIP: "192.168.1.50",
-            machineInOutGridId: 9
+            machineInOutGridId: 9,
           });
         }
       }
 
-      // Only push out-time if present
-      if (outTimeEdit) {
-        const finalOutTime = makeTimestamp(inDateVal, outTimeEdit);
+      // ---------- OUT TIME ----------
+      if (emp.outTimeEdit) {
+        const finalOutTime = makeTimestamp(outDateFinal, emp.outTimeEdit);
         if (finalOutTime) {
           punches.push({
             employeeId: emp.employeeId,
@@ -154,10 +264,11 @@ const Form = () => {
             timestamp: finalOutTime,
             machineType: "IN / OUT",
             machineIP: "192.168.1.50",
-            machineInOutGridId: 9
+            machineInOutGridId: 9,
           });
         }
       }
+
 
       // Push valid punches to main array
       if (punches.length > 0) {
@@ -312,12 +423,14 @@ const Form = () => {
         </div>
 
         {
-          openPermissionModal && (<Permissiontable permissionTableData={permissionTableData} selectedBreakSummary={selectedBreakSummary} setSelectedBreakSummary={setSelectedBreakSummary} closeModal={closeModal} openModal={openModal} reportView={reportView} selectedShiftType={selectedShiftType} showModal={showModal} setShowModal={setShowModal} onClose={() => setOpenPermissionModal(false)} />
+          openPermissionModal && (<Permissiontable shiftData={shiftData}
+            permissionTableData={permissionTableData} selectedBreakSummary={selectedBreakSummary} setSelectedBreakSummary={setSelectedBreakSummary} closeModal={closeModal} openModal={openModal} reportView={reportView} selectedShiftType={selectedShiftType} showModal={showModal} setShowModal={setShowModal} onClose={() => setOpenPermissionModal(false)} />
           )
         }
 
         {
-          openAbsentModal && (<AbsentTable onUpdate={handleAbsentUpdate} onSaveAll={handleSaveAllAbsent}
+          openAbsentModal && (<AbsentTable onUpdate={handleAbsentUpdate} onSaveAll={handleSaveAllAbsent} shiftData={shiftData}
+
             date={date}
 
             absentData={absentData} reportView={reportView} selectedShiftType={selectedShiftType} onClose={() => setOpenAbsentModal(false)}
@@ -325,7 +438,7 @@ const Form = () => {
           )
         }
         {
-          openDutyModal && (<OnDutyTable absentData={absentData} onUpdate={handleAbsentUpdate} onSaveAll={handleSaveAllAbsent} reportView={reportView} selectedShiftType={selectedShiftType} onClose={() => setOpenDutyModal(false)} date={date}
+          openDutyModal && (<OnDutyTable shiftData={shiftData} absentData={absentData} onUpdate={handleAbsentUpdate} onSaveAll={handleSaveAllAbsent} reportView={reportView} selectedShiftType={selectedShiftType} onClose={() => setOpenDutyModal(false)} date={date}
           />
           )
         }
@@ -390,31 +503,7 @@ const Form = () => {
                   Other Punches
                 </th>
 
-                {/* 
-                {selectedShiftType === "Hourly" ? (<th className={`w-[40px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>
-                  Permission
-                </th>) : ""} */}
 
-
-                {/* {selectedShiftType === "Hourly" ? (<th className={`w-[40px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>
-                  Actual Worked Hours
-                </th>) : ""}
-
-                {selectedShiftType === "Hourly" ? (<th className={`w-[45px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>worked Hours (with Break)</th>) : (<th className={`w-[35px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>worked Hours</th>)}
-
-
-                {selectedShiftType === "Hourly" ? (<th className={`w-[40px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>worked Hours (without Break and OT)</th>) : (<th className={`w-[35px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>OT Hours</th>)}
-
-                {
-                  selectedShiftType === "Hourly" ? (<th className={`w-[40px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>
-                    OT Hours
-                  </th>) : (<th className={`w-[30px] py-2 item-center font-medium text-[13px] border border-gray-300`}>
-                    Shift Count
-                  </th>)
-                } */}
-                {/* ================================
-    HOURLY COLUMNS
-================================== */}
                 {selectedShiftType === "Hourly" && (
                   <>
                     {/* 1. worked Hours (with Break) */}
@@ -508,7 +597,7 @@ const Form = () => {
                     >
                       <input
                         type="text"
-                        value={item?.shiftName}
+                        value={item?.shiftType}
                         className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
                       />
                     </td>
@@ -886,7 +975,7 @@ const Form = () => {
                     >
                       <input
                         type="text"
-                        value={item?.shiftName}
+                        value={item?.shiftType}
                         className={`w-full text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
                       />
                     </td>

@@ -65,7 +65,17 @@ WITH Punches AS (
     ROW_NUMBER() OVER (PARTITION BY p.mIdCard, p.machineType ORDER BY p.timestamp DESC) AS rn_desc,
     COUNT(*) OVER (PARTITION BY p.mIdCard, p.machineType) AS cnt
   FROM PythonPunchData p
-  WHERE DATE(p.timestamp) = ${date}
+  WHERE 
+      p.timestamp >= ${date}
+      AND p.timestamp < DATE_ADD(${date}, INTERVAL 1 DAY)
+          + INTERVAL (
+                SELECT 
+                    HOUR(toleranceInBeforeStart)*3600 
+                    + MINUTE(toleranceInBeforeStart)*60 
+                    + SECOND(toleranceInBeforeStart)
+                FROM ShiftTemplateItems 
+                LIMIT 1
+            ) SECOND
 ),
 Attendance AS (
   SELECT
@@ -95,7 +105,6 @@ Attendance AS (
     MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=6 THEN ts END) AS eveningBreakOutBoth,
     MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=7 THEN ts END) AS eveningBreakInBoth,
     MAX(CASE WHEN machineType='IN / OUT' THEN ts END) AS outTimeBoth,
-
 
 
     -- ✅ first & last punch for total worked time (regardless of category)
@@ -258,7 +267,7 @@ ORDER BY e.mIdCard;
     departmentName: row.departmentName || null,
     designationName: row.designationName || null,
     shiftId: row.shiftId || null,
-    shiftName: row.shiftName || null,
+    shiftType: row.shiftName || null,
     inTime: row.inTime || null,
     firstBreakOut: row.firstBreakOut || null,
     firstBreakIn: row.firstBreakIn || null,
@@ -305,7 +314,7 @@ ORDER BY e.mIdCard;
     });
 
     if (!punches.length) {
-      // console.log(`Employee ${emp.firstName} has no punches on ${date}`);
+      console.log(`Employee ${emp.firstName} has no punches on ${date}`);
       continue;
     }
 
@@ -346,7 +355,7 @@ ORDER BY e.mIdCard;
     })?.filter(Boolean);
 
 
-    // console.log(punchesTime, "punchesTime");
+    console.log(punchesTime, "punchesTime");
 
     const quarterValues = {};
 
@@ -365,11 +374,11 @@ ORDER BY e.mIdCard;
 
       // If this is the last quarter, allow unlimited late punches
       const isLastQuarter = index === emp.quarters.length - 2;
-      // console.log(isLastQuarter, "isLastQuarter");
+      console.log(isLastQuarter, "isLastQuarter");
 
       if (isLastQuarter) {
         toMins = Infinity; // or a reasonable cap if needed
-        // console.log(`  (Last Quarter) Extended tolerance: now accepting punches up until ANY time`);
+        console.log(`  (Last Quarter) Extended tolerance: now accepting punches up until ANY time`);
       }
       // const fromMins = timeStrToMinutes(q.from) - 30;
       // const toMins = timeStrToMinutes(q.to) + 15;
@@ -379,11 +388,11 @@ ORDER BY e.mIdCard;
       const toleratedFromStr = minutesToTimeStr(fromMins);
       const toleratedToStr = minutesToTimeStr(toMins);
 
-      // console.log(`Employee ${emp.firstName} - Quarter ${q.name}:`);
-      // console.log(`Original window: ${originalFromStr} to ${originalToStr}`);
-      // console.log(`Window: ${minutesToTimeStr(fromMins)} to ${isLastQuarter ? "∞" : minutesToTimeStr(toMins)}`);
-      // console.log(`Tolerance applied: -${ftGrace} mins, +${ttGrace} mins`);
-      // console.log(`New window with tolerance: ${toleratedFromStr} to ${toleratedToStr}`);
+      console.log(`Employee ${emp.firstName} - Quarter ${q.name}:`);
+      console.log(`Original window: ${originalFromStr} to ${originalToStr}`);
+      console.log(`Window: ${minutesToTimeStr(fromMins)} to ${isLastQuarter ? "∞" : minutesToTimeStr(toMins)}`);
+      console.log(`Tolerance applied: -${ftGrace} mins, +${ttGrace} mins`);
+      console.log(`New window with tolerance: ${toleratedFromStr} to ${toleratedToStr}`);
 
 
       const quarterPunches = punchesTime?.filter(time => {
@@ -401,13 +410,13 @@ ORDER BY e.mIdCard;
         // Log the punches used
         const minPunchStr = minutesToTimeStr(minPunch);
         const maxPunchStr = minutesToTimeStr(maxPunch);
-        // console.log(`Employee ${emp.firstName} - Quarter ${q.name}:`);
-        // console.log(`Punches within window: ${quarterPunches.join(", ")}`);
-        // console.log(`First punch: ${minPunchStr}`);
-        // console.log(`Last punch: ${maxPunchStr}`);
+        console.log(`Employee ${emp.firstName} - Quarter ${q.name}:`);
+        console.log(`Punches within window: ${quarterPunches.join(", ")}`);
+        console.log(`First punch: ${minPunchStr}`);
+        console.log(`Last punch: ${maxPunchStr}`);
         const workedSeconds = Math.round(workedMins * 60);
         const durationStr = secondsToHms(workedSeconds);
-        // console.log(`  Worked duration: ${durationStr} (${workedMins.toFixed(2)} mins)`);
+        console.log(`  Worked duration: ${durationStr} (${workedMins.toFixed(2)} mins)`);
 
 
         const totalHours = timeStrToHours(q.total); // e.g., "04:30:00" → 4.5
@@ -434,7 +443,7 @@ ORDER BY e.mIdCard;
 
 
 
-        // console.log(`Employee ${emp.firstName} - Quarter ${q.name} value = ${finalValue}`);
+        console.log(`Employee ${emp.firstName} - Quarter ${q.name} value = ${finalValue}`);
         quarterValues[q.name] = finalValue;
 
       }
@@ -459,7 +468,7 @@ ORDER BY e.mIdCard;
       // } 
 
       else {
-        // console.log(`Employee ${emp.firstName} - Quarter ${q.name} has no punches in range`);
+        console.log(`Employee ${emp.firstName} - Quarter ${q.name} has no punches in range`);
         quarterValues[q.name] = 0; // no punches = 0
       }
 
@@ -479,34 +488,14 @@ ORDER BY e.mIdCard;
 
       const formulaResult = safeEval(formulaExpr);
       emp.formulaResult = formulaResult;
-      // console.log(`Employee ${emp.firstName} - Formula result:`, formulaResult);
+      console.log(`Employee ${emp.firstName} - Formula result:`, formulaResult);
     }
-
-
-
-    // if (formulas?.length) {
-    //   let formulaExpr = formulas.join(";");
-
-    //   // Replace quarter names in formula with ACTUAL hours (numbers)
-    //   for (const [qName, val] of Object.entries(quarterValues)) {
-    //     const re = new RegExp(`\\b${qName}\\b`, "g");
-    //     formulaExpr = formulaExpr.replace(re, val);
-    //   }
-
-    //   // Calculate raw result
-    //   let rawResult = safeEval(formulaExpr); // e.g., (4.5 + 2.25) / 9 = 0.75
-    //   if (isNaN(rawResult)) rawResult = 0;
-
-    //   // Convert to fraction (0, 0.25, 0.5, 0.75, 1)
-    //   emp.formulaResult = (Math.round(rawResult * 4) / 4).toFixed(2);
-
-    //   console.log(`Employee ${emp.firstName} - Formula result: ${emp.formulaResult}`);
-    // }
+//End of quarter calculation
 
 
     // Before hourly calculation
     if (!shiftItem) {
-      // console.log(`No shiftTemplateItem found for employee ${emp.firstName}`);
+      console.log(`No shiftTemplateItem found for employee ${emp.firstName}`);
       // emp.hourlyWorkedTime = "00:00:00";
       // emp.rawWorkedTime = "00:00:00"; // also set raw
       continue; // skip hourly calculation
@@ -554,7 +543,7 @@ ORDER BY e.mIdCard;
         if (outSecs > inSecs) rawSeconds += outSecs - inSecs;
       }
       const empOTHours = timeToSeconds(emp.otHours)
-      // console.log(empOTHours, "empOTHours");
+      console.log(empOTHours, "empOTHours");
       //  SUBTRACT OT HOURS HERE
       rawSeconds = rawSeconds - empOTHours;
       if (rawSeconds < 0) rawSeconds = 0;
@@ -735,16 +724,16 @@ ORDER BY e.mIdCard;
 
 
         const formattedTime = formatTime(totalSeconds);
-        // console.log(`Employee ${emp.firstName} - Worked Time with breaks = ${formattedTime}`);
-        // console.log(`Employee ${emp.firstName} - Raw Worked Time = ${emp.rawWorkedTime}`);
-        // console.log(`Employee ${emp.firstName} - Break Summary =`, emp.breakSummary);
+        console.log(`Employee ${emp.firstName} - Worked Time with breaks = ${formattedTime}`);
+        console.log(`Employee ${emp.firstName} - Raw Worked Time = ${emp.rawWorkedTime}`);
+        console.log(`Employee ${emp.firstName} - Break Summary =`, emp.breakSummary);
         emp.hourlyWorkedTime = formattedTime;
         // emp.breakSummary.earlySeconds = formatTime(earlySeconds);
         // emp.breakSummary.lateSeconds = formatTime(lateSeconds);
         // emp.breakSummary.eveningEarlySeconds = formatTime(eveningEarlySeconds);
         // emp.breakSummary.eveningExtraSeconds = formatTime(eveningExtraSeconds);
       } else {
-        // console.log(`Employee ${emp.firstName} has no punches`);
+        console.log(`Employee ${emp.firstName} has no punches`);
         emp.hourlyWorkedTime = ""
         emp.rawWorkedTime = "";
         emp.breakSummary = {
