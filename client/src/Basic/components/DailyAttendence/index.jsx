@@ -6,7 +6,7 @@ import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCat
 import { useGetEmployeeQuery } from "../../../redux/services/EmployeeMasterService";
 import { useLazyGetAttendenceGenerationQuery, useAddmanualPunchMutation } from "../../../redux/services/AttenedenceGeneration";
 import Modal from "../../../UiComponents/Modal";
-import { GroupBy } from "../../../Utils/DropdownData";
+import { GroupBy ,ShiftTime} from "../../../Utils/DropdownData";
 import { getCommonParams } from "../../../Utils/helper";
 import Swal from "sweetalert2";
 import moment from "moment-timezone";
@@ -88,64 +88,8 @@ const Form = () => {
     setAbsentData(absent);
     setRegularData(regular);
     setIrregularData(irregular);
-  }, [allData]);
+  }, [allData]); 
 
-
-
-  // const handleAbsentUpdate = (index, field, value) => {
-  //   const updated = structuredClone(absentData); // Safe deep clone
-
-  //   // -----------------------------
-  //   //  OUT DATE VALIDATION
-  //   // -----------------------------
-  //   if (field === "outDate") {
-  //     const inDate = updated[index].inDate || date; // Fallback to reportDate
-
-  //     const inD = new Date(inDate);
-  //     const outD = new Date(value);
-
-  //     // ❌ Out Date cannot be earlier than In Date
-  //     if (outD < inD) {
-  //       Swal.fire({
-  //         icon: "warning",
-  //         title: "Invalid Out Date",
-  //         text: "Out Date cannot be earlier than In Date.",
-  //         timer: 1800,
-  //       });
-  //       return; // Block update
-  //     }
-
-  //     // ✅ If you want Out Date MUST be at least +1 day:
-  //     // (Enable by uncommenting)
-
-  //     const oneDayLater = new Date(inD);
-  //     oneDayLater.setDate(oneDayLater.getDate() + 1);
-
-  //     if (outD <= oneDayLater) {
-  //       Swal.fire({
-  //         icon: "warning",
-  //         title: "Invalid Out Date",
-  //         text: "Out Date must be at least one day after In Date.",
-  //         timer: 2000,
-  //       });
-  //       return;
-  //     }
-
-  //   }
-
-  //   // -----------------------------
-  //   //  SAVE THE UPDATED FIELD
-  //   // -----------------------------
-  //   updated[index][field] = value;
-  //   setAbsentData(updated);
-
-  // };
- 
- 
- 
- 
- 
- 
   const handleAbsentUpdate = (index, field, value) => {
     const updated = structuredClone(absentData);
     if (field === "shiftName") {
@@ -331,7 +275,7 @@ const Form = () => {
 
     // return true if ANY matches these
     return statuses?.some((s) =>
-      ["Late", "Out Early", "Delayed", "Miss punch", "No punches"].includes(s)
+      ["Late", "Out Early"].includes(s)
     );
   }) || [];
 
@@ -430,7 +374,7 @@ const Form = () => {
 
         {
           openAbsentModal && (<AbsentTable onUpdate={handleAbsentUpdate} onSaveAll={handleSaveAllAbsent} shiftData={shiftData}
-
+ShiftTime={ShiftTime}
             date={date}
 
             absentData={absentData} reportView={reportView} selectedShiftType={selectedShiftType} onClose={() => setOpenAbsentModal(false)}
@@ -1339,7 +1283,7 @@ const Form = () => {
           </table>
           {showModal && selectedBreakSummary && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50 overscroll-y-hidden">
-              <div className={`relative bg-white rounded-lg p-7 w-[700px] h-[350px]`}>
+              <div className={`relative bg-white rounded-lg p-7 w-[700px] h-[250px]`}>
 
                 <button
                   className="absolute top-0 right-0 m-1 text-gray-600 hover:text-gray-800 hover:bg-red-400 rounded focus:outline-none "
@@ -1368,7 +1312,7 @@ const Form = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {["morningInOut", "eveningInOut"].map((key) => {
+                    {["morningInOut", "eveningInOut"]?.map((key) => {
                       const breakItem = selectedBreakSummary[key];
                       return (
                         <tr key={key}>
@@ -1383,7 +1327,7 @@ const Form = () => {
                     })}
                   </tbody>
                 </table>
-                <h2 className="text-[15px] mt-5 font-semibold mb-4">Break Summary</h2>
+                {/* <h2 className="text-[15px] mt-5 font-semibold mb-4">Break Summary</h2>
 
                 <table className="w-full border-collapse">
                   <thead className="bg-gray-200 text-gray-800 ">
@@ -1413,7 +1357,7 @@ const Form = () => {
                       );
                     })}
                   </tbody>
-                </table>
+                </table> */}
 
               </div>
             </div>

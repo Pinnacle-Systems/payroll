@@ -612,9 +612,9 @@ ORDER BY e.mIdCard;
         delay: "00:00:00"
       };
 
-      if (lastPunch < eveningOutSec) {
+      if (lastPunch < eveningOutFromTol) {
         // Employee left early → count as delay
-        const delaySeconds = eveningOutSec - lastPunch;
+        const delaySeconds = eveningOutFromTol - lastPunch;
         eveningStatus.status = "Out Early";
         eveningStatus.delay = formatTime(delaySeconds);
       } else {

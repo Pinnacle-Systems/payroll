@@ -95,12 +95,10 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                                         </th>
 
 
-                                        {/* {selectedShiftType === "Hourly" ? (<th className={`w-[40px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                                        {selectedShiftType === "Hourly" ? (<th className={`w-[40px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>
                                             Status
-                                        </th>) : ""} */}
-                                        {/* ================================
-    HOURLY COLUMNS
-================================== */}
+                                        </th>) : ""}
+                                        {/* ================================  HOURLY COLUMNS  ================================== */}
                                         {selectedShiftType === "Hourly" && (
                                             <>
                                                 {/* 1. worked Hours (with Break) */}
@@ -195,7 +193,7 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                                                 >
                                                     <input
                                                         type="text"
-                                                        value={item?.shiftName}
+                                                        value={item?.shiftType}
                                                         className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
                                                     />
                                                 </td>
@@ -205,8 +203,7 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                                                 >
                                                     <input
                                                         type="text"
-                                                        value={item?.departmentName
-                                                        }
+                                                        value={item?.departmentName}
                                                         className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
                                                     />
                                                 </td>
@@ -363,7 +360,7 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                                                     </>
                                                 )}
 
-                                                {/* {
+                                                {
                                                     selectedShiftType === "Hourly" ? (<td
                                                         rowSpan={2}
                                                         className="  border border-gray-300 text-[12px] py-0.5 text-center item-center"
@@ -389,7 +386,7 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                                                             </svg>
                                                         </button>
                                                     </td>) : ""
-                                                } */}
+                                                }
 
 
                                                 {selectedShiftType === "Hourly" && (
@@ -541,7 +538,7 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
             </div>
             {showModal && selectedBreakSummary && (
                 <div className="fixed inset-0 z-[999] flex items-center justify-center bg-gray-800 bg-opacity-50 overscroll-y-hidden">
-                    <div className={`relative bg-white rounded-lg p-7 w-[700px] h-[450px]`}>
+                    <div className={`relative bg-white rounded-lg p-7 w-[700px] h-[250px]`}>
 
                         <button
                             className="absolute top-0 right-0 m-1 text-gray-600 hover:text-gray-800 hover:bg-red-400 rounded focus:outline-none "
@@ -585,7 +582,9 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                                 })}
                             </tbody>
                         </table>
-                        <h2 className="text-[15px] mt-5 font-semibold mb-4">Break Summary</h2>
+
+
+                        {/* <h2 className="text-[15px] mt-5 font-semibold mb-4">Break Summary</h2>
 
                         <table className="w-full border-collapse">
                             <thead className="bg-gray-200 text-gray-800 ">
@@ -615,7 +614,7 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                                     );
                                 })}
                             </tbody>
-                        </table>
+                        </table> */}
 
                     </div>
                 </div>

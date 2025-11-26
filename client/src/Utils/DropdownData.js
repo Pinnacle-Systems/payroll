@@ -321,19 +321,26 @@ export const Days = [
 ];
 
 export const Quarter = [
-  {show:"SHIFTCALC" , value:"SHIFTCALC"},
-  {show:"FORMULA" , value:"FORMULA"},
-  {show:"OTCALC" , value:"OTCALC"},
+  { show: "SHIFTCALC", value: "SHIFTCALC" },
+  { show: "FORMULA", value: "FORMULA" },
+  { show: "OTCALC", value: "OTCALC" },
 
 ];
 
 
 export const GroupBy = [
-  {show:"Department" ,value:"department"},
-  {show:"Designation" ,value:"designation"}
+  { show: "Department", value: "department" },
+  { show: "Designation", value: "designation" }
 ]
 
 export const ShiftType = [
-    {show:"Hourly" ,value:"Hourly"},
-  {show:"Quarter" ,value:"Quarter"}
+  { show: "Hourly", value: "Hourly" },
+  { show: "Quarter", value: "Quarter" }
 ]
+
+export const ShiftTime = [
+  { show: "l & ll", value: "Fully" },
+  { show: "l", value: "FirstHalf" },
+  { show: "ll", value: "secondHalf" },
+]
+

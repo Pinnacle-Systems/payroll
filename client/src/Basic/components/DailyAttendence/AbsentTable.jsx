@@ -2,7 +2,7 @@ import moment from "moment-timezone";
 import React, { useEffect, useState, useRef } from "react";
 
 
-const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpdate, onSaveAll, date, shiftData }) => {
+const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpdate, onSaveAll, date, shiftData ,ShiftTime}) => {
 
     console.log(shiftData, "shiftData");
 
@@ -43,7 +43,7 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                         <div
                             className={` mt-3  p-2  bg-white h-[500px]  overflow-x-auto overflow-y-auto`}
                         >
-                            <table className={` w-[70vw]  border-collapse table-fixed`}>
+                            <table className={` w-[75vw]  border-collapse table-fixed`}>
 
                                 <thead className="bg-gray-200 text-gray-800 border border-gray-400">
                                     <tr>
@@ -67,6 +67,11 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                             className={`w-[40px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
                                         >
                                             Shift
+                                        </th>
+                                        <th
+                                            className={`w-[40px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                                        >
+                                            Present
                                         </th>
                                         <th
                                             className={`w-[45px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
@@ -155,6 +160,23 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                                         {shiftData?.data?.map((shift) => (
                                                             <option key={shift.id} value={shift.name}>
                                                                 {shift.name}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </td>
+                                                <td
+                                                    rowSpan={2}
+                                                    className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                >
+                                                    <select
+                                                        value={item?.shiftTime || ""}
+                                                        onChange={(e) => onUpdate(index, "shiftTime", e.target.value)}
+                                                        className="w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent"
+                                                    >
+                                                        <option value="">Select</option>
+                                                        {ShiftTime?.map((shift) => (
+                                                            <option key={shift.value} value={shift.value}>
+                                                                {shift.show}
                                                             </option>
                                                         ))}
                                                     </select>
