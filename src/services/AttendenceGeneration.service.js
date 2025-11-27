@@ -10,6 +10,13 @@ function safeEval(expr) {
     return 0;
   }
 }
+function formatLocalHHMMSS(ts) {
+  const d = new Date(ts);
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mm = String(d.getMinutes()).padStart(2, "0");
+  const ss = String(d.getSeconds()).padStart(2, "0");
+  return `${hh}:${mm}:${ss}`;
+}
 function minutesToHMS(minutes) {
   if (typeof minutes !== "number") return minutes; // keep "single punch" as is
   const h = Math.floor(minutes / 60);
@@ -380,9 +387,7 @@ ORDER BY e.mIdCard;
         toMins = Infinity; // or a reasonable cap if needed
         console.log(`  (Last Quarter) Extended tolerance: now accepting punches up until ANY time`);
       }
-      // const fromMins = timeStrToMinutes(q.from) - 30;
-      // const toMins = timeStrToMinutes(q.to) + 15;
-      // Convert to readable time strings
+
       const originalFromStr = q.from;
       const originalToStr = q.to;
       const toleratedFromStr = minutesToTimeStr(fromMins);
@@ -424,9 +429,6 @@ ORDER BY e.mIdCard;
         const halfMins = totalMins / 2;
         const halfHours = totalHours / 2;
 
-        // Return total hours if workedMins >= totalMins, else 0
-        // const value = workedMins >= totalMins ? totalHours : 0;
-        // const finalValue = roundToHalf(value);
 
         let value = 0;
 
@@ -447,25 +449,7 @@ ORDER BY e.mIdCard;
         quarterValues[q.name] = finalValue;
 
       }
-      // if (quarterPunches?.length) {
-      //   const punchMinsArray = quarterPunches?.map(timeStrToMinutes);
-      //   const minPunch = Math.min(...punchMinsArray);
-      //   const maxPunch = Math.max(...punchMinsArray);
-      //   const workedMins = maxPunch - minPunch;
 
-      //   const workedHours = workedMins / 60;
-      //   const totalHours = timeStrToHours(q.total); // e.g., 4.5 for "04:30:00"
-
-      //   // Capping quarter value
-      //   const quarterValue = Math.min(workedHours, totalHours);
-
-      //   // Log details
-      //   console.log(`Employee ${emp.firstName} - Quarter ${q.name}:`);
-      //   console.log(`  Worked duration: ${secondsToHms(workedMins * 60)} (${workedHours.toFixed(2)} hrs)`);
-      //   console.log(`  Quarter value (hours): ${quarterValue.toFixed(2)} / ${totalHours}`);
-
-      //   quarterValues[q.name] = quarterValue;
-      // } 
 
       else {
         console.log(`Employee ${emp.firstName} - Quarter ${q.name} has no punches in range`);
@@ -490,7 +474,7 @@ ORDER BY e.mIdCard;
       emp.formulaResult = formulaResult;
       console.log(`Employee ${emp.firstName} - Formula result:`, formulaResult);
     }
-//End of quarter calculation
+    //End of quarter calculation
 
 
     // Before hourly calculation
@@ -571,8 +555,46 @@ ORDER BY e.mIdCard;
       const eveningOutSec = timeToSeconds(eveningIn);
       const eveningOutToTol = timeToSeconds(eveningInToTolerance);
       const fbout = timeToSeconds(emp.shiftTemplateItem.fbOut)
+      const fbIn = timeToSeconds(emp.shiftTemplateItem.fbIn)
+      const sbOut = timeToSeconds(emp.shiftTemplateItem.sbOut)
+      const sbIn = timeToSeconds(emp.shiftTemplateItem.sbIn)
+      // ---- 1. Define tolerance windows ----
+      const windows = [
+        { name: "Morning In Window", start: morningInFromTol, end: morningInToTol },
+        { name: "Evening Out Window", start: eveningOutFromTol, end: eveningOutToTol },
 
+        { name: "First Break Out", start: fbout, end: fbout },
+        { name: "First Break In", start: fbIn, end: fbIn },
+        { name: "Second Break Out", start: sbOut, end: sbOut },
+        { name: "Second Break In", start: sbIn, end: sbIn },
+      ];
 
+      // Helper to convert HH:mm:ss → seconds
+      const timeStrToSeconds = (str) => {
+        const [h, m, s] = str.split(":").map(Number);
+        return h * 3600 + m * 60 + s;
+      };
+
+      // Check if a punch is inside any window
+      function isInAnyWindow(punchSec, windows) {
+        return windows.some(w => punchSec >= w.start && punchSec <= w.end);
+      }
+
+      // Filter punches outside windows
+      const outsidePunches = punchesTime.filter(p => {
+        const secs = timeStrToSeconds(p);
+        return !isInAnyWindow(secs, windows);
+      });
+
+      // Attach to breakSummary
+      emp.breakSummary.outsideTolerance = [
+        {
+          punches: outsidePunches,
+          status: "outsidePunchTime",
+        },
+      ];
+
+      console.log(emp.breakSummary.outsideTolerance);
       let morningStatus;
 
       if (firstPunch >= morningInSec && firstPunch <= morningInToTol) {
@@ -777,5 +799,29 @@ async function addAbsentPunches(body) {
   return { statusCode: 0, data };
 }
 
+async function updatePermissionPunches(body) {
+  const { data } = body;
+  console.log("Received punches:", data);
+  for (const entry of data) {
+    const { mIdCard, date, isPermission, isOnDuty } = entry;
 
-export { get, addAbsentPunches };
+    // Update all punches for that employee on that date
+    await prisma.pythonPunchData.updateMany({
+      where: {
+        mIdCard,
+        timestamp: {
+          gte: new Date(`${date}T00:00:00.000Z`),
+          lte: new Date(`${date}T23:59:59.999Z`),
+        },
+      },
+      data: {
+        isPermission,
+        isOnDuty,
+      },
+    });
+  }
+  return { statusCode: 0, data };
+
+}
+
+export { get, addAbsentPunches, updatePermissionPunches };

@@ -74,6 +74,22 @@ const AttendenceGenerationApi = createApi({
       },
       invalidatesTags: ["attendenceGeneration"],
     }),
+
+
+    updatePermission: builder.mutation({
+      query: (payload) => {
+        return {
+          url: `${ATTENDENCE_GENERATION}/update-permission`,
+          method: "PUT",
+          body: payload,
+        };
+      },
+      invalidatesTags: ["attendenceGeneration"],
+    }),
+
+
+
+
     deleteAttendenceGeneration: builder.mutation({
       query: (id) => ({
         url: `${ATTENDENCE_GENERATION}/${id}`,
@@ -91,7 +107,8 @@ export const {
   useAddAttendenceGenerationMutation,
   useUpdateAttendenceGenerationMutation,
   useDeleteAttendenceGenerationMutation,
-  useAddmanualPunchMutation
+  useAddmanualPunchMutation,
+  useUpdatePermissionMutation,
 } = AttendenceGenerationApi;
 
 export default AttendenceGenerationApi;

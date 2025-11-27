@@ -1879,6 +1879,8 @@ model PythonPunchData {
   MachineInOutGrid   MachineInOutGrid? @relation(fields: [machineInOutGridId], references: [id])
   machineInOutGridId Int?
   machineType        String?
+  isPermission       Boolean?
+  isOnDuty           Boolean?
 
   @@unique([mIdCard, timestamp])
 }

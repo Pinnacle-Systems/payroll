@@ -134,7 +134,7 @@ const OnDutyTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                                 >
                                                     <input
                                                         type="text"
-                                                        value={item?.shiftName}
+                                                        value={item?.shiftType}
                                                         className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
                                                     />
                                                 </td>

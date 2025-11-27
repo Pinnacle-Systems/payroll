@@ -1,6 +1,9 @@
 import moment from "moment-timezone";
 import React, { useEffect, useState, useRef } from "react";
-const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, openModal, selectedBreakSummary, setSelectedBreakSummary, showModal, setShowModal, closeModal, onClose }) => {
+const Permissiontable = ({ reportView, permissionTable, selectedShiftType,handleSavePermission, openModal, selectedBreakSummary, setSelectedBreakSummary, showModal, setShowModal, closeModal, onClose, handlePermissionToggle }) => {
+
+    console.log(permissionTable, "permissionTableinmodal");
+
     return (
         <>
             <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
@@ -10,7 +13,7 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                             <h2 className="text-lg font-semibold">Permission</h2>
                             <div className="flex justify-end align-items-center   mx-2">
                                 <button
-                                    // onClick={onSaveAll}
+                                    onClick={handleSavePermission}
                                     className="px-3 mr-4  ml-2 bg-green-600 text-white rounded text-xs"
                                 >
                                     Update
@@ -36,7 +39,7 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                         <div
                             className={` mt-3  p-2  bg-white h-[500px]  overflow-x-auto overflow-y-auto`}
                         >
-                            <table className={` ${selectedShiftType === "Hourly" ? "w-[110vw]" : "w-[100vw]"}  border-collapse table-fixed`}>
+                            <table className={` ${selectedShiftType === "Hourly" ? "w-[100vw]" : "w-[100vw]"}  border-collapse table-fixed`}>
 
                                 <thead className="bg-gray-200 text-gray-800 border border-gray-400">
                                     <tr>
@@ -98,53 +101,52 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                                         {selectedShiftType === "Hourly" ? (<th className={`w-[40px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>
                                             Status
                                         </th>) : ""}
+                                        <th className={`w-12 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                                            Permission
+                                        </th>
+                                        <th className={`w-8 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                                            OnDuty
+                                        </th>
                                         {/* ================================  HOURLY COLUMNS  ================================== */}
-                                        {selectedShiftType === "Hourly" && (
+                                        {/* {selectedShiftType === "Hourly" && (
                                             <>
-                                                {/* 1. worked Hours (with Break) */}
 
                                                 <th className="w-[45px] py-2 item-center font-medium text-[13px] border border-gray-300">
                                                     worked Hours (with Break)
                                                 </th>
 
-                                                {/* 2. worked Hours (without Break and OT) */}
                                                 <th className="w-[50px] py-2 item-center  px-1 font-medium text-[13px] border border-gray-300">
                                                     worked Hours (without Break)
                                                 </th>
 
-                                                {/* 3. OT Hours */}
                                                 <th className="w-[40px] py-2 item-center font-medium text-[13px] border border-gray-300">
                                                     OT Hours
                                                 </th>
 
-                                                {/* 4. Actual Worked Hours (LAST) */}
                                                 <th className="w-[45px] py-2 item-center font-medium text-[13px] border border-gray-300">
                                                     Actual Worked Hours
                                                 </th>
                                             </>
-                                        )}
+                                        )} */}
 
                                         {/* ================================
     NON-HOURLY COLUMNS
 ================================== */}
-                                        {selectedShiftType !== "Hourly" && (
+                                        {/* {selectedShiftType !== "Hourly" && (
                                             <>
-                                                {/* 1. worked Hours */}
                                                 <th className="w-[35px] py-2 item-center font-medium text-[13px] border border-gray-300">
                                                     worked Hours
                                                 </th>
 
-                                                {/* 2. OT Hours */}
                                                 <th className="w-[35px] py-2 item-center font-medium text-[13px] border border-gray-300">
                                                     OT Hours
                                                 </th>
 
-                                                {/* 3. Shift Count */}
                                                 <th className="w-[30px] py-2 item-center font-medium text-[13px] border border-gray-300">
                                                     Shift Count
                                                 </th>
                                             </>
-                                        )}
+                                        )} */}
 
 
 
@@ -154,7 +156,7 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
 
 
                                 <tbody>
-                                    {permissionTableData?.map((item, index) => (
+                                    {permissionTable?.map((item, index) => (
                                         <React.Fragment key={index}>
                                             {/* Row 1 - In + Morning */}
                                             <tr>
@@ -387,13 +389,42 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                                                         </button>
                                                     </td>) : ""
                                                 }
+                                                <td
+                                                    rowSpan={2}
+                                                    className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                                                >
+                                                    <input
+                                                        disabled={item?.isOnDuty}
+                                                        onChange={() => handlePermissionToggle(index, "isPermission")}
 
+                                                        type="checkbox"
+                                                        checked={
+                                                            item?.isPermission
+                                                        }
 
-                                                {selectedShiftType === "Hourly" && (
+                                                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                                                    />
+                                                </td>
+                                                <td
+                                                    rowSpan={2}
+                                                    className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                                                >
+                                                    <input
+                                                        disabled={item?.isPermission}
+                                                        type="checkbox"
+                                                        checked={
+                                                            item?.isOnDuty
+                                                        }
+                                                        onChange={() => handlePermissionToggle(index, "isOnDuty")}
+
+                                                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                                                    />
+                                                </td>
+
+                                                {/* {selectedShiftType === "Hourly" && (
                                                     <>
 
 
-                                                        {/* 2. worked Hours (without Break and OT) → hourlyWorkedTime */}
                                                         <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
                                                             <input
                                                                 type="text"
@@ -404,7 +435,6 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
 
 
 
-                                                        {/* 4. Actual Worked Hours (LAST) → rawWorkedTime */}
                                                         <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
                                                             <input
                                                                 type="text"
@@ -412,7 +442,6 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                                                                 className="w-full bg-transparent text-center focus:outline-none"
                                                             />
                                                         </td>
-                                                        {/* 3. OT Hours */}
                                                         <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
                                                             <input
                                                                 type="text"
@@ -420,7 +449,6 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                                                                 className="w-full bg-transparent text-center focus:outline-none"
                                                             />
                                                         </td>
-                                                        {/* 1. worked Hours (with Break) → actualWorkedTime */}
                                                         <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
                                                             <input
                                                                 type="text"
@@ -429,14 +457,13 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                                                             />
                                                         </td>
                                                     </>
-                                                )}
+                                                )} */}
 
                                                 {/* ================================
     NON-HOURLY COLUMNS (3 columns)
 ================================== */}
-                                                {selectedShiftType !== "Hourly" && (
+                                                {/* {selectedShiftType !== "Hourly" && (
                                                     <>
-                                                        {/* 1. worked Hours */}
                                                         <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
                                                             <input
                                                                 type="text"
@@ -445,7 +472,6 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                                                             />
                                                         </td>
 
-                                                        {/* 2. OT Hours */}
                                                         <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
                                                             <input
                                                                 type="text"
@@ -454,7 +480,6 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                                                             />
                                                         </td>
 
-                                                        {/* 3. Shift Count */}
                                                         <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
                                                             <input
                                                                 type="number"
@@ -463,7 +488,7 @@ const Permissiontable = ({ reportView, permissionTableData, selectedShiftType, o
                                                             />
                                                         </td>
                                                     </>
-                                                )}
+                                                )} */}
 
 
 

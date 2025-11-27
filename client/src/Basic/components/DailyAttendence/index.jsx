@@ -4,9 +4,9 @@ import { ReusableTable, DateInput, customSelectStyles } from "../../../Inputs";
 import Select from "react-select";
 import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCategoryMasterService";
 import { useGetEmployeeQuery } from "../../../redux/services/EmployeeMasterService";
-import { useLazyGetAttendenceGenerationQuery, useAddmanualPunchMutation } from "../../../redux/services/AttenedenceGeneration";
+import { useLazyGetAttendenceGenerationQuery, useAddmanualPunchMutation, useUpdatePermissionMutation } from "../../../redux/services/AttenedenceGeneration";
 import Modal from "../../../UiComponents/Modal";
-import { GroupBy ,ShiftTime} from "../../../Utils/DropdownData";
+import { GroupBy, ShiftTime } from "../../../Utils/DropdownData";
 import { getCommonParams } from "../../../Utils/helper";
 import Swal from "sweetalert2";
 import moment from "moment-timezone";
@@ -37,6 +37,7 @@ const Form = () => {
   const [absentData, setAbsentData] = useState([]);
   const [regularData, setRegularData] = useState([]);
   const [irregularData, setIrregularData] = useState([]);
+  const [permissionTable, setPermissionTable] = useState([])
   const { data: shiftData } = useGetshiftMasterQuery({
     params,
 
@@ -57,6 +58,7 @@ const Form = () => {
 
   const { data: employeeData } = useGetEmployeeQuery({ params });
   const [manualPunch] = useAddmanualPunchMutation();
+  const [updatePermission] = useUpdatePermissionMutation()
 
   useEffect(() => {
     if (form && designationRef.current) {
@@ -88,7 +90,7 @@ const Form = () => {
     setAbsentData(absent);
     setRegularData(regular);
     setIrregularData(irregular);
-  }, [allData]); 
+  }, [allData]);
 
   const handleAbsentUpdate = (index, field, value) => {
     const updated = structuredClone(absentData);
@@ -149,9 +151,9 @@ const Form = () => {
   const makeTimestamp = (date, time) => {
     if (!date || !time) return null;
 
-    const full = `${date} ${time}`; 
+    const full = `${date} ${time}`;
 
-    return moment(full, "YYYY-MM-DD HH:mm:ss", true) 
+    return moment(full, "YYYY-MM-DD HH:mm:ss", true)
       .format("YYYY-MM-DD HH:mm:ss");
   };
 
@@ -159,8 +161,6 @@ const Form = () => {
     let remainingAbsent = [];
 
     let updatedAttendence = []; //  collect punches to insert
-
-    // Check if at least one inTimeEdit or outTimeEdit exists in the whole absentData
     const hasAtLeastOnePunch = absentData?.some(emp => emp.inTimeEdit || emp.outTimeEdit);
     if (!hasAtLeastOnePunch) {
       Swal.fire({
@@ -259,31 +259,11 @@ const Form = () => {
 
   const selectedShiftType = shiftTypeData?.data?.find(val => val?.selectedShiftType)?.selectedShiftType;
 
-  const permissionTableData = allData?.data?.filter((item) => {
-    const bs = item.breakSummary;
+  useEffect(() => {
+    if (!allData?.data) return;
 
-    if (!bs) return false;
-
-    // collect all status values
-    const statuses = [
-      bs.morningInOut?.status,
-      bs.morning?.status,
-      bs.lunch?.status,
-      bs.evening?.status,
-      bs.eveningInOut?.status
-    ]?.filter(Boolean);
-
-    // return true if ANY matches these
-    return statuses?.some((s) =>
-      ["Late", "Out Early"].includes(s)
-    );
-  }) || [];
-
-
-
-
-  const nonDelayedList =
-    allData?.data?.filter((item) => {
+    // Step 1: filter data
+    const filtered = allData.data.filter((item) => {
       const bs = item.breakSummary;
       if (!bs) return false;
 
@@ -295,10 +275,79 @@ const Form = () => {
         bs.eveningInOut?.status
       ].filter(Boolean);
 
-      return !statuses.some((s) =>
-        ["Late", "Delayed", "Delayed Out"].includes(s)
-      );
-    }) || [];
+      return statuses.some((s) => ["Late", "Out Early"].includes(s));
+    });
+
+    // Step 2: clone each filtered item so it becomes editable
+    const cloned = filtered.map(item => ({
+      ...item,                 // unfreezes the object
+      isPermission: false,
+      isOnDuty: false
+    }));
+
+    // Step 3: store into state
+    setPermissionTable(cloned);
+
+  }, [allData]);
+
+
+
+
+  const handlePermissionToggle = (index, field) => {
+    setPermissionTable(prev => {
+      const updated = [...prev];
+
+      if (field === "isPermission") {
+        updated[index].isPermission = !updated[index].isPermission;
+        updated[index].isOnDuty = false;
+      }
+
+      if (field === "isOnDuty") {
+        updated[index].isOnDuty = !updated[index].isOnDuty;
+        updated[index].isPermission = false;
+      }
+
+      return updated;
+    });
+  };
+  console.log(permissionTable, "permissionTableindex");
+
+  const handleSavePermission = async () => {
+
+    const data = permissionTable.map((row) => ({
+      mIdCard: row.mIdCard,
+      date: row.inTime.split("T")[0],   // extract yyyy-mm-dd
+      isPermission: row.isPermission,
+      isOnDuty: row.isOnDuty
+    }));
+    const payload = { data }
+    const reportDate = date;
+
+    try {
+      await updatePermission(payload).unwrap()
+      await triggerReport({
+        searchParams: {
+          date,
+        },
+      });
+      Swal.fire({
+        icon: "success",
+        title: "Updated!",
+        text: "Attendance punches have been successfully updated.",
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } catch (error) {
+      console.error("Error saving punches:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to update attendance punches.",
+      });
+      return;
+    }
+
+  }
 
   return (
     <div>
@@ -367,17 +416,15 @@ const Form = () => {
         </div>
 
         {
-          openPermissionModal && (<Permissiontable shiftData={shiftData}
-            permissionTableData={permissionTableData} selectedBreakSummary={selectedBreakSummary} setSelectedBreakSummary={setSelectedBreakSummary} closeModal={closeModal} openModal={openModal} reportView={reportView} selectedShiftType={selectedShiftType} showModal={showModal} setShowModal={setShowModal} onClose={() => setOpenPermissionModal(false)} />
+          openPermissionModal && (<Permissiontable shiftData={shiftData} permissionTable={permissionTable} handleSavePermission={handleSavePermission}
+            setPermissionTable={setPermissionTable} handlePermissionToggle={handlePermissionToggle}
+            selectedBreakSummary={selectedBreakSummary} setSelectedBreakSummary={setSelectedBreakSummary} closeModal={closeModal} openModal={openModal} reportView={reportView} selectedShiftType={selectedShiftType} showModal={showModal} setShowModal={setShowModal} onClose={() => setOpenPermissionModal(false)} />
           )
         }
 
         {
           openAbsentModal && (<AbsentTable onUpdate={handleAbsentUpdate} onSaveAll={handleSaveAllAbsent} shiftData={shiftData}
-ShiftTime={ShiftTime}
-            date={date}
-
-            absentData={absentData} reportView={reportView} selectedShiftType={selectedShiftType} onClose={() => setOpenAbsentModal(false)}
+            ShiftTime={ShiftTime} date={date} absentData={absentData} reportView={reportView} selectedShiftType={selectedShiftType} onClose={() => setOpenAbsentModal(false)}
           />
           )
         }

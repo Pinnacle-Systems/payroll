@@ -4,7 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 
 const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpdate, onSaveAll, date, shiftData ,ShiftTime}) => {
 
-    console.log(shiftData, "shiftData");
+    console.log(absentData, "absentData");
 
     return (
         <>
