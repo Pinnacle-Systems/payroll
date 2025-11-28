@@ -1,8 +1,37 @@
 import moment from "moment-timezone";
 import React, { useEffect, useState, useRef } from "react";
-const Permissiontable = ({ reportView, permissionTable, selectedShiftType,handleSavePermission, openModal, selectedBreakSummary, setSelectedBreakSummary, showModal, setShowModal, closeModal, onClose, handlePermissionToggle }) => {
+import Modal from "../../../UiComponents/Modal";
+
+const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handleSavePermission, openModal, selectedBreakSummary, setSelectedBreakSummary, showModal, setShowModal, closeModal, onClose, handlePermissionToggle, handlePunchPermissionToggle, showPermissionModal,
+    setShowPermissionModal, selectedEmployeePunches, setSelectedEmployeePunches,
+    selectedEmployee, setSelectedEmployee
+
+
+
+}) => {
+
 
     console.log(permissionTable, "permissionTableinmodal");
+    // const openPermissionModal = (employee) => {
+    //     setSelectedEmployee(employee);
+    //     const punchList = (employee.punches || []).map(p => ({
+    //         timestamp: p.timestamp,
+    //         // isPermission: false
+    //     }));
+    //     setSelectedEmployeePunches(punchList);
+    //     setShowPermissionModal(true);
+    // };
+    const openPermissionModal = (employee) => {
+        setSelectedEmployee(employee);
+
+        const punchList = (employee.breakSummary?.outsideTolerance || [])?.map(p => ({
+            timestamp: p.timestamp,
+            // isPermission: false
+        }));
+
+        setSelectedEmployeePunches(punchList);
+        setShowPermissionModal(true);
+    };
 
     return (
         <>
@@ -12,12 +41,12 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType,handle
                         <div className="bg-white flex justify-between align-items-center border-b p-2">
                             <h2 className="text-lg font-semibold">Permission</h2>
                             <div className="flex justify-end align-items-center   mx-2">
-                                <button
+                                {/* <button
                                     onClick={handleSavePermission}
                                     className="px-3 mr-4  ml-2 bg-green-600 text-white rounded text-xs"
                                 >
                                     Update
-                                </button>
+                                </button> */}
                                 <button
                                     onClick={onClose}
                                     className="text-gray-800  ml-2 bg-red-400 rounded focus:outline-none"
@@ -39,7 +68,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType,handle
                         <div
                             className={` mt-3  p-2  bg-white h-[500px]  overflow-x-auto overflow-y-auto`}
                         >
-                            <table className={` ${selectedShiftType === "Hourly" ? "w-[100vw]" : "w-[100vw]"}  border-collapse table-fixed`}>
+                            <table className={` ${selectedShiftType === "Hourly" ? "w-[90vw]" : "w-[90vw]"}  border-collapse table-fixed`}>
 
                                 <thead className="bg-gray-200 text-gray-800 border border-gray-400">
                                     <tr>
@@ -104,50 +133,6 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType,handle
                                         <th className={`w-12 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
                                             Permission
                                         </th>
-                                        <th className={`w-8 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
-                                            OnDuty
-                                        </th>
-                                        {/* ================================  HOURLY COLUMNS  ================================== */}
-                                        {/* {selectedShiftType === "Hourly" && (
-                                            <>
-
-                                                <th className="w-[45px] py-2 item-center font-medium text-[13px] border border-gray-300">
-                                                    worked Hours (with Break)
-                                                </th>
-
-                                                <th className="w-[50px] py-2 item-center  px-1 font-medium text-[13px] border border-gray-300">
-                                                    worked Hours (without Break)
-                                                </th>
-
-                                                <th className="w-[40px] py-2 item-center font-medium text-[13px] border border-gray-300">
-                                                    OT Hours
-                                                </th>
-
-                                                <th className="w-[45px] py-2 item-center font-medium text-[13px] border border-gray-300">
-                                                    Actual Worked Hours
-                                                </th>
-                                            </>
-                                        )} */}
-
-                                        {/* ================================
-    NON-HOURLY COLUMNS
-================================== */}
-                                        {/* {selectedShiftType !== "Hourly" && (
-                                            <>
-                                                <th className="w-[35px] py-2 item-center font-medium text-[13px] border border-gray-300">
-                                                    worked Hours
-                                                </th>
-
-                                                <th className="w-[35px] py-2 item-center font-medium text-[13px] border border-gray-300">
-                                                    OT Hours
-                                                </th>
-
-                                                <th className="w-[30px] py-2 item-center font-medium text-[13px] border border-gray-300">
-                                                    Shift Count
-                                                </th>
-                                            </>
-                                        )} */}
-
 
 
                                     </tr>
@@ -391,107 +376,27 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType,handle
                                                 }
                                                 <td
                                                     rowSpan={2}
-                                                    className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    className=" border border-gray-300 text-[12px] py-0.5 text-center item-center"
                                                 >
-                                                    <input
-                                                        disabled={item?.isOnDuty}
-                                                        onChange={() => handlePermissionToggle(index, "isPermission")}
-
-                                                        type="checkbox"
-                                                        checked={
-                                                            item?.isPermission
-                                                        }
-
-                                                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
+                                                    <button
+                                                        className="text-blue-600 text-center text-blue  bg-blue-50 rounded"
+                                                        onClick={() => openPermissionModal(item)}
+                                                    >
+                                                        <svg
+                                                            xmlns="http://www.w3.org/2000/svg"
+                                                            className="h-4 w-4"
+                                                            viewBox="0 0 20 20"
+                                                            fill="currentColor"
+                                                        >
+                                                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                                                            <path
+                                                                fillRule="evenodd"
+                                                                d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                                                                clipRule="evenodd"
+                                                            />
+                                                        </svg>
+                                                    </button>
                                                 </td>
-                                                <td
-                                                    rowSpan={2}
-                                                    className=" border border-gray-300 text-[12px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        disabled={item?.isPermission}
-                                                        type="checkbox"
-                                                        checked={
-                                                            item?.isOnDuty
-                                                        }
-                                                        onChange={() => handlePermissionToggle(index, "isOnDuty")}
-
-                                                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td>
-
-                                                {/* {selectedShiftType === "Hourly" && (
-                                                    <>
-
-
-                                                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
-                                                            <input
-                                                                type="text"
-                                                                value={item.hourlyWorkedTime || ""}
-                                                                className="w-full bg-transparent text-center focus:outline-none"
-                                                            />
-                                                        </td>
-
-
-
-                                                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
-                                                            <input
-                                                                type="text"
-                                                                value={item.rawWorkedTime || ""}
-                                                                className="w-full bg-transparent text-center focus:outline-none"
-                                                            />
-                                                        </td>
-                                                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
-                                                            <input
-                                                                type="text"
-                                                                value={item.otHours || ""}
-                                                                className="w-full bg-transparent text-center focus:outline-none"
-                                                            />
-                                                        </td>
-                                                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
-                                                            <input
-                                                                type="text"
-                                                                value={item.actualWorkedTime || ""}
-                                                                className="w-full bg-transparent text-center focus:outline-none"
-                                                            />
-                                                        </td>
-                                                    </>
-                                                )} */}
-
-                                                {/* ================================
-    NON-HOURLY COLUMNS (3 columns)
-================================== */}
-                                                {/* {selectedShiftType !== "Hourly" && (
-                                                    <>
-                                                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
-                                                            <input
-                                                                type="text"
-                                                                value={item.totalWorkedTime || ""}
-                                                                className="w-full bg-transparent text-center focus:outline-none"
-                                                            />
-                                                        </td>
-
-                                                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
-                                                            <input
-                                                                type="text"
-                                                                value={item.otHours || ""}
-                                                                className="w-full bg-transparent text-center focus:outline-none"
-                                                            />
-                                                        </td>
-
-                                                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
-                                                            <input
-                                                                type="number"
-                                                                value={item.formulaResult || ""}
-                                                                className="w-full bg-transparent text-right pr-2 focus:outline-none"
-                                                            />
-                                                        </td>
-                                                    </>
-                                                )} */}
-
-
-
 
                                             </tr>
 
@@ -561,6 +466,72 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType,handle
                 </div>
 
             </div>
+            {showPermissionModal && (
+                <div className="fixed inset-0 bg-black z-[1000] bg-opacity-40 flex justify-center items-center">
+                    <div className="bg-white p-5 rounded shadow-lg w-[500px] h-[500px]">
+                        <div className="flex justify-between">
+                            <h2 className=" mb-3">
+                                {selectedEmployee?.firstName}
+                            </h2>
+                            <button
+                                onClick={() => setShowPermissionModal(false)}
+                                className="text-gray-800 h-6 ml-2 bg-red-400 rounded focus:outline-none"
+                            >
+                                <svg
+                                    className="h-6 w-6 fill-current"
+                                    viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <title>Close</title>
+                                    <path
+                                        d="M14.348 5.652a.999.999 0 00-1.414 0L10 8.586l-2.93-2.93a.999.999 0 10-1.414 1.414L8.586 10l-2.93 2.93a.999.999 0 101.414 1.414L10 11.414l2.93 2.93a.999.999 0 101.414-1.414L11.414 10l2.93-2.93a.999.999 0 000-1.414z"
+                                        fillRule="evenodd"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+                        <div className="bg-gray-200 p-2">
+                            <div className="h-[400px] overflow-y-auto bg-white">
+                                <div className="flex gap-x-12 items-center py-2 bg-gray-200 border-b font-semibold">
+                                    <span className="w-20 ml-2">Time</span>
+                                    <span className="w-4"></span> {/* for checkbox spacing */}
+                                    <span>Permission Allowed</span>
+                                </div>
+                                {selectedEmployeePunches?.map((punch, index) => (
+                                    <div key={index} className="flex gap-x-12 items-center py-2 border-b">
+
+                                        {/* FIXED → show timestamp, not object */}
+                                        <span className="w-40 text-sm ml-2">{punch.timestamp ? moment(punch.timestamp).format("HH:mm:ss") : "-"}</span>
+
+                                        <input className="ml-10"
+                                            type="checkbox"
+                                            checked={punch.isPermission || false}
+                                            onChange={() => handlePunchPermissionToggle(index)}
+                                        />
+
+                                    </div>
+                                ))}
+                                <div className="flex justify-end mt-2 mr-2">
+                                    <button
+                                        className="px-4  bg-green-600 text-white text-right rounded"
+                                        onClick={handleSavePermission}
+                                    >
+                                        Save
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end text-sm gap-3 bg-white">
+
+
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+
             {showModal && selectedBreakSummary && (
                 <div className="fixed inset-0 z-[999] flex items-center justify-center bg-gray-800 bg-opacity-50 overscroll-y-hidden">
                     <div className={`relative bg-white rounded-lg p-7 w-[700px] h-[250px]`}>

@@ -289,62 +289,63 @@ const Form = () => {
     setPermissionTable(cloned);
 
   }, [allData]);
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
+  const [selectedEmployeePunches, setSelectedEmployeePunches] = useState([]);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const handlePunchPermissionToggle = (index) => {
+    setSelectedEmployeePunches(prev => {
+      const updated = [...prev];
+      updated[index].isPermission = !updated[index].isPermission;
+      return updated;
+    });
+  };
 
 
 
-
-  const handlePermissionToggle = (index, field) => {
+  const handlePermissionToggle = (empIndex, punchIndex) => {
     setPermissionTable(prev => {
       const updated = [...prev];
 
-      if (field === "isPermission") {
-        updated[index].isPermission = !updated[index].isPermission;
-        updated[index].isOnDuty = false;
-      }
+      // Employee row
+      const emp = updated[empIndex];
 
-      if (field === "isOnDuty") {
-        updated[index].isOnDuty = !updated[index].isOnDuty;
-        updated[index].isPermission = false;
-      }
+      // toggle the punch permission (allowed true / false)
+      emp.punches[punchIndex].allowed = !emp.punches[punchIndex].allowed;
 
       return updated;
     });
   };
+
   console.log(permissionTable, "permissionTableindex");
 
   const handleSavePermission = async () => {
 
-    const data = permissionTable.map((row) => ({
-      mIdCard: row.mIdCard,
-      date: row.inTime.split("T")[0],   // extract yyyy-mm-dd
-      isPermission: row.isPermission,
-      isOnDuty: row.isOnDuty
+    const payload = selectedEmployeePunches.map(p => ({
+      mIdCard: selectedEmployee.mIdCard,
+      timestamp: p.timestamp,
+      isPermission: p.isPermission
     }));
-    const payload = { data }
-    const reportDate = date;
 
     try {
-      await updatePermission(payload).unwrap()
-      await triggerReport({
-        searchParams: {
-          date,
-        },
-      });
+      await updatePermission({ data: payload }).unwrap();
+
       Swal.fire({
         icon: "success",
         title: "Updated!",
-        text: "Attendance punches have been successfully updated.",
+        text: "Permission updated successfully.",
         timer: 2000,
         showConfirmButton: false
       });
-    } catch (error) {
-      console.error("Error saving punches:", error);
+
+      setShowPermissionModal(false);
+
+    } catch (err) {
+      console.error(err);
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Failed to update attendance punches.",
+        text: "Failed to update permission."
       });
-      return;
     }
 
   }
@@ -417,8 +418,16 @@ const Form = () => {
 
         {
           openPermissionModal && (<Permissiontable shiftData={shiftData} permissionTable={permissionTable} handleSavePermission={handleSavePermission}
-            setPermissionTable={setPermissionTable} handlePermissionToggle={handlePermissionToggle}
-            selectedBreakSummary={selectedBreakSummary} setSelectedBreakSummary={setSelectedBreakSummary} closeModal={closeModal} openModal={openModal} reportView={reportView} selectedShiftType={selectedShiftType} showModal={showModal} setShowModal={setShowModal} onClose={() => setOpenPermissionModal(false)} />
+            setPermissionTable={setPermissionTable} handlePermissionToggle={handlePermissionToggle} handlePunchPermissionToggle={handlePunchPermissionToggle}
+            selectedBreakSummary={selectedBreakSummary} setSelectedBreakSummary={setSelectedBreakSummary} closeModal={closeModal} openModal={openModal} reportView={reportView} selectedShiftType={selectedShiftType} showModal={showModal} setShowModal={setShowModal} onClose={() => setOpenPermissionModal(false)}
+
+            showPermissionModal={showPermissionModal}
+            setShowPermissionModal={setShowPermissionModal}
+            selectedEmployeePunches={selectedEmployeePunches}
+            setSelectedEmployeePunches={setSelectedEmployeePunches}
+            selectedEmployee={selectedEmployee}
+            setSelectedEmployee={setSelectedEmployee}
+          />
           )
         }
 

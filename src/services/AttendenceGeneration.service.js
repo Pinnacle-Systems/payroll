@@ -545,58 +545,59 @@ ORDER BY e.mIdCard;
       let lateSeconds = 0;
 
       const moriningInFromTolerance = emp.shiftTemplateItem.toleranceInBeforeStart
+      const morningIn = emp.shiftTemplateItem.startTime
       const moriningInToTolerance = emp.shiftTemplateItem.toleranceInAfterEnd
       const eveningInFromTolerance = emp.shiftTemplateItem.toleranceOutBeforeStart
       const eveningIn = emp.shiftTemplateItem.endTime
       const eveningInToTolerance = emp.shiftTemplateItem.toleranceOutAfterEnd
+
+
+
       const morningInFromTol = timeToSeconds(moriningInFromTolerance);
       const morningInToTol = timeToSeconds(moriningInToTolerance);
       const eveningOutFromTol = timeToSeconds(eveningInFromTolerance);
-      const eveningOutSec = timeToSeconds(eveningIn);
       const eveningOutToTol = timeToSeconds(eveningInToTolerance);
+      const eveningOutSec = timeToSeconds(eveningIn);
+
+
       const fbout = timeToSeconds(emp.shiftTemplateItem.fbOut)
       const fbIn = timeToSeconds(emp.shiftTemplateItem.fbIn)
       const sbOut = timeToSeconds(emp.shiftTemplateItem.sbOut)
       const sbIn = timeToSeconds(emp.shiftTemplateItem.sbIn)
-      // ---- 1. Define tolerance windows ----
-      const windows = [
-        { name: "Morning In Window", start: morningInFromTol, end: morningInToTol },
-        { name: "Evening Out Window", start: eveningOutFromTol, end: eveningOutToTol },
+      const lunchBst = timeToSeconds(emp.shiftTemplateItem.lunchBst)
+      const lunchBET = timeToSeconds(emp.shiftTemplateItem.lunchBET)
 
-        { name: "First Break Out", start: fbout, end: fbout },
-        { name: "First Break In", start: fbIn, end: fbIn },
-        { name: "Second Break Out", start: sbOut, end: sbOut },
-        { name: "Second Break In", start: sbIn, end: sbIn },
+      // ---- Tolerance windows array ----
+      const windows = [
+        { start: morningInFromTol, end: morningInToTol },
+        { start: eveningOutFromTol, end: eveningOutToTol },
+        { start: fbout, end: fbIn },       // First Break
+        { start: sbOut, end: sbIn },       // Second Break
+        { start: lunchBst, end: lunchBET } // Lunch Break
       ];
 
-      // Helper to convert HH:mm:ss → seconds
+      // ---- Convert HH:mm:ss → seconds helper ----
       const timeStrToSeconds = (str) => {
         const [h, m, s] = str.split(":").map(Number);
         return h * 3600 + m * 60 + s;
       };
 
-      // Check if a punch is inside any window
-      function isInAnyWindow(punchSec, windows) {
-        return windows.some(w => punchSec >= w.start && punchSec <= w.end);
-      }
+      // ---- Check if a punch is inside any tolerance window ----
+      const isInAnyWindow = (sec) => windows.some(w => sec >= w.start && sec <= w.end);
 
-      // Filter punches outside windows
-      const outsidePunches = punchesTime.filter(p => {
-        const secs = timeStrToSeconds(p);
-        return !isInAnyWindow(secs, windows);
-      });
+      // ---- Filter punches outside all windows ----
+      emp.breakSummary.outsideTolerance = (emp?.punches || []).filter(p => {
+        if (!p?.timestamp) return false;
+        const timeStr = new Date(p.timestamp).toTimeString().split(" ")[0];
+        const sec = timeStrToSeconds(timeStr);
+        return !isInAnyWindow(sec);
+      }).map(p => ({ timestamp: p.timestamp }));
 
-      // Attach to breakSummary
-      emp.breakSummary.outsideTolerance = [
-        {
-          punches: outsidePunches,
-          status: "outsidePunchTime",
-        },
-      ];
+      console.log(emp.breakSummary.outsideTolerance, "Outside Tolerance Punches");
 
-      console.log(emp.breakSummary.outsideTolerance);
+
+
       let morningStatus;
-
       if (firstPunch >= morningInSec && firstPunch <= morningInToTol) {
         morningStatus = {
           status: "On Time",
@@ -802,26 +803,27 @@ async function addAbsentPunches(body) {
 async function updatePermissionPunches(body) {
   const { data } = body;
   console.log("Received punches:", data);
-  for (const entry of data) {
-    const { mIdCard, date, isPermission, isOnDuty } = entry;
 
-    // Update all punches for that employee on that date
+  for (const entry of data) {
+    const { mIdCard, timestamp, isPermission } = entry;
+
     await prisma.pythonPunchData.updateMany({
       where: {
         mIdCard,
         timestamp: {
-          gte: new Date(`${date}T00:00:00.000Z`),
-          lte: new Date(`${date}T23:59:59.999Z`),
+          gte: new Date(`${timestamp.slice(0, 19)}.000Z`),
+          lte: new Date(`${timestamp.slice(0, 19)}.999Z`),
         },
       },
       data: {
         isPermission,
-        isOnDuty,
       },
     });
-  }
-  return { statusCode: 0, data };
 
+  }
+
+  return { statusCode: 0, data };
 }
+
 
 export { get, addAbsentPunches, updatePermissionPunches };
