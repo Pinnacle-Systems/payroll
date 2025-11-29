@@ -292,6 +292,9 @@ const Form = () => {
   const [showPermissionModal, setShowPermissionModal] = useState(false);
   const [selectedEmployeePunches, setSelectedEmployeePunches] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [showOtherPunchesModal, setShowOtherPunchesModal] = useState(false);
+  const [selectedEmployeeOtherPunches, setSelectedEmployeeOtherPunches] = useState([]);
+  const [selectedEmployeeOther, setSelectedEmployeeOther] = useState(null);
   const handlePunchPermissionToggle = (index) => {
     setSelectedEmployeePunches(prev => {
       const updated = [...prev];
@@ -427,6 +430,12 @@ const Form = () => {
             setSelectedEmployeePunches={setSelectedEmployeePunches}
             selectedEmployee={selectedEmployee}
             setSelectedEmployee={setSelectedEmployee}
+            showOtherPunchesModal={showOtherPunchesModal}
+            setShowOtherPunchesModal={setShowOtherPunchesModal}
+            selectedEmployeeOtherPunches={selectedEmployeeOtherPunches}
+            setSelectedEmployeeOtherPunches={setSelectedEmployeeOtherPunches}
+            selectedEmployeeOther={selectedEmployeeOther}
+            setSelectedEmployeeOther={setSelectedEmployeeOther}
           />
           )
         }

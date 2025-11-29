@@ -4,9 +4,9 @@ import Modal from "../../../UiComponents/Modal";
 
 const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handleSavePermission, openModal, selectedBreakSummary, setSelectedBreakSummary, showModal, setShowModal, closeModal, onClose, handlePermissionToggle, handlePunchPermissionToggle, showPermissionModal,
     setShowPermissionModal, selectedEmployeePunches, setSelectedEmployeePunches,
-    selectedEmployee, setSelectedEmployee
-
-
+    selectedEmployee, setSelectedEmployee, showOtherPunchesModal, setShowOtherPunchesModal
+    , selectedEmployeeOtherPunches, setSelectedEmployeeOtherPunches, selectedEmployeeOther
+    , setSelectedEmployeeOther
 
 }) => {
 
@@ -21,17 +21,67 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
     //     setSelectedEmployeePunches(punchList);
     //     setShowPermissionModal(true);
     // };
+    const openOtherPunchesModal = (employee) => {
+        setSelectedEmployeeOther(employee);
+
+        const outsidePunches = employee.breakSummary?.outsideTolerance || [];
+
+        // Pair punches: even index → Out, odd index → In
+        const punchList = [];
+        for (let i = 0; i < outsidePunches.length; i += 2) {
+            const outPunch = outsidePunches[i];
+            const inPunch = outsidePunches[i + 1];
+
+            // Clean timestamps (remove .000000 microseconds)
+            const outTime = outPunch?.timestamp ? outPunch.timestamp.split('.')[0] : null;
+            const inTime = inPunch?.timestamp ? inPunch.timestamp.split('.')[0] : null;
+
+            punchList.push({
+                out: outTime || "-",
+                in: inTime || "-",
+                isPermission: false,
+            });
+        }
+
+        setSelectedEmployeeOtherPunches(punchList);
+        setShowOtherPunchesModal(true);
+    };
+
     const openPermissionModal = (employee) => {
+        console.log("Employee passed:", employee);
+
         setSelectedEmployee(employee);
 
-        const punchList = (employee.breakSummary?.outsideTolerance || [])?.map(p => ({
-            timestamp: p.timestamp,
-            // isPermission: false
-        }));
+        const punchList = [];
 
+        // Morning In-Out
+        if (employee.breakSummary?.morningInOut?.punch &&
+            employee.breakSummary.morningInOut.status === "Late") {
+            punchList.push({
+                timestamp: employee.breakSummary.morningInOut.punch,
+                type: "Morning In-Out",
+                status: employee.breakSummary.morningInOut.status || "-",
+            });
+        }
+
+        // Evening In-Out
+        if (employee.breakSummary?.eveningInOut?.punch &&
+            employee.breakSummary.eveningInOut.status === "Out Early") {
+            punchList.push({
+                timestamp: employee.breakSummary.eveningInOut.punch,
+                type: "Evening In-Out",
+                status: employee.breakSummary.eveningInOut.status || "-",
+            });
+        }
+
+        console.log("Punch list:", punchList); // Should now contain morning and evening punches
         setSelectedEmployeePunches(punchList);
         setShowPermissionModal(true);
     };
+
+
+
+
 
     return (
         <>
@@ -126,10 +176,10 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                             Other Punches
                                         </th>
 
-
+                                        {/* 
                                         {selectedShiftType === "Hourly" ? (<th className={`w-[40px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>
                                             Status
-                                        </th>) : ""}
+                                        </th>) : ""} */}
                                         <th className={`w-12 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
                                             Permission
                                         </th>
@@ -272,14 +322,14 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
 
                                                 {reportView === "Seperate" && (
                                                     <>
-                                                        <td className=" border border-gray-300 text-[12px] py-0.5 ">
+                                                        <td className=" border border-gray-300 text-[12px] py-0.5 " onClick={() => openOtherPunchesModal(item)}>
                                                             <input
                                                                 type="text"
-                                                                value={"OUT"}
+                                                                value={"OUT"} onClick={() => openOtherPunchesModal(item)}
                                                                 className={`w-full text-center bg-transparent  focus:outline-none focus:border-transparent `}
                                                             />
                                                         </td>
-                                                        <td className="border border-gray-300 text-[12px] py-0.5 item-center">
+                                                        <td className="border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openOtherPunchesModal(item)}>
                                                             <input
                                                                 min="0"
                                                                 type="text"
@@ -290,11 +340,11 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                             .format("HH:mm:ss")
                                                                         : ""
                                                                 }
-                                                                onFocus={(e) => e.target.select()}
+                                                                onFocus={(e) => e.target.select()} onClick={() => openOtherPunchesModal(item)}
                                                                 className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                                                             />
                                                         </td>
-                                                        <td className="border border-gray-300 text-[12px] text-center px-1">
+                                                        <td className="border border-gray-300 text-[12px] text-center px-1" onClick={() => openOtherPunchesModal(item)}>
                                                             <input
                                                                 type="text"
                                                                 value={
@@ -305,10 +355,10 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                         : ""
                                                                 }
                                                                 className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                                                                disabled
+                                                                 onClick={() => openOtherPunchesModal(item)}
                                                             />
                                                         </td>
-                                                        <td className="border border-gray-300 text-[12px] text-center px-1">
+                                                        <td className="border border-gray-300 text-[12px] text-center px-1" onClick={() => openOtherPunchesModal(item)}>
                                                             <input
                                                                 type="text"
                                                                 value={
@@ -319,17 +369,17 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                         : ""
                                                                 }
                                                                 className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                                                                disabled
+                                                                 onClick={() => openOtherPunchesModal(item)}
                                                             />
                                                         </td>
                                                     </>
                                                 )}
                                                 {reportView === "Single" && (
                                                     <>
-                                                        <td colSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
+                                                        <td colSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openOtherPunchesModal(item)}>
                                                             <input
                                                                 type="text"
-
+                                                                onClick={() => openOtherPunchesModal(item)}
                                                                 value={[
                                                                     item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
                                                                     item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
@@ -341,13 +391,12 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                     .filter(Boolean) // remove null or empty values
                                                                     .join(" , ")} // join only existing values
                                                                 className={`w-full bg-transparent text-left pl-1 focus:outline-none focus:border-transparent `}
-                                                                disabled
                                                             />
                                                         </td>
                                                     </>
                                                 )}
 
-                                                {
+                                                {/* {
                                                     selectedShiftType === "Hourly" ? (<td
                                                         rowSpan={2}
                                                         className="  border border-gray-300 text-[12px] py-0.5 text-center item-center"
@@ -373,7 +422,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                             </svg>
                                                         </button>
                                                     </td>) : ""
-                                                }
+                                                } */}
                                                 <td
                                                     rowSpan={2}
                                                     className=" border border-gray-300 text-[12px] py-0.5 text-center item-center"
@@ -403,15 +452,15 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                             {/* Row 2 - Evening + Out */}
                                             {reportView === "Seperate" && (
                                                 <>
-                                                    <td className=" border border-gray-300 text-[12px] py-0.5 item-center">
+                                                    <td className=" border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openOtherPunchesModal(item)}>
                                                         <input
                                                             type="text"
-                                                            value={"IN"}
+                                                            value={"IN"} onClick={() => openOtherPunchesModal(item)}
                                                             className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
                                                         />
                                                     </td>
                                                     {/* Morning Break In */}
-                                                    <td className="border border-gray-300 text-[12px] py-0.5 item-center">
+                                                    <td className="border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openOtherPunchesModal(item)}>
                                                         <input
                                                             type="text"
                                                             value={
@@ -420,11 +469,11 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                     : ""
                                                             }
                                                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                                                            disabled
+                                                            
                                                         />
                                                     </td>
 
-                                                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
+                                                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openOtherPunchesModal(item)}>
                                                         <input
                                                             type="text"
                                                             value={
@@ -435,10 +484,10 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                     : ""
                                                             }
                                                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                                                            disabled
+                                                             onClick={() => openOtherPunchesModal(item)}
                                                         />
                                                     </td>
-                                                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
+                                                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openOtherPunchesModal(item)}>
                                                         <input
                                                             type="text"
                                                             value={
@@ -449,7 +498,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                     : ""
                                                             }
                                                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                                                            disabled
+                                                            onClick={() => openOtherPunchesModal(item)}
                                                         />
                                                     </td>
                                                 </>
@@ -468,7 +517,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
             </div>
             {showPermissionModal && (
                 <div className="fixed inset-0 bg-black z-[1000] bg-opacity-40 flex justify-center items-center">
-                    <div className="bg-white p-5 rounded shadow-lg w-[500px] h-[500px]">
+                    <div className="bg-white p-5 rounded shadow-lg w-[500px] h-[280px]">
                         <div className="flex justify-between">
                             <h2 className=" mb-3">
                                 {selectedEmployee?.firstName}
@@ -491,27 +540,27 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                             </button>
                         </div>
                         <div className="bg-gray-200 p-2">
-                            <div className="h-[400px] overflow-y-auto bg-white">
-                                <div className="flex gap-x-12 items-center py-2 bg-gray-200 border-b font-semibold">
+                            <div className="h-[180px] relative overflow-y-auto bg-white">
+                                <div className="flex gap-x-12 items-center py-2 bg-gray-200 border-b text-[14px]">
                                     <span className="w-20 ml-2">Time</span>
-                                    <span className="w-4"></span> {/* for checkbox spacing */}
-                                    <span>Permission Allowed</span>
+                                    <span className="w-4">Status</span> {/* for checkbox spacing */}
+                                    <span className="ml-12">Permission Allowed</span>
                                 </div>
                                 {selectedEmployeePunches?.map((punch, index) => (
-                                    <div key={index} className="flex gap-x-12 items-center py-2 border-b">
-
-                                        {/* FIXED → show timestamp, not object */}
-                                        <span className="w-40 text-sm ml-2">{punch.timestamp ? moment(punch.timestamp).format("HH:mm:ss") : "-"}</span>
-
-                                        <input className="ml-10"
+                                    <div key={index} className="flex gap-x-12 items-center py-2 border-b text-[13px]">
+                                        <span className="w-20  ml-2">
+                                            {punch.timestamp ? moment(punch.timestamp).format("HH:mm:ss") : "-"}
+                                        </span>
+                                        {/* <span className="w-44 text-sm">{punch.type}</span> */}
+                                        <span className="w-32 ">{punch.status}</span>
+                                        <input
                                             type="checkbox"
                                             checked={punch.isPermission || false}
                                             onChange={() => handlePunchPermissionToggle(index)}
                                         />
-
                                     </div>
                                 ))}
-                                <div className="flex justify-end mt-2 mr-2">
+                                <div className=" text-[13px] absolute bottom-3 right-3 ">
                                     <button
                                         className="px-4  bg-green-600 text-white text-right rounded"
                                         onClick={handleSavePermission}
@@ -521,11 +570,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                 </div>
                             </div>
 
-                            <div className="flex justify-end text-sm gap-3 bg-white">
 
-
-
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -612,6 +657,74 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                             </tbody>
                         </table> */}
 
+                    </div>
+                </div>
+            )}
+
+            {showOtherPunchesModal && (
+                <div className="fixed inset-0 bg-black z-[1000] bg-opacity-40 flex justify-center items-center">
+                    <div className="bg-white p-5 rounded shadow-lg w-[480px] h-[400px]">
+                        <div className="flex justify-between">
+                            <h2 className=" mb-3">
+                                {selectedEmployeeOther?.firstName}
+                            </h2>
+                            <button
+                                onClick={() => setShowOtherPunchesModal(false)}
+                                className="text-gray-800 h-6 ml-2 bg-red-400 rounded focus:outline-none"
+                            >
+                                <svg
+                                    className="h-6 w-6 fill-current"
+                                    viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <title>Close</title>
+                                    <path
+                                        d="M14.348 5.652a.999.999 0 00-1.414 0L10 8.586l-2.93-2.93a.999.999 0 10-1.414 1.414L8.586 10l-2.93 2.93a.999.999 0 101.414 1.414L10 11.414l2.93 2.93a.999.999 0 101.414-1.414L11.414 10l2.93-2.93a.999.999 0 000-1.414z"
+                                        fillRule="evenodd"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+                        <div className="bg-gray-200 p-2">
+                            <div className="h-[280px] relative overflow-y-auto bg-white">
+                                <div className="flex gap-x-12 items-center justify-space-between py-2 bg-gray-200 border-b text-[14px]">
+                                    <span className="w-12 ml-2">Out</span>
+                                    <span className="w-12">In</span>
+                                    <span className="">Permission Allowed</span>
+                                </div>
+                                {selectedEmployeeOtherPunches?.map((punch, index) => (
+                                    <div key={index} className="flex gap-x-12 items-center py-2 border-b text-[13px]">
+                                        {/* Out Punch */}
+                                        <span className="w-12  ml-2">
+                                            {punch.out !== "-" ? moment(punch.out).format("HH:mm:ss") : "-"}
+                                        </span>
+
+                                        {/* In Punch */}
+                                        <span className="w-12 ">
+                                            {punch.in !== "-" ? moment(punch.in).format("HH:mm:ss") : "-"}
+                                        </span>
+
+                                        {/* Permission Checkbox */}
+                                        <input
+                                            className="text-center ml-14"
+                                            type="checkbox"
+                                            checked={punch.isPermission || false}
+                                        // onChange={() => handleOtherPunchPermissionToggle(index)}
+                                        />
+                                    </div>
+                                ))}
+                                <div className="text-[13px] absolute bottom-3 right-3 ">
+                                    <button
+                                        className="px-4  bg-green-600 text-white text-right rounded"
+                                    // onClick={handleSavePermission}
+                                    >
+                                        Save
+                                    </button>
+                                </div>
+                            </div>
+
+
+                        </div>
                     </div>
                 </div>
             )}

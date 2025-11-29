@@ -70,7 +70,7 @@ WITH Punches AS (
     p.timestamp AS ts,
     ROW_NUMBER() OVER (PARTITION BY p.mIdCard, p.machineType ORDER BY p.timestamp ASC) AS rn_asc,
     ROW_NUMBER() OVER (PARTITION BY p.mIdCard, p.machineType ORDER BY p.timestamp DESC) AS rn_desc,
-    COUNT(*) OVER (PARTITION BY p.mIdCard, p.machineType) AS cnt
+    COUNT(*) OVER (PARTITION BY p.mIdCard, p.machineType) AS cnt  
   FROM PythonPunchData p
   WHERE 
       p.timestamp >= ${date}
@@ -126,11 +126,11 @@ SELECT
   e.id AS employeeId,
   e.mIdCard,
   e.firstName,
-    d.name AS departmentName,
+  d.name AS departmentName,
   des.name AS designationName,
   sh.id AS shiftId,
   sh.name AS shiftName,
-    sti.id AS shiftTemplateId,   -- <<< add this
+  sti.id AS shiftTemplateId,   -- <<< add this
 
 
   -- ✅ In-time: always take first available punch
@@ -217,9 +217,9 @@ SELECT
       SELECT 1
       FROM ShiftTemplateItems s
       WHERE s.shiftCommonTemplateId = e.shiftCommonTemplateId
-        AND TIME_FORMAT(COALESCE(a.inTimeIn, a.inTimeBoth), '%H:%i')
-            BETWEEN TIME_FORMAT(s.toleranceInBeforeStart, '%H:%i')
-                AND TIME_FORMAT(s.toleranceInAfterEnd, '%H:%i')
+        AND TIME_FORMAT(COALESCE(a.inTimeIn, a.inTimeBoth), '%H:%i:%s')
+            BETWEEN TIME_FORMAT(s.toleranceInBeforeStart, '%H:%i:%s')
+                AND TIME_FORMAT(s.toleranceInAfterEnd, '%H:%i:%s')
         AND (
             ( s.inNextDay = 'No'
               AND TIME(COALESCE(a.outTimeOut, a.outTimeBoth))
@@ -237,13 +237,14 @@ SELECT
             )
              OR
              ( s.inNextDay = 'Yes'
-               AND TIME_FORMAT(COALESCE(a.outTimeOut, a.outTimeBoth), '%H:%i')
-                   BETWEEN TIME_FORMAT(s.toleranceOutBeforeStart, '%H:%i')
-                       AND TIME_FORMAT(s.toleranceOutAfterEnd, '%H:%i')
+               AND TIME_FORMAT(COALESCE(a.outTimeOut, a.outTimeBoth), '%H:%i:%s')
+                   BETWEEN TIME_FORMAT(s.toleranceOutBeforeStart, '%H:%i:%s')
+                       AND TIME_FORMAT(s.toleranceOutAfterEnd, '%H:%i:%s')
              )
         )
     ) THEN 'Regular'
     ELSE 'Irregular'
+    
   END AS status ,
     -- ✅ NEW: Collect all punches into JSON array
   (
@@ -567,6 +568,8 @@ ORDER BY e.mIdCard;
       const lunchBst = timeToSeconds(emp.shiftTemplateItem.lunchBst)
       const lunchBET = timeToSeconds(emp.shiftTemplateItem.lunchBET)
 
+
+
       // ---- Tolerance windows array ----
       const windows = [
         { start: morningInFromTol, end: morningInToTol },
@@ -586,22 +589,54 @@ ORDER BY e.mIdCard;
       const isInAnyWindow = (sec) => windows.some(w => sec >= w.start && sec <= w.end);
 
       // ---- Filter punches outside all windows ----
-      emp.breakSummary.outsideTolerance = (emp?.punches || []).filter(p => {
-        if (!p?.timestamp) return false;
+      // emp.breakSummary.outsideTolerance = (emp?.punches || []).filter(p => {
+      //   if (!p?.timestamp) return false;
+      //   const timeStr = new Date(p.timestamp).toTimeString().split(" ")[0];
+      //   const sec = timeStrToSeconds(timeStr);
+      //   return !isInAnyWindow(sec);
+      // }).map(p => ({ timestamp: p.timestamp }));
+
+      // console.log(emp.breakSummary.outsideTolerance, "Outside Tolerance Punches");
+      // ---- NEW LOGIC: outside punches + next punch ----
+      let finalPunches = [];
+
+      let punches = emp?.punches || [];
+
+      for (let i = 0; i < punches.length; i++) {
+        const p = punches[i];
+        if (!p?.timestamp) continue;
+
         const timeStr = new Date(p.timestamp).toTimeString().split(" ")[0];
         const sec = timeStrToSeconds(timeStr);
-        return !isInAnyWindow(sec);
-      }).map(p => ({ timestamp: p.timestamp }));
 
-      console.log(emp.breakSummary.outsideTolerance, "Outside Tolerance Punches");
+        const isOutside = !isInAnyWindow(sec);
+
+        if (isOutside) {
+          // Add this punch
+          finalPunches.push({ timestamp: p.timestamp });
+
+          // Add next punch (if exists)
+          if (i < punches.length - 1) {
+            finalPunches.push({
+              timestamp: punches[i + 1].timestamp
+            });
+          }
+        }
+      }
+
+      emp.breakSummary.outsideTolerance = finalPunches;
 
 
+
+
+
+      const firstPunchObj = emp?.punches?.[0];
 
       let morningStatus;
       if (firstPunch >= morningInSec && firstPunch <= morningInToTol) {
         morningStatus = {
           status: "On Time",
-          punch: formatTime(firstPunch),
+          punch: firstPunchObj.timestamp,   // <-- FULL TIMESTAMP
           delay: "00:00:00",
         };
       }
@@ -612,26 +647,27 @@ ORDER BY e.mIdCard;
 
         morningStatus = {
           status: "Late",
-          punch: formatTime(firstPunch),
+          punch: firstPunchObj.timestamp,   // <-- FULL TIMESTAMP
           delay: formatTime(lateSeconds),
         };
       } else if (firstPunch >= fbout) {
         morningStatus = {
           status: "Late",
-          punch: formatTime(firstPunch),
+          punch: firstPunchObj.timestamp,   // <-- FULL TIMESTAMP
           delay: "00:00:00",  // No delay after break start
         };
       }
 
 
       emp.breakSummary.morningInOut = morningStatus;
+      const lastPunchObj = emp.punches[emp.punches.length - 1];
 
 
       // Evening Out Punch
       // Evening Out Punch (no more Extra Work concept)
       const lastPunch = punchesInSeconds[punchesInSeconds.length - 1];
       let eveningStatus = {
-        punch: formatTime(lastPunch),
+        punch: lastPunchObj.timestamp,    // <-- FULL TIMESTAMP
         delay: "00:00:00"
       };
 
