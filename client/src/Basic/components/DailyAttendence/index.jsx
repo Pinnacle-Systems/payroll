@@ -295,6 +295,8 @@ const Form = () => {
   const [showOtherPunchesModal, setShowOtherPunchesModal] = useState(false);
   const [selectedEmployeeOtherPunches, setSelectedEmployeeOtherPunches] = useState([]);
   const [selectedEmployeeOther, setSelectedEmployeeOther] = useState(null);
+  const [showCombinedModal, setShowCombinedModal] = useState(false)
+
   const handlePunchPermissionToggle = (index) => {
     setSelectedEmployeePunches(prev => {
       const updated = [...prev];
@@ -302,54 +304,117 @@ const Form = () => {
       return updated;
     });
   };
-
-
-
-  const handlePermissionToggle = (empIndex, punchIndex) => {
-    setPermissionTable(prev => {
+  const handleOtherPunchPermissionToggle = (index) => {
+    setSelectedEmployeeOtherPunches(prev => {
       const updated = [...prev];
-
-      // Employee row
-      const emp = updated[empIndex];
-
-      // toggle the punch permission (allowed true / false)
-      emp.punches[punchIndex].allowed = !emp.punches[punchIndex].allowed;
-
+      updated[index].isPermission = !updated[index].isPermission; // toggle pair
       return updated;
     });
   };
-
-  console.log(permissionTable, "permissionTableindex");
-
-  const handleSavePermission = async () => {
-
-    const payload = selectedEmployeePunches.map(p => ({
-      mIdCard: selectedEmployee.mIdCard,
-      timestamp: p.timestamp,
-      isPermission: p.isPermission
-    }));
-
+  const handleSaveAll = async () => {
     try {
-      await updatePermission({ data: payload }).unwrap();
+      // Call both save functions
+      await handleSavePermission();
+      await handleSaveOtherPunchPermission();
 
       Swal.fire({
         icon: "success",
         title: "Updated!",
-        text: "Permission updated successfully.",
+        text: "All permissions updated successfully.",
         timer: 2000,
         showConfirmButton: false
       });
 
-      setShowPermissionModal(false);
+      setShowCombinedModal(false);
 
     } catch (err) {
-      console.error(err);
+      console.error("Error in combined save:", err);
       Swal.fire({
         icon: "error",
         title: "Error",
-        text: "Failed to update permission."
+        text: "Failed to save permissions."
       });
     }
+  };
+
+  const handleSaveOtherPunchPermission = async () => {
+    if (!selectedEmployeeOther) return;
+
+    // Flatten each Out-In pair into separate entries
+    const payload = selectedEmployeeOtherPunches?.filter(p => p.isPermission)?.flatMap(p => [
+      { mIdCard: selectedEmployeeOther.mIdCard, timestamp: p.out, isPermission: p.isPermission },
+      { mIdCard: selectedEmployeeOther.mIdCard, timestamp: p.in, isPermission: p.isPermission }
+    ])?.filter(p => p.timestamp && p.timestamp !== "-");
+
+    if (!payload || payload.length === 0) return; //  Avoid empty API call
+
+    return updatePermission({ data: payload }).unwrap();
+
+    // try {
+    //   await updatePermission({ data: payload }).unwrap();
+
+    //   Swal.fire({
+    //     icon: "success",
+    //     title: "Updated!",
+    //     text: "Other punches permission updated successfully.",
+    //     timer: 2000,
+    //     showConfirmButton: false
+    //   });
+
+    //   // setShowOtherPunchesModal(false);
+
+    // } catch (err) {
+    //   console.error(err);
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Error",
+    //     text: "Failed to update other punches permission."
+    //   });
+    // }
+  };
+
+
+
+
+
+  console.log(permissionTable, "permissionTableindex");
+
+  const handleSavePermission = async () => {
+    const payload = selectedEmployeePunches?.filter(p => p.isPermission)?.map(p => ({
+      mIdCard: selectedEmployee.mIdCard,
+      timestamp: p.timestamp,
+      isPermission: p.isPermission
+    }));
+    if (!payload || payload.length === 0) return;
+
+    return updatePermission({ data: payload }).unwrap();
+    // const payload = selectedEmployeePunches?.filter(p => p.isPermission)?.map(p => ({
+    //   mIdCard: selectedEmployee.mIdCard,
+    //   timestamp: p.timestamp,
+    //   isPermission: p.isPermission
+    // }));
+
+    // try {
+    //   await updatePermission({ data: payload }).unwrap();
+
+    //   Swal.fire({
+    //     icon: "success",
+    //     title: "Updated!",
+    //     text: "Permission updated successfully.",
+    //     timer: 2000,
+    //     showConfirmButton: false
+    //   });
+
+    //   // setShowPermissionModal(false);
+
+    // } catch (err) {
+    //   console.error(err);
+    //   Swal.fire({
+    //     icon: "error",
+    //     title: "Error",
+    //     text: "Failed to update permission."
+    //   });
+    // }
 
   }
 
@@ -421,9 +486,9 @@ const Form = () => {
 
         {
           openPermissionModal && (<Permissiontable shiftData={shiftData} permissionTable={permissionTable} handleSavePermission={handleSavePermission}
-            setPermissionTable={setPermissionTable} handlePermissionToggle={handlePermissionToggle} handlePunchPermissionToggle={handlePunchPermissionToggle}
+            setPermissionTable={setPermissionTable} handlePunchPermissionToggle={handlePunchPermissionToggle} handleOtherPunchPermissionToggle={handleOtherPunchPermissionToggle}
             selectedBreakSummary={selectedBreakSummary} setSelectedBreakSummary={setSelectedBreakSummary} closeModal={closeModal} openModal={openModal} reportView={reportView} selectedShiftType={selectedShiftType} showModal={showModal} setShowModal={setShowModal} onClose={() => setOpenPermissionModal(false)}
-
+            handleSaveOtherPunchPermission={handleSaveOtherPunchPermission}
             showPermissionModal={showPermissionModal}
             setShowPermissionModal={setShowPermissionModal}
             selectedEmployeePunches={selectedEmployeePunches}
@@ -434,8 +499,8 @@ const Form = () => {
             setShowOtherPunchesModal={setShowOtherPunchesModal}
             selectedEmployeeOtherPunches={selectedEmployeeOtherPunches}
             setSelectedEmployeeOtherPunches={setSelectedEmployeeOtherPunches}
-            selectedEmployeeOther={selectedEmployeeOther}
-            setSelectedEmployeeOther={setSelectedEmployeeOther}
+            selectedEmployeeOther={selectedEmployeeOther} handleSaveAll={handleSaveAll}
+            setSelectedEmployeeOther={setSelectedEmployeeOther} showCombinedModal={showCombinedModal} setShowCombinedModal={setShowCombinedModal}
           />
           )
         }
@@ -454,7 +519,7 @@ const Form = () => {
         {tableShow === "Final" && (<div
           className={` mt-3  p-2  bg-white max-h-[600px]  overflow-x-auto overflow-y-auto`}
         >
-          <table className={` ${selectedShiftType === "Hourly" ? "w-[105vw]" : "w-[100vw]"}  border-collapse table-fixed`}>
+          <table className={` ${selectedShiftType === "Hourly" ? "w-[110vw]" : "w-[105vw]"}  border-collapse table-fixed`}>
 
             <thead className="bg-gray-200 text-gray-800 border border-gray-400">
               <tr>
@@ -495,7 +560,7 @@ const Form = () => {
                   In Date
                 </th>
                 <th className={`w-8 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
-                  In
+                  In Time
                 </th>
                 <th
                   className={`w-8 py-2 item-center font-medium text-[13px]  border border-gray-300`}
@@ -503,7 +568,7 @@ const Form = () => {
                   Out Date
                 </th>
                 <th className={`w-8 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
-                  Out
+                  Out Time
                 </th>
 
                 <th
@@ -511,7 +576,9 @@ const Form = () => {
                   className={`${reportView === "Single" ? "w-32" : "w-36"} py-2 text-center font-medium text-[13px]  border border-gray-300`}                >
                   Other Punches
                 </th>
-
+                <th className={`w-12 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                  Permission Duration
+                </th>
 
                 {selectedShiftType === "Hourly" && (
                   <>
@@ -804,6 +871,16 @@ const Form = () => {
                     {/* ================================
     HOURLY COLUMNS (4 columns)
 ================================== */}
+                    <td
+                      rowSpan={2}
+                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                       value=''
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />
+                    </td>
                     {selectedShiftType === "Hourly" && (
                       <>
 
@@ -1151,36 +1228,18 @@ const Form = () => {
                         </td>
                       </>
                     )}
-                    {/* {
-                      selectedShiftType === "Hourly" ? (<td
-                        rowSpan={2}
-                        className="  border border-gray-300 text-[12px] text-center py-0.5 item-center"
-                      >
-                        <button
-                          className="text-blue-600 text-center text-blue  bg-blue-50 rounded"
-                          onClick={() => openModal(item.breakSummary)}
-
-                          title="Open"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                            <path
-                              fillRule="evenodd"
-                              d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </button>
-                      </td>) : ""
-                    } */}
-                    {/* ================================
-    HOURLY COLUMNS (4 columns)
-================================== */}
+                   
+                    <td
+                      rowSpan={2}
+                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                    >
+                      <input
+                        type="text"
+                        value={ ""
+                        }
+                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                      />
+                    </td>
                     {selectedShiftType === "Hourly" && (
                       <>
 

@@ -10,19 +10,7 @@ function safeEval(expr) {
     return 0;
   }
 }
-function formatLocalHHMMSS(ts) {
-  const d = new Date(ts);
-  const hh = String(d.getHours()).padStart(2, "0");
-  const mm = String(d.getMinutes()).padStart(2, "0");
-  const ss = String(d.getSeconds()).padStart(2, "0");
-  return `${hh}:${mm}:${ss}`;
-}
-function minutesToHMS(minutes) {
-  if (typeof minutes !== "number") return minutes; // keep "single punch" as is
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return [h, m, 0]?.map(v => String(v).padStart(2, "0"))?.join(":");
-}
+
 function secondsToHms(d) {
   d = Number(d);
   const h = Math.floor(d / 3600);
@@ -49,9 +37,7 @@ function timeStrToHours(timeStr) {
   const [h, m, s] = timeStr.split(":")?.map(Number);
   return h + m / 60 + (s ? s / 3600 : 0);
 }
-function roundToHalf(value) {
-  return Math.round(value * 2) / 2;
-}
+
 const formatTime = (totalSec) => {
   const hours = Math.floor(totalSec / 3600);
   const mins = Math.floor((totalSec % 3600) / 60);
@@ -443,22 +429,14 @@ ORDER BY e.mIdCard;
 
         // keep precision (2 decimals)
         const finalValue = Number(value.toFixed(2));
-
-
-
         console.log(`Employee ${emp.firstName} - Quarter ${q.name} value = ${finalValue}`);
         quarterValues[q.name] = finalValue;
 
       }
-
-
       else {
         console.log(`Employee ${emp.firstName} - Quarter ${q.name} has no punches in range`);
         quarterValues[q.name] = 0; // no punches = 0
       }
-
-
-
     })
 
     const formulas = emp.quarters?.filter(q => q?.formula)?.map(q => q?.formula);
@@ -475,10 +453,7 @@ ORDER BY e.mIdCard;
       emp.formulaResult = formulaResult;
       console.log(`Employee ${emp.firstName} - Formula result:`, formulaResult);
     }
-    //End of quarter calculation
-
-
-    // Before hourly calculation
+  
     if (!shiftItem) {
       console.log(`No shiftTemplateItem found for employee ${emp.firstName}`);
       // emp.hourlyWorkedTime = "00:00:00";
@@ -598,33 +573,64 @@ ORDER BY e.mIdCard;
 
       // console.log(emp.breakSummary.outsideTolerance, "Outside Tolerance Punches");
       // ---- NEW LOGIC: outside punches + next punch ----
-      let finalPunches = [];
+      // safe extractor for "YYYY-MM-DD HH:MM:SS(.ssssss)" format
+      const extractSeconds = (timestamp) => {
+        if (!timestamp) return NaN;
+        // assume format "YYYY-MM-DD HH:MM:SS..." (space separated)
+        const timePart = timestamp.split(" ")[1];              // "13:36:34.000000"
+        if (!timePart) return NaN;
+        const [h, m, sRaw] = timePart.split(":");
+        const s = Math.floor(parseFloat(sRaw || "0"));
+        return (+h * 3600) + (+m * 60) + s;
+      };
 
-      let punches = emp?.punches || [];
+      let finalPunches = [];
+      let added = new Set();          // to avoid duplicate timestamps
+      let pairedByPrev = new Set();   // indexes that were added as "next" for an outside punch
+
+      const punches = emp?.punches || [];
 
       for (let i = 0; i < punches.length; i++) {
+
         const p = punches[i];
         if (!p?.timestamp) continue;
+        if (i === 0) continue;
+        const isLast = (i === punches.length - 1);
 
-        const timeStr = new Date(p.timestamp).toTimeString().split(" ")[0];
-        const sec = timeStrToSeconds(timeStr);
-
+        // ❌ Last punch should NEVER start a pair
+        if (isLast) continue;
+        const sec = extractSeconds(p.timestamp);
         const isOutside = !isInAnyWindow(sec);
 
         if (isOutside) {
-          // Add this punch
-          finalPunches.push({ timestamp: p.timestamp });
-
-          // Add next punch (if exists)
-          if (i < punches.length - 1) {
-            finalPunches.push({
-              timestamp: punches[i + 1].timestamp
-            });
+          // Add this outside punch if not already added
+          if (!added.has(p.timestamp)) {
+            finalPunches.push({ timestamp: p.timestamp });
+            added.add(p.timestamp);
           }
+          // Pair with next punch — even if next is last punch (allowed)
+          const nextIdx = i + 1;
+          const next = punches[nextIdx];
+          if (next && !added.has(next.timestamp)) {
+            finalPunches.push({ timestamp: next.timestamp });
+            added.add(next.timestamp);
+            pairedByPrev.add(nextIdx);
+          }
+        }
+
+
+        if (pairedByPrev.has(i)) {
+
+          continue;
         }
       }
 
+      // keep original chronological order (already in order) — finalPunches preserves push order
       emp.breakSummary.outsideTolerance = finalPunches;
+
+      console.log("Windows:", windows);
+      console.log("11:12 → sec =", extractSeconds("2025-11-29 11:12:22.000000"));
+      console.log("isInAnyWindow(11:12) =", isInAnyWindow(extractSeconds("2025-11-29 11:12:22.000000")));
 
 
 

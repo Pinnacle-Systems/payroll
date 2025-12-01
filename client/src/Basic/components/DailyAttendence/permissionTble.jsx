@@ -2,13 +2,14 @@ import moment from "moment-timezone";
 import React, { useEffect, useState, useRef } from "react";
 import Modal from "../../../UiComponents/Modal";
 
-const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handleSavePermission, openModal, selectedBreakSummary, setSelectedBreakSummary, showModal, setShowModal, closeModal, onClose, handlePermissionToggle, handlePunchPermissionToggle, showPermissionModal,
+const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handleSavePermission, openModal, selectedBreakSummary, setSelectedBreakSummary, showModal, setShowModal, closeModal, onClose, handlePunchPermissionToggle, showPermissionModal,
     setShowPermissionModal, selectedEmployeePunches, setSelectedEmployeePunches,
     selectedEmployee, setSelectedEmployee, showOtherPunchesModal, setShowOtherPunchesModal
-    , selectedEmployeeOtherPunches, setSelectedEmployeeOtherPunches, selectedEmployeeOther
-    , setSelectedEmployeeOther
+    , selectedEmployeeOtherPunches, setSelectedEmployeeOtherPunches, selectedEmployeeOther, handleSaveAll
+    , setSelectedEmployeeOther, handleOtherPunchPermissionToggle, handleSaveOtherPunchPermission, showCombinedModal, setShowCombinedModal
 
 }) => {
+
 
 
     console.log(permissionTable, "permissionTableinmodal");
@@ -25,6 +26,24 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
         setSelectedEmployeeOther(employee);
 
         const outsidePunches = employee.breakSummary?.outsideTolerance || [];
+        const diffTime = (out, inn) => {
+            if (!out || !inn || out === "-" || inn === "-") return "-";
+
+            const start = new Date(out);
+            const end = new Date(inn);
+
+            if (isNaN(start) || isNaN(end)) return "-";
+
+            let diffSec = Math.floor((end - start) / 1000);
+            if (diffSec < 0) return "-";
+
+            const h = String(Math.floor(diffSec / 3600)).padStart(2, '0');
+            const m = String(Math.floor((diffSec % 3600) / 60)).padStart(2, '0');
+            const s = String(diffSec % 60).padStart(2, '0');
+
+            return `${h}:${m}:${s}`;
+        };
+
 
         // Pair punches: even index → Out, odd index → In
         const punchList = [];
@@ -35,10 +54,13 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
             // Clean timestamps (remove .000000 microseconds)
             const outTime = outPunch?.timestamp ? outPunch.timestamp.split('.')[0] : null;
             const inTime = inPunch?.timestamp ? inPunch.timestamp.split('.')[0] : null;
+            const diff = diffTime(outTime, inTime);
 
             punchList.push({
                 out: outTime || "-",
                 in: inTime || "-",
+                delay: diff,           // ⬅️ Added here
+
                 isPermission: false,
             });
         }
@@ -80,6 +102,13 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
     };
 
 
+    const openCombinedModal = (employee) => {
+        // Sets both datasets
+        openPermissionModal(employee);
+        openOtherPunchesModal(employee);
+
+        setShowCombinedModal(true);
+    };
 
 
 
@@ -115,10 +144,8 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                 </button>
                             </div>
                         </div>
-                        <div
-                            className={` mt-3  p-2  bg-white h-[500px]  overflow-x-auto overflow-y-auto`}
-                        >
-                            <table className={` ${selectedShiftType === "Hourly" ? "w-[90vw]" : "w-[90vw]"}  border-collapse table-fixed`}>
+                        <div className={` mt-3  p-2  bg-white h-[500px]  overflow-x-auto overflow-y-auto`}>
+                            <table className={` ${selectedShiftType === "Hourly" ? "w-[85vw]" : "w-[85vw]"}  border-collapse table-fixed`}>
 
                                 <thead className="bg-gray-200 text-gray-800 border border-gray-400">
                                     <tr>
@@ -159,7 +186,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                             In Date
                                         </th>
                                         <th className={`w-8 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
-                                            In
+                                            In Time
                                         </th>
                                         <th
                                             className={`w-8 py-2 item-center font-medium text-[13px]  border border-gray-300`}
@@ -167,7 +194,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                             Out Date
                                         </th>
                                         <th className={`w-8 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
-                                            Out
+                                            Out Time
                                         </th>
 
                                         <th
@@ -180,9 +207,9 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                         {selectedShiftType === "Hourly" ? (<th className={`w-[40px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>
                                             Status
                                         </th>) : ""} */}
-                                        <th className={`w-12 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                                        {/* <th className={`w-12 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
                                             Permission
-                                        </th>
+                                        </th> */}
 
 
                                     </tr>
@@ -192,6 +219,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
 
                                 <tbody>
                                     {permissionTable?.map((item, index) => (
+
                                         <React.Fragment key={index}>
                                             {/* Row 1 - In + Morning */}
                                             <tr>
@@ -285,8 +313,8 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                 : ""
                                                         }
                                                         onFocus={(e) => e.target.select()}
-                                                        className={`w-full bg-transparent  text-center focus:outline-none focus:border-transparent  `}
-                                                    />
+                                                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent 
+        ${item.breakSummary?.morningInOut?.status === "Late" ? "text-red-600 font-semibold" : ""}`} />
                                                 </td>
                                                 {/* Out Date */}
                                                 <td
@@ -316,20 +344,20 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                 ? moment.utc(item.outTime).format("HH:mm:ss")
                                                                 : ""
                                                         }
-                                                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                                                    />
+                                                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent 
+        ${item.breakSummary?.eveningInOut?.status === "Out Early" ? "text-red-600 font-semibold" : ""}`} />
                                                 </td>
 
                                                 {reportView === "Seperate" && (
                                                     <>
-                                                        <td className=" border border-gray-300 text-[12px] py-0.5 " onClick={() => openOtherPunchesModal(item)}>
+                                                        <td className=" border border-gray-300 text-[12px] py-0.5 " onClick={() => openCombinedModal(item)}>
                                                             <input
                                                                 type="text"
-                                                                value={"OUT"} onClick={() => openOtherPunchesModal(item)}
+                                                                value={"OUT"} onClick={() => openCombinedModal(item)}
                                                                 className={`w-full text-center bg-transparent  focus:outline-none focus:border-transparent `}
                                                             />
                                                         </td>
-                                                        <td className="border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openOtherPunchesModal(item)}>
+                                                        <td className="border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
                                                             <input
                                                                 min="0"
                                                                 type="text"
@@ -340,11 +368,11 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                             .format("HH:mm:ss")
                                                                         : ""
                                                                 }
-                                                                onFocus={(e) => e.target.select()} onClick={() => openOtherPunchesModal(item)}
+                                                                onFocus={(e) => e.target.select()} onClick={() => openCombinedModal(item)}
                                                                 className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                                                             />
                                                         </td>
-                                                        <td className="border border-gray-300 text-[12px] text-center px-1" onClick={() => openOtherPunchesModal(item)}>
+                                                        <td className="border border-gray-300 text-[12px] text-center px-1" onClick={() => openCombinedModal(item)}>
                                                             <input
                                                                 type="text"
                                                                 value={
@@ -355,10 +383,10 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                         : ""
                                                                 }
                                                                 className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                                                                 onClick={() => openOtherPunchesModal(item)}
+                                                                onClick={() => openCombinedModal(item)}
                                                             />
                                                         </td>
-                                                        <td className="border border-gray-300 text-[12px] text-center px-1" onClick={() => openOtherPunchesModal(item)}>
+                                                        <td className="border border-gray-300 text-[12px] text-center px-1" onClick={() => openCombinedModal(item)}>
                                                             <input
                                                                 type="text"
                                                                 value={
@@ -369,17 +397,17 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                         : ""
                                                                 }
                                                                 className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                                                                 onClick={() => openOtherPunchesModal(item)}
+                                                                onClick={() => openCombinedModal(item)}
                                                             />
                                                         </td>
                                                     </>
                                                 )}
                                                 {reportView === "Single" && (
                                                     <>
-                                                        <td colSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openOtherPunchesModal(item)}>
+                                                        <td colSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
                                                             <input
                                                                 type="text"
-                                                                onClick={() => openOtherPunchesModal(item)}
+                                                                onClick={() => openCombinedModal(item)}
                                                                 value={[
                                                                     item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
                                                                     item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
@@ -423,7 +451,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                         </button>
                                                     </td>) : ""
                                                 } */}
-                                                <td
+                                                {/* <td
                                                     rowSpan={2}
                                                     className=" border border-gray-300 text-[12px] py-0.5 text-center item-center"
                                                 >
@@ -445,22 +473,22 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                             />
                                                         </svg>
                                                     </button>
-                                                </td>
+                                                </td> */}
 
                                             </tr>
 
                                             {/* Row 2 - Evening + Out */}
                                             {reportView === "Seperate" && (
                                                 <>
-                                                    <td className=" border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openOtherPunchesModal(item)}>
+                                                    <td className=" border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
                                                         <input
                                                             type="text"
-                                                            value={"IN"} onClick={() => openOtherPunchesModal(item)}
+                                                            value={"IN"} onClick={() => openCombinedModal(item)}
                                                             className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
                                                         />
                                                     </td>
                                                     {/* Morning Break In */}
-                                                    <td className="border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openOtherPunchesModal(item)}>
+                                                    <td className="border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
                                                         <input
                                                             type="text"
                                                             value={
@@ -469,11 +497,11 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                     : ""
                                                             }
                                                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                                                            
+
                                                         />
                                                     </td>
 
-                                                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openOtherPunchesModal(item)}>
+                                                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
                                                         <input
                                                             type="text"
                                                             value={
@@ -484,10 +512,10 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                     : ""
                                                             }
                                                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                                                             onClick={() => openOtherPunchesModal(item)}
+                                                            onClick={() => openCombinedModal(item)}
                                                         />
                                                     </td>
-                                                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openOtherPunchesModal(item)}>
+                                                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
                                                         <input
                                                             type="text"
                                                             value={
@@ -498,7 +526,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                     : ""
                                                             }
                                                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                                                            onClick={() => openOtherPunchesModal(item)}
+                                                            onClick={() => openCombinedModal(item)}
                                                         />
                                                     </td>
                                                 </>
@@ -515,7 +543,196 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                 </div>
 
             </div>
-            {showPermissionModal && (
+
+            {showCombinedModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-[1000]">
+                    <div className="bg-white  rounded-lg shadow-xl p-4 overflow-hidden border border-gray-300">
+
+                        <div className="bg-gray-200 p-2 rounded shadow-lg w-[500px]  h-[445px] overflow-y-auto">
+
+                            <div className="bg-white flex justify-between align-items-center pb-1 border-b p-2">
+                                <h2 className=" text-[15px] ">
+                                    {selectedEmployee?.firstName}
+                                </h2>
+                                <button
+                                    onClick={() => setShowCombinedModal(false)}
+                                    className="text-gray-800 h-6 ml-2 bg-red-400 rounded focus:outline-none"
+                                >
+                                    <svg
+                                        className="h-6 w-6 fill-current"
+                                        viewBox="0 0 20 20"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                    >
+                                        <title>Close</title>
+                                        <path
+                                            d="M14.348 5.652a.999.999 0 00-1.414 0L10 8.586l-2.93-2.93a.999.999 0 10-1.414 1.414L8.586 10l-2.93 2.93a.999.999 0 101.414 1.414L10 11.414l2.93 2.93a.999.999 0 101.414-1.414L11.414 10l2.93-2.93a.999.999 0 000-1.414z"
+                                            fillRule="evenodd"
+                                        />
+                                    </svg>
+                                </button>
+                            </div>
+
+
+                            <div className="bg-white px-3 py-2 mt-3 h-[380px] relative">
+                                <h3 className=" mt-1 mb-2 text-[14px]">Employee In & Out</h3>
+
+                                <table className="w-full text-[13px] border">
+                                    <thead className="bg-gray-200  text-[13px]">
+                                        <tr>
+                                            <th className="border  font-medium px-2 py-1 w-24">Time</th>
+                                            <th className="border  font-medium  px-2 py-1 w-32">Status</th>
+                                            <th className="border  font-medium px-2 py-1 w-20">Permission</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {selectedEmployeePunches?.map((punch, idx) => (
+                                            <tr key={idx} className="text-center">
+                                                <td className="border px-2 py-1">
+                                                    {moment(punch.timestamp).format("HH:mm:ss")}
+                                                </td>
+                                                <td className="border text-left pl-1 px-2 py-1">{punch.status}</td>
+                                                <td className="border px-2 py-1">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={punch.isPermission}
+                                                        onChange={() => handlePunchPermissionToggle(idx)}
+                                                    />
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+
+
+
+                                <h3 className=" mb-2 mt-2 text-[14px]">Other Punches</h3>
+
+                                <table className="w-full text-[13px] border">
+                                    <thead className="bg-gray-200">
+                                        <tr>
+                                            <th className="border  font-medium px-2 py-1 w-20">Out</th>
+                                            <th className="border  font-medium px-2 py-1 w-20">In</th>
+                                            <th className="border  font-medium px-2 py-1 w-24">Duration</th>
+                                            <th className="border  font-medium px-2 py-1 w-20">Permission</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {selectedEmployeeOtherPunches?.map((punch, idx) => (
+                                            <tr key={idx} className="text-center">
+                                                <td className="border px-2 py-1">
+                                                    {punch.out !== "-" ? moment(punch.out).format("HH:mm:ss") : "-"}
+                                                </td>
+                                                <td className="border px-2 py-1">
+                                                    {punch.in !== "-" ? moment(punch.in).format("HH:mm:ss") : "-"}
+                                                </td>
+                                                <td className="border px-2 py-1">{punch.delay}</td>
+                                                <td className="border px-2 py-1">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={punch.isPermission}
+                                                        onChange={() => handleOtherPunchPermissionToggle(idx)}
+                                                    />
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+
+                                <div className="flex justify-end mt-4 absolute right-2  bottom-2">
+                                    <button
+                                        onClick={handleSaveAll}
+                                        className="px-4 py-1 bg-green-600 text-white rounded text-[15px]"
+                                    >
+                                        Save
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+
+
+
+
+
+
+
+
+
+            {/* {showOtherPunchesModal && (
+                <div className="fixed inset-0 bg-black z-[1000] bg-opacity-40 flex justify-center items-center">
+                    <div className="bg-white p-5 rounded shadow-lg w-[520px] h-[400px]">
+                        <div className="flex justify-between">
+                            <h2 className=" mb-3">
+                                {selectedEmployeeOther?.firstName}
+                            </h2>
+                            <button
+                                onClick={() => setShowOtherPunchesModal(false)}
+                                className="text-gray-800 h-6 ml-2 bg-red-400 rounded focus:outline-none"
+                            >
+                                <svg
+                                    className="h-6 w-6 fill-current"
+                                    viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <title>Close</title>
+                                    <path
+                                        d="M14.348 5.652a.999.999 0 00-1.414 0L10 8.586l-2.93-2.93a.999.999 0 10-1.414 1.414L8.586 10l-2.93 2.93a.999.999 0 101.414 1.414L10 11.414l2.93 2.93a.999.999 0 101.414-1.414L11.414 10l2.93-2.93a.999.999 0 000-1.414z"
+                                        fillRule="evenodd"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+                        <div className="bg-gray-200 p-2">
+                            <div className="h-[280px] relative overflow-y-auto bg-white">
+                                <div className="flex gap-x-12 items-center justify-space-between py-2 bg-gray-200 border-b text-[14px]">
+                                    <span className="w-12 ml-2">Out</span>
+                                    <span className="w-12">In</span>
+                                    <span className="w-20">Time (HRS)</span>
+
+                                    <span className="">Permission Allowed</span>
+                                </div>
+                                {selectedEmployeeOtherPunches?.map((punch, index) => (
+                                    <div key={index} className="flex gap-x-12 items-center py-2 border-b text-[13px]">
+                                        <span className="w-12  ml-2">
+                                            {punch.out !== "-" ? moment(punch.out).format("HH:mm:ss") : "-"}
+                                        </span>
+
+                                        <span className="w-12 ">
+                                            {punch.in !== "-" ? moment(punch.in).format("HH:mm:ss") : "-"}
+                                        </span>
+                                        <span className="w-20">
+                                            {punch.delay || "-"}
+                                        </span>
+                                        <input
+                                            className="text-center ml-14"
+                                            type="checkbox"
+                                            checked={punch.isPermission || false}
+                                            onChange={() => handleOtherPunchPermissionToggle(index)}
+                                        />
+                                    </div>
+                                ))}
+                                <div className="text-[13px] absolute bottom-3 right-3 ">
+                                    <button
+                                        className="px-4  bg-green-600 text-white text-right rounded"
+                                        onClick={handleSaveOtherPunchPermission}
+                                    >
+                                        Save
+                                    </button>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            )} */}
+            {/* {showPermissionModal && (
                 <div className="fixed inset-0 bg-black z-[1000] bg-opacity-40 flex justify-center items-center">
                     <div className="bg-white p-5 rounded shadow-lg w-[500px] h-[280px]">
                         <div className="flex justify-between">
@@ -543,7 +760,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                             <div className="h-[180px] relative overflow-y-auto bg-white">
                                 <div className="flex gap-x-12 items-center py-2 bg-gray-200 border-b text-[14px]">
                                     <span className="w-20 ml-2">Time</span>
-                                    <span className="w-4">Status</span> {/* for checkbox spacing */}
+                                    <span className="w-4">Status</span> 
                                     <span className="ml-12">Permission Allowed</span>
                                 </div>
                                 {selectedEmployeePunches?.map((punch, index) => (
@@ -551,7 +768,6 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                         <span className="w-20  ml-2">
                                             {punch.timestamp ? moment(punch.timestamp).format("HH:mm:ss") : "-"}
                                         </span>
-                                        {/* <span className="w-44 text-sm">{punch.type}</span> */}
                                         <span className="w-32 ">{punch.status}</span>
                                         <input
                                             type="checkbox"
@@ -574,9 +790,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                         </div>
                     </div>
                 </div>
-            )}
-
-
+            )} */}
             {showModal && selectedBreakSummary && (
                 <div className="fixed inset-0 z-[999] flex items-center justify-center bg-gray-800 bg-opacity-50 overscroll-y-hidden">
                     <div className={`relative bg-white rounded-lg p-7 w-[700px] h-[250px]`}>
@@ -657,74 +871,6 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                             </tbody>
                         </table> */}
 
-                    </div>
-                </div>
-            )}
-
-            {showOtherPunchesModal && (
-                <div className="fixed inset-0 bg-black z-[1000] bg-opacity-40 flex justify-center items-center">
-                    <div className="bg-white p-5 rounded shadow-lg w-[480px] h-[400px]">
-                        <div className="flex justify-between">
-                            <h2 className=" mb-3">
-                                {selectedEmployeeOther?.firstName}
-                            </h2>
-                            <button
-                                onClick={() => setShowOtherPunchesModal(false)}
-                                className="text-gray-800 h-6 ml-2 bg-red-400 rounded focus:outline-none"
-                            >
-                                <svg
-                                    className="h-6 w-6 fill-current"
-                                    viewBox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <title>Close</title>
-                                    <path
-                                        d="M14.348 5.652a.999.999 0 00-1.414 0L10 8.586l-2.93-2.93a.999.999 0 10-1.414 1.414L8.586 10l-2.93 2.93a.999.999 0 101.414 1.414L10 11.414l2.93 2.93a.999.999 0 101.414-1.414L11.414 10l2.93-2.93a.999.999 0 000-1.414z"
-                                        fillRule="evenodd"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                        <div className="bg-gray-200 p-2">
-                            <div className="h-[280px] relative overflow-y-auto bg-white">
-                                <div className="flex gap-x-12 items-center justify-space-between py-2 bg-gray-200 border-b text-[14px]">
-                                    <span className="w-12 ml-2">Out</span>
-                                    <span className="w-12">In</span>
-                                    <span className="">Permission Allowed</span>
-                                </div>
-                                {selectedEmployeeOtherPunches?.map((punch, index) => (
-                                    <div key={index} className="flex gap-x-12 items-center py-2 border-b text-[13px]">
-                                        {/* Out Punch */}
-                                        <span className="w-12  ml-2">
-                                            {punch.out !== "-" ? moment(punch.out).format("HH:mm:ss") : "-"}
-                                        </span>
-
-                                        {/* In Punch */}
-                                        <span className="w-12 ">
-                                            {punch.in !== "-" ? moment(punch.in).format("HH:mm:ss") : "-"}
-                                        </span>
-
-                                        {/* Permission Checkbox */}
-                                        <input
-                                            className="text-center ml-14"
-                                            type="checkbox"
-                                            checked={punch.isPermission || false}
-                                        // onChange={() => handleOtherPunchPermissionToggle(index)}
-                                        />
-                                    </div>
-                                ))}
-                                <div className="text-[13px] absolute bottom-3 right-3 ">
-                                    <button
-                                        className="px-4  bg-green-600 text-white text-right rounded"
-                                    // onClick={handleSavePermission}
-                                    >
-                                        Save
-                                    </button>
-                                </div>
-                            </div>
-
-
-                        </div>
                     </div>
                 </div>
             )}
