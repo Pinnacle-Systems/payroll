@@ -1881,6 +1881,7 @@ model PythonPunchData {
   machineType        String?
   isPermission       Boolean?
   isOnDuty           Boolean?
+  permissionTime     String?
 
   @@unique([mIdCard, timestamp])
 }

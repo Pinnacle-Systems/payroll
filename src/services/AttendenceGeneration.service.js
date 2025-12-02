@@ -236,7 +236,7 @@ SELECT
   (
     SELECT JSON_ARRAYAGG(
       JSON_OBJECT(
-        'timestamp', p.timestamp
+        'timestamp', p.timestamp ,'isPermission', p.isPermission 
       )
     )
     FROM PythonPunchData p
@@ -311,7 +311,24 @@ ORDER BY e.mIdCard;
       console.log(`Employee ${emp.firstName} has no punches on ${date}`);
       continue;
     }
+    // ------------------------------------------------------
+    //   PERMISSION HOURS TOTAL (permissionHrs)
+    // ------------------------------------------------------
+    let totalPermissionSeconds = 0;
 
+    for (const p of punches || []) {
+      if (p.isPermission && p.permissionTime) {
+        const [h, m, s] = p.permissionTime.split(":").map(Number);
+        totalPermissionSeconds += h * 3600 + m * 60 + s;
+      }
+    }
+
+    // convert back to HH:mm:ss
+    const hrs = String(Math.floor(totalPermissionSeconds / 3600)).padStart(2, "0");
+    const mins = String(Math.floor((totalPermissionSeconds % 3600) / 60)).padStart(2, "0");
+    const secs = String(totalPermissionSeconds % 60).padStart(2, "0");
+
+    emp.permissionHrs = `${hrs}:${mins}:${secs}`;
     // const punchesTime = punches.map(p => p.timestamp.toISOString().split("T")[1].substr(0, 8));
     // ✅ Combine all punches safely, converting Date → HH:MM:SS
     // const punchesTime = [
@@ -453,7 +470,7 @@ ORDER BY e.mIdCard;
       emp.formulaResult = formulaResult;
       console.log(`Employee ${emp.firstName} - Formula result:`, formulaResult);
     }
-  
+
     if (!shiftItem) {
       console.log(`No shiftTemplateItem found for employee ${emp.firstName}`);
       // emp.hourlyWorkedTime = "00:00:00";
@@ -560,20 +577,9 @@ ORDER BY e.mIdCard;
         return h * 3600 + m * 60 + s;
       };
 
+
       // ---- Check if a punch is inside any tolerance window ----
       const isInAnyWindow = (sec) => windows.some(w => sec >= w.start && sec <= w.end);
-
-      // ---- Filter punches outside all windows ----
-      // emp.breakSummary.outsideTolerance = (emp?.punches || []).filter(p => {
-      //   if (!p?.timestamp) return false;
-      //   const timeStr = new Date(p.timestamp).toTimeString().split(" ")[0];
-      //   const sec = timeStrToSeconds(timeStr);
-      //   return !isInAnyWindow(sec);
-      // }).map(p => ({ timestamp: p.timestamp }));
-
-      // console.log(emp.breakSummary.outsideTolerance, "Outside Tolerance Punches");
-      // ---- NEW LOGIC: outside punches + next punch ----
-      // safe extractor for "YYYY-MM-DD HH:MM:SS(.ssssss)" format
       const extractSeconds = (timestamp) => {
         if (!timestamp) return NaN;
         // assume format "YYYY-MM-DD HH:MM:SS..." (space separated)
@@ -605,14 +611,18 @@ ORDER BY e.mIdCard;
         if (isOutside) {
           // Add this outside punch if not already added
           if (!added.has(p.timestamp)) {
-            finalPunches.push({ timestamp: p.timestamp });
+            finalPunches.push({
+              timestamp: p.timestamp, isPermission: p.isPermission ?? null
+            });
             added.add(p.timestamp);
           }
           // Pair with next punch — even if next is last punch (allowed)
           const nextIdx = i + 1;
           const next = punches[nextIdx];
           if (next && !added.has(next.timestamp)) {
-            finalPunches.push({ timestamp: next.timestamp });
+            finalPunches.push({
+              timestamp: next.timestamp, isPermission: next.isPermission ?? null
+            });
             added.add(next.timestamp);
             pairedByPrev.add(nextIdx);
           }
@@ -644,6 +654,8 @@ ORDER BY e.mIdCard;
           status: "On Time",
           punch: firstPunchObj.timestamp,   // <-- FULL TIMESTAMP
           delay: "00:00:00",
+          isPermission: firstPunchObj.isPermission ?? null  // <<< add here
+
         };
       }
 
@@ -652,15 +664,19 @@ ORDER BY e.mIdCard;
         const lateSeconds = firstPunch - morningInToTol;
 
         morningStatus = {
-          status: "Late",
+          status: "Late Login",
           punch: firstPunchObj.timestamp,   // <-- FULL TIMESTAMP
           delay: formatTime(lateSeconds),
+          isPermission: firstPunchObj.isPermission ?? null  // <<< add here
+
         };
       } else if (firstPunch >= fbout) {
         morningStatus = {
-          status: "Late",
+          status: "Late Login",
           punch: firstPunchObj.timestamp,   // <-- FULL TIMESTAMP
           delay: "00:00:00",  // No delay after break start
+          isPermission: firstPunchObj.isPermission ?? null  // <<< add here
+
         };
       }
 
@@ -674,14 +690,18 @@ ORDER BY e.mIdCard;
       const lastPunch = punchesInSeconds[punchesInSeconds.length - 1];
       let eveningStatus = {
         punch: lastPunchObj.timestamp,    // <-- FULL TIMESTAMP
-        delay: "00:00:00"
+        delay: "00:00:00",
+        isPermission: lastPunchObj.isPermission ?? null  // <<< add here
+
+
       };
 
       if (lastPunch < eveningOutFromTol) {
         // Employee left early → count as delay
         const delaySeconds = eveningOutFromTol - lastPunch;
-        eveningStatus.status = "Out Early";
+        eveningStatus.status = "Early Logout";
         eveningStatus.delay = formatTime(delaySeconds);
+
       } else {
         // On-time or after – no extra work concept
         eveningStatus.status = "On Time";
@@ -847,7 +867,7 @@ async function updatePermissionPunches(body) {
   console.log("Received punches:", data);
 
   for (const entry of data) {
-    const { mIdCard, timestamp, isPermission } = entry;
+    const { mIdCard, timestamp, isPermission, permissionTime } = entry;
 
     await prisma.pythonPunchData.updateMany({
       where: {
@@ -859,6 +879,7 @@ async function updatePermissionPunches(body) {
       },
       data: {
         isPermission,
+        permissionTime
       },
     });
 

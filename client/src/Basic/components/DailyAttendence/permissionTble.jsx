@@ -59,15 +59,18 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
             punchList.push({
                 out: outTime || "-",
                 in: inTime || "-",
-                delay: diff,           // ⬅️ Added here
+                permissionTime: diff,           // ⬅️ Added here
 
-                isPermission: false,
+                isPermission: outPunch?.isPermission === 1 || inPunch?.isPermission === 1 ? true : false,
             });
         }
 
         setSelectedEmployeeOtherPunches(punchList);
         setShowOtherPunchesModal(true);
     };
+
+
+    console.log();
 
     const openPermissionModal = (employee) => {
         console.log("Employee passed:", employee);
@@ -78,21 +81,28 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
 
         // Morning In-Out
         if (employee.breakSummary?.morningInOut?.punch &&
-            employee.breakSummary.morningInOut.status === "Late") {
+            employee.breakSummary.morningInOut.status === "Late Login") {
             punchList.push({
                 timestamp: employee.breakSummary.morningInOut.punch,
                 type: "Morning In-Out",
+                permissionTime: employee.breakSummary.morningInOut.delay,
                 status: employee.breakSummary.morningInOut.status || "-",
+                isPermission: employee.breakSummary.morningInOut.isPermission === 1
+
             });
         }
 
         // Evening In-Out
         if (employee.breakSummary?.eveningInOut?.punch &&
-            employee.breakSummary.eveningInOut.status === "Out Early") {
+            employee.breakSummary.eveningInOut.status === "Early Logout") {
             punchList.push({
                 timestamp: employee.breakSummary.eveningInOut.punch,
                 type: "Evening In-Out",
+                permissionTime: employee.breakSummary.eveningInOut.delay,
+
                 status: employee.breakSummary.eveningInOut.status || "-",
+                isPermission: employee.breakSummary.eveningInOut.isPermission === 1
+
             });
         }
 
@@ -145,7 +155,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                             </div>
                         </div>
                         <div className={` mt-3  p-2  bg-white h-[500px]  overflow-x-auto overflow-y-auto`}>
-                            <table className={` ${selectedShiftType === "Hourly" ? "w-[85vw]" : "w-[85vw]"}  border-collapse table-fixed`}>
+                            <table className={` ${selectedShiftType === "Hourly" ? "w-[88vw]" : "w-[88vw]"}  border-collapse table-fixed`}>
 
                                 <thead className="bg-gray-200 text-gray-800 border border-gray-400">
                                     <tr>
@@ -196,6 +206,9 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                         <th className={`w-8 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
                                             Out Time
                                         </th>
+                                        <th className={`w-[75px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                                            Status
+                                        </th>
 
                                         <th
                                             colSpan={reportView === "Seperate" ? 4 : 2}
@@ -218,323 +231,315 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
 
 
                                 <tbody>
-                                    {permissionTable?.map((item, index) => (
+                                    {permissionTable?.map((item, index) => {
+                                        let mStatus = item.breakSummary?.morningInOut?.status;          // Late
+                                        let eStatus = item.breakSummary?.eveningInOut?.status;          // Out Early
 
-                                        <React.Fragment key={index}>
-                                            {/* Row 1 - In + Morning */}
-                                            <tr>
-                                                {/* S.No rowspan */}
-                                                <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 py-1.5 text-[12px]  text-center px-1"
-                                                >
-                                                    {index + 1}
-                                                </td>
+                                        let mPerm = item.breakSummary?.morningInOut?.isPermission === 1;
+                                        let ePerm = item.breakSummary?.eveningInOut?.isPermission === 1;
 
-                                                {/* Employee Id rowspan */}
-                                                <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 text-[12px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={item?.mIdCard}
-                                                        className={`w-full  text-right pr-1 bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td>
-                                                <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 text-[12px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={item?.firstName}
-                                                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td>
-                                                <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 text-[12px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={item?.shiftType}
-                                                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td>
-                                                <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 text-[12px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={item?.departmentName}
-                                                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td>
-                                                <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 text-[12px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={item?.designationName}
-                                                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td>
+                                        let parts = [];
 
-                                                {/* In Date */}
-                                                <td
-                                                    rowSpan={2}
-                                                    className=" border border-gray-300 text-[12px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={
-                                                            item.inTime
-                                                                ? moment.utc(item.inTime).format("DD-MM-YYYY")
-                                                                : ""
-                                                        }
-                                                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td>
+                                        // Morning (Late Login)
+                                        if (mStatus === "Late Login") {
+                                            if (mPerm) {
+                                                parts.push("Permission");
+                                            } else {
+                                                parts.push("Late Login");
+                                            }
+                                        }
 
-                                                {/* In Time */}
-                                                <td
-                                                    rowSpan={2}
-                                                    className=" border border-gray-300 text-[12px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        min="0"
-                                                        type="text"
-                                                        value={
-                                                            item.inTime
-                                                                ? moment.utc(item.inTime).format("HH:mm:ss")
-                                                                : ""
-                                                        }
-                                                        onFocus={(e) => e.target.select()}
-                                                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent 
-        ${item.breakSummary?.morningInOut?.status === "Late" ? "text-red-600 font-semibold" : ""}`} />
-                                                </td>
-                                                {/* Out Date */}
-                                                <td
-                                                    rowSpan={2}
-                                                    className="  border border-gray-300 text-[12px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={
-                                                            item.outTime
-                                                                ? moment.utc(item.outTime).format("DD-MM-YYYY")
-                                                                : ""
-                                                        }
-                                                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                                                    />
-                                                </td>
-                                                {/* Out Time*/}
+                                        // Evening (Early Logout)
+                                        if (eStatus === "Early Logout") {
+                                            if (ePerm) {
+                                                parts.push("Permission");
+                                            } else {
+                                                parts.push("Early Logout");
+                                            }
+                                        }
 
-                                                <td
-                                                    rowSpan={2}
-                                                    className="  border border-gray-300 text-[12px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={
-                                                            item.outTime
-                                                                ? moment.utc(item.outTime).format("HH:mm:ss")
-                                                                : ""
-                                                        }
-                                                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent 
-        ${item.breakSummary?.eveningInOut?.status === "Out Early" ? "text-red-600 font-semibold" : ""}`} />
-                                                </td>
+                                        let showDelay = parts.join(" & ");
 
-                                                {reportView === "Seperate" && (
-                                                    <>
-                                                        <td className=" border border-gray-300 text-[12px] py-0.5 " onClick={() => openCombinedModal(item)}>
-                                                            <input
-                                                                type="text"
-                                                                value={"OUT"} onClick={() => openCombinedModal(item)}
-                                                                className={`w-full text-center bg-transparent  focus:outline-none focus:border-transparent `}
-                                                            />
-                                                        </td>
-                                                        <td className="border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
-                                                            <input
-                                                                min="0"
-                                                                type="text"
-                                                                value={
-                                                                    item.firstBreakOut
-                                                                        ? moment
-                                                                            .utc(item.firstBreakOut)
-                                                                            .format("HH:mm:ss")
-                                                                        : ""
-                                                                }
-                                                                onFocus={(e) => e.target.select()} onClick={() => openCombinedModal(item)}
-                                                                className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                                                            />
-                                                        </td>
-                                                        <td className="border border-gray-300 text-[12px] text-center px-1" onClick={() => openCombinedModal(item)}>
-                                                            <input
-                                                                type="text"
-                                                                value={
-                                                                    item.lunchBreakOut
-                                                                        ? moment
-                                                                            .utc(item.lunchBreakOut)
-                                                                            .format("HH:mm:ss")
-                                                                        : ""
-                                                                }
-                                                                className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                                                                onClick={() => openCombinedModal(item)}
-                                                            />
-                                                        </td>
-                                                        <td className="border border-gray-300 text-[12px] text-center px-1" onClick={() => openCombinedModal(item)}>
-                                                            <input
-                                                                type="text"
-                                                                value={
-                                                                    item.eveningBreakOut
-                                                                        ? moment
-                                                                            .utc(item.eveningBreakOut)
-                                                                            .format("HH:mm:ss")
-                                                                        : ""
-                                                                }
-                                                                className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                                                                onClick={() => openCombinedModal(item)}
-                                                            />
-                                                        </td>
-                                                    </>
-                                                )}
-                                                {reportView === "Single" && (
-                                                    <>
-                                                        <td colSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
-                                                            <input
-                                                                type="text"
-                                                                onClick={() => openCombinedModal(item)}
-                                                                value={[
-                                                                    item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
-                                                                    item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
-                                                                    item.lunchBreakOut ? moment.utc(item.lunchBreakOut).format("HH:mm:ss") : null,
-                                                                    item.lunchBreakIn ? moment.utc(item.lunchBreakIn).format("HH:mm:ss") : null,
-                                                                    item.eveningBreakOut ? moment.utc(item.eveningBreakOut).format("HH:mm:ss") : null,
-                                                                    item.eveningBreakIn ? moment.utc(item.eveningBreakIn).format("HH:mm:ss") : null,
-                                                                ]
-                                                                    .filter(Boolean) // remove null or empty values
-                                                                    .join(" , ")} // join only existing values
-                                                                className={`w-full bg-transparent text-left pl-1 focus:outline-none focus:border-transparent `}
-                                                            />
-                                                        </td>
-                                                    </>
-                                                )}
 
-                                                {/* {
-                                                    selectedShiftType === "Hourly" ? (<td
+                                        return (
+                                            <React.Fragment key={index}>
+                                                {/* Row 1 - In + Morning */}
+                                                <tr>
+                                                    {/* S.No rowspan */}
+                                                    <td
                                                         rowSpan={2}
-                                                        className="  border border-gray-300 text-[12px] py-0.5 text-center item-center"
+                                                        className="border border-gray-300 py-1.5 text-[12px]  text-center px-1"
                                                     >
-                                                        <button
-                                                            className="text-blue-600 text-center text-blue  bg-blue-50 rounded"
-                                                            onClick={() => openModal(item.breakSummary)}
+                                                        {index + 1}
+                                                    </td>
 
-                                                            title="Open"
-                                                        >
-                                                            <svg
-                                                                xmlns="http://www.w3.org/2000/svg"
-                                                                className="h-4 w-4"
-                                                                viewBox="0 0 20 20"
-                                                                fill="currentColor"
-                                                            >
-                                                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                                                <path
-                                                                    fillRule="evenodd"
-                                                                    d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                                                                    clipRule="evenodd"
-                                                                />
-                                                            </svg>
-                                                        </button>
-                                                    </td>) : ""
-                                                } */}
-                                                {/* <td
-                                                    rowSpan={2}
-                                                    className=" border border-gray-300 text-[12px] py-0.5 text-center item-center"
-                                                >
-                                                    <button
-                                                        className="text-blue-600 text-center text-blue  bg-blue-50 rounded"
-                                                        onClick={() => openPermissionModal(item)}
+                                                    {/* Employee Id rowspan */}
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[12px] py-0.5 item-center"
                                                     >
-                                                        <svg
-                                                            xmlns="http://www.w3.org/2000/svg"
-                                                            className="h-4 w-4"
-                                                            viewBox="0 0 20 20"
-                                                            fill="currentColor"
-                                                        >
-                                                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                                            <path
-                                                                fillRule="evenodd"
-                                                                d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                                                                clipRule="evenodd"
-                                                            />
-                                                        </svg>
-                                                    </button>
-                                                </td> */}
-
-                                            </tr>
-
-                                            {/* Row 2 - Evening + Out */}
-                                            {reportView === "Seperate" && (
-                                                <>
-                                                    <td className=" border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
                                                         <input
                                                             type="text"
-                                                            value={"IN"} onClick={() => openCombinedModal(item)}
+                                                            value={item?.mIdCard}
+                                                            className={`w-full  text-right pr-1 bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={item?.firstName}
+                                                            className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={item?.shiftType}
+                                                            className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={item?.departmentName}
+                                                            className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={item?.designationName}
+                                                            className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+
+                                                    {/* In Date */}
+                                                    <td
+                                                        rowSpan={2}
+                                                        className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={
+                                                                item.inTime
+                                                                    ? moment.utc(item.inTime).format("DD-MM-YYYY")
+                                                                    : ""
+                                                            }
                                                             className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
                                                         />
                                                     </td>
-                                                    {/* Morning Break In */}
-                                                    <td className="border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
+
+                                                    {/* In Time */}
+                                                    <td
+                                                        rowSpan={2}
+                                                        className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            min="0"
+                                                            type="text"
+                                                            value={
+                                                                item.inTime
+                                                                    ? moment.utc(item.inTime).format("HH:mm:ss")
+                                                                    : ""
+                                                            }
+                                                            onFocus={(e) => e.target.select()}
+                                                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent 
+        ${item.breakSummary?.morningInOut?.status === "Late Login" ? "text-red-600 font-semibold" : ""}`} />
+                                                    </td>
+                                                    {/* Out Date */}
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    >
                                                         <input
                                                             type="text"
                                                             value={
-                                                                item.firstBreakIn
-                                                                    ? moment.utc(item.firstBreakIn).format("HH:mm:ss")
+                                                                item.outTime
+                                                                    ? moment.utc(item.outTime).format("DD-MM-YYYY")
                                                                     : ""
                                                             }
-                                                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-
+                                                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                                                         />
                                                     </td>
+                                                    {/* Out Time*/}
 
-                                                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    >
                                                         <input
                                                             type="text"
                                                             value={
-                                                                item.lunchBreakIn
-                                                                    ? moment
-                                                                        .utc(item.lunchBreakIn)
-                                                                        .format("HH:mm:ss")
+                                                                item.outTime
+                                                                    ? moment.utc(item.outTime).format("HH:mm:ss")
                                                                     : ""
                                                             }
-                                                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                                                            onClick={() => openCombinedModal(item)}
-                                                        />
+                                                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent 
+        ${item.breakSummary?.eveningInOut?.status === "Early Logout" ? "text-red-600 font-semibold" : ""}`} />
                                                     </td>
-                                                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
+
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="text-left  border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    >
                                                         <input
                                                             type="text"
                                                             value={
-                                                                item.eveningBreakIn
-                                                                    ? moment
-                                                                        .utc(item.eveningBreakIn)
-                                                                        .format("HH:mm:ss")
-                                                                    : ""
+                                                                showDelay
                                                             }
-                                                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                                                            onClick={() => openCombinedModal(item)}
-                                                        />
+                                                            className={`w-full text-left pl-1 bg-transparent  focus:outline-none focus:border-transparent `} />
                                                     </td>
-                                                </>
-                                            )}
 
-                                            <tr>{/* Evening Break In */}</tr>
-                                        </React.Fragment>
-                                    ))}
+                                                    {reportView === "Seperate" && (
+                                                        <>
+                                                            <td className=" border border-gray-300 text-[12px] py-0.5 " onClick={() => openCombinedModal(item)}>
+                                                                <input
+                                                                    type="text"
+                                                                    value={"OUT"} onClick={() => openCombinedModal(item)}
+                                                                    className={`w-full text-center bg-transparent  focus:outline-none focus:border-transparent `}
+                                                                />
+                                                            </td>
+                                                            <td className="border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
+                                                                <input
+                                                                    min="0"
+                                                                    type="text"
+                                                                    value={
+                                                                        item.firstBreakOut
+                                                                            ? moment
+                                                                                .utc(item.firstBreakOut)
+                                                                                .format("HH:mm:ss")
+                                                                            : ""
+                                                                    }
+                                                                    onFocus={(e) => e.target.select()} onClick={() => openCombinedModal(item)}
+                                                                    className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                                                                />
+                                                            </td>
+                                                            <td className="border border-gray-300 text-[12px] text-center px-1" onClick={() => openCombinedModal(item)}>
+                                                                <input
+                                                                    type="text"
+                                                                    value={
+                                                                        item.lunchBreakOut
+                                                                            ? moment
+                                                                                .utc(item.lunchBreakOut)
+                                                                                .format("HH:mm:ss")
+                                                                            : ""
+                                                                    }
+                                                                    className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                                                                    onClick={() => openCombinedModal(item)}
+                                                                />
+                                                            </td>
+                                                            <td className="border border-gray-300 text-[12px] text-center px-1" onClick={() => openCombinedModal(item)}>
+                                                                <input
+                                                                    type="text"
+                                                                    value={
+                                                                        item.eveningBreakOut
+                                                                            ? moment
+                                                                                .utc(item.eveningBreakOut)
+                                                                                .format("HH:mm:ss")
+                                                                            : ""
+                                                                    }
+                                                                    className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                                                                    onClick={() => openCombinedModal(item)}
+                                                                />
+                                                            </td>
+                                                        </>
+                                                    )}
+                                                    {reportView === "Single" && (
+                                                        <>
+                                                            <td colSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
+                                                                <input
+                                                                    type="text"
+                                                                    onClick={() => openCombinedModal(item)}
+                                                                    value={[
+                                                                        item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
+                                                                        item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
+                                                                        item.lunchBreakOut ? moment.utc(item.lunchBreakOut).format("HH:mm:ss") : null,
+                                                                        item.lunchBreakIn ? moment.utc(item.lunchBreakIn).format("HH:mm:ss") : null,
+                                                                        item.eveningBreakOut ? moment.utc(item.eveningBreakOut).format("HH:mm:ss") : null,
+                                                                        item.eveningBreakIn ? moment.utc(item.eveningBreakIn).format("HH:mm:ss") : null,
+                                                                    ]
+                                                                        .filter(Boolean) // remove null or empty values
+                                                                        .join(" , ")} // join only existing values
+                                                                    className={`w-full bg-transparent text-left pl-1 focus:outline-none focus:border-transparent `}
+                                                                />
+                                                            </td>
+                                                        </>
+                                                    )}
+
+
+                                                </tr>
+
+                                                {/* Row 2 - Evening + Out */}
+                                                {reportView === "Seperate" && (
+                                                    <>
+                                                        <td className=" border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
+                                                            <input
+                                                                type="text"
+                                                                value={"IN"} onClick={() => openCombinedModal(item)}
+                                                                className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                                                            />
+                                                        </td>
+                                                        {/* Morning Break In */}
+                                                        <td className="border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
+                                                            <input
+                                                                type="text"
+                                                                value={
+                                                                    item.firstBreakIn
+                                                                        ? moment.utc(item.firstBreakIn).format("HH:mm:ss")
+                                                                        : ""
+                                                                }
+                                                                className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+
+                                                            />
+                                                        </td>
+
+                                                        <td className="  border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
+                                                            <input
+                                                                type="text"
+                                                                value={
+                                                                    item.lunchBreakIn
+                                                                        ? moment
+                                                                            .utc(item.lunchBreakIn)
+                                                                            .format("HH:mm:ss")
+                                                                        : ""
+                                                                }
+                                                                className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                                                                onClick={() => openCombinedModal(item)}
+                                                            />
+                                                        </td>
+                                                        <td className="  border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
+                                                            <input
+                                                                type="text"
+                                                                value={
+                                                                    item.eveningBreakIn
+                                                                        ? moment
+                                                                            .utc(item.eveningBreakIn)
+                                                                            .format("HH:mm:ss")
+                                                                        : ""
+                                                                }
+                                                                className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                                                                onClick={() => openCombinedModal(item)}
+                                                            />
+                                                        </td>
+                                                    </>
+                                                )}
+
+                                                <tr>{/* Evening Break In */}</tr>
+                                            </React.Fragment>
+                                        )
+                                    })}
                                 </tbody>
                             </table>
 
@@ -579,19 +584,26 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                 <table className="w-full text-[13px] border">
                                     <thead className="bg-gray-200  text-[13px]">
                                         <tr>
-                                            <th className="border  font-medium px-2 py-1 w-24">Time</th>
-                                            <th className="border  font-medium  px-2 py-1 w-32">Status</th>
+                                            <th className="border  font-medium px-2 py-1 w-20">Time</th>
+                                            <th className="border  font-medium  px-2 py-1 w-20">Status</th>
+                                            <th className="border  font-medium px-2 py-1 w-24">Duration</th>
+
                                             <th className="border  font-medium px-2 py-1 w-20">Permission</th>
                                         </tr>
                                     </thead>
 
                                     <tbody>
                                         {selectedEmployeePunches?.map((punch, idx) => (
-                                            <tr key={idx} className="text-center">
-                                                <td className="border px-2 py-1">
+                                            <tr key={idx} className="text-center text-[12px]">
+                                                <td className="border px-2 py-1 ">
                                                     {moment(punch.timestamp).format("HH:mm:ss")}
-                                                </td>
-                                                <td className="border text-left pl-1 px-2 py-1">{punch.status}</td>
+                                                </td >
+                                                {/* {punch.isPermission ? "Permission" : punch.status} */}
+                                                                                                <td className="text-left border px-2 py-1">
+
+                                                { punch.status} </td >
+                                                <td className="border px-2 py-1">{punch.permissionTime}</td>
+
                                                 <td className="border px-2 py-1">
                                                     <input
                                                         type="checkbox"
@@ -611,8 +623,8 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                 <table className="w-full text-[13px] border">
                                     <thead className="bg-gray-200">
                                         <tr>
-                                            <th className="border  font-medium px-2 py-1 w-20">Out</th>
-                                            <th className="border  font-medium px-2 py-1 w-20">In</th>
+                                            <th className="border  font-medium px-2 py-1 w-20">Out Time</th>
+                                            <th className="border  font-medium px-2 py-1 w-20">In Time</th>
                                             <th className="border  font-medium px-2 py-1 w-24">Duration</th>
                                             <th className="border  font-medium px-2 py-1 w-20">Permission</th>
                                         </tr>
@@ -620,14 +632,14 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
 
                                     <tbody>
                                         {selectedEmployeeOtherPunches?.map((punch, idx) => (
-                                            <tr key={idx} className="text-center">
+                                            <tr key={idx} className="text-center text-[12px]">
                                                 <td className="border px-2 py-1">
                                                     {punch.out !== "-" ? moment(punch.out).format("HH:mm:ss") : "-"}
                                                 </td>
                                                 <td className="border px-2 py-1">
                                                     {punch.in !== "-" ? moment(punch.in).format("HH:mm:ss") : "-"}
                                                 </td>
-                                                <td className="border px-2 py-1">{punch.delay}</td>
+                                                <td className="border px-2 py-1">{punch.permissionTime}</td>
                                                 <td className="border px-2 py-1">
                                                     <input
                                                         type="checkbox"
@@ -643,7 +655,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                 <div className="flex justify-end mt-4 absolute right-2  bottom-2">
                                     <button
                                         onClick={handleSaveAll}
-                                        className="px-4 py-1 bg-green-600 text-white rounded text-[15px]"
+                                        className="px-4  bg-green-600 text-white rounded text-[15px]"
                                     >
                                         Save
                                     </button>
@@ -651,226 +663,6 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
 
                             </div>
                         </div>
-                    </div>
-                </div>
-            )}
-
-
-
-
-
-
-
-
-
-
-            {/* {showOtherPunchesModal && (
-                <div className="fixed inset-0 bg-black z-[1000] bg-opacity-40 flex justify-center items-center">
-                    <div className="bg-white p-5 rounded shadow-lg w-[520px] h-[400px]">
-                        <div className="flex justify-between">
-                            <h2 className=" mb-3">
-                                {selectedEmployeeOther?.firstName}
-                            </h2>
-                            <button
-                                onClick={() => setShowOtherPunchesModal(false)}
-                                className="text-gray-800 h-6 ml-2 bg-red-400 rounded focus:outline-none"
-                            >
-                                <svg
-                                    className="h-6 w-6 fill-current"
-                                    viewBox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <title>Close</title>
-                                    <path
-                                        d="M14.348 5.652a.999.999 0 00-1.414 0L10 8.586l-2.93-2.93a.999.999 0 10-1.414 1.414L8.586 10l-2.93 2.93a.999.999 0 101.414 1.414L10 11.414l2.93 2.93a.999.999 0 101.414-1.414L11.414 10l2.93-2.93a.999.999 0 000-1.414z"
-                                        fillRule="evenodd"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                        <div className="bg-gray-200 p-2">
-                            <div className="h-[280px] relative overflow-y-auto bg-white">
-                                <div className="flex gap-x-12 items-center justify-space-between py-2 bg-gray-200 border-b text-[14px]">
-                                    <span className="w-12 ml-2">Out</span>
-                                    <span className="w-12">In</span>
-                                    <span className="w-20">Time (HRS)</span>
-
-                                    <span className="">Permission Allowed</span>
-                                </div>
-                                {selectedEmployeeOtherPunches?.map((punch, index) => (
-                                    <div key={index} className="flex gap-x-12 items-center py-2 border-b text-[13px]">
-                                        <span className="w-12  ml-2">
-                                            {punch.out !== "-" ? moment(punch.out).format("HH:mm:ss") : "-"}
-                                        </span>
-
-                                        <span className="w-12 ">
-                                            {punch.in !== "-" ? moment(punch.in).format("HH:mm:ss") : "-"}
-                                        </span>
-                                        <span className="w-20">
-                                            {punch.delay || "-"}
-                                        </span>
-                                        <input
-                                            className="text-center ml-14"
-                                            type="checkbox"
-                                            checked={punch.isPermission || false}
-                                            onChange={() => handleOtherPunchPermissionToggle(index)}
-                                        />
-                                    </div>
-                                ))}
-                                <div className="text-[13px] absolute bottom-3 right-3 ">
-                                    <button
-                                        className="px-4  bg-green-600 text-white text-right rounded"
-                                        onClick={handleSaveOtherPunchPermission}
-                                    >
-                                        Save
-                                    </button>
-                                </div>
-                            </div>
-
-
-                        </div>
-                    </div>
-                </div>
-            )} */}
-            {/* {showPermissionModal && (
-                <div className="fixed inset-0 bg-black z-[1000] bg-opacity-40 flex justify-center items-center">
-                    <div className="bg-white p-5 rounded shadow-lg w-[500px] h-[280px]">
-                        <div className="flex justify-between">
-                            <h2 className=" mb-3">
-                                {selectedEmployee?.firstName}
-                            </h2>
-                            <button
-                                onClick={() => setShowPermissionModal(false)}
-                                className="text-gray-800 h-6 ml-2 bg-red-400 rounded focus:outline-none"
-                            >
-                                <svg
-                                    className="h-6 w-6 fill-current"
-                                    viewBox="0 0 20 20"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <title>Close</title>
-                                    <path
-                                        d="M14.348 5.652a.999.999 0 00-1.414 0L10 8.586l-2.93-2.93a.999.999 0 10-1.414 1.414L8.586 10l-2.93 2.93a.999.999 0 101.414 1.414L10 11.414l2.93 2.93a.999.999 0 101.414-1.414L11.414 10l2.93-2.93a.999.999 0 000-1.414z"
-                                        fillRule="evenodd"
-                                    />
-                                </svg>
-                            </button>
-                        </div>
-                        <div className="bg-gray-200 p-2">
-                            <div className="h-[180px] relative overflow-y-auto bg-white">
-                                <div className="flex gap-x-12 items-center py-2 bg-gray-200 border-b text-[14px]">
-                                    <span className="w-20 ml-2">Time</span>
-                                    <span className="w-4">Status</span> 
-                                    <span className="ml-12">Permission Allowed</span>
-                                </div>
-                                {selectedEmployeePunches?.map((punch, index) => (
-                                    <div key={index} className="flex gap-x-12 items-center py-2 border-b text-[13px]">
-                                        <span className="w-20  ml-2">
-                                            {punch.timestamp ? moment(punch.timestamp).format("HH:mm:ss") : "-"}
-                                        </span>
-                                        <span className="w-32 ">{punch.status}</span>
-                                        <input
-                                            type="checkbox"
-                                            checked={punch.isPermission || false}
-                                            onChange={() => handlePunchPermissionToggle(index)}
-                                        />
-                                    </div>
-                                ))}
-                                <div className=" text-[13px] absolute bottom-3 right-3 ">
-                                    <button
-                                        className="px-4  bg-green-600 text-white text-right rounded"
-                                        onClick={handleSavePermission}
-                                    >
-                                        Save
-                                    </button>
-                                </div>
-                            </div>
-
-
-                        </div>
-                    </div>
-                </div>
-            )} */}
-            {showModal && selectedBreakSummary && (
-                <div className="fixed inset-0 z-[999] flex items-center justify-center bg-gray-800 bg-opacity-50 overscroll-y-hidden">
-                    <div className={`relative bg-white rounded-lg p-7 w-[700px] h-[250px]`}>
-
-                        <button
-                            className="absolute top-0 right-0 m-1 text-gray-600 hover:text-gray-800 hover:bg-red-400 rounded focus:outline-none "
-                            onClick={closeModal}
-                        >
-                            <svg
-                                className="h-6 w-6 fill-current"
-                                viewBox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <title>Close</title>
-                                <path
-                                    d="M14.348 5.652a.999.999 0 00-1.414 0L10 8.586l-2.93-2.93a.999.999 0 10-1.414 1.414L8.586 10l-2.93 2.93a.999.999 0 101.414 1.414L10 11.414l2.93 2.93a.999.999 0 101.414-1.414L11.414 10l2.93-2.93a.999.999 0 000-1.414z"
-                                    fillRule="evenodd"
-                                />
-                            </svg>
-                        </button>
-                        <h2 className="text-[15px] font-semibold mb-4">Morning / Evening Summary</h2>
-                        <table className="w-full border-collapse">
-                            <thead className="bg-gray-200 text-gray-800 ">
-                                <tr>
-                                    <th className="px-1 py-1 text-center font-medium text-[13px]">Break</th>
-                                    <th className="px-1 text-center font-medium text-[13px]">Status</th>
-                                    <th className="px-1 text-center font-medium text-[13px]">Punch</th>
-                                    <th className="px-1 text-center font-medium text-[13px]">Delay</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {["morningInOut", "eveningInOut"].map((key) => {
-                                    const breakItem = selectedBreakSummary[key];
-                                    return (
-                                        <tr key={key}>
-                                            <td className="border border-gray-300 py-1 text-[12px]  text-left px-1 capitalize">{key}</td>
-                                            <td className="border border-gray-300 py-1 text-[12px]  text-left px-1">{breakItem?.status || "-"}</td>
-                                            <td className="border border-gray-300 py-1 text-[12px]  text-center px-1">
-                                                {breakItem?.punch || "-"}
-                                            </td>
-                                            <td className="border border-gray-300 py-1 text-[12px]  text-center px-1">{breakItem?.delay || "-"}</td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
-
-
-                        {/* <h2 className="text-[15px] mt-5 font-semibold mb-4">Break Summary</h2>
-
-                        <table className="w-full border-collapse">
-                            <thead className="bg-gray-200 text-gray-800 ">
-                                <tr>
-                                    <th className="px-1 py-1 text-center font-medium text-[13px]">Break</th>
-                                    <th className="px-1 text-center font-medium text-[13px]">Status</th>
-                                    <th className="px-1 text-center font-medium text-[13px]">Punch</th>
-                                    <th className="px-1 text-center font-medium text-[13px]">Break Duration</th>
-                                    <th className="px-1 text-center font-medium text-[13px]">Delay</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {["morning", "lunch", "evening"].map((key) => {
-                                    const breakItem = selectedBreakSummary[key];
-                                    return (
-                                        <tr key={key}>
-                                            <td className="border border-gray-300 py-1 text-[12px]  text-left px-1 capitalize">{key}</td>
-                                            <td className="border border-gray-300 py-1 text-[12px]  text-left px-1">{breakItem?.status || "-"}</td>
-                                            <td className="border border-gray-300 py-1 text-[12px]  text-center px-1">
-                                                {breakItem?.punch || breakItem?.punches?.in
-                                                    ? breakItem?.punch || `${breakItem.punches.out} - ${breakItem.punches.in} `
-                                                    : "-"}
-                                            </td>
-                                            <td className="border border-gray-300 py-1 text-[12px]  text-center px-1">{breakItem?.breakDuration || "-"}</td>
-                                            <td className="border border-gray-300 py-1 text-[12px]  text-center px-1">{breakItem?.delay || "-"}</td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table> */}
-
                     </div>
                 </div>
             )}

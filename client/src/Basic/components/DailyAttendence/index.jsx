@@ -38,24 +38,32 @@ const Form = () => {
   const [regularData, setRegularData] = useState([]);
   const [irregularData, setIrregularData] = useState([]);
   const [permissionTable, setPermissionTable] = useState([])
-  const { data: shiftData } = useGetshiftMasterQuery({
-    params,
+  const [onDutyTable, setOnDutyTable] = useState([])
+  const [showPermissionModal, setShowPermissionModal] = useState(false);
+  const [selectedEmployeePunches, setSelectedEmployeePunches] = useState([]);
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [showOtherPunchesModal, setShowOtherPunchesModal] = useState(false);
+  const [selectedEmployeeOtherPunches, setSelectedEmployeeOtherPunches] = useState([]);
+  const [selectedEmployeeOther, setSelectedEmployeeOther] = useState(null);
+  const [showCombinedModal, setShowCombinedModal] = useState(false)
 
-  });
+
+
+
+  const { data: shiftData } = useGetshiftMasterQuery({ params });
   const openModal = (breakSummary) => {
     setSelectedBreakSummary(breakSummary);
     setShowModal(true);
   };
 
+
   const closeModal = () => {
     setSelectedBreakSummary(null);
     setShowModal(false);
   };
-  const [triggerReport, { data: allData, isFetching }] =
-    useLazyGetAttendenceGenerationQuery();
+  const [triggerReport, { data: allData, isFetching }] = useLazyGetAttendenceGenerationQuery();
   const { data: employeeCategory } = useGetEmployeeCategoryQuery({ params });
   const { data: shiftTypeData } = useGetshiftTypeQuery({ params })
-
   const { data: employeeData } = useGetEmployeeQuery({ params });
   const [manualPunch] = useAddmanualPunchMutation();
   const [updatePermission] = useUpdatePermissionMutation()
@@ -144,6 +152,59 @@ const Form = () => {
 
     updated[index][field] = value;
     setAbsentData(updated);
+  };
+  const handleOnDutyUpdate = (index, field, value) => {
+    const updated = structuredClone(onDutyTable);
+    if (field === "shiftName") {
+      const selectedShift = shiftData?.data?.find(s => s.name === value);
+      updated[index].shiftName = value;
+
+      if (selectedShift) {
+        updated[index].inTimeEdit = selectedShift.from;  // Auto-fill based on shift
+        updated[index].outTimeEdit = selectedShift.to;   // Auto-fill based on shift
+      }
+
+      setOnDutyTable(updated);
+      return;
+    }
+
+    if (field === "outDate") {
+      const inDate = updated[index].inDate || date;
+
+      let inD = new Date(inDate);
+      let outD = new Date(value);
+
+      // Normalize to midnight (fix timezone issues)
+      inD.setHours(0, 0, 0, 0);
+      outD.setHours(0, 0, 0, 0);
+
+      if (outD < inD) {
+        Swal.fire({
+          icon: "warning",
+          title: "Invalid Out Date",
+          text: "Out Date cannot be earlier than In Date.",
+          timer: 1500,
+        });
+        return;
+      }
+
+      let oneDayLater = new Date(inD);
+      oneDayLater.setDate(oneDayLater.getDate() + 1);
+      oneDayLater.setHours(0, 0, 0, 0);
+
+      if (outD > oneDayLater) {
+        Swal.fire({
+          icon: "warning",
+          title: "Invalid Out Date",
+          text: "Out Date can only be same day or exactly the next day.",
+          timer: 1500,
+        });
+        return;
+      }
+    }
+
+    updated[index][field] = value;
+    setOnDutyTable(updated);
   };
 
 
@@ -269,13 +330,14 @@ const Form = () => {
 
       const statuses = [
         bs.morningInOut?.status,
-        bs.morning?.status,
-        bs.lunch?.status,
-        bs.evening?.status,
+        // bs.morning?.status,
+        // bs.lunch?.status,
+        // bs.evening?.status,
         bs.eveningInOut?.status
       ].filter(Boolean);
-
-      return statuses.some((s) => ["Late", "Out Early"].includes(s));
+      const hasOutsideTolerance = Array.isArray(bs.outsideTolerance) && bs.outsideTolerance.length > 0;
+      return statuses.some((s) => ["Late Login", "Early Logout"].includes(s))
+      // ||  hasOutsideTolerance
     });
 
     // Step 2: clone each filtered item so it becomes editable
@@ -288,14 +350,70 @@ const Form = () => {
     // Step 3: store into state
     setPermissionTable(cloned);
 
+    // -------------------------------
+    // 2️⃣ ON DUTY TABLE FILTER
+    // -------------------------------
+    const onDutyFiltered = allData.data.filter((item) => {
+      const punches = item?.punches ?? [];
+      return item.status === "Absent" || punches.length <= 4;
+    });
+
+    // Split into two groups
+    const incompletePunches = onDutyFiltered.filter(
+      (item) => (item.punches?.length ?? 0) <= 4 && item.status !== "Absent"
+    );
+
+    const onlyAbsent = onDutyFiltered.filter(
+      (item) => item.status === "Absent"
+    );
+
+    // Merge in required order (incomplete punch first → absent next)
+    const orderedList = [...incompletePunches, ...onlyAbsent];
+
+    // Clone rows
+    const onDutyCloned = orderedList.map((item) => ({
+      ...item,
+    }));
+
+    setOnDutyTable(onDutyCloned);
+
+
   }, [allData]);
-  const [showPermissionModal, setShowPermissionModal] = useState(false);
-  const [selectedEmployeePunches, setSelectedEmployeePunches] = useState([]);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [showOtherPunchesModal, setShowOtherPunchesModal] = useState(false);
-  const [selectedEmployeeOtherPunches, setSelectedEmployeeOtherPunches] = useState([]);
-  const [selectedEmployeeOther, setSelectedEmployeeOther] = useState(null);
-  const [showCombinedModal, setShowCombinedModal] = useState(false)
+
+
+
+
+  // useEffect(() => {
+  //   if (!allData?.data) return;
+
+  //   // Step 1: filter data
+  //   const filtered = allData.data.filter((item) => {
+  //     const bs = item.breakSummary;
+  //     if (!bs) return false;
+
+  //     const hasMorningLate = bs.morningInOut?.status === "Late";
+  //     const hasEveningEarly = bs.eveningInOut?.status === "Out Early";
+  //     const hasOutsideTolerance = Array.isArray(bs.outsideTolerance) && bs.outsideTolerance.length > 0;
+
+  //     return (hasMorningLate || hasEveningEarly) && hasOutsideTolerance;
+  //   });
+
+  //   // Step 2: clone each filtered item so it becomes editable
+  //   const cloned = filtered.map(item => ({
+  //     ...item,
+  //     // Step 2a: pre-check permission if backend says isPermission = 1
+  //     morningPermission: item.breakSummary.morningInOut?.isPermission === 1,
+  //     eveningPermission: item.breakSummary.eveningInOut?.isPermission === 1,
+  //     isPermission: false, // optional for global row permission
+  //     isOnDuty: false
+  //   }));
+
+  //   // Step 3: store into state
+  //   setPermissionTable(cloned);
+
+  // }, [allData]);
+
+  
 
   const handlePunchPermissionToggle = (index) => {
     setSelectedEmployeePunches(prev => {
@@ -312,11 +430,17 @@ const Form = () => {
     });
   };
   const handleSaveAll = async () => {
+    const reportDate = date;
+
     try {
       // Call both save functions
       await handleSavePermission();
       await handleSaveOtherPunchPermission();
-
+      await triggerReport({
+        searchParams: {
+          date,
+        },
+      });
       Swal.fire({
         icon: "success",
         title: "Updated!",
@@ -342,7 +466,9 @@ const Form = () => {
 
     // Flatten each Out-In pair into separate entries
     const payload = selectedEmployeeOtherPunches?.filter(p => p.isPermission)?.flatMap(p => [
-      { mIdCard: selectedEmployeeOther.mIdCard, timestamp: p.out, isPermission: p.isPermission },
+      {
+        mIdCard: selectedEmployeeOther.mIdCard, timestamp: p.out, isPermission: p.isPermission, permissionTime: p.permissionTime || "00:00:00"
+      },
       { mIdCard: selectedEmployeeOther.mIdCard, timestamp: p.in, isPermission: p.isPermission }
     ])?.filter(p => p.timestamp && p.timestamp !== "-");
 
@@ -350,27 +476,6 @@ const Form = () => {
 
     return updatePermission({ data: payload }).unwrap();
 
-    // try {
-    //   await updatePermission({ data: payload }).unwrap();
-
-    //   Swal.fire({
-    //     icon: "success",
-    //     title: "Updated!",
-    //     text: "Other punches permission updated successfully.",
-    //     timer: 2000,
-    //     showConfirmButton: false
-    //   });
-
-    //   // setShowOtherPunchesModal(false);
-
-    // } catch (err) {
-    //   console.error(err);
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Error",
-    //     text: "Failed to update other punches permission."
-    //   });
-    // }
   };
 
 
@@ -383,38 +488,13 @@ const Form = () => {
     const payload = selectedEmployeePunches?.filter(p => p.isPermission)?.map(p => ({
       mIdCard: selectedEmployee.mIdCard,
       timestamp: p.timestamp,
-      isPermission: p.isPermission
+      isPermission: p.isPermission,
+      permissionTime: p.permissionTime || "00:00:00"
     }));
     if (!payload || payload.length === 0) return;
 
     return updatePermission({ data: payload }).unwrap();
-    // const payload = selectedEmployeePunches?.filter(p => p.isPermission)?.map(p => ({
-    //   mIdCard: selectedEmployee.mIdCard,
-    //   timestamp: p.timestamp,
-    //   isPermission: p.isPermission
-    // }));
 
-    // try {
-    //   await updatePermission({ data: payload }).unwrap();
-
-    //   Swal.fire({
-    //     icon: "success",
-    //     title: "Updated!",
-    //     text: "Permission updated successfully.",
-    //     timer: 2000,
-    //     showConfirmButton: false
-    //   });
-
-    //   // setShowPermissionModal(false);
-
-    // } catch (err) {
-    //   console.error(err);
-    //   Swal.fire({
-    //     icon: "error",
-    //     title: "Error",
-    //     text: "Failed to update permission."
-    //   });
-    // }
 
   }
 
@@ -512,7 +592,8 @@ const Form = () => {
           )
         }
         {
-          openDutyModal && (<OnDutyTable shiftData={shiftData} absentData={absentData} onUpdate={handleAbsentUpdate} onSaveAll={handleSaveAllAbsent} reportView={reportView} selectedShiftType={selectedShiftType} onClose={() => setOpenDutyModal(false)} date={date}
+          openDutyModal && (<OnDutyTable shiftData={shiftData} onDutyTable={onDutyTable} onUpdate={handleOnDutyUpdate} onSaveAll={handleSaveAllAbsent} reportView={reportView} selectedShiftType={selectedShiftType} onClose={() => setOpenDutyModal(false)} date={date}
+            ShiftTime={ShiftTime}
           />
           )
         }
@@ -576,7 +657,7 @@ const Form = () => {
                   className={`${reportView === "Single" ? "w-32" : "w-36"} py-2 text-center font-medium text-[13px]  border border-gray-300`}                >
                   Other Punches
                 </th>
-                <th className={`w-12 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                <th className={`w-8 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
                   Permission Duration
                 </th>
 
@@ -841,43 +922,14 @@ const Form = () => {
                       </>
                     )}
 
-                    {/* {
-                      selectedShiftType === "Hourly" ? (<td
-                        rowSpan={2}
-                        className="  border border-gray-300 text-[12px] py-0.5 text-center item-center"
-                      >
-                        <button
-                          className="text-blue-600 text-center text-blue  bg-blue-50 rounded"
-                          onClick={() => openModal(item.breakSummary)}
 
-                          title="Open"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                          >
-                            <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                            <path
-                              fillRule="evenodd"
-                              d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        </button>
-                      </td>) : ""
-                    } */}
-                    {/* ================================
-    HOURLY COLUMNS (4 columns)
-================================== */}
                     <td
                       rowSpan={2}
                       className="  border border-gray-300 text-[12px] py-0.5 item-center"
                     >
                       <input
                         type="text"
-                       value=''
+                        value={item?.permissionHrs || ''}
                         className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                       />
                     </td>
@@ -1228,15 +1280,15 @@ const Form = () => {
                         </td>
                       </>
                     )}
-                   
+
                     <td
                       rowSpan={2}
                       className="  border border-gray-300 text-[12px] py-0.5 item-center"
                     >
                       <input
                         type="text"
-                        value={ ""
-                        }
+                        value={item?.permissionHrs || ''}
+
                         className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                       />
                     </td>

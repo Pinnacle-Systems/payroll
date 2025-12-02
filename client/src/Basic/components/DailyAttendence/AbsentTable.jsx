@@ -250,9 +250,11 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                                 >
                                                     <input
                                                         type="date"
-                                                        value={item.outDate || date}
+                                                        // value={item.outDate || date}
+                                                        value={date}
 
                                                         onChange={(e) => onUpdate(index, "outDate", e.target.value)}
+                                                                                                                readOnly
 
                                                         className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
                                                     />
