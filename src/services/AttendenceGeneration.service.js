@@ -564,19 +564,20 @@ ORDER BY e.mIdCard;
 
       // ---- Tolerance windows array ----
       const windows = [
-        { start: morningInFromTol, end: morningInToTol },
-        { start: eveningOutFromTol, end: eveningOutToTol },
-        { start: fbout, end: fbIn },       // First Break
-        { start: sbOut, end: sbIn },       // Second Break
-        { start: lunchBst, end: lunchBET } // Lunch Break
+        { key: "inTime", start: morningInFromTol, end: morningInToTol },
+
+        // Break windows
+        { key: "firstBreakOut", start: fbout, end: fbIn },
+        { key: "firstBreakIn", start: fbIn, end: fbIn },
+        { key: "lunchBreakOut", start: lunchBst, end: lunchBET },
+        { key: "lunchBreakIn", start: lunchBET, end: lunchBET },
+        { key: "eveningBreakOut", start: sbOut, end: sbIn },
+        { key: "eveningBreakIn", start: sbIn, end: sbIn },
+
+
+        { key: "outTime", start: eveningOutFromTol, end: eveningOutToTol },
+
       ];
-
-      // ---- Convert HH:mm:ss → seconds helper ----
-      const timeStrToSeconds = (str) => {
-        const [h, m, s] = str.split(":").map(Number);
-        return h * 3600 + m * 60 + s;
-      };
-
 
       // ---- Check if a punch is inside any tolerance window ----
       const isInAnyWindow = (sec) => windows.some(w => sec >= w.start && sec <= w.end);
@@ -595,6 +596,7 @@ ORDER BY e.mIdCard;
       let pairedByPrev = new Set();   // indexes that were added as "next" for an outside punch
 
       const punches = emp?.punches || [];
+      const lastPunch = punchesInSeconds[punchesInSeconds.length - 1];
 
       for (let i = 0; i < punches.length; i++) {
 
@@ -638,13 +640,79 @@ ORDER BY e.mIdCard;
       // keep original chronological order (already in order) — finalPunches preserves push order
       emp.breakSummary.outsideTolerance = finalPunches;
 
-      console.log("Windows:", windows);
-      console.log("11:12 → sec =", extractSeconds("2025-11-29 11:12:22.000000"));
-      console.log("isInAnyWindow(11:12) =", isInAnyWindow(extractSeconds("2025-11-29 11:12:22.000000")));
+      // helper: find which window a second belongs to
+      const findWindowKey = (sec) => {
+        if (Number.isNaN(sec)) return null;
+        const w = windows.find(w => sec >= w.start && sec <= w.end);
+        return w ? w.key : null;
+      };
+
+      // ---- initialize punchSlots (keep existing mapping)
+      const punchSlots = {
+        inTime: null,
+        firstBreakOut: null,
+        firstBreakIn: null,
+        lunchBreakOut: null,
+        lunchBreakIn: null,
+        eveningBreakOut: null,
+        eveningBreakIn: null,
+        outTime: null,
+      };
+
+      // ------------------------------------
+      // MAP PUNCHES INTO WINDOWS
+      // ------------------------------------
+
+      for (const w of windows) {
+        const match = punches.find(p => {
+          const sec = extractSeconds(p.timestamp);
+          return sec >= w.start && sec <= w.end;
+        });
+        if (match) punchSlots[w.key] = match.timestamp;
+      }
+      // ---- if no punches -> empty result and continue
+      if (!punches || punches.length === 0) {
+        emp.absentTableData = [];
+      } else {
+        // determine first and last punch objects
+        const firstPunchObj = punches[0];
+        const lastPunchObj = punches[punches.length - 1];
+
+        const firstSec = extractSeconds(firstPunchObj.timestamp);
+        const lastSec = extractSeconds(lastPunchObj.timestamp);
+
+        // classify windows for first & last
+        const firstWindow = findWindowKey(firstSec); // e.g., "lunchBreakOut"
+        const lastWindow = findWindowKey(lastSec);  // e.g., "outTime"
+
+        // ----- RULES -----
+        // Rule A: First = morning IN, Last = lunch window
+        const ruleA = (firstWindow === "inTime") && (lastWindow === "lunchBreakOut" || lastWindow === "lunchBreakIn");
+
+        // Rule B: First = lunch window, Last = outTime
+        const ruleB = (firstWindow === "lunchBreakOut" || firstWindow === "lunchBreakIn") && (lastWindow === "outTime");
 
 
 
+        const isSpecialAbsent = ruleA || ruleB /*|| ruleC*/;
 
+        if (emp.status === "Absent" || isSpecialAbsent) {
+          emp.absentTableData = [
+            {
+              ...punchSlots,                // your existing window-based slots
+              allPunches: punches.map(p => ({
+                timestamp: p.timestamp,
+                isPermission: p.isPermission ?? null
+              }))                              // attach all punches here
+            }
+          ];
+        } else {
+          emp.absentTableData = [];
+        }
+
+        // --- for debugging (optional): attach windows to emp for inspection
+        // emp._debug = { firstWindow, lastWindow, firstSec, lastSec, windows };
+      }
 
       const firstPunchObj = emp?.punches?.[0];
 
@@ -687,7 +755,6 @@ ORDER BY e.mIdCard;
 
       // Evening Out Punch
       // Evening Out Punch (no more Extra Work concept)
-      const lastPunch = punchesInSeconds[punchesInSeconds.length - 1];
       let eveningStatus = {
         punch: lastPunchObj.timestamp,    // <-- FULL TIMESTAMP
         delay: "00:00:00",

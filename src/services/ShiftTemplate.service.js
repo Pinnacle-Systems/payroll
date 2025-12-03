@@ -53,6 +53,7 @@ async function get(req) {
     include: {
       ShiftTemplateItems: {
         include: {
+          shift:true,
           QuarterDetails: true,
         },
       },

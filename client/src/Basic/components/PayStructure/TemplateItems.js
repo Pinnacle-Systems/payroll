@@ -23,12 +23,12 @@ const TemplateItems = ({
   docId,
   employeeCategoryList,
   childRecord,
-form,
+  form,
   setReadOnly,
   setId,
 }) => {
 
-   const payref = useRef(null);
+  const payref = useRef(null);
   useEffect(() => {
     if (form && !readOnly && payref.current) {
       payref.current.focus();
@@ -448,9 +448,8 @@ form,
                             "salaryPercentage"
                           );
                         }}
-                        className={`w-full bg-transparent text-right pr-2 focus:outline-none focus:border-transparent ${
-                          readOnly ? "text-gray-600" : "text-black"
-                        }`}
+                        className={`w-full bg-transparent text-right pr-2 focus:outline-none focus:border-transparent ${readOnly ? "text-gray-600" : "text-black"
+                          }`}
                         disabled={readOnly}
                       />
                     </td>
@@ -485,9 +484,8 @@ form,
                       <input
                         type="text"
                         value={item?.pickFrom || ""}
-                        className={`w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent ${
-                          readOnly ? "text-gray-600" : "text-black"
-                        } `}
+                        className={`w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent ${readOnly ? "text-gray-600" : "text-black"
+                          } `}
                         disabled
                       />
                     </td>
@@ -502,11 +500,10 @@ form,
                           }
                         }}
                         className={`flex items-center justify-center w-6 h-6 rounded mx-auto 
-    ${
-      item?.pickFrom?.toLowerCase() === "formula"
-        ? "cursor-pointer"
-        : "cursor-not-allowed opacity-50"
-    }`}
+    ${item?.pickFrom?.toLowerCase() === "formula"
+                            ? "cursor-pointer"
+                            : "cursor-not-allowed opacity-50"
+                          }`}
                         title={
                           item?.pickFrom?.toLowerCase() === "formula"
                             ? "Add Formula"
@@ -548,9 +545,8 @@ form,
                       <input
                         type="text"
                         value={item?.notes || ""}
-                        className={`w-full bg-transparent pl-2 focus:outline-none ${
-                          readOnly ? "text-gray-600" : "text-black"
-                        }`}
+                        className={`w-full bg-transparent pl-2 focus:outline-none ${readOnly ? "text-gray-600" : "text-black"
+                          }`}
                         onChange={(e) =>
                           handleInputChange(e.target.value, index, "notes")
                         }
@@ -562,8 +558,8 @@ form,
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             e.preventDefault();
-                            if(item?.payDetailsId){
-                            addNewRow();
+                            if (item?.payDetailsId) {
+                              addNewRow();
                             }
                           }
                         }}
@@ -685,8 +681,8 @@ form,
                                   backgroundColor: state.isSelected
                                     ? "#3b82f6" // blue background for selected
                                     : state.isFocused
-                                    ? "#e5e7eb" // light gray on hover
-                                    : "white",
+                                      ? "#e5e7eb" // light gray on hover
+                                      : "white",
                                   fontSize: "11px",
                                   padding: "5px 10px",
                                   cursor: "pointer",
@@ -709,9 +705,8 @@ form,
                               onChange={(e) =>
                                 setModalFormulaValue(e.target.value)
                               }
-                              className={`border border-gray-300 h-24 px-2 py-1 w-full text-[11px]  rounded focus:outline-none focus:ring-1 focus:ring-blue-400 ${
-                                readOnly ? "text-gray-600" : "text-black"
-                              }`}
+                              className={`border border-gray-300 h-24 px-2 py-1 w-full text-[11px]  rounded focus:outline-none focus:ring-1 focus:ring-blue-400 ${readOnly ? "text-gray-600" : "text-black"
+                                }`}
                               placeholder="Type or select Pay Code"
                               disabled={readOnly}
                             />
@@ -720,11 +715,10 @@ form,
                         <div className="flex justify-end gap-2 mt-2">
                           <button
                             className={`px-3 py-1 text-red-600 border border-red-600 text-xs rounded 
-    ${
-      readOnly
-        ? "bg-gray-100 text-gray-400 cursor-not-allowed hover:bg-gray-100 hover:text-gray-400"
-        : "hover:bg-red-600 hover:text-white"
-    }`}
+    ${readOnly
+                                ? "bg-gray-100 text-gray-400 cursor-not-allowed hover:bg-gray-100 hover:text-gray-400"
+                                : "hover:bg-red-600 hover:text-white"
+                              }`}
                             onClick={() => {
                               setModalFormulaValue(""); // clear modal input
                             }}
@@ -734,11 +728,10 @@ form,
                           </button>
                           <button
                             className={`px-4 py-1 text-green-600 border border-green-600 text-xs rounded 
-    ${
-      readOnly
-        ? "bg-gray-100 text-gray-400 cursor-not-allowed hover:bg-gray-100 hover:text-gray-400"
-        : "hover:bg-green-600 hover:text-white"
-    }`}
+    ${readOnly
+                                ? "bg-gray-100 text-gray-400 cursor-not-allowed hover:bg-gray-100 hover:text-gray-400"
+                                : "hover:bg-green-600 hover:text-white"
+                              }`}
                             onClick={() => {
                               // Update the formula in the correct row
                               handleInputChange(

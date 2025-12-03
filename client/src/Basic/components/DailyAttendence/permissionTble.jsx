@@ -154,73 +154,73 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                 </button>
                             </div>
                         </div>
-                        <div className={` mt-3  p-2  bg-white h-[500px]  overflow-x-auto overflow-y-auto`}>
+                        <div className={` mt-3  p-2  bg-white h-[523px]  overflow-x-auto overflow-y-auto`}>
                             <table className={` ${selectedShiftType === "Hourly" ? "w-[88vw]" : "w-[88vw]"}  border-collapse table-fixed`}>
 
                                 <thead className="bg-gray-200 text-gray-800 border border-gray-400">
                                     <tr>
                                         <th
-                                            className={`w-[15px] px-1 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-[15px] px-1 text-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             S.No
                                         </th>
 
                                         <th
-                                            className={`w-6  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-6  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             MId
                                         </th>
                                         <th
-                                            className={`w-[50px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-[50px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             Emp Name
                                         </th>
                                         <th
-                                            className={`w-[30px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-[30px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             Shift
                                         </th>
                                         <th
-                                            className={`w-[45px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-[45px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             Department
                                         </th>
                                         <th
-                                            className={`w-[65px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-[65px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             Designation
                                         </th>
                                         <th
-                                            className={`w-8  py-2 item-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-8  py-2 item-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             In Date
                                         </th>
-                                        <th className={`w-8 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                                        <th className={`w-8 py-2 item-center font-medium text-[12px]  border border-gray-300`}>
                                             In Time
                                         </th>
                                         <th
-                                            className={`w-8 py-2 item-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-8 py-2 item-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             Out Date
                                         </th>
-                                        <th className={`w-8 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                                        <th className={`w-8 py-2 item-center font-medium text-[12px]  border border-gray-300`}>
                                             Out Time
                                         </th>
-                                        <th className={`w-[75px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                                        <th className={`w-[75px] py-2 item-center font-medium text-[12px]  border border-gray-300`}>
                                             Status
                                         </th>
 
                                         <th
                                             colSpan={reportView === "Seperate" ? 4 : 2}
-                                            className={`${reportView === "Single" ? "w-32" : "w-36"} py-2 text-center font-medium text-[13px]  border border-gray-300`}                >
+                                            className={`${reportView === "Single" ? "w-32" : "w-36"} py-2 text-center font-medium text-[12px]  border border-gray-300`}                >
                                             Other Punches
                                         </th>
 
                                         {/* 
-                                        {selectedShiftType === "Hourly" ? (<th className={`w-[40px] py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                                        {selectedShiftType === "Hourly" ? (<th className={`w-[40px] py-2 item-center font-medium text-[12px]  border border-gray-300`}>
                                             Status
                                         </th>) : ""} */}
-                                        {/* <th className={`w-12 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                                        {/* <th className={`w-12 py-2 item-center font-medium text-[12px]  border border-gray-300`}>
                                             Permission
                                         </th> */}
 
@@ -264,11 +264,11 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                         return (
                                             <React.Fragment key={index}>
                                                 {/* Row 1 - In + Morning */}
-                                                <tr>
+                                                <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
                                                     {/* S.No rowspan */}
                                                     <td
                                                         rowSpan={2}
-                                                        className="border border-gray-300 py-1.5 text-[12px]  text-center px-1"
+                                                        className="border border-gray-300 py-1.5 text-[11px]  text-center px-1"
                                                     >
                                                         {index + 1}
                                                     </td>
@@ -276,7 +276,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                     {/* Employee Id rowspan */}
                                                     <td
                                                         rowSpan={2}
-                                                        className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
                                                     >
                                                         <input
                                                             type="text"
@@ -286,7 +286,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                     </td>
                                                     <td
                                                         rowSpan={2}
-                                                        className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
                                                     >
                                                         <input
                                                             type="text"
@@ -296,7 +296,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                     </td>
                                                     <td
                                                         rowSpan={2}
-                                                        className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
                                                     >
                                                         <input
                                                             type="text"
@@ -306,7 +306,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                     </td>
                                                     <td
                                                         rowSpan={2}
-                                                        className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
                                                     >
                                                         <input
                                                             type="text"
@@ -316,7 +316,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                     </td>
                                                     <td
                                                         rowSpan={2}
-                                                        className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
                                                     >
                                                         <input
                                                             type="text"
@@ -328,7 +328,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                     {/* In Date */}
                                                     <td
                                                         rowSpan={2}
-                                                        className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                                                        className=" border border-gray-300 text-[11px] py-0.5 item-center"
                                                     >
                                                         <input
                                                             type="text"
@@ -344,7 +344,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                     {/* In Time */}
                                                     <td
                                                         rowSpan={2}
-                                                        className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                                                        className=" border border-gray-300 text-[11px] py-0.5 item-center"
                                                     >
                                                         <input
                                                             min="0"
@@ -361,7 +361,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                     {/* Out Date */}
                                                     <td
                                                         rowSpan={2}
-                                                        className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                                                        className="  border border-gray-300 text-[11px] py-0.5 item-center"
                                                     >
                                                         <input
                                                             type="text"
@@ -377,7 +377,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
 
                                                     <td
                                                         rowSpan={2}
-                                                        className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                                                        className="  border border-gray-300 text-[11px] py-0.5 item-center"
                                                     >
                                                         <input
                                                             type="text"
@@ -392,7 +392,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
 
                                                     <td
                                                         rowSpan={2}
-                                                        className="text-left  border border-gray-300 text-[12px] py-0.5 item-center"
+                                                        className="text-left  border border-gray-300 text-[11px] py-0.5 item-center"
                                                     >
                                                         <input
                                                             type="text"
@@ -404,14 +404,14 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
 
                                                     {reportView === "Seperate" && (
                                                         <>
-                                                            <td className=" border border-gray-300 text-[12px] py-0.5 " onClick={() => openCombinedModal(item)}>
+                                                            <td className=" border border-gray-300 text-[11px] py-0.5 " onClick={() => openCombinedModal(item)}>
                                                                 <input
                                                                     type="text"
                                                                     value={"OUT"} onClick={() => openCombinedModal(item)}
                                                                     className={`w-full text-center bg-transparent  focus:outline-none focus:border-transparent `}
                                                                 />
                                                             </td>
-                                                            <td className="border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
+                                                            <td className="border border-gray-300 text-[11px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
                                                                 <input
                                                                     min="0"
                                                                     type="text"
@@ -426,7 +426,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                     className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                                                                 />
                                                             </td>
-                                                            <td className="border border-gray-300 text-[12px] text-center px-1" onClick={() => openCombinedModal(item)}>
+                                                            <td className="border border-gray-300 text-[11px] text-center px-1" onClick={() => openCombinedModal(item)}>
                                                                 <input
                                                                     type="text"
                                                                     value={
@@ -440,7 +440,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                     onClick={() => openCombinedModal(item)}
                                                                 />
                                                             </td>
-                                                            <td className="border border-gray-300 text-[12px] text-center px-1" onClick={() => openCombinedModal(item)}>
+                                                            <td className="border border-gray-300 text-[11px] text-center px-1" onClick={() => openCombinedModal(item)}>
                                                                 <input
                                                                     type="text"
                                                                     value={
@@ -458,7 +458,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                     )}
                                                     {reportView === "Single" && (
                                                         <>
-                                                            <td colSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
+                                                            <td colSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
                                                                 <input
                                                                     type="text"
                                                                     onClick={() => openCombinedModal(item)}
@@ -484,55 +484,56 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                 {/* Row 2 - Evening + Out */}
                                                 {reportView === "Seperate" && (
                                                     <>
-                                                        <td className=" border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
-                                                            <input
-                                                                type="text"
-                                                                value={"IN"} onClick={() => openCombinedModal(item)}
-                                                                className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                                                            />
-                                                        </td>
-                                                        {/* Morning Break In */}
-                                                        <td className="border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
-                                                            <input
-                                                                type="text"
-                                                                value={
-                                                                    item.firstBreakIn
-                                                                        ? moment.utc(item.firstBreakIn).format("HH:mm:ss")
-                                                                        : ""
-                                                                }
-                                                                className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                                                        <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
+                                                            <td className=" border border-gray-300 text-[11px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
+                                                                <input
+                                                                    type="text"
+                                                                    value={"IN"} onClick={() => openCombinedModal(item)}
+                                                                    className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                                                                />
+                                                            </td>
+                                                            {/* Morning Break In */}
+                                                            <td className="border border-gray-300 text-[11px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
+                                                                <input
+                                                                    type="text"
+                                                                    value={
+                                                                        item.firstBreakIn
+                                                                            ? moment.utc(item.firstBreakIn).format("HH:mm:ss")
+                                                                            : ""
+                                                                    }
+                                                                    className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
 
-                                                            />
-                                                        </td>
+                                                                />
+                                                            </td>
 
-                                                        <td className="  border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
-                                                            <input
-                                                                type="text"
-                                                                value={
-                                                                    item.lunchBreakIn
-                                                                        ? moment
-                                                                            .utc(item.lunchBreakIn)
-                                                                            .format("HH:mm:ss")
-                                                                        : ""
-                                                                }
-                                                                className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                                                                onClick={() => openCombinedModal(item)}
-                                                            />
-                                                        </td>
-                                                        <td className="  border border-gray-300 text-[12px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
-                                                            <input
-                                                                type="text"
-                                                                value={
-                                                                    item.eveningBreakIn
-                                                                        ? moment
-                                                                            .utc(item.eveningBreakIn)
-                                                                            .format("HH:mm:ss")
-                                                                        : ""
-                                                                }
-                                                                className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                                                                onClick={() => openCombinedModal(item)}
-                                                            />
-                                                        </td>
+                                                            <td className="  border border-gray-300 text-[11px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
+                                                                <input
+                                                                    type="text"
+                                                                    value={
+                                                                        item.lunchBreakIn
+                                                                            ? moment
+                                                                                .utc(item.lunchBreakIn)
+                                                                                .format("HH:mm:ss")
+                                                                            : ""
+                                                                    }
+                                                                    className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                                                                    onClick={() => openCombinedModal(item)}
+                                                                />
+                                                            </td>
+                                                            <td className="  border border-gray-300 text-[11px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
+                                                                <input
+                                                                    type="text"
+                                                                    value={
+                                                                        item.eveningBreakIn
+                                                                            ? moment
+                                                                                .utc(item.eveningBreakIn)
+                                                                                .format("HH:mm:ss")
+                                                                            : ""
+                                                                    }
+                                                                    className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                                                                    onClick={() => openCombinedModal(item)}
+                                                                />
+                                                            </td></tr>
                                                     </>
                                                 )}
 
@@ -581,8 +582,8 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                             <div className="bg-white px-3 py-2 mt-3 h-[380px] relative">
                                 <h3 className=" mt-1 mb-2 text-[14px]">Employee In & Out</h3>
 
-                                <table className="w-full text-[13px] border">
-                                    <thead className="bg-gray-200  text-[13px]">
+                                <table className="w-full  border">
+                                    <thead className="bg-gray-200  text-[12px]">
                                         <tr>
                                             <th className="border  font-medium px-2 py-1 w-20">Time</th>
                                             <th className="border  font-medium  px-2 py-1 w-20">Status</th>
@@ -594,14 +595,14 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
 
                                     <tbody>
                                         {selectedEmployeePunches?.map((punch, idx) => (
-                                            <tr key={idx} className="text-center text-[12px]">
-                                                <td className="border px-2 py-1 ">
+                                            <tr key={idx} className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-100"} text-center text-[11px]`}
+                                            >                                                <td className="border px-2 py-1 ">
                                                     {moment(punch.timestamp).format("HH:mm:ss")}
                                                 </td >
                                                 {/* {punch.isPermission ? "Permission" : punch.status} */}
-                                                                                                <td className="text-left border px-2 py-1">
+                                                <td className="text-left border px-2 py-1">
 
-                                                { punch.status} </td >
+                                                    {punch.status} </td >
                                                 <td className="border px-2 py-1">{punch.permissionTime}</td>
 
                                                 <td className="border px-2 py-1">
@@ -620,7 +621,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
 
                                 <h3 className=" mb-2 mt-2 text-[14px]">Other Punches</h3>
 
-                                <table className="w-full text-[13px] border">
+                                <table className="w-full text-[12px]  border">
                                     <thead className="bg-gray-200">
                                         <tr>
                                             <th className="border  font-medium px-2 py-1 w-20">Out Time</th>
@@ -632,7 +633,8 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
 
                                     <tbody>
                                         {selectedEmployeeOtherPunches?.map((punch, idx) => (
-                                            <tr key={idx} className="text-center text-[12px]">
+                                            <tr key={idx} className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-100"} text-center text-[11px]`}
+                                            >
                                                 <td className="border px-2 py-1">
                                                     {punch.out !== "-" ? moment(punch.out).format("HH:mm:ss") : "-"}
                                                 </td>

@@ -2,9 +2,9 @@ import moment from "moment-timezone";
 import React, { useEffect, useState, useRef } from "react";
 
 
-const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpdate, onSaveAll, date, shiftData ,ShiftTime}) => {
+const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpdate, onSaveAll, date, shiftData, ShiftTime, shiftTemplateData, setAbsentData }) => {
 
-    console.log(absentData, "absentData");
+    console.log(shiftTemplateData, "shiftTemplateDatallll");
 
     return (
         <>
@@ -40,64 +40,67 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
 
                         </div>
 
-                        <div
-                            className={` mt-3  p-2  bg-white h-[500px]  overflow-x-auto overflow-y-auto`}
-                        >
+                        <div className={` mt-3  p-2  bg-white h-[523px]  overflow-x-auto overflow-y-auto`}>
+
                             <table className={` w-[75vw]  border-collapse table-fixed`}>
 
                                 <thead className="bg-gray-200 text-gray-800 border border-gray-400">
                                     <tr>
                                         <th
-                                            className={`w-[15px] px-1 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-[15px] px-1 text-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             S.No
                                         </th>
 
                                         <th
-                                            className={`w-6  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-6  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             MId
                                         </th>
                                         <th
-                                            className={`w-[50px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-[50px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             Emp Name
                                         </th>
+                                        <th className={`w-8 py-2 item-center font-medium text-[12px]  border border-gray-300`}>
+                                            Leave
+                                        </th>
                                         <th
-                                            className={`w-[40px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-[40px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             Shift
                                         </th>
                                         <th
-                                            className={`w-[40px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-[40px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             Present
                                         </th>
                                         <th
-                                            className={`w-[45px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-[45px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             Department
                                         </th>
                                         <th
-                                            className={`w-[65px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-[65px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             Designation
                                         </th>
                                         <th
-                                            className={`w-12  py-2 item-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-12  py-2 item-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             In Date
                                         </th>
-                                        <th className={`w-12 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                                        <th className={`w-12 py-2 item-center font-medium text-[12px]  border border-gray-300`}>
                                             In
                                         </th>
-                                        <th className={`w-12 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                                        <th className={`w-12 py-2 item-center font-medium text-[12px]  border border-gray-300`}>
                                             Out Date
                                         </th>
 
-                                        <th className={`w-12 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                                        <th className={`w-12 py-2 item-center font-medium text-[12px]  border border-gray-300`}>
                                             Out
                                         </th>
+
 
 
                                     </tr>
@@ -107,11 +110,11 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                     {absentData?.map((item, index) => (
                                         <React.Fragment key={index}>
                                             {/* Row 1 - In + Morning */}
-                                            <tr>
+                                            <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
                                                 {/* S.No rowspan */}
                                                 <td
                                                     rowSpan={2}
-                                                    className="border border-gray-300 py-1.5 text-[12px]  text-center px-1"
+                                                    className="border border-gray-300 py-1.5 text-[11px]  text-center px-1"
                                                 >
                                                     {index + 1}
                                                 </td>
@@ -119,7 +122,7 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                                 {/* Employee Id rowspan */}
                                                 <td
                                                     rowSpan={2}
-                                                    className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
                                                 >
                                                     <input
                                                         type="text"
@@ -129,7 +132,7 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                                 </td>
                                                 <td
                                                     rowSpan={2}
-                                                    className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
                                                 >
                                                     <input
                                                         type="text"
@@ -137,54 +140,72 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                                         className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
                                                     />
                                                 </td>
-                                                {/* <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 text-[12px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={item?.shiftName}
-                                                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td> */}
                                                 <td
                                                     rowSpan={2}
-                                                    className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
                                                 >
-                                                    <select
-                                                        value={item.shiftName || ""}
-                                                        onChange={(e) => onUpdate(index, "shiftName", e.target.value)}
-                                                        className="w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent"
-                                                    >
-                                                        <option value="">Select</option>
-                                                        {shiftData?.data?.map((shift) => (
-                                                            <option key={shift.id} value={shift.name}>
-                                                                {shift.name}
-                                                            </option>
-                                                        ))}
-                                                    </select>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={item?.isLeave}
+                                                        onChange={(e) => {
+                                                            const updated = structuredClone(absentData);
+                                                            updated[index].isLeave = e.target.checked;
+
+                                                            // Optional: clear in/out time when leave is checked
+                                                            if (e.target.checked) {
+                                                                updated[index].inTimeEdit = "";
+                                                                updated[index].outTimeEdit = "";
+                                                                updated[index].shiftName = "";
+                                                                updated[index].shiftTime = "";
+                                                            }
+
+                                                            setAbsentData(updated);
+                                                        }}
+                                                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                                                    />
                                                 </td>
                                                 <td
                                                     rowSpan={2}
-                                                    className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
                                                 >
-                                                    <select
-                                                        value={item?.shiftTime || ""}
-                                                        onChange={(e) => onUpdate(index, "shiftTime", e.target.value)}
-                                                        className="w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent"
+                                                    <select className="w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent"
+                                                        value={item.shiftName || ""}
+                                                        disabled={item?.isLeave}
+                                                        onChange={(e) => onUpdate(index, "shiftName", e.target.value)}
                                                     >
                                                         <option value="">Select</option>
-                                                        {ShiftTime?.map((shift) => (
-                                                            <option key={shift.value} value={shift.value}>
-                                                                {shift.show}
+
+                                                        {shiftTemplateData?.data?.flatMap(t => t.ShiftTemplateItems || []).map((s) => (
+                                                            <option key={s.id} value={s.shiftId}>
+                                                                {s.shift?.name}
                                                             </option>
                                                         ))}
                                                     </select>
+
+                                                </td>
+                                                <td
+                                                    rowSpan={2}
+                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
+                                                >
+                                                    <select className="w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent"
+                                                        value={item.shiftTime || ""}
+                                                        disabled={!item?.shiftName}
+                                                        onChange={(e) => onUpdate(index, "shiftTime", e.target.value)}
+                                                    >
+                                                        <option value="">Select</option>
+                                                        {ShiftTime.map((st) => (
+                                                            <option key={st.value} value={st.value}>
+                                                                {st.show}
+                                                            </option>
+                                                        ))}
+
+                                                    </select>
+
                                                 </td>
 
                                                 <td
                                                     rowSpan={2}
-                                                    className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
                                                 >
                                                     <input
                                                         type="text"
@@ -196,7 +217,7 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
 
                                                 <td
                                                     rowSpan={2}
-                                                    className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
                                                 >
                                                     <input
                                                         type="text"
@@ -208,7 +229,7 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                                 {/* In Date */}
                                                 <td
                                                     rowSpan={2}
-                                                    className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    className=" border border-gray-300 text-[11px] py-0.5 item-center"
                                                 >
                                                     <input
                                                         type="date"
@@ -223,7 +244,7 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
 
                                                 <td
                                                     rowSpan={2}
-                                                    className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    className=" border border-gray-300 text-[11px] py-0.5 item-center"
                                                 >
                                                     <input
                                                         min="0"
@@ -238,7 +259,7 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                                         }
 
                                                         onChange={(e) => onUpdate(index, "inTimeEdit", e.target.value)}
-
+                                                        disabled={item?.shiftName || item?.isLeave}
                                                         onFocus={(e) => e.target.select()}
                                                         className={`w-full bg-transparent  text-center focus:outline-none focus:border-transparent  `}
                                                     />
@@ -246,7 +267,7 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                                 {/* out Date */}
                                                 <td
                                                     rowSpan={2}
-                                                    className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    className=" border border-gray-300 text-[11px] py-0.5 item-center"
                                                 >
                                                     <input
                                                         type="date"
@@ -254,7 +275,7 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                                         value={date}
 
                                                         onChange={(e) => onUpdate(index, "outDate", e.target.value)}
-                                                                                                                readOnly
+                                                        readOnly
 
                                                         className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
                                                     />
@@ -262,7 +283,7 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
 
                                                 <td
                                                     rowSpan={2}
-                                                    className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    className="  border border-gray-300 text-[11px] py-0.5 item-center"
                                                 >
                                                     <input
                                                         min="0"
@@ -278,10 +299,12 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                                         }
 
                                                         onChange={(e) => onUpdate(index, "outTimeEdit", e.target.value)}
+                                                        disabled={item?.shiftName || item?.isLeave}
 
                                                         className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                                                     />
                                                 </td>
+
 
 
                                             </tr>

@@ -14,7 +14,7 @@ import {
   useGetshiftTypeQuery,
 } from "../../../redux/uniformService/shiftTYpeService";
 import { useGetshiftMasterQuery } from "../../../redux/services/ShiftMasterService";
-
+import { useGetShiftTemplateMasterQuery } from '../../../redux/services/ShiftTemplateMaster'
 import Permissiontable from "./permissionTble";
 import AbsentTable from "./AbsentTable";
 import OnDutyTable from "./OnDutyTable";
@@ -35,6 +35,7 @@ const Form = () => {
   const [openDutyModal, setOpenDutyModal] = useState(false)
   const [openPermissionModal, setOpenPermissionModal] = useState(false)
   const [absentData, setAbsentData] = useState([]);
+  const [absentTable, setAbsentTable] = useState([])
   const [regularData, setRegularData] = useState([]);
   const [irregularData, setIrregularData] = useState([]);
   const [permissionTable, setPermissionTable] = useState([])
@@ -51,6 +52,8 @@ const Form = () => {
 
 
   const { data: shiftData } = useGetshiftMasterQuery({ params });
+  const { data: shiftTemplateData } = useGetShiftTemplateMasterQuery({ params })
+
   const openModal = (breakSummary) => {
     setSelectedBreakSummary(breakSummary);
     setShowModal(true);
@@ -95,64 +98,119 @@ const Form = () => {
     const regular = allData?.data?.filter(i => i.status === "Regular") || [];
     const irregular = allData?.data?.filter(i => i.status === "Irregular") || [];
 
-    setAbsentData(absent);
+    setAbsentTable(absent);
     setRegularData(regular);
     setIrregularData(irregular);
   }, [allData]);
 
   const handleAbsentUpdate = (index, field, value) => {
     const updated = structuredClone(absentData);
+
+    // -------------------------------
+    // 🔹 1. Shift selection changed
+    // -------------------------------
     if (field === "shiftName") {
-      const selectedShift = shiftData?.data?.find(s => s.name === value);
       updated[index].shiftName = value;
+      // If empty shift selected → clear all shift & time fields
+      if (!value) {
+        updated[index].shiftStart = "";
+        updated[index].shiftLunchBst = "";
+        updated[index].shiftLunchBET = "";
+        updated[index].shiftEnd = "";
+        updated[index].shiftTime = "";
+        updated[index].inTimeEdit = "";
+        updated[index].outTimeEdit = "";
+
+        setAbsentData(updated);
+        return;
+      }
+      const selectedShift = shiftTemplateData?.data
+        ?.flatMap(d => d.ShiftTemplateItems || [])
+        ?.find(s => s.shiftId === Number(value));
 
       if (selectedShift) {
-        updated[index].inTimeEdit = selectedShift.from;  // Auto-fill based on shift
-        updated[index].outTimeEdit = selectedShift.to;   // Auto-fill based on shift
+        updated[index].shiftStart = selectedShift.startTime;
+        updated[index].shiftLunchBst = selectedShift.lunchBst;
+        updated[index].shiftLunchBET = selectedShift.lunchBET;
+        updated[index].shiftEnd = selectedShift.endTime;
       }
 
       setAbsentData(updated);
       return;
     }
 
-    if (field === "outDate") {
-      const inDate = updated[index].inDate || date;
+    // ----------------------------------
+    // 🔹 2. SHIFT TIME (l / ll / l&ll)
+    // ----------------------------------
+    if (field === "shiftTime") {
+      updated[index].shiftTime = value;
 
-      let inD = new Date(inDate);
-      let outD = new Date(value);
+      const s = updated[index]; // current record
 
-      // Normalize to midnight (fix timezone issues)
-      inD.setHours(0, 0, 0, 0);
-      outD.setHours(0, 0, 0, 0);
+      let inTime = "";
+      let outTime = "";
 
-      if (outD < inD) {
-        Swal.fire({
-          icon: "warning",
-          title: "Invalid Out Date",
-          text: "Out Date cannot be earlier than In Date.",
-          timer: 1500,
-        });
-        return;
+      if (value === "FirstHalf") {
+        inTime = s.shiftStart;
+        outTime = s.shiftLunchBst;
+      } else if (value === "secondHalf") {
+        inTime = s.shiftLunchBET;
+        outTime = s.shiftEnd;
+      } else if (value === "Fully") {
+        inTime = s.shiftStart;
+        outTime = s.shiftEnd;
       }
 
-      let oneDayLater = new Date(inD);
-      oneDayLater.setDate(oneDayLater.getDate() + 1);
-      oneDayLater.setHours(0, 0, 0, 0);
+      updated[index].inTimeEdit = inTime;
+      updated[index].outTimeEdit = outTime;
 
-      if (outD > oneDayLater) {
-        Swal.fire({
-          icon: "warning",
-          title: "Invalid Out Date",
-          text: "Out Date can only be same day or exactly the next day.",
-          timer: 1500,
-        });
-        return;
-      }
+      setAbsentData(updated);
+      return;
     }
 
+    // ----------------------------------
+    // 🔹 3. Out Date validation
+    // ----------------------------------
+    // if (field === "outDate") {
+    //     const inDate = updated[index].inDate || date;
+
+    //     let inD = new Date(inDate);
+    //     let outD = new Date(value);
+
+    //     inD.setHours(0, 0, 0, 0);
+    //     outD.setHours(0, 0, 0, 0);
+
+    //     if (outD < inD) {
+    //         Swal.fire({
+    //             icon: "warning",
+    //             title: "Invalid Out Date",
+    //             text: "Out Date cannot be earlier than In Date.",
+    //             timer: 1500,
+    //         });
+    //         return;
+    //     }
+
+    //     let nextDay = new Date(inD);
+    //     nextDay.setDate(nextDay.getDate() + 1);
+
+    //     if (outD > nextDay) {
+    //         Swal.fire({
+    //             icon: "warning",
+    //             title: "Invalid Out Date",
+    //             text: "Out Date can only be same day or the next day.",
+    //             timer: 1500,
+    //         });
+    //         return;
+    //     }
+    // }
+
+    // ----------------------------------
+    // 🔹 4. Normal field update
+    // ----------------------------------
     updated[index][field] = value;
     setAbsentData(updated);
   };
+
   const handleOnDutyUpdate = (index, field, value) => {
     const updated = structuredClone(onDutyTable);
     if (field === "shiftName") {
@@ -377,6 +435,21 @@ const Form = () => {
 
     setOnDutyTable(onDutyCloned);
 
+    const absentFiltered = allData?.data?.filter((item) => {
+      const condition1 = item.status === "Absent";
+
+      const condition2 =
+        (item.inTime && item.lunchBreakOut && !item.lunchBreakIn && !item.outTime) ||
+        (item.lunchBreakIn && item.outTime && !item.inTime && !item.lunchBreakOut);
+
+      return condition1 || condition2;
+    });
+
+    const absentCloned = absentFiltered?.map(item => ({
+      ...item,
+    }));
+
+    setAbsentData(absentCloned)
 
   }, [allData]);
 
@@ -413,7 +486,7 @@ const Form = () => {
 
   // }, [allData]);
 
-  
+
 
   const handlePunchPermissionToggle = (index) => {
     setSelectedEmployeePunches(prev => {
@@ -553,7 +626,7 @@ const Form = () => {
                 onChange={(e) => {
                   setReportView(e.target.value);
                 }}
-                className="w-[110px]   px-1 py-0.5 text-xs text-[12px] border border-gray-300 rounded-lg
+                className="w-[110px]   px-1 py-0.5 text-[11px] text-[12px] border border-gray-300 rounded-lg
     focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
     transition-all duration-150 shadow-sm"
               >
@@ -586,8 +659,8 @@ const Form = () => {
         }
 
         {
-          openAbsentModal && (<AbsentTable onUpdate={handleAbsentUpdate} onSaveAll={handleSaveAllAbsent} shiftData={shiftData}
-            ShiftTime={ShiftTime} date={date} absentData={absentData} reportView={reportView} selectedShiftType={selectedShiftType} onClose={() => setOpenAbsentModal(false)}
+          openAbsentModal && (<AbsentTable onUpdate={handleAbsentUpdate} onSaveAll={handleSaveAllAbsent} shiftData={shiftData} shiftTemplateData={shiftTemplateData}
+            ShiftTime={ShiftTime} date={date} absentData={absentData} setAbsentData={setAbsentData} reportView={reportView} selectedShiftType={selectedShiftType} onClose={() => setOpenAbsentModal(false)}
           />
           )
         }
@@ -605,59 +678,59 @@ const Form = () => {
             <thead className="bg-gray-200 text-gray-800 border border-gray-400">
               <tr>
                 <th
-                  className={`w-[15px] px-1 text-center font-medium text-[13px]  border border-gray-300`}
+                  className={`w-[15px] px-1 text-center font-medium text-[12px]  border border-gray-300`}
                 >
                   S.No
                 </th>
 
                 <th
-                  className={`w-6  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                  className={`w-6  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                 >
                   MId
                 </th>
                 <th
-                  className={`w-[50px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                  className={`w-[50px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                 >
                   Emp Name
                 </th>
                 <th
-                  className={`w-[30px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                  className={`w-[30px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                 >
                   Shift
                 </th>
                 <th
-                  className={`w-[45px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                  className={`w-[45px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                 >
                   Department
                 </th>
                 <th
-                  className={`w-[65px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                  className={`w-[65px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                 >
                   Designation
                 </th>
                 <th
-                  className={`w-8  py-2 item-center font-medium text-[13px]  border border-gray-300`}
+                  className={`w-8  py-2 item-center font-medium text-[12px]  border border-gray-300`}
                 >
                   In Date
                 </th>
-                <th className={`w-8 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                <th className={`w-8 py-2 item-center font-medium text-[12px]  border border-gray-300`}>
                   In Time
                 </th>
                 <th
-                  className={`w-8 py-2 item-center font-medium text-[13px]  border border-gray-300`}
+                  className={`w-8 py-2 item-center font-medium text-[12px]  border border-gray-300`}
                 >
                   Out Date
                 </th>
-                <th className={`w-8 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                <th className={`w-8 py-2 item-center font-medium text-[12px]  border border-gray-300`}>
                   Out Time
                 </th>
 
                 <th
                   colSpan={reportView === "Seperate" ? 4 : 2}
-                  className={`${reportView === "Single" ? "w-32" : "w-36"} py-2 text-center font-medium text-[13px]  border border-gray-300`}                >
+                  className={`${reportView === "Single" ? "w-32" : "w-36"} py-2 text-center font-medium text-[12px]  border border-gray-300`}                >
                   Other Punches
                 </th>
-                <th className={`w-8 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                <th className={`w-8 py-2 item-center font-medium text-[12px]  border border-gray-300`}>
                   Permission Duration
                 </th>
 
@@ -665,22 +738,22 @@ const Form = () => {
                   <>
                     {/* 1. worked Hours (with Break) */}
 
-                    <th className="w-[45px] py-2 item-center font-medium text-[13px] border border-gray-300">
+                    <th className="w-[45px] py-2 item-center font-medium text-[12px] border border-gray-300">
                       worked Hours (with Break)
                     </th>
 
                     {/* 2. worked Hours (without Break and OT) */}
-                    <th className="w-[40px] py-2 item-center font-medium text-[13px] border border-gray-300">
+                    <th className="w-[40px] py-2 item-center font-medium text-[12px] border border-gray-300">
                       worked Hours (without Break)
                     </th>
 
                     {/* 3. OT Hours */}
-                    <th className="w-[40px] py-2 item-center font-medium text-[13px] border border-gray-300">
+                    <th className="w-[40px] py-2 item-center font-medium text-[12px] border border-gray-300">
                       OT Hours
                     </th>
 
                     {/* 4. Actual Worked Hours (LAST) */}
-                    <th className="w-[40px] py-2 item-center font-medium text-[13px] border border-gray-300">
+                    <th className="w-[40px] py-2 item-center font-medium text-[12px] border border-gray-300">
                       Actual Worked Hours
                     </th>
                   </>
@@ -690,17 +763,17 @@ const Form = () => {
                 {selectedShiftType !== "Hourly" && (
                   <>
                     {/* 1. worked Hours */}
-                    <th className="w-[35px] py-2 item-center font-medium text-[13px] border border-gray-300">
+                    <th className="w-[35px] py-2 item-center font-medium text-[12px] border border-gray-300">
                       worked Hours
                     </th>
 
                     {/* 2. OT Hours */}
-                    <th className="w-[35px] py-2 item-center font-medium text-[13px] border border-gray-300">
+                    <th className="w-[35px] py-2 item-center font-medium text-[12px] border border-gray-300">
                       OT Hours
                     </th>
 
                     {/* 3. Shift Count */}
-                    <th className="w-[30px] py-2 item-center font-medium text-[13px] border border-gray-300">
+                    <th className="w-[30px] py-2 item-center font-medium text-[12px] border border-gray-300">
                       Shift Count
                     </th>
                   </>
@@ -714,15 +787,15 @@ const Form = () => {
 
             <p className=" z-10 w-[100px] text-sm px-1 py-0.5  ">REGULAR</p>
 
-            <tbody>
+            <tbody >
               {regularData?.map((item, index) => (
                 <React.Fragment key={index}>
                   {/* Row 1 - In + Morning */}
-                  <tr>
+                  <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
                     {/* S.No rowspan */}
                     <td
                       rowSpan={2}
-                      className="border border-gray-300 py-1.5 text-[12px]  text-center px-1"
+                      className="border border-gray-300 py-1.5 text-[11px]  text-center px-1"
                     >
                       {index + 1}
                     </td>
@@ -730,7 +803,7 @@ const Form = () => {
                     {/* Employee Id rowspan */}
                     <td
                       rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
+                      className="border border-gray-300 text-[11px] py-0.5 item-center"
                     >
                       <input
                         type="text"
@@ -740,7 +813,7 @@ const Form = () => {
                     </td>
                     <td
                       rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
+                      className="border border-gray-300 text-[11px] py-0.5 item-center"
                     >
                       <input
                         type="text"
@@ -750,7 +823,7 @@ const Form = () => {
                     </td>
                     <td
                       rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
+                      className="border border-gray-300 text-[11px] py-0.5 item-center"
                     >
                       <input
                         type="text"
@@ -760,7 +833,7 @@ const Form = () => {
                     </td>
                     <td
                       rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
+                      className="border border-gray-300 text-[11px] py-0.5 item-center"
                     >
                       <input
                         type="text"
@@ -771,7 +844,7 @@ const Form = () => {
                     </td>
                     <td
                       rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
+                      className="border border-gray-300 text-[11px] py-0.5 item-center"
                     >
                       <input
                         type="text"
@@ -783,7 +856,7 @@ const Form = () => {
                     {/* In Date */}
                     <td
                       rowSpan={2}
-                      className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                      className=" border border-gray-300 text-[11px] py-0.5 item-center"
                     >
                       <input
                         type="text"
@@ -799,7 +872,7 @@ const Form = () => {
                     {/* In Time */}
                     <td
                       rowSpan={2}
-                      className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                      className=" border border-gray-300 text-[11px] py-0.5 item-center"
                     >
                       <input
                         min="0"
@@ -816,7 +889,7 @@ const Form = () => {
                     {/* Out Date */}
                     <td
                       rowSpan={2}
-                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                      className="  border border-gray-300 text-[11px] py-0.5 item-center"
                     >
                       <input
                         type="text"
@@ -832,7 +905,7 @@ const Form = () => {
 
                     <td
                       rowSpan={2}
-                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                      className="  border border-gray-300 text-[11px] py-0.5 item-center"
                     >
                       <input
                         type="text"
@@ -847,14 +920,15 @@ const Form = () => {
 
                     {reportView === "Seperate" && (
                       <>
-                        <td className=" border border-gray-300 text-[12px] py-0.5 ">
+
+                        <td className=" border  border-gray-300 text-[11px] py-0.5 ">
                           <input
                             type="text"
                             value={"OUT"}
                             className={`w-full text-center bg-transparent  focus:outline-none focus:border-transparent `}
                           />
                         </td>
-                        <td className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <td className="border border-gray-300 text-[11px] py-0.5 item-center">
                           <input
                             min="0"
                             type="text"
@@ -869,7 +943,7 @@ const Form = () => {
                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                           />
                         </td>
-                        <td className="border border-gray-300 text-[12px] text-center px-1">
+                        <td className="border border-gray-300 text-[11px] text-center px-1">
                           <input
                             type="text"
                             value={
@@ -883,7 +957,7 @@ const Form = () => {
                             disabled
                           />
                         </td>
-                        <td className="border border-gray-300 text-[12px] text-center px-1">
+                        <td className="border border-gray-300 text-[11px] text-center px-1">
                           <input
                             type="text"
                             value={
@@ -901,7 +975,7 @@ const Form = () => {
                     )}
                     {reportView === "Single" && (
                       <>
-                        <td colSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <td colSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
                           <input
                             type="text"
 
@@ -925,7 +999,7 @@ const Form = () => {
 
                     <td
                       rowSpan={2}
-                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                      className="  border border-gray-300 text-[11px] py-0.5 item-center"
                     >
                       <input
                         type="text"
@@ -938,7 +1012,7 @@ const Form = () => {
 
 
                         {/* 2. worked Hours (without Break and OT) → hourlyWorkedTime */}
-                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
                           <input
                             type="text"
                             value={item.hourlyWorkedTime || ""}
@@ -949,7 +1023,7 @@ const Form = () => {
 
 
                         {/* 4. Actual Worked Hours (LAST) → rawWorkedTime */}
-                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
                           <input
                             type="text"
                             value={item.rawWorkedTime || ""}
@@ -957,7 +1031,7 @@ const Form = () => {
                           />
                         </td>
                         {/* 3. OT Hours */}
-                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
                           <input
                             type="text"
                             value={item.otHours || ""}
@@ -965,7 +1039,7 @@ const Form = () => {
                           />
                         </td>
                         {/* 1. worked Hours (with Break) → actualWorkedTime */}
-                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
                           <input
                             type="text"
                             value={item.actualWorkedTime || ""}
@@ -981,7 +1055,7 @@ const Form = () => {
                     {selectedShiftType !== "Hourly" && (
                       <>
                         {/* 1. worked Hours */}
-                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
                           <input
                             type="text"
                             value={item.totalWorkedTime || ""}
@@ -990,7 +1064,7 @@ const Form = () => {
                         </td>
 
                         {/* 2. OT Hours */}
-                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
                           <input
                             type="text"
                             value={item.otHours || ""}
@@ -999,7 +1073,7 @@ const Form = () => {
                         </td>
 
                         {/* 3. Shift Count */}
-                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
                           <input
                             type="number"
                             value={item.formulaResult || ""}
@@ -1015,8 +1089,9 @@ const Form = () => {
 
                   {/* Row 2 - Evening + Out */}
                   {reportView === "Seperate" && (
-                    <>
-                      <td className=" border border-gray-300 text-[12px] py-0.5 item-center">
+                    <>    <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
+
+                      <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
                         <input
                           type="text"
                           value={"IN"}
@@ -1024,7 +1099,7 @@ const Form = () => {
                         />
                       </td>
                       {/* Morning Break In */}
-                      <td className="border border-gray-300 text-[12px] py-0.5 item-center">
+                      <td className="border border-gray-300 text-[11px] py-0.5 item-center">
                         <input
                           type="text"
                           value={
@@ -1037,7 +1112,7 @@ const Form = () => {
                         />
                       </td>
 
-                      <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
+                      <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
                         <input
                           type="text"
                           value={
@@ -1051,7 +1126,7 @@ const Form = () => {
                           disabled
                         />
                       </td>
-                      <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
+                      <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
                         <input
                           type="text"
                           value={
@@ -1065,10 +1140,11 @@ const Form = () => {
                           disabled
                         />
                       </td>
+                    </tr>
                     </>
                   )}
 
-                  <tr>{/* Evening Break In */}</tr>
+                  <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>{/* Evening Break In */}</tr>
                 </React.Fragment>
               ))}
             </tbody>
@@ -1077,11 +1153,11 @@ const Form = () => {
               {irregularData?.map((item, index) => (
                 <React.Fragment key={index}>
                   {/* Row 1 - In + Morning */}
-                  <tr>
+                  <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
                     {/* S.No rowspan */}
                     <td
                       rowSpan={2}
-                      className="border border-gray-300 py-1.5 text-[12px]  text-center px-1"
+                      className="border  border-gray-300 py-1.5 text-[11px]  text-center px-1"
                     >
                       {index + 1}
                     </td>
@@ -1089,7 +1165,7 @@ const Form = () => {
                     {/* Employee Id rowspan */}
                     <td
                       rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
+                      className="border border-gray-300 text-[11px] py-0.5 item-center"
                     >
                       <input
                         type="text"
@@ -1099,7 +1175,7 @@ const Form = () => {
                     </td>
                     <td
                       rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
+                      className="border border-gray-300 text-[11px] py-0.5 item-center"
                     >
                       <input
                         type="text"
@@ -1109,7 +1185,7 @@ const Form = () => {
                     </td>
                     <td
                       rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
+                      className="border border-gray-300 text-[11px] py-0.5 item-center"
                     >
                       <input
                         type="text"
@@ -1119,7 +1195,7 @@ const Form = () => {
                     </td>
                     <td
                       rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
+                      className="border border-gray-300 text-[11px] py-0.5 item-center"
                     >
                       <input
                         type="text"
@@ -1129,7 +1205,7 @@ const Form = () => {
                     </td>
                     <td
                       rowSpan={2}
-                      className="border border-gray-300 text-[12px] py-0.5 item-center"
+                      className="border border-gray-300 text-[11px] py-0.5 item-center"
                     >
                       <input
                         type="text"
@@ -1141,7 +1217,7 @@ const Form = () => {
                     {/* In Date */}
                     <td
                       rowSpan={2}
-                      className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                      className=" border border-gray-300 text-[11px] py-0.5 item-center"
                     >
                       <input
                         type="text"
@@ -1157,7 +1233,7 @@ const Form = () => {
                     {/* In Time */}
                     <td
                       rowSpan={2}
-                      className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                      className=" border border-gray-300 text-[11px] py-0.5 item-center"
                     >
                       <input
                         min="0"
@@ -1174,7 +1250,7 @@ const Form = () => {
                     {/* Out Date */}
                     <td
                       rowSpan={2}
-                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                      className="  border border-gray-300 text-[11px] py-0.5 item-center"
                     >
                       <input
                         type="text"
@@ -1190,7 +1266,7 @@ const Form = () => {
 
                     <td
                       rowSpan={2}
-                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                      className="  border border-gray-300 text-[11px] py-0.5 item-center"
                     >
                       <input
                         type="text"
@@ -1205,14 +1281,14 @@ const Form = () => {
 
                     {reportView === "Seperate" && (
                       <>
-                        <td className=" border border-gray-300 text-[12px] py-0.5 ">
+                        <td className=" border border-gray-300 text-[11px] py-0.5 ">
                           <input
                             type="text"
                             value={"OUT"}
                             className={`w-full text-center bg-transparent  focus:outline-none focus:border-transparent `}
                           />
                         </td>
-                        <td className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <td className="border border-gray-300 text-[11px] py-0.5 item-center">
                           <input
                             min="0"
                             type="text"
@@ -1227,7 +1303,7 @@ const Form = () => {
                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                           />
                         </td>
-                        <td className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <td className="border border-gray-300 text-[11px] py-0.5 item-center">
                           <input
                             min="0"
                             type="text"
@@ -1242,7 +1318,7 @@ const Form = () => {
                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                           />
                         </td>
-                        <td className="border border-gray-300 text-[12px] text-center px-1">
+                        <td className="border border-gray-300 text-[11px] text-center px-1">
                           <input
                             type="text"
                             value={
@@ -1260,7 +1336,7 @@ const Form = () => {
                     )}
                     {reportView === "Single" && (
                       <>
-                        <td colSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <td colSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
                           <input
                             type="text"
 
@@ -1283,7 +1359,7 @@ const Form = () => {
 
                     <td
                       rowSpan={2}
-                      className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                      className="  border border-gray-300 text-[11px] py-0.5 item-center"
                     >
                       <input
                         type="text"
@@ -1297,7 +1373,7 @@ const Form = () => {
 
 
                         {/* 2. worked Hours (without Break and OT) → hourlyWorkedTime */}
-                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
                           <input
                             type="text"
                             value={item.hourlyWorkedTime || ""}
@@ -1308,7 +1384,7 @@ const Form = () => {
 
 
                         {/* 4. Actual Worked Hours (LAST) → rawWorkedTime */}
-                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
                           <input
                             type="text"
                             value={item.rawWorkedTime || ""}
@@ -1316,7 +1392,7 @@ const Form = () => {
                           />
                         </td>
                         {/* 3. OT Hours */}
-                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
                           <input
                             type="text"
                             value={item.otHours || ""}
@@ -1324,7 +1400,7 @@ const Form = () => {
                           />
                         </td>
                         {/* 1. worked Hours (with Break) → actualWorkedTime */}
-                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
                           <input
                             type="text"
                             value={item.actualWorkedTime || ""}
@@ -1340,7 +1416,7 @@ const Form = () => {
                     {selectedShiftType !== "Hourly" && (
                       <>
                         {/* 1. worked Hours */}
-                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
                           <input
                             type="text"
                             value={item.totalWorkedTime || ""}
@@ -1349,7 +1425,7 @@ const Form = () => {
                         </td>
 
                         {/* 2. OT Hours */}
-                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
                           <input
                             type="text"
                             value={item.otHours || ""}
@@ -1358,7 +1434,7 @@ const Form = () => {
                         </td>
 
                         {/* 3. Shift Count */}
-                        <td rowSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center">
+                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
                           <input
                             type="number"
                             value={item.formulaResult || ""}
@@ -1371,81 +1447,85 @@ const Form = () => {
 
                   {/* Row 2 - Evening + Out */}
                   {reportView === "Seperate" && (
-                    <>
-                      <td className=" border border-gray-300 text-[12px] py-0.5 item-center">
-                        <input
-                          type="text"
-                          value={"IN"}
-                          className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                        />
-                      </td>
-                      {/* Morning Break In */}
-                      <td className="border border-gray-300 text-[12px] py-0.5 item-center">
-                        <input
-                          type="text"
-                          value={
-                            item.firstBreakIn
-                              ? moment.utc(item.firstBreakIn).format("HH:mm:ss")
-                              : ""
-                          }
-                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                          disabled
-                        />
-                      </td>
-                      <td className="border border-gray-300 text-[12px] py-0.5 item-center">
-                        <input
-                          type="text"
-                          value={
-                            item.lunchBreakIn
-                              ? moment.utc(item.lunchBreakIn).format("HH:mm:ss")
-                              : ""
-                          }
-                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                          disabled
-                        />
-                      </td>
 
-                      <td className="  border border-gray-300 text-[12px] py-0.5 item-center">
-                        <input
-                          type="text"
-                          value={
-                            item.eveningBreakIn
-                              ? moment
-                                .utc(item.eveningBreakIn)
-                                .format("HH:mm:ss")
-                              : ""
-                          }
-                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                          disabled
-                        />
-                      </td>
+                    <>
+                      <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
+
+                        <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+                          <input
+                            type="text"
+                            value={"IN"}
+                            className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                          />
+                        </td>
+                        {/* Morning Break In */}
+                        <td className="border border-gray-300 text-[11px] py-0.5 item-center">
+                          <input
+                            type="text"
+                            value={
+                              item.firstBreakIn
+                                ? moment.utc(item.firstBreakIn).format("HH:mm:ss")
+                                : ""
+                            }
+                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                            disabled
+                          />
+                        </td>
+                        <td className="border border-gray-300 text-[11px] py-0.5 item-center">
+                          <input
+                            type="text"
+                            value={
+                              item.lunchBreakIn
+                                ? moment.utc(item.lunchBreakIn).format("HH:mm:ss")
+                                : ""
+                            }
+                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                            disabled
+                          />
+                        </td>
+
+                        <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                          <input
+                            type="text"
+                            value={
+                              item.eveningBreakIn
+                                ? moment
+                                  .utc(item.eveningBreakIn)
+                                  .format("HH:mm:ss")
+                                : ""
+                            }
+                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                            disabled
+                          />
+                        </td>
+                      </tr>
                     </>
                   )}
 
-                  <tr>{/* Evening Break In */}</tr>
+                  <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>{/* Evening Break In */}</tr>
                 </React.Fragment>
               ))}
             </tbody>
             <p className="z-10 w-[100px] text-sm px-1 py-0.5 ">ABSENT</p>
             <tbody>
-              {absentData?.map((item, index) => (
+              {absentTable?.map((item, index) => (
                 <>
                   {/* Row 1 - In + Morning */}
-                  <tr>
+                  <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
                     {/* S.No rowspan */}
-                    <td className="border border-gray-300 py-1.5 text-[12px]  text-center px-1">
+                    <td className="border border-gray-300 py-1.5 text-[11px]  text-center px-1">
                       {index + 1}
                     </td>
 
                     {/* Employee Id rowspan */}
-                    <td className="border border-gray-300 text-[12px] py-0.5 item-center">
+                    <td className="border border-gray-300 text-[11px] py-0.5 item-center">
                       <input
                         type="text"
                         value={item?.mIdCard}
                         className={`w-full   text-right pr-1 bg-transparent   focus:outline-none focus:border-transparent `}
                       />
                     </td>
-                    <td className="border border-gray-300 text-[12px] py-0.5 item-center">
+                    <td className="border border-gray-300 text-[11px] py-0.5 item-center">
                       <input
                         type="text"
                         value={item?.firstName}
@@ -1492,12 +1572,12 @@ const Form = () => {
                       const breakItem = selectedBreakSummary[key];
                       return (
                         <tr key={key}>
-                          <td className="border border-gray-300 py-1 text-[12px]  text-left px-1 capitalize">{key}</td>
-                          <td className="border border-gray-300 py-1 text-[12px]  text-left px-1">{breakItem?.status || "-"}</td>
-                          <td className="border border-gray-300 py-1 text-[12px]  text-center px-1">
+                          <td className="border border-gray-300 py-1 text-[11px]  text-left px-1 capitalize">{key}</td>
+                          <td className="border border-gray-300 py-1 text-[11px]  text-left px-1">{breakItem?.status || "-"}</td>
+                          <td className="border border-gray-300 py-1 text-[11px]  text-center px-1">
                             {breakItem?.punch || "-"}
                           </td>
-                          <td className="border border-gray-300 py-1 text-[12px]  text-center px-1">{breakItem?.delay || "-"}</td>
+                          <td className="border border-gray-300 py-1 text-[11px]  text-center px-1">{breakItem?.delay || "-"}</td>
                         </tr>
                       );
                     })}
@@ -1520,15 +1600,15 @@ const Form = () => {
                       const breakItem = selectedBreakSummary[key];
                       return (
                         <tr key={key}>
-                          <td className="border border-gray-300 py-1 text-[12px]  text-left px-1 capitalize">{key}</td>
-                          <td className="border border-gray-300 py-1 text-[12px]  text-left px-1">{breakItem?.status || "-"}</td>
-                          <td className="border border-gray-300 py-1 text-[12px]  text-center px-1">
+                          <td className="border border-gray-300 py-1 text-[11px]  text-left px-1 capitalize">{key}</td>
+                          <td className="border border-gray-300 py-1 text-[11px]  text-left px-1">{breakItem?.status || "-"}</td>
+                          <td className="border border-gray-300 py-1 text-[11px]  text-center px-1">
                             {breakItem?.punch || breakItem?.punches?.in
                               ? breakItem?.punch || `${breakItem.punches.out} - ${breakItem.punches.in} `
                               : "-"}
                           </td>
-                          <td className="border border-gray-300 py-1 text-[12px]  text-center px-1">{breakItem?.breakDuration || "-"}</td>
-                          <td className="border border-gray-300 py-1 text-[12px]  text-center px-1">{breakItem?.delay || "-"}</td>
+                          <td className="border border-gray-300 py-1 text-[11px]  text-center px-1">{breakItem?.breakDuration || "-"}</td>
+                          <td className="border border-gray-300 py-1 text-[11px]  text-center px-1">{breakItem?.delay || "-"}</td>
                         </tr>
                       );
                     })}
@@ -1576,7 +1656,7 @@ const Form = () => {
                             />
                           </div>
                           {/* <div className="w-52">
-                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            <label className="block text-[11px] font-semibold text-slate-700 mb-1">
                               Employee Category
                               <span className="text-red-500">*</span>
                             </label>
@@ -1596,7 +1676,7 @@ const Form = () => {
                               menuShouldScrollIntoView={false}
                               maxMenuHeight={150} // <-- Reduce height here
                               onInputChange={(value) => value.toUpperCase()}
-                              className="w-full px-1 text-[12px] text-black -ml-1 text-xs rounded-lg
+                              className="w-full px-1 text-[11px] text-black -ml-1 text-[11px] rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
                               styles={customSelectStyles}
@@ -1604,13 +1684,13 @@ const Form = () => {
                           </div> */}
                           {/* <div className="mb-3">
                             {" "}
-                            <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            <label className="block text-[11px] font-semibold text-slate-700 mb-1">
                               {" "}
                               Group By{" "}
                             </label>{" "}
                             <select
                               value={groupBy}
-                              className="w-full px-1 py-0.5 text-xs text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-150 shadow-sm"
+                              className="w-full px-1 py-0.5 text-[11px] text-[12px] border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-150 shadow-sm"
                               onChange={(e) => setGroupBy(e.target.value)}
                             >
                               {" "}
@@ -1644,7 +1724,7 @@ const Form = () => {
                                 setForm(false);
                               }}
                               className="px-3 py-1.5 font-sans hover:bg-green-600 h-6 mt-5 hover:text-white rounded text-green-600 
-                          border border-green-600 flex items-center gap-1 text-xs"
+                          border border-green-600 flex items-center gap-1 text-[11px]"
                               type="button"
                             >
                               Generate Report
