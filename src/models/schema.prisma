@@ -1882,6 +1882,7 @@ model PythonPunchData {
   isPermission       Boolean?
   isOnDuty           Boolean?
   permissionTime     String?
+  isEditedPunch      Boolean?
 
   @@unique([mIdCard, timestamp])
 }

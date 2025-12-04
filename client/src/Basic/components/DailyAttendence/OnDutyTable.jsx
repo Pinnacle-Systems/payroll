@@ -45,59 +45,59 @@ const OnDutyTable = ({ selectedShiftType, onDutyTable, reportView, onClose, onUp
                                 <thead className="bg-gray-200 text-gray-800 border border-gray-400">
                                     <tr>
                                         <th
-                                            className={`w-[15px] px-1 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-[15px] px-1 text-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             S.No
                                         </th>
 
                                         <th
-                                            className={`w-6  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-6  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             MId
                                         </th>
                                         <th
-                                            className={`w-[50px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-[50px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             Emp Name
                                         </th>
                                         {/* <th
-                                            className={`w-[40px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-[40px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             Shift
                                         </th>
                                         <th
-                                            className={`w-[40px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-[40px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             Present
                                         </th> */}
                                         <th
-                                            className={`w-[45px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-[45px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             Department
                                         </th>
                                         <th
-                                            className={`w-[70px]  py-2 text-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-[70px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             Designation
                                         </th>
                                         <th
-                                            className={`w-12  py-2 item-center font-medium text-[13px]  border border-gray-300`}
+                                            className={`w-12  py-2 item-center font-medium text-[12px]  border border-gray-300`}
                                         >
                                             In Date
                                         </th>
-                                        <th className={`w-12 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                                        <th className={`w-12 py-2 item-center font-medium text-[12px]  border border-gray-300`}>
                                             In Time
                                         </th>
-                                        <th className={`w-12 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                                        <th className={`w-12 py-2 item-center font-medium text-[12px]  border border-gray-300`}>
                                             Out Date
                                         </th>
 
-                                        <th className={`w-12 py-2 item-center font-medium text-[13px]  border border-gray-300`}>
+                                        <th className={`w-12 py-2 item-center font-medium text-[12px]  border border-gray-300`}>
                                             Out Time
                                         </th>
                                         <th
                                             colSpan={reportView === "Seperate" ? 4 : 2}
-                                            className={`${reportView === "Single" ? "w-32" : "w-36"} py-2 text-center font-medium text-[13px]  border border-gray-300`}                >
+                                            className={`${reportView === "Single" ? "w-32" : "w-36"} py-2 text-center font-medium text-[12px]  border border-gray-300`}                >
                                             Other Punches
                                         </th>
 
@@ -108,11 +108,11 @@ const OnDutyTable = ({ selectedShiftType, onDutyTable, reportView, onClose, onUp
                                     {onDutyTable?.map((item, index) => (
                                         <React.Fragment key={index}>
                                             {/* Row 1 - In + Morning */}
-                                            <tr>
+                                            <tr  className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
                                                 {/* S.No rowspan */}
                                                 <td
                                                     rowSpan={2}
-                                                    className="border border-gray-300 py-1.5 text-[12px]  text-center px-1"
+                                                    className="border border-gray-300 py-1.5 text-[11px]  text-center px-1"
                                                 >
                                                     {index + 1}
                                                 </td>
@@ -120,7 +120,7 @@ const OnDutyTable = ({ selectedShiftType, onDutyTable, reportView, onClose, onUp
                                                 {/* Employee Id rowspan */}
                                                 <td
                                                     rowSpan={2}
-                                                    className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
                                                 >
                                                     <input
                                                         type="text"
@@ -130,7 +130,7 @@ const OnDutyTable = ({ selectedShiftType, onDutyTable, reportView, onClose, onUp
                                                 </td>
                                                 <td
                                                     rowSpan={2}
-                                                    className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
                                                 >
                                                     <input
                                                         type="text"
@@ -142,7 +142,7 @@ const OnDutyTable = ({ selectedShiftType, onDutyTable, reportView, onClose, onUp
 
                                                 <td
                                                     rowSpan={2}
-                                                    className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
                                                 >
                                                     <input
                                                         type="text"
@@ -154,7 +154,7 @@ const OnDutyTable = ({ selectedShiftType, onDutyTable, reportView, onClose, onUp
 
                                                 <td
                                                     rowSpan={2}
-                                                    className="border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
                                                 >
                                                     <input
                                                         type="text"
@@ -166,7 +166,7 @@ const OnDutyTable = ({ selectedShiftType, onDutyTable, reportView, onClose, onUp
                                                 {/* In Date */}
                                                 <td
                                                     rowSpan={2}
-                                                    className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    className=" border border-gray-300 text-[11px] py-0.5 item-center"
                                                 >
                                                     <input
                                                         type="date"
@@ -181,7 +181,7 @@ const OnDutyTable = ({ selectedShiftType, onDutyTable, reportView, onClose, onUp
 
                                                 <td
                                                     rowSpan={2}
-                                                    className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    className=" border border-gray-300 text-[11px] py-0.5 item-center"
                                                 >
                                                     <input
                                                         min="0"
@@ -204,7 +204,7 @@ const OnDutyTable = ({ selectedShiftType, onDutyTable, reportView, onClose, onUp
                                                 {/* out Date */}
                                                 <td
                                                     rowSpan={2}
-                                                    className=" border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    className=" border border-gray-300 text-[11px] py-0.5 item-center"
                                                 >
                                                     <input
                                                         type="date"
@@ -220,7 +220,7 @@ const OnDutyTable = ({ selectedShiftType, onDutyTable, reportView, onClose, onUp
 
                                                 <td
                                                     rowSpan={2}
-                                                    className="  border border-gray-300 text-[12px] py-0.5 item-center"
+                                                    className="  border border-gray-300 text-[11px] py-0.5 item-center"
                                                 >
                                                     <input
                                                         min="0"
@@ -242,14 +242,14 @@ const OnDutyTable = ({ selectedShiftType, onDutyTable, reportView, onClose, onUp
                                                 </td>
                                                 {reportView === "Seperate" && (
                                                     <>
-                                                        <td className=" border border-gray-300 text-[12px] py-0.5 " >
+                                                        <td className=" border border-gray-300 text-[11px] py-0.5 " >
                                                             <input
                                                                 type="text"
                                                                 value={"OUT"}
                                                                 className={`w-full text-center bg-transparent  focus:outline-none focus:border-transparent `}
                                                             />
                                                         </td>
-                                                        <td className="border border-gray-300 text-[12px] py-0.5 item-center" >
+                                                        <td className="border border-gray-300 text-[11px] py-0.5 item-center" >
                                                             <input
                                                                 min="0"
                                                                 type="text"
@@ -264,7 +264,7 @@ const OnDutyTable = ({ selectedShiftType, onDutyTable, reportView, onClose, onUp
                                                                 className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                                                             />
                                                         </td>
-                                                        <td className="border border-gray-300 text-[12px] text-center px-1" >
+                                                        <td className="border border-gray-300 text-[11px] text-center px-1" >
                                                             <input
                                                                 type="text"
                                                                 value={
@@ -278,7 +278,7 @@ const OnDutyTable = ({ selectedShiftType, onDutyTable, reportView, onClose, onUp
 
                                                             />
                                                         </td>
-                                                        <td className="border border-gray-300 text-[12px] text-center px-1" >
+                                                        <td className="border border-gray-300 text-[11px] text-center px-1" >
                                                             <input
                                                                 type="text"
                                                                 value={
@@ -296,7 +296,7 @@ const OnDutyTable = ({ selectedShiftType, onDutyTable, reportView, onClose, onUp
                                                 )}
                                                 {reportView === "Single" && (
                                                     <>
-                                                        <td colSpan={2} className="border border-gray-300 text-[12px] py-0.5 item-center" >
+                                                        <td colSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center" >
                                                             <input
                                                                 type="text"
 
@@ -319,7 +319,8 @@ const OnDutyTable = ({ selectedShiftType, onDutyTable, reportView, onClose, onUp
                                             </tr>
                                             {reportView === "Seperate" && (
                                                 <>
-                                                    <td className=" border border-gray-300 text-[12px] py-0.5 item-center" >
+                                                 <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
+                                                    <td className=" border border-gray-300 text-[11px] py-0.5 item-center" >
                                                         <input
                                                             type="text"
                                                             value={"IN"}
@@ -327,7 +328,7 @@ const OnDutyTable = ({ selectedShiftType, onDutyTable, reportView, onClose, onUp
                                                         />
                                                     </td>
                                                     {/* Morning Break In */}
-                                                    <td className="border border-gray-300 text-[12px] py-0.5 item-center" >
+                                                    <td className="border border-gray-300 text-[11px] py-0.5 item-center" >
                                                         <input
                                                             type="text"
                                                             value={
@@ -340,7 +341,7 @@ const OnDutyTable = ({ selectedShiftType, onDutyTable, reportView, onClose, onUp
                                                         />
                                                     </td>
 
-                                                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center" >
+                                                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center" >
                                                         <input
                                                             type="text"
                                                             value={
@@ -354,7 +355,7 @@ const OnDutyTable = ({ selectedShiftType, onDutyTable, reportView, onClose, onUp
 
                                                         />
                                                     </td>
-                                                    <td className="  border border-gray-300 text-[12px] py-0.5 item-center" >
+                                                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center" >
                                                         <input
                                                             type="text"
                                                             value={
@@ -367,7 +368,7 @@ const OnDutyTable = ({ selectedShiftType, onDutyTable, reportView, onClose, onUp
                                                             className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
 
                                                         />
-                                                    </td>
+                                                    </td></tr>
                                                 </>
                                             )}
                                             <tr></tr>

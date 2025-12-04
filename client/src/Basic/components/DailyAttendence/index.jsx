@@ -4,7 +4,7 @@ import { ReusableTable, DateInput, customSelectStyles } from "../../../Inputs";
 import Select from "react-select";
 import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCategoryMasterService";
 import { useGetEmployeeQuery } from "../../../redux/services/EmployeeMasterService";
-import { useLazyGetAttendenceGenerationQuery, useAddmanualPunchMutation, useUpdatePermissionMutation } from "../../../redux/services/AttenedenceGeneration";
+import { useLazyGetAttendenceGenerationQuery, useAddmanualPunchMutation, useUpdatePermissionMutation, useUpdateAbsentPunchesMutation } from "../../../redux/services/AttenedenceGeneration";
 import Modal from "../../../UiComponents/Modal";
 import { GroupBy, ShiftTime } from "../../../Utils/DropdownData";
 import { getCommonParams } from "../../../Utils/helper";
@@ -40,6 +40,7 @@ const Form = () => {
   const [irregularData, setIrregularData] = useState([]);
   const [permissionTable, setPermissionTable] = useState([])
   const [onDutyTable, setOnDutyTable] = useState([])
+  const [halfDay, setHalfDay] = useState([])
   const [showPermissionModal, setShowPermissionModal] = useState(false);
   const [selectedEmployeePunches, setSelectedEmployeePunches] = useState([]);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -47,9 +48,11 @@ const Form = () => {
   const [selectedEmployeeOtherPunches, setSelectedEmployeeOtherPunches] = useState([]);
   const [selectedEmployeeOther, setSelectedEmployeeOther] = useState(null);
   const [showCombinedModal, setShowCombinedModal] = useState(false)
-
-
-
+  const [fullDayLeave, setFullDayLeave] = useState("Full Day Leave")
+  const [showPunchModal, setShowPunchModal] = useState(false);
+  const [selectedRecord, setSelectedRecord] = useState(null);
+  const [newPunchList, setNewPunchList] = useState([]);
+  const [newPunchTime, setNewPunchTime] = useState("");
 
   const { data: shiftData } = useGetshiftMasterQuery({ params });
   const { data: shiftTemplateData } = useGetShiftTemplateMasterQuery({ params })
@@ -70,6 +73,7 @@ const Form = () => {
   const { data: employeeData } = useGetEmployeeQuery({ params });
   const [manualPunch] = useAddmanualPunchMutation();
   const [updatePermission] = useUpdatePermissionMutation()
+  const [updatedAbsentPunches] = useUpdateAbsentPunchesMutation()
 
   useEffect(() => {
     if (form && designationRef.current) {
@@ -408,9 +412,8 @@ const Form = () => {
     // Step 3: store into state
     setPermissionTable(cloned);
 
-    // -------------------------------
     // 2️⃣ ON DUTY TABLE FILTER
-    // -------------------------------
+
     const onDutyFiltered = allData.data.filter((item) => {
       const punches = item?.punches ?? [];
       return item.status === "Absent" || punches.length <= 4;
@@ -437,12 +440,7 @@ const Form = () => {
 
     const absentFiltered = allData?.data?.filter((item) => {
       const condition1 = item.status === "Absent";
-
-      const condition2 =
-        (item.inTime && item.lunchBreakOut && !item.lunchBreakIn && !item.outTime) ||
-        (item.lunchBreakIn && item.outTime && !item.inTime && !item.lunchBreakOut);
-
-      return condition1 || condition2;
+      return condition1
     });
 
     const absentCloned = absentFiltered?.map(item => ({
@@ -450,42 +448,17 @@ const Form = () => {
     }));
 
     setAbsentData(absentCloned)
+    const halfDayDatafiltered = allData?.data?.filter((item) =>
+      item?.absentTableData?.some(val => val.allPunches && val.allPunches.length > 0)
+    ) || [];
+    const halfDayData = halfDayDatafiltered?.map(item => ({
+      ...item,
+    }));
+
+    setHalfDay(halfDayData)
+
 
   }, [allData]);
-
-
-
-
-  // useEffect(() => {
-  //   if (!allData?.data) return;
-
-  //   // Step 1: filter data
-  //   const filtered = allData.data.filter((item) => {
-  //     const bs = item.breakSummary;
-  //     if (!bs) return false;
-
-  //     const hasMorningLate = bs.morningInOut?.status === "Late";
-  //     const hasEveningEarly = bs.eveningInOut?.status === "Out Early";
-  //     const hasOutsideTolerance = Array.isArray(bs.outsideTolerance) && bs.outsideTolerance.length > 0;
-
-  //     return (hasMorningLate || hasEveningEarly) && hasOutsideTolerance;
-  //   });
-
-  //   // Step 2: clone each filtered item so it becomes editable
-  //   const cloned = filtered.map(item => ({
-  //     ...item,
-  //     // Step 2a: pre-check permission if backend says isPermission = 1
-  //     morningPermission: item.breakSummary.morningInOut?.isPermission === 1,
-  //     eveningPermission: item.breakSummary.eveningInOut?.isPermission === 1,
-  //     isPermission: false, // optional for global row permission
-  //     isOnDuty: false
-  //   }));
-
-  //   // Step 3: store into state
-  //   setPermissionTable(cloned);
-
-  // }, [allData]);
-
 
 
   const handlePunchPermissionToggle = (index) => {
@@ -552,11 +525,6 @@ const Form = () => {
   };
 
 
-
-
-
-  console.log(permissionTable, "permissionTableindex");
-
   const handleSavePermission = async () => {
     const payload = selectedEmployeePunches?.filter(p => p.isPermission)?.map(p => ({
       mIdCard: selectedEmployee.mIdCard,
@@ -570,6 +538,103 @@ const Form = () => {
 
 
   }
+
+  const handleAddPunch = () => {
+    if (!newPunchTime) return; // must have a time
+
+    const date =
+      selectedRecord?.punches?.[0]?.timestamp?.split(" ")[0] ||
+      moment().format("YYYY-MM-DD");
+
+    const fullTimestamp = makeTimestamp(date, newPunchTime);
+    // ---------- VALIDATION ----------
+    // 1️⃣ Check in existing punches
+    const existsInOld =
+      selectedRecord?.punches?.some(
+        (p) => moment(p.timestamp).format("YYYY-MM-DD HH:mm:ss") === fullTimestamp
+      );
+
+    // 2️⃣ Check in new punches
+    const existsInNew =
+      selectedRecord?.newPunchList?.some(
+        (p) => p.timestamp === fullTimestamp
+      );
+
+    if (existsInOld || existsInNew) {
+      Swal.fire({
+        icon: "warning",
+        title: "warning",
+        text: "Duplicate Punches not allowed",
+      }); return;
+    }
+
+    const updatedPunchList = [
+      ...(selectedRecord.newPunchList || []),
+      {
+        employeeId: selectedRecord.employeeId,
+        mIdCard: selectedRecord.mIdCard,
+        timestamp: fullTimestamp,
+        isEditedPunch: true,
+        machineType: "IN / OUT",
+        machineIP: "192.168.1.50",
+        machineInOutGridId: 9,
+      }
+    ];
+
+    setSelectedRecord({
+      ...selectedRecord,
+      newPunchList: updatedPunchList,
+      newPunchTime: "",
+    });
+    setNewPunchTime(""); // clear input after adding
+
+  };
+  const handleSaveAllPunches = async () => {
+    if (!selectedRecord?.newPunchList?.length) {
+      Swal.fire({
+        icon: "warning",
+        title: "No punches",
+        text: "Please enter at least one In or Out time before updating.",
+        timer: 2000,
+
+      })
+      return
+    }
+
+    const payload = selectedRecord.newPunchList;
+
+    const data = { payload }
+
+    console.log("FINAL PAYLOAD:", payload);
+
+    try {
+      await updatedAbsentPunches(data).unwrap();
+
+      await triggerReport({
+        searchParams: {
+          date,
+        },
+      });
+      // ✅ Show success alert
+      Swal.fire({
+        icon: "success",
+        title: "Updated!",
+        text: "Attendance punches have been successfully updated.",
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } catch (err) {
+      console.error("Error saving punches:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Failed to update attendance punches.",
+      });
+      return;
+    }
+
+    setShowPunchModal(false);
+  };
 
   return (
     <div>
@@ -632,7 +697,8 @@ const Form = () => {
               >
                 <option value="Seperate">Seperate</option>
                 <option value="Single">Single</option>
-              </select></div>
+              </select>
+            </div>
 
           </div>
         </div>
@@ -660,7 +726,10 @@ const Form = () => {
 
         {
           openAbsentModal && (<AbsentTable onUpdate={handleAbsentUpdate} onSaveAll={handleSaveAllAbsent} shiftData={shiftData} shiftTemplateData={shiftTemplateData}
-            ShiftTime={ShiftTime} date={date} absentData={absentData} setAbsentData={setAbsentData} reportView={reportView} selectedShiftType={selectedShiftType} onClose={() => setOpenAbsentModal(false)}
+            ShiftTime={ShiftTime} date={date} absentData={absentData} setAbsentData={setAbsentData} reportView={reportView} selectedShiftType={selectedShiftType}
+            onClose={() => setOpenAbsentModal(false)} halfDay={halfDay} setHalfDay={setHalfDay} fullDayLeave={fullDayLeave} setFullDayLeave={setFullDayLeave} handleAddPunch={handleAddPunch} showPunchModal={showPunchModal} setShowPunchModal={setShowPunchModal} setNewPunchList={setNewPunchList} newPunchTime={newPunchTime} setNewPunchTime={setNewPunchTime} handleSaveAllPunches={handleSaveAllPunches} selectedRecord={selectedRecord} newPunchList={newPunchList} setSelectedRecord={setSelectedRecord}
+
+
           />
           )
         }

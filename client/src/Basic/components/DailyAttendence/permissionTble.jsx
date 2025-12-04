@@ -406,7 +406,8 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                         <>
                                                             <td className=" border border-gray-300 text-[11px] py-0.5 " onClick={() => openCombinedModal(item)}>
                                                                 <input
-                                                                    type="text"
+                                                                    type="text" title="Open Modal"
+
                                                                     value={"OUT"} onClick={() => openCombinedModal(item)}
                                                                     className={`w-full text-center bg-transparent  focus:outline-none focus:border-transparent `}
                                                                 />
@@ -421,7 +422,8 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                                 .utc(item.firstBreakOut)
                                                                                 .format("HH:mm:ss")
                                                                             : ""
-                                                                    }
+                                                                    } title="Open Modal"
+
                                                                     onFocus={(e) => e.target.select()} onClick={() => openCombinedModal(item)}
                                                                     className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                                                                 />
@@ -435,7 +437,8 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                                 .utc(item.lunchBreakOut)
                                                                                 .format("HH:mm:ss")
                                                                             : ""
-                                                                    }
+                                                                    } title="Open Modal"
+
                                                                     className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
                                                                     onClick={() => openCombinedModal(item)}
                                                                 />
@@ -449,7 +452,8 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                                 .utc(item.eveningBreakOut)
                                                                                 .format("HH:mm:ss")
                                                                             : ""
-                                                                    }
+                                                                    } title="Open Modal"
+
                                                                     className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
                                                                     onClick={() => openCombinedModal(item)}
                                                                 />
@@ -461,6 +465,8 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                             <td colSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
                                                                 <input
                                                                     type="text"
+                                                                    title="Open Modal"
+
                                                                     onClick={() => openCombinedModal(item)}
                                                                     value={[
                                                                         item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
@@ -490,6 +496,8 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                     type="text"
                                                                     value={"IN"} onClick={() => openCombinedModal(item)}
                                                                     className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                                                                    title="Open Modal"
+
                                                                 />
                                                             </td>
                                                             {/* Morning Break In */}
@@ -502,6 +510,7 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                             : ""
                                                                     }
                                                                     className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                                                                    title="Open Modal"
 
                                                                 />
                                                             </td>
@@ -518,6 +527,8 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                     }
                                                                     className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
                                                                     onClick={() => openCombinedModal(item)}
+                                                                    title="Open Modal"
+
                                                                 />
                                                             </td>
                                                             <td className="  border border-gray-300 text-[11px] py-0.5 item-center" onClick={() => openCombinedModal(item)}>
@@ -530,6 +541,8 @@ const Permissiontable = ({ reportView, permissionTable, selectedShiftType, handl
                                                                                 .format("HH:mm:ss")
                                                                             : ""
                                                                     }
+                                                                    title="Open Modal"
+
                                                                     className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
                                                                     onClick={() => openCombinedModal(item)}
                                                                 />

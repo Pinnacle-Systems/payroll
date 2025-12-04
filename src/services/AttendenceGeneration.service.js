@@ -955,5 +955,34 @@ async function updatePermissionPunches(body) {
   return { statusCode: 0, data };
 }
 
+async function updateAbsentPunches(body) {
+  const { payload } = body;
+  console.log("Received punches:", payload);
 
-export { get, addAbsentPunches, updatePermissionPunches };
+  const formatted = payload?.map(item => {
+    const local = new Date(item.timestamp.replace(" ", "T"));
+    local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
+    return {
+      employeeId: item.employeeId ?? undefined,
+      mIdCard: item.mIdCard,
+      timestamp: local,   // ✔ exact time saved
+      machineType: item.machineType || undefined,
+      machineIP: item.machineIP || undefined,
+      machineInOutGridId: item.machineInOutGridId || undefined,
+      isEditedPunch: item?.isEditedPunch || false,
+
+    }
+
+  });
+  const data = await prisma.pythonPunchData.createMany({
+    data:
+      formatted,
+    skipDuplicates: true,
+
+
+  });
+  return { statusCode: 0, data };
+}
+
+
+export { get, addAbsentPunches, updatePermissionPunches, updateAbsentPunches };

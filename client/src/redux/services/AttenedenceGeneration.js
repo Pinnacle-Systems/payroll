@@ -87,6 +87,17 @@ const AttendenceGenerationApi = createApi({
       invalidatesTags: ["attendenceGeneration"],
     }),
 
+    updateAbsentPunches: builder.mutation({
+      query: (payload) => {
+        return {
+          url: `${ATTENDENCE_GENERATION}/update-absent-punches`,
+          method: "PUT",
+          body: payload,
+        };
+      },
+      invalidatesTags: ["attendenceGeneration"],
+    }),
+
 
 
 
@@ -109,6 +120,7 @@ export const {
   useDeleteAttendenceGenerationMutation,
   useAddmanualPunchMutation,
   useUpdatePermissionMutation,
+  useUpdateAbsentPunchesMutation
 } = AttendenceGenerationApi;
 
 export default AttendenceGenerationApi;

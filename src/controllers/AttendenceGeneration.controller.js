@@ -1,7 +1,8 @@
 import {
   get as _get,
   addAbsentPunches as _addAbsentPunches,
-  updatePermissionPunches as _updatePermissionPunches
+  updatePermissionPunches as _updatePermissionPunches,
+  updateAbsentPunches as _updateAbsentPunches
 
 } from "../services/AttendenceGeneration.service.js";
 import { Prisma } from '@prisma/client'
@@ -49,5 +50,22 @@ async function updatePermissionPunches(req, res, next) {
     }
   }
 }
+async function updateAbsentPunches(req, res, next) {
+  try {
+    res.json(await _updateAbsentPunches(req.body));
+    console.log(res.statusCode);
+  } catch (error) {
+    console.error(`Error`, error.message);
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === 'P2002') {
+        res.statusCode = 200;
+        res.json({ statusCode: 1, message: `${error.meta.target.split("_")[1].toUpperCase()} Already exists` })
+        console.log(res.statusCode)
+      }
+    } else {
+      res.json({ statusCode: 1, message: error.message })
+    }
+  }
+}
 
-export { get, addAbsentPunches,updatePermissionPunches };
+export { get, addAbsentPunches,updatePermissionPunches,updateAbsentPunches };
