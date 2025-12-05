@@ -74,30 +74,31 @@ Attendance AS (
   SELECT
     mIdCard,
 
-    -- IN punches
-    MIN(CASE WHEN machineType='IN' AND rn_asc=1 THEN ts END) AS inTimeIn,
-    MIN(CASE WHEN machineType='IN' AND rn_asc=2 THEN ts END) AS firstBreakInIn,
-    MIN(CASE WHEN machineType='IN' AND rn_asc=3 THEN ts END) AS lunchBreakInIn,
-    MIN(CASE WHEN machineType='IN' AND rn_asc=4 THEN ts END) AS eveningBreakInIn,
+   
+  -- IN punches (IN + MANUAL treated as IN)
+MIN(CASE WHEN machineType IN ('IN','MANUAL') AND rn_asc=1 THEN ts END) AS inTimeIn,
+MIN(CASE WHEN machineType IN ('IN','MANUAL') AND rn_asc=2 THEN ts END) AS firstBreakInIn,
+MIN(CASE WHEN machineType IN ('IN','MANUAL') AND rn_asc=3 THEN ts END) AS lunchBreakInIn,
+MIN(CASE WHEN machineType IN ('IN','MANUAL') AND rn_asc=4 THEN ts END) AS eveningBreakInIn,
 
-    -- OUT punches
-    MAX(CASE WHEN machineType='OUT' AND rn_desc=1 THEN ts END) AS outTimeOut,
-    MAX(CASE WHEN machineType='OUT' AND rn_desc=2 THEN ts END) AS eveningBreakOutOut,
-    MAX(CASE WHEN machineType='OUT' AND rn_desc=3 THEN ts END) AS lunchBreakOutOut,
-    MAX(CASE WHEN machineType='OUT' AND rn_desc=4 THEN ts END) AS firstBreakOutOut,
 
-    -- BOTH punches 
-    
-        -- ✅ BOTH punches corrected order
-    
-    MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=1 THEN ts END) AS inTimeBoth,
-    MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=2 THEN ts END) AS firstBreakOutBoth,
-    MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=3 THEN ts END) AS firstBreakInBoth,
-    MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=4 THEN ts END) AS lunchBreakOutBoth,
-    MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=5 THEN ts END) AS lunchBreakInBoth,
-    MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=6 THEN ts END) AS eveningBreakOutBoth,
-    MIN(CASE WHEN machineType='IN / OUT' AND rn_asc=7 THEN ts END) AS eveningBreakInBoth,
-    MAX(CASE WHEN machineType='IN / OUT' THEN ts END) AS outTimeBoth,
+-- OUT punches (OUT + MANUAL treated as OUT)
+MAX(CASE WHEN machineType IN ('OUT','MANUAL') AND rn_desc=1 THEN ts END) AS outTimeOut,
+MAX(CASE WHEN machineType IN ('OUT','MANUAL') AND rn_desc=2 THEN ts END) AS eveningBreakOutOut,
+MAX(CASE WHEN machineType IN ('OUT','MANUAL') AND rn_desc=3 THEN ts END) AS lunchBreakOutOut,
+MAX(CASE WHEN machineType IN ('OUT','MANUAL') AND rn_desc=4 THEN ts END) AS firstBreakOutOut,
+
+
+-- BOTH punches (IN / OUT + MANUAL)
+MIN(CASE WHEN machineType IN ('IN / OUT','MANUAL') AND rn_asc=1 THEN ts END) AS inTimeBoth,
+MIN(CASE WHEN machineType IN ('IN / OUT','MANUAL') AND rn_asc=2 THEN ts END) AS firstBreakOutBoth,
+MIN(CASE WHEN machineType IN ('IN / OUT','MANUAL') AND rn_asc=3 THEN ts END) AS firstBreakInBoth,
+MIN(CASE WHEN machineType IN ('IN / OUT','MANUAL') AND rn_asc=4 THEN ts END) AS lunchBreakOutBoth,
+MIN(CASE WHEN machineType IN ('IN / OUT','MANUAL') AND rn_asc=5 THEN ts END) AS lunchBreakInBoth,
+MIN(CASE WHEN machineType IN ('IN / OUT','MANUAL') AND rn_asc=6 THEN ts END) AS eveningBreakOutBoth,
+MIN(CASE WHEN machineType IN ('IN / OUT','MANUAL') AND rn_asc=7 THEN ts END) AS eveningBreakInBoth,
+MAX(CASE WHEN machineType IN ('IN / OUT','MANUAL') THEN ts END) AS outTimeBoth,
+
 
 
     -- ✅ first & last punch for total worked time (regardless of category)
@@ -249,6 +250,7 @@ LEFT JOIN Department d ON e.departmentId = d.id
 LEFT JOIN Designation des ON e.designationId = des.id
 LEFT JOIN ShiftTemplateItems sti ON sti.shiftCommonTemplateId = e.shiftCommonTemplateId
 LEFT JOIN Shift sh ON sh.id = sti.shiftId
+WHERE e.active = 1
 
 ORDER BY e.mIdCard;
 
@@ -916,6 +918,8 @@ async function addAbsentPunches(body) {
       machineType: item.machineType || undefined,
       machineIP: item.machineIP || undefined,
       machineInOutGridId: item.machineInOutGridId || undefined,
+      isEditedPunch: item?.isEditedPunch || false,
+
     }
 
   });

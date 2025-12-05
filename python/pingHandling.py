@@ -143,7 +143,7 @@ async def fetch_logs(from_date: str = Query(...), to_date: str = Query(...)):
                 log_objects = []
                 if not existing_logs:
                     for log in logs_for_day:
-                        employeeId = employees.get(str(log.user_id))
+                        employeeId =  employees.get(int(log.user_id))
                         log_objects.append(
                             PythonPunchData(
                                 mIdCard=str(log.user_id),
@@ -173,7 +173,7 @@ async def fetch_logs(from_date: str = Query(...), to_date: str = Query(...)):
                             .first()
                         )
                         if not exists:
-                            employeeId = employees.get(str(log.user_id))
+                            employeeId =  employees.get(int(log.user_id))
                             log_objects.append(
                                 PythonPunchData(
                                     mIdCard=str(log.user_id),

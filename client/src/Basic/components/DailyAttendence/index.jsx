@@ -18,6 +18,7 @@ import { useGetShiftTemplateMasterQuery } from '../../../redux/services/ShiftTem
 import Permissiontable from "./permissionTble";
 import AbsentTable from "./AbsentTable";
 import OnDutyTable from "./OnDutyTable";
+import Loader from "../Loader";
 
 const Form = () => {
   const [date, setDate] = useState("");
@@ -53,7 +54,7 @@ const Form = () => {
   const [selectedRecord, setSelectedRecord] = useState(null);
   const [newPunchList, setNewPunchList] = useState([]);
   const [newPunchTime, setNewPunchTime] = useState("");
-
+  const [singlePunchData, setSinglePunchData] = useState([])
   const { data: shiftData } = useGetshiftMasterQuery({ params });
   const { data: shiftTemplateData } = useGetShiftTemplateMasterQuery({ params })
 
@@ -67,7 +68,7 @@ const Form = () => {
     setSelectedBreakSummary(null);
     setShowModal(false);
   };
-  const [triggerReport, { data: allData, isFetching }] = useLazyGetAttendenceGenerationQuery();
+  const [triggerReport, { data: allData, isFetching, isLoading }] = useLazyGetAttendenceGenerationQuery();
   const { data: employeeCategory } = useGetEmployeeCategoryQuery({ params });
   const { data: shiftTypeData } = useGetshiftTypeQuery({ params })
   const { data: employeeData } = useGetEmployeeQuery({ params });
@@ -314,9 +315,8 @@ const Form = () => {
             employeeId: emp.employeeId,
             mIdCard: emp.mIdCard,
             timestamp: finalInTime,
-            machineType: "IN / OUT",
-            machineIP: "192.168.1.50",
-            machineInOutGridId: 9,
+            machineType: "MANUAL",
+            isEditedPunch: true
           });
         }
       }
@@ -329,9 +329,9 @@ const Form = () => {
             employeeId: emp.employeeId,
             mIdCard: emp.mIdCard,
             timestamp: finalOutTime,
-            machineType: "IN / OUT",
-            machineIP: "192.168.1.50",
-            machineInOutGridId: 9,
+            machineType: "MANUAL",
+            isEditedPunch: true
+
           });
         }
       }
@@ -445,6 +445,8 @@ const Form = () => {
 
     const absentCloned = absentFiltered?.map(item => ({
       ...item,
+
+
     }));
 
     setAbsentData(absentCloned)
@@ -457,6 +459,16 @@ const Form = () => {
 
     setHalfDay(halfDayData)
 
+
+    const singlePunchFiltered = allData?.data?.filter((item) => {
+      return item?.punches?.length === 1;
+    });
+
+
+    const clonedsinglePunchFiltered = singlePunchFiltered?.map(item => ({
+      ...item,
+    }));
+    setSinglePunchData(clonedsinglePunchFiltered)
 
   }, [allData]);
 
@@ -575,9 +587,8 @@ const Form = () => {
         mIdCard: selectedRecord.mIdCard,
         timestamp: fullTimestamp,
         isEditedPunch: true,
-        machineType: "IN / OUT",
-        machineIP: "192.168.1.50",
-        machineInOutGridId: 9,
+        machineType: "MANUAL",
+
       }
     ];
 
@@ -635,6 +646,7 @@ const Form = () => {
 
     setShowPunchModal(false);
   };
+  if (isLoading || isFetching) return <Loader />;
 
   return (
     <div>
@@ -729,7 +741,7 @@ const Form = () => {
             ShiftTime={ShiftTime} date={date} absentData={absentData} setAbsentData={setAbsentData} reportView={reportView} selectedShiftType={selectedShiftType}
             onClose={() => setOpenAbsentModal(false)} halfDay={halfDay} setHalfDay={setHalfDay} fullDayLeave={fullDayLeave} setFullDayLeave={setFullDayLeave} handleAddPunch={handleAddPunch} showPunchModal={showPunchModal} setShowPunchModal={setShowPunchModal} setNewPunchList={setNewPunchList} newPunchTime={newPunchTime} setNewPunchTime={setNewPunchTime} handleSaveAllPunches={handleSaveAllPunches} selectedRecord={selectedRecord} newPunchList={newPunchList} setSelectedRecord={setSelectedRecord}
 
-
+            singlePunchData={singlePunchData}
           />
           )
         }
