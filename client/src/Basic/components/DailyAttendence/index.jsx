@@ -4,7 +4,7 @@ import { ReusableTable, DateInput, customSelectStyles } from "../../../Inputs";
 import Select from "react-select";
 import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCategoryMasterService";
 import { useGetEmployeeQuery } from "../../../redux/services/EmployeeMasterService";
-import { useLazyGetAttendenceGenerationQuery, useAddmanualPunchMutation, useUpdatePermissionMutation, useUpdateAbsentPunchesMutation } from "../../../redux/services/AttenedenceGeneration";
+import { useLazyGetAttendenceGenerationQuery, useAddmanualPunchMutation, useUpdatePermissionMutation, useUpdateAbsentPunchesMutation, useUpdateSinglePunchMutation } from "../../../redux/services/AttenedenceGeneration";
 import Modal from "../../../UiComponents/Modal";
 import { GroupBy, ShiftTime } from "../../../Utils/DropdownData";
 import { getCommonParams } from "../../../Utils/helper";
@@ -75,6 +75,7 @@ const Form = () => {
   const [manualPunch] = useAddmanualPunchMutation();
   const [updatePermission] = useUpdatePermissionMutation()
   const [updatedAbsentPunches] = useUpdateAbsentPunchesMutation()
+  const [updateSinglePunch] = useUpdateSinglePunchMutation()
 
   useEffect(() => {
     if (form && designationRef.current) {
@@ -646,6 +647,169 @@ const Form = () => {
 
     setShowPunchModal(false);
   };
+
+
+  const handleSinglePunch = (index, field, value) => {
+    setSinglePunchData((prev) => {
+      const updated = structuredClone(prev);
+      const item = updated[index];
+
+      const format = (t) => moment(t, "HH:mm:ss");
+
+      // -----------------------------
+      // 1️⃣ WHEN EDITING IN TIME
+      // -----------------------------
+      if (field === "inTimeEdit") {
+        const oldInTime =
+          item.inTimeEdit ||
+          (item.inTime ? moment.utc(item.inTime).format("HH:mm:ss") : "");
+        item.isInTimeChanged = true;
+
+        // Move OLD inTime → outTime only if user hasn't changed outTime before
+        if (!item.outTimeEdit) {
+          item.outTimeEdit = oldInTime;
+        }
+
+        // Temporarily update new inTime
+        const newInTime = value;
+
+        // Validate if outTime exists
+        if (
+          item.outTimeEdit &&
+          format(item.outTimeEdit).isSameOrBefore(format(newInTime))
+        ) {
+          Swal.fire({
+            icon: "error",
+            title: "Invalid Time",
+            text: "Out Time should be greater than In Time",
+            timer: 1800,
+          });
+
+          return prev; // ❌ BLOCK UPDATE
+        }
+
+        item.inTimeEdit = newInTime;
+      }
+
+      // -----------------------------
+      // 2️⃣ WHEN EDITING OUT TIME
+      // -----------------------------
+      else if (field === "outTimeEdit") {
+        const newOutTime = value;
+        const inTime =
+          item.inTimeEdit ||
+          (item.inTime ? moment.utc(item.inTime).format("HH:mm:ss") : "");
+        item.isOutTimeChanged = true;
+
+        // Validation: out must be > in
+        if (
+          inTime &&
+          moment(newOutTime, "HH:mm:ss").isSameOrBefore(
+            moment(inTime, "HH:mm:ss")
+          )
+        ) {
+          Swal.fire({
+            icon: "error",
+            title: "Invalid Time",
+            text: "Out Time should be greater than In Time",
+            timer: 1800,
+          });
+
+          return prev; // ❌ BLOCK UPDATE
+        }
+
+        item.outTimeEdit = newOutTime;
+      }
+
+      return updated;
+    });
+
+    console.log(singlePunchData, "singlePunchData");
+
+  };
+
+  const getSimplePunchPayload = (item) => {
+    const punchDate = moment(item.inTime).format("YYYY-MM-DD");
+
+    const payload = {
+      mIdCard: item.mIdCard,
+      employeeId: item.employeeId,
+      machineType: "MANUAL",
+      isEditedPunch: true
+    };
+
+
+    // USER changed InTime ONLY
+    if (item.isInTimeChanged && !item.isOutTimeChanged) {
+      payload.timestamp = `${punchDate} ${item.inTimeEdit}`;
+      return payload;
+    }
+
+    // USER changed OutTime ONLY
+    if (!item.isInTimeChanged && item.isOutTimeChanged) {
+      payload.timestamp = `${punchDate} ${item.outTimeEdit}`;
+      return payload;
+    }
+
+    // USER changed both → send the last one edited
+    if (item.isInTimeChanged && item.isOutTimeChanged) {
+      const lastEdited =
+        moment(item.outTimeEdit, "HH:mm:ss").isAfter(moment(item.inTimeEdit, "HH:mm:ss"))
+          ? item.outTimeEdit
+          : item.inTimeEdit;
+
+      payload.timestamp = `${punchDate} ${lastEdited}`;
+      return payload;
+    }
+
+    return payload;
+  };
+
+  const handleSaveSinglePunch = async () => {
+    const payload = singlePunchData
+      .map((item) => {
+        if (!item.inTimeEdit && !item.outTimeEdit) return null;
+
+        return getSimplePunchPayload(item);
+      })
+      .filter(Boolean); // remove nulls
+
+    if (payload.length === 0) {
+      Swal.fire({
+        icon: "info",
+        title: "No changes to save",
+        timer: 1200,
+      });
+      return;
+    }
+
+
+    const data = { payload }
+    console.log("Final payload to backend:", data);
+
+    try {
+      await updateSinglePunch(data).unwrap();
+      await triggerReport({
+        searchParams: {
+          date,
+        },
+      });
+      Swal.fire({
+        icon: "success",
+        title: "Updated Successfully",
+        timer: 1500,
+      });
+
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "Something went wrong",
+      });
+    }
+  };
+
+
   if (isLoading || isFetching) return <Loader />;
 
   return (
@@ -739,8 +903,8 @@ const Form = () => {
         {
           openAbsentModal && (<AbsentTable onUpdate={handleAbsentUpdate} onSaveAll={handleSaveAllAbsent} shiftData={shiftData} shiftTemplateData={shiftTemplateData}
             ShiftTime={ShiftTime} date={date} absentData={absentData} setAbsentData={setAbsentData} reportView={reportView} selectedShiftType={selectedShiftType}
-            onClose={() => setOpenAbsentModal(false)} halfDay={halfDay} setHalfDay={setHalfDay} fullDayLeave={fullDayLeave} setFullDayLeave={setFullDayLeave} handleAddPunch={handleAddPunch} showPunchModal={showPunchModal} setShowPunchModal={setShowPunchModal} setNewPunchList={setNewPunchList} newPunchTime={newPunchTime} setNewPunchTime={setNewPunchTime} handleSaveAllPunches={handleSaveAllPunches} selectedRecord={selectedRecord} newPunchList={newPunchList} setSelectedRecord={setSelectedRecord}
-
+            onClose={() => setOpenAbsentModal(false)} halfDay={halfDay} setHalfDay={setHalfDay} fullDayLeave={fullDayLeave} setFullDayLeave={setFullDayLeave} handleAddPunch={handleAddPunch} showPunchModal={showPunchModal} setShowPunchModal={setShowPunchModal} setNewPunchList={setNewPunchList} newPunchTime={newPunchTime} setNewPunchTime={setNewPunchTime} handleSaveAllPunches={handleSaveAllPunches} selectedRecord={selectedRecord} newPunchList={newPunchList} setSelectedRecord={setSelectedRecord} handleSaveSinglePunch={handleSaveSinglePunch}
+            handleSinglePunch={handleSinglePunch}
             singlePunchData={singlePunchData}
           />
           )

@@ -27,29 +27,8 @@ const AttendenceGenerationApi = createApi({
       keepUnusedDataFor: 21600,
 
     }),
-    getAttendenceGenerationById: builder.query({
-      query: (id) => {
-        return {
-          url: `${ATTENDENCE_GENERATION}/${id}`,
-          method: "GET",
-          headers: {
-            "Content-type": "application/json; charset=UTF-8",
-          },
-        };
-      },
-      providesTags: ["attendenceGeneration"],
-    }),
-    addAttendenceGeneration: builder.mutation({
-      query: (payload) => ({
-        url: ATTENDENCE_GENERATION,
-        method: "POST",
-        body: payload,
-        headers: {
-          "Content-type": "application/json; charset=UTF-8",
-        },
-      }),
-      invalidatesTags: ["attendenceGeneration"],
-    }),
+ 
+
     addmanualPunch: builder.mutation({
       query: (payload) => ({
         url: ATTENDENCE_GENERATION,
@@ -63,17 +42,7 @@ const AttendenceGenerationApi = createApi({
 
     }),
 
-    updateAttendenceGeneration: builder.mutation({
-      query: (payload) => {
-        const { id, ...body } = payload;
-        return {
-          url: `${ATTENDENCE_GENERATION}/${id}`,
-          method: "PUT",
-          body,
-        };
-      },
-      invalidatesTags: ["attendenceGeneration"],
-    }),
+    
 
 
     updatePermission: builder.mutation({
@@ -97,30 +66,30 @@ const AttendenceGenerationApi = createApi({
       },
       invalidatesTags: ["attendenceGeneration"],
     }),
-
-
-
-
-    deleteAttendenceGeneration: builder.mutation({
-      query: (id) => ({
-        url: `${ATTENDENCE_GENERATION}/${id}`,
-        method: "DELETE",
-      }),
+    updateSinglePunch: builder.mutation({
+      query: (payload) => {
+        return {
+          url: `${ATTENDENCE_GENERATION}/update-single-punch`,
+          method: "PUT",
+          body: payload,
+        };
+      },
       invalidatesTags: ["attendenceGeneration"],
     }),
+
+
+
+
   }),
 });
 
 export const {
   useGetAttendenceGenerationQuery,
   useLazyGetAttendenceGenerationQuery,
-  useGetAttendenceGenerationByIdQuery,
-  useAddAttendenceGenerationMutation,
-  useUpdateAttendenceGenerationMutation,
-  useDeleteAttendenceGenerationMutation,
   useAddmanualPunchMutation,
   useUpdatePermissionMutation,
-  useUpdateAbsentPunchesMutation
+  useUpdateAbsentPunchesMutation,
+  useUpdateSinglePunchMutation
 } = AttendenceGenerationApi;
 
 export default AttendenceGenerationApi;

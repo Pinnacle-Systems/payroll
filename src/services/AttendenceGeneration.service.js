@@ -277,12 +277,8 @@ ORDER BY e.mIdCard;
     totalMinutes: row.totalMinutes || 0,
     otHours: row.otHours || 0,
     shiftTemplateId: row.shiftTemplateId || null, // add this
-
     formulaResult: 0, // default value
-    punches:
-      typeof row.punchesArray === "string"
-        ? JSON.parse(row.punchesArray)
-        : row.punchesArray || [],
+    punches: typeof row.punchesArray === "string" ? JSON.parse(row.punchesArray) : row.punchesArray || [],
 
   }));
   for (const emp of data) {
@@ -987,6 +983,34 @@ async function updateAbsentPunches(body) {
   });
   return { statusCode: 0, data };
 }
+async function updateSinglePunch(body) {
+  const { payload } = body;
+  console.log("Receivedsinglepunch:", payload);
+
+  const formatted = payload?.map(item => {
+    const local = new Date(item.timestamp.replace(" ", "T"));
+    local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
+    return {
+      employeeId: item.employeeId ?? undefined,
+      mIdCard: item.mIdCard,
+      timestamp: local,   // ✔ exact time saved
+      machineType: item.machineType || undefined,
+      machineIP: item.machineIP || undefined,
+      machineInOutGridId: item.machineInOutGridId || undefined,
+      isEditedPunch: item?.isEditedPunch || false,
+
+    }
+
+  });
+  const data = await prisma.pythonPunchData.createMany({
+    data:
+      formatted,
+    skipDuplicates: true,
 
 
-export { get, addAbsentPunches, updatePermissionPunches, updateAbsentPunches };
+  });
+  return { statusCode: 0, data };
+}
+
+
+export { get, addAbsentPunches, updatePermissionPunches, updateAbsentPunches, updateSinglePunch };

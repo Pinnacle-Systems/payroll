@@ -2,9 +2,8 @@ import moment from "moment-timezone";
 import React, { useEffect, useState, useRef } from "react";
 
 
-const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpdate, onSaveAll, date, shiftData, ShiftTime, shiftTemplateData, setAbsentData, halfDay, setHalfDay, fullDayLeave, setFullDayLeave, handleAddPunch, showPunchModal, setShowPunchModal, selectedRecord, setSelectedRecord, newPunchTime, setNewPunchTime, newPunchList, setNewPunchList, handleSaveAllPunches,singlePunchData }) => {
+const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpdate, onSaveAll, date, shiftData, ShiftTime, shiftTemplateData, setAbsentData, halfDay, setHalfDay, fullDayLeave, setFullDayLeave, handleAddPunch, showPunchModal, setShowPunchModal, selectedRecord, setSelectedRecord, newPunchTime, setNewPunchTime, newPunchList, setNewPunchList, handleSaveAllPunches, singlePunchData, handleSinglePunch, handleSaveSinglePunch }) => {
 
-    console.log(singlePunchData, "singlePunchDatainmodal");
 
     const calculateTimeDiff = (start, end) => {
         if (!start || !end) return "";
@@ -35,12 +34,8 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                             <h2 className="text-lg font-semibold">Leave</h2>
                             <div className="flex justify-end align-items-center   mx-2">
 
-                                <button
-                                    onClick={onSaveAll}
-                                    className="px-3 mr-4  ml-2 bg-green-600 text-white rounded text-xs"
-                                >
-                                    Update
-                                </button>
+
+
 
                                 <button
                                     onClick={onClose}
@@ -64,8 +59,15 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
 
                         <div className={` mt-3  p-2  bg-white h-[523px]  overflow-x-auto overflow-y-auto`}>
 
-
-                            <p className="mt-2 text-sm font-semibold">Full Day Leave</p>
+                            <div className="flex relative mt-2">
+                                <p className=" text-sm font-semibold">Full Day Leave</p>
+                                <button
+                                    onClick={onSaveAll}
+                                    className="px-3 absolute right-[calc(100%-1200px)] py-1  bg-green-600 text-white rounded text-xs"
+                                >
+                                    Update
+                                </button>
+                            </div>
                             <table className={` w-[75vw] mt-2  border-collapse table-fixed`}>
 
                                 <thead className="bg-gray-200 text-gray-800 border  border-gray-400">
@@ -134,223 +136,549 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
 
                                 </thead>
                                 <tbody>
-                                    {absentData?.map((item, index) => (
-                                        <React.Fragment key={index}>
-                                            {/* Row 1 - In + Morning */}
-                                            <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
-                                                {/* S.No rowspan */}
-                                                <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 py-1.5 text-[11px]  text-center px-1"
-                                                >
-                                                    {index + 1}
-                                                </td>
+                                    {absentData?.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={13}
 
-                                                {/* Employee Id rowspan */}
-                                                <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={item?.mIdCard}
-                                                        className={`w-full  text-right pr-1 bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td>
-                                                <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={item?.firstName}
-                                                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td>
-                                                <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={item?.isLeave}
-                                                        onChange={(e) => {
-                                                            const updated = structuredClone(absentData);
-                                                            updated[index].isLeave = e.target.checked;
+                                                className="border border-gray-300 py-1.5 text-[11px]  text-center px-1"
+                                            >
+                                                No Data Available
 
-                                                            // Optional: clear in/out time when leave is checked
-                                                            if (e.target.checked) {
-                                                                updated[index].inTimeEdit = "";
-                                                                updated[index].outTimeEdit = "";
-                                                                updated[index].shiftName = "";
-                                                                updated[index].shiftTime = "";
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        absentData?.map((item, index) => (
+                                            <React.Fragment key={index}>
+                                                {/* Row 1 - In + Morning */}
+                                                <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
+                                                    {/* S.No rowspan */}
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 py-1.5 text-[11px]  text-center px-1"
+                                                    >
+                                                        {index + 1}
+                                                    </td>
+
+                                                    {/* Employee Id rowspan */}
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={item?.mIdCard}
+                                                            className={`w-full  text-right pr-1 bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={item?.firstName}
+                                                            className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={item?.isLeave}
+                                                            onChange={(e) => {
+                                                                const updated = structuredClone(absentData);
+                                                                updated[index].isLeave = e.target.checked;
+
+                                                                // Optional: clear in/out time when leave is checked
+                                                                if (e.target.checked) {
+                                                                    updated[index].inTimeEdit = "";
+                                                                    updated[index].outTimeEdit = "";
+                                                                    updated[index].shiftName = "";
+                                                                    updated[index].shiftTime = "";
+                                                                }
+
+                                                                setAbsentData(updated);
+                                                            }}
+                                                            className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <select className="w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent"
+                                                            value={item.shiftName || ""}
+                                                            disabled={item?.isLeave}
+                                                            onChange={(e) => onUpdate(index, "shiftName", e.target.value)}
+                                                        >
+                                                            <option value="">Select</option>
+
+                                                            {shiftTemplateData?.data?.flatMap(t => t.ShiftTemplateItems || []).map((s) => (
+                                                                <option key={s.id} value={s.shiftId}>
+                                                                    {s.shift?.name}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+
+                                                    </td>
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <select className="w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent"
+                                                            value={item.shiftTime || ""}
+                                                            disabled={!item?.shiftName}
+                                                            onChange={(e) => onUpdate(index, "shiftTime", e.target.value)}
+                                                        >
+                                                            <option value="">Select</option>
+                                                            {ShiftTime.map((st) => (
+                                                                <option key={st.value} value={st.value}>
+                                                                    {st.show}
+                                                                </option>
+                                                            ))}
+
+                                                        </select>
+
+                                                    </td>
+
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={item?.departmentName
+                                                            }
+                                                            className={`w-full  text-left pl-2 text-[11px] bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={item?.designationName}
+                                                            className={`w-full  text-left pl-2 text-[11px] bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+
+                                                    {/* In Date */}
+                                                    <td
+                                                        rowSpan={2}
+                                                        className=" border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="date"
+                                                            // value={item.inDate || (item.inTime ? moment.utc(item.inTime)?.format("DD-MM-YYYY") : "")}
+                                                            value={date}
+
+                                                            onChange={(e) => onUpdate(index, "inDate", e.target.value)}
+                                                            readOnly
+                                                            className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+
+                                                    <td
+                                                        rowSpan={2}
+                                                        className=" border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            min="0"
+                                                            type="time" // enforce proper format
+                                                            step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
+                                                            value={
+                                                                item.inTimeEdit
+                                                                    ? item.inTimeEdit
+                                                                    : item.inTime
+                                                                        ? moment.utc(item.inTime).format("HH:mm:ss")
+                                                                        : ""
                                                             }
 
-                                                            setAbsentData(updated);
-                                                        }}
-                                                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td>
-                                                <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
-                                                >
-                                                    <select className="w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent"
-                                                        value={item.shiftName || ""}
-                                                        disabled={item?.isLeave}
-                                                        onChange={(e) => onUpdate(index, "shiftName", e.target.value)}
+                                                            onChange={(e) => onUpdate(index, "inTimeEdit", e.target.value)}
+                                                            disabled={item?.shiftName || item?.isLeave}
+                                                            onFocus={(e) => e.target.select()}
+                                                            className={`w-full bg-transparent  text-center focus:outline-none focus:border-transparent  `}
+                                                        />
+                                                    </td>
+                                                    {/* out Date */}
+                                                    <td
+                                                        rowSpan={2}
+                                                        className=" border border-gray-300 text-[11px] py-0.5 item-center"
                                                     >
-                                                        <option value="">Select</option>
+                                                        <input
+                                                            type="date"
+                                                            // value={item.outDate || date}
+                                                            value={date}
 
-                                                        {shiftTemplateData?.data?.flatMap(t => t.ShiftTemplateItems || []).map((s) => (
-                                                            <option key={s.id} value={s.shiftId}>
-                                                                {s.shift?.name}
-                                                            </option>
-                                                        ))}
-                                                    </select>
+                                                            onChange={(e) => onUpdate(index, "outDate", e.target.value)}
+                                                            readOnly
 
-                                                </td>
-                                                <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
-                                                >
-                                                    <select className="w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent"
-                                                        value={item.shiftTime || ""}
-                                                        disabled={!item?.shiftName}
-                                                        onChange={(e) => onUpdate(index, "shiftTime", e.target.value)}
+                                                            className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="  border border-gray-300 text-[11px] py-0.5 item-center"
                                                     >
-                                                        <option value="">Select</option>
-                                                        {ShiftTime.map((st) => (
-                                                            <option key={st.value} value={st.value}>
-                                                                {st.show}
-                                                            </option>
-                                                        ))}
+                                                        <input
+                                                            min="0"
+                                                            type="time" // enforce proper format
+                                                            step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
 
-                                                    </select>
+                                                            value={
+                                                                item.outTimeEdit
+                                                                    ? item.outTimeEdit
+                                                                    : item.outTime
+                                                                        ? moment.utc(item.outTime).format("HH:mm:ss")
+                                                                        : ""
+                                                            }
 
-                                                </td>
+                                                            onChange={(e) => onUpdate(index, "outTimeEdit", e.target.value)}
+                                                            disabled={item?.shiftName || item?.isLeave}
 
-                                                <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={item?.departmentName
+                                                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                                                        />
+
+
+                                                    </td>
+                                                    <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 text-center">
+                                                        {
+                                                            calculateTimeDiff(
+                                                                item.inTimeEdit || (item.inTime ? moment.utc(item.inTime).format("HH:mm:ss") : ""),
+                                                                item.outTimeEdit || (item.outTime ? moment.utc(item.outTime).format("HH:mm:ss") : "")
+                                                            )
                                                         }
-                                                        className={`w-full  text-left pl-2 text-[11px] bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td>
+                                                    </td>
 
-                                                <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={item?.designationName}
-                                                        className={`w-full  text-left pl-2 text-[11px] bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td>
 
-                                                {/* In Date */}
-                                                <td
-                                                    rowSpan={2}
-                                                    className=" border border-gray-300 text-[11px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="date"
-                                                        // value={item.inDate || (item.inTime ? moment.utc(item.inTime)?.format("DD-MM-YYYY") : "")}
-                                                        value={date}
+                                                </tr>
+                                                <tr></tr>
+                                            </React.Fragment>
+                                        ))
+                                    )}
 
-                                                        onChange={(e) => onUpdate(index, "inDate", e.target.value)}
-                                                        readOnly
-                                                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td>
+                                </tbody>
+                            </table>
 
-                                                <td
-                                                    rowSpan={2}
-                                                    className=" border border-gray-300 text-[11px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        min="0"
-                                                        type="time" // enforce proper format
-                                                        step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
-                                                        value={
-                                                            item.inTimeEdit
-                                                                ? item.inTimeEdit
-                                                                : item.inTime
-                                                                    ? moment.utc(item.inTime).format("HH:mm:ss")
-                                                                    : ""
+
+                            <div className="flex relative mt-4">
+                                <p className=" text-sm font-semibold">Miss Punch</p>
+                                <button
+                                    onClick={handleSaveSinglePunch}
+                                    className="px-3 absolute right-[calc(100%-1200px)] py-1  bg-green-600 text-white rounded text-xs"
+                                >
+                                    Update
+                                </button>
+                            </div>
+
+
+                            <table className={` w-[75vw] mt-2  border-collapse table-fixed`}>
+
+                                <thead className="bg-gray-200 text-gray-800 border  border-gray-400">
+                                    <tr>
+                                        <th
+                                            className={`w-[15px] px-1 text-center font-medium text-[12px]  border border-gray-300`}
+                                        >
+                                            S.No
+                                        </th>
+
+                                        <th
+                                            className={`w-6  py-2 text-center font-medium text-[12px]  border border-gray-300`}
+                                        >
+                                            MId
+                                        </th>
+                                        <th
+                                            className={`w-[50px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
+                                        >
+                                            Emp Name
+                                        </th>
+                                        <th className={`w-8 py-2 item-center font-medium text-[12px]  border border-gray-300`}>
+                                            Leave
+                                        </th>
+                                        <th
+                                            className={`w-[40px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
+                                        >
+                                            Shift
+                                        </th>
+                                        <th
+                                            className={`w-[40px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
+                                        >
+                                            Present
+                                        </th>
+                                        <th
+                                            className={`w-[45px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
+                                        >
+                                            Department
+                                        </th>
+                                        <th
+                                            className={`w-[70px]  py-2 text-center font-medium text-[12px]  border border-gray-300`}
+                                        >
+                                            Designation
+                                        </th>
+                                        <th
+                                            className={`w-12  py-2 item-center font-medium text-[12px]  border border-gray-300`}
+                                        >
+                                            In Date
+                                        </th>
+                                        <th className={`w-12 py-2 item-center font-medium text-[12px]  border border-gray-300`}>
+                                            In Time
+                                        </th>
+                                        <th className={`w-12 py-2 item-center font-medium text-[12px]  border border-gray-300`}>
+                                            Out Date
+                                        </th>
+
+                                        <th className={`w-12 py-2 item-center font-medium text-[12px]  border border-gray-300`}>
+                                            Out Time
+                                        </th>
+                                        <th className={`w-12 py-2 item-center font-medium text-[12px]  border border-gray-300`}>
+                                            Worked Hours
+                                        </th>
+
+
+
+                                    </tr>
+
+                                </thead>
+
+
+
+                                <tbody>
+
+                                    {singlePunchData?.length === 0 || singlePunchData?.every(item => !item?.punches || item.punches.length === 0) ? (
+                                        <tr>
+                                            <td colSpan={13}
+
+                                                className="border border-gray-300 py-1.5 text-[11px]  text-center px-1"
+                                            >
+                                                No Data Available
+                                            </td>
+                                        </tr>
+                                    ) : (
+
+                                        singlePunchData?.map((item, index) => (
+                                            <React.Fragment key={index}>
+                                                {/* Row 1 - In + Morning */}
+                                                <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
+                                                    {/* S.No rowspan */}
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 py-1.5 text-[11px]  text-center px-1"
+                                                    >
+                                                        {index + 1}
+                                                    </td>
+
+                                                    {/* Employee Id rowspan */}
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={item?.mIdCard}
+                                                            className={`w-full  text-right pr-1 bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={item?.firstName}
+                                                            className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={item?.isLeave}
+                                                            onChange={(e) => {
+                                                                const updated = structuredClone(absentData);
+                                                                updated[index].isLeave = e.target.checked;
+
+                                                                // Optional: clear in/out time when leave is checked
+                                                                if (e.target.checked) {
+                                                                    updated[index].inTimeEdit = "";
+                                                                    updated[index].outTimeEdit = "";
+                                                                    updated[index].shiftName = "";
+                                                                    updated[index].shiftTime = "";
+                                                                }
+
+                                                                setAbsentData(updated);
+                                                            }}
+                                                            className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <select className="w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent"
+                                                            value={item.shiftName || ""}
+                                                            disabled={item?.isLeave}
+                                                            onChange={(e) => onUpdate(index, "shiftName", e.target.value)}
+                                                        >
+                                                            <option value="">Select</option>
+
+                                                            {shiftTemplateData?.data?.flatMap(t => t.ShiftTemplateItems || []).map((s) => (
+                                                                <option key={s.id} value={s.shiftId}>
+                                                                    {s.shift?.name}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+
+                                                    </td>
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <select className="w-full bg-transparent text-left pl-2 focus:outline-none focus:border-transparent"
+                                                            value={item.shiftTime || ""}
+                                                            disabled={!item?.shiftName}
+                                                            onChange={(e) => onUpdate(index, "shiftTime", e.target.value)}
+                                                        >
+                                                            <option value="">Select</option>
+                                                            {ShiftTime.map((st) => (
+                                                                <option key={st.value} value={st.value}>
+                                                                    {st.show}
+                                                                </option>
+                                                            ))}
+
+                                                        </select>
+
+                                                    </td>
+
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={item?.departmentName
+                                                            }
+                                                            className={`w-full  text-left pl-2 text-[11px] bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={item?.designationName}
+                                                            className={`w-full  text-left pl-2 text-[11px] bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+
+                                                    {/* In Date */}
+                                                    <td
+                                                        rowSpan={2}
+                                                        className=" border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="date"
+                                                            // value={item.inDate || (item.inTime ? moment.utc(item.inTime)?.format("DD-MM-YYYY") : "")}
+                                                            value={date}
+
+                                                            onChange={(e) => onUpdate(index, "inDate", e.target.value)}
+                                                            readOnly
+                                                            className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+
+                                                    <td
+                                                        rowSpan={2}
+                                                        className=" border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            min="0"
+                                                            type="time" // enforce proper format
+                                                            step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
+                                                            value={
+                                                                item.inTimeEdit
+                                                                    ? item.inTimeEdit
+                                                                    : item.inTime
+                                                                        ? moment.utc(item.inTime).format("HH:mm:ss")
+                                                                        : ""
+                                                            }
+
+                                                            onChange={(e) => handleSinglePunch(index, "inTimeEdit", e.target.value)}
+                                                            disabled={item?.shiftName || item?.isLeave}
+                                                            onFocus={(e) => e.target.select()}
+                                                            className={`w-full bg-transparent  text-center focus:outline-none focus:border-transparent  `}
+                                                        />
+                                                    </td>
+                                                    {/* out Date */}
+                                                    <td
+                                                        rowSpan={2}
+                                                        className=" border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="date"
+                                                            // value={item.outDate || date}
+                                                            value={date}
+
+                                                            onChange={(e) => handleSinglePunch(index, "outDate", e.target.value)}
+                                                            readOnly
+
+                                                            className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="  border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            min="0"
+                                                            type="time" // enforce proper format
+                                                            step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
+
+                                                            value={
+                                                                item.outTimeEdit
+                                                                    ? item.outTimeEdit
+                                                                    : item.outTime
+                                                                        ? moment.utc(item.outTime).format("HH:mm:ss")
+                                                                        : ""
+                                                            }
+
+                                                            onChange={(e) => handleSinglePunch(index, "outTimeEdit", e.target.value)}
+                                                            disabled={item?.shiftName || item?.isLeave}
+
+                                                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                                                        />
+
+
+                                                    </td>
+                                                    <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 text-center">
+                                                        {
+                                                            calculateTimeDiff(
+                                                                item.inTimeEdit || (item.inTime ? moment.utc(item.inTime).format("HH:mm:ss") : ""),
+                                                                item.outTimeEdit || (item.outTime ? moment.utc(item.outTime).format("HH:mm:ss") : "")
+                                                            )
                                                         }
-
-                                                        onChange={(e) => onUpdate(index, "inTimeEdit", e.target.value)}
-                                                        disabled={item?.shiftName || item?.isLeave}
-                                                        onFocus={(e) => e.target.select()}
-                                                        className={`w-full bg-transparent  text-center focus:outline-none focus:border-transparent  `}
-                                                    />
-                                                </td>
-                                                {/* out Date */}
-                                                <td
-                                                    rowSpan={2}
-                                                    className=" border border-gray-300 text-[11px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="date"
-                                                        // value={item.outDate || date}
-                                                        value={date}
-
-                                                        onChange={(e) => onUpdate(index, "outDate", e.target.value)}
-                                                        readOnly
-
-                                                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td>
-
-                                                <td
-                                                    rowSpan={2}
-                                                    className="  border border-gray-300 text-[11px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        min="0"
-                                                        type="time" // enforce proper format
-                                                        step="1" // allows seconds, so HH:MM:SS instead of only HH:MM
-
-                                                        value={
-                                                            item.outTimeEdit
-                                                                ? item.outTimeEdit
-                                                                : item.outTime
-                                                                    ? moment.utc(item.outTime).format("HH:mm:ss")
-                                                                    : ""
-                                                        }
-
-                                                        onChange={(e) => onUpdate(index, "outTimeEdit", e.target.value)}
-                                                        disabled={item?.shiftName || item?.isLeave}
-
-                                                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                                                    />
+                                                    </td>
 
 
-                                                </td>
-                                                <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 text-center">
-                                                    {
-                                                        calculateTimeDiff(
-                                                            item.inTimeEdit || (item.inTime ? moment.utc(item.inTime).format("HH:mm:ss") : ""),
-                                                            item.outTimeEdit || (item.outTime ? moment.utc(item.outTime).format("HH:mm:ss") : "")
-                                                        )
-                                                    }
-                                                </td>
-
-
-                                            </tr>
-                                            <tr></tr>
-                                        </React.Fragment>
-                                    ))}
+                                                </tr>
+                                                <tr></tr>
+                                            </React.Fragment>
+                                        ))
+                                    )}
 
 
                                 </tbody>
                             </table>
+
                             <p className="mt-3 text-sm font-semibold">Half Day Leave</p>
 
                             <table className={` ${selectedShiftType === "Hourly" ? "w-[85vw]" : "w-[85vw]"} mt-3  border-collapse table-fixed`}>
@@ -425,179 +753,278 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
 
                                 </thead>
                                 <tbody>
-                                    {halfDay?.map((item, index) => (
-                                        <React.Fragment key={index}>
-                                            {/* Row 1 - In + Morning */}
-                                            <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
-                                                {/* S.No rowspan */}
-                                                <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 py-1.5 text-[11px]  text-center px-1"
-                                                >
-                                                    {index + 1}
-                                                </td>
+                                    {halfDay?.length === 0 || halfDay?.every(item => !item?.punches || item.punches.length === 0) ? (
+                                        <tr>
+                                            <td colSpan={reportView === "Seperate" ? 14 : 12}
 
-                                                {/* Employee Id rowspan */}
-                                                <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={item?.mIdCard}
-                                                        className={`w-full  text-right pr-1 bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td>
-                                                <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={item?.firstName}
-                                                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td>
-                                                <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={item?.shiftType}
-                                                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td>
-                                                <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={item?.departmentName
-                                                        }
-                                                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td>
-                                                <td
-                                                    rowSpan={2}
-                                                    className="border border-gray-300 text-[11px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={item?.designationName}
-                                                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td>
 
-                                                {/* In Date */}
-                                                <td
-                                                    rowSpan={2} onClick={() => clickevent(item)}
-                                                    className=" border border-gray-300 text-[11px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={
-                                                            item.inTime
-                                                                ? moment.utc(item.inTime).format("DD-MM-YYYY")
-                                                                : ""
-                                                        }
-                                                        title="Open Modal"
+                                                className="border border-gray-300 py-1.5 text-[11px]  text-center px-1"
+                                            >
+                                                No Data Available
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        halfDay?.map((item, index) => (
+                                            <React.Fragment key={index}>
+                                                {/* Row 1 - In + Morning */}
+                                                <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
+                                                    {/* S.No rowspan */}
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 py-1.5 text-[11px]  text-center px-1"
+                                                    >
+                                                        {index + 1}
+                                                    </td>
 
-                                                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                                                    />
-                                                </td>
+                                                    {/* Employee Id rowspan */}
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={item?.mIdCard}
+                                                            className={`w-full  text-right pr-1 bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={item?.firstName}
+                                                            className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={item?.shiftType}
+                                                            className={`w-full  text-left pl-2 bg-transparent text-[11px]   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={item?.departmentName
+                                                            }
+                                                            className={`w-full  text-left pl-2 bg-transparent text-[11px]   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
+                                                    <td
+                                                        rowSpan={2}
+                                                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={item?.designationName}
+                                                            className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
 
-                                                {/* In Time */}
-                                                <td
-                                                    rowSpan={2} onClick={() => clickevent(item)}
-                                                    className=" border border-gray-300 text-[11px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        min="0"
-                                                        type="text"
-                                                        value={
-                                                            item.inTime
-                                                                ? moment.utc(item.inTime).format("HH:mm:ss")
-                                                                : ""
-                                                        }
-                                                        title="Open Modal"
+                                                    {/* In Date */}
+                                                    <td
+                                                        rowSpan={2} onClick={() => clickevent(item)}
+                                                        className=" border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={
+                                                                item.inTime
+                                                                    ? moment.utc(item.inTime).format("DD-MM-YYYY")
+                                                                    : ""
+                                                            }
+                                                            title="Open Modal"
 
-                                                        onFocus={(e) => e.target.select()}
-                                                        className={`w-full bg-transparent  text-center focus:outline-none focus:border-transparent  `}
-                                                    />
-                                                </td>
-                                                {/* Out Date */}
-                                                <td
-                                                    rowSpan={2} onClick={() => clickevent(item)}
-                                                    className="  border border-gray-300 text-[11px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={
-                                                            item.outTime
-                                                                ? moment.utc(item.outTime).format("DD-MM-YYYY")
-                                                                : ""
-                                                        }
-                                                        title="Open Modal"
+                                                            className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                                                        />
+                                                    </td>
 
-                                                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                                                    />
-                                                </td>
-                                                {/* Out Time*/}
+                                                    {/* In Time */}
+                                                    <td
+                                                        rowSpan={2} onClick={() => clickevent(item)}
+                                                        className=" border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            min="0"
+                                                            type="text"
+                                                            value={
+                                                                item.inTime
+                                                                    ? moment.utc(item.inTime).format("HH:mm:ss")
+                                                                    : ""
+                                                            }
+                                                            title="Open Modal"
 
-                                                <td
-                                                    rowSpan={2} onClick={() => clickevent(item)}
-                                                    className="  border border-gray-300 text-[11px] py-0.5 item-center"
-                                                >
-                                                    <input
-                                                        type="text"
-                                                        value={
-                                                            item.outTime
-                                                                ? moment.utc(item.outTime).format("HH:mm:ss")
-                                                                : ""
-                                                        }
-                                                        title="Open Modal"
+                                                            onFocus={(e) => e.target.select()}
+                                                            className={`w-full bg-transparent  text-center focus:outline-none focus:border-transparent  `}
+                                                        />
+                                                    </td>
+                                                    {/* Out Date */}
+                                                    <td
+                                                        rowSpan={2} onClick={() => clickevent(item)}
+                                                        className="  border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={
+                                                                item.outTime
+                                                                    ? moment.utc(item.outTime).format("DD-MM-YYYY")
+                                                                    : ""
+                                                            }
+                                                            title="Open Modal"
 
-                                                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                                                    />
-                                                </td>
+                                                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                                                        />
+                                                    </td>
+                                                    {/* Out Time*/}
 
+                                                    <td
+                                                        rowSpan={2} onClick={() => clickevent(item)}
+                                                        className="  border border-gray-300 text-[11px] py-0.5 item-center"
+                                                    >
+                                                        <input
+                                                            type="text"
+                                                            value={
+                                                                item.outTime
+                                                                    ? moment.utc(item.outTime).format("HH:mm:ss")
+                                                                    : ""
+                                                            }
+                                                            title="Open Modal"
+
+                                                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                                                        />
+                                                    </td>
+
+                                                    {reportView === "Seperate" && (
+                                                        <>
+
+                                                            <td className=" border  border-gray-300 text-[11px] py-0.5 " onClick={() => clickevent(item)}>
+                                                                <input
+                                                                    type="text"
+                                                                    value={"OUT"}
+                                                                    className={`w-full text-center bg-transparent  focus:outline-none focus:border-transparent `}
+                                                                    title="Open Modal"
+                                                                />
+                                                            </td>
+                                                            <td className="border border-gray-300 text-[11px] py-0.5 item-center" onClick={() => clickevent(item)}>
+                                                                <input
+                                                                    min="0"
+                                                                    type="text"
+                                                                    value={
+                                                                        item.firstBreakOut
+                                                                            ? moment
+                                                                                .utc(item.firstBreakOut)
+                                                                                .format("HH:mm:ss")
+                                                                            : ""
+                                                                    }
+                                                                    onFocus={(e) => e.target.select()}
+                                                                    className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                                                                    title="Open Modal"
+
+                                                                />
+                                                            </td>
+                                                            <td className="border border-gray-300 text-[11px] text-center px-1" onClick={() => clickevent(item)}>
+                                                                <input
+                                                                    type="text"
+                                                                    value={
+                                                                        item.lunchBreakOut
+                                                                            ? moment
+                                                                                .utc(item.lunchBreakOut)
+                                                                                .format("HH:mm:ss")
+                                                                            : ""
+                                                                    }
+                                                                    className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                                                                    title="Open Modal"
+                                                                />
+                                                            </td>
+                                                            <td className="border border-gray-300 text-[11px] text-center px-1" onClick={() => clickevent(item)}>
+                                                                <input
+                                                                    type="text"
+                                                                    value={
+                                                                        item.eveningBreakOut
+                                                                            ? moment
+                                                                                .utc(item.eveningBreakOut)
+                                                                                .format("HH:mm:ss")
+                                                                            : ""
+                                                                    }
+                                                                    className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
+                                                                    title="Open Modal"
+                                                                />
+                                                            </td>
+                                                        </>
+                                                    )}
+                                                    {reportView === "Single" && (
+                                                        <>
+                                                            <td colSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center" onClick={() => clickevent(item)}>
+                                                                <input
+                                                                    type="text"
+
+                                                                    value={[
+                                                                        item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
+                                                                        item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
+                                                                        item.lunchBreakOut ? moment.utc(item.lunchBreakOut).format("HH:mm:ss") : null,
+                                                                        item.lunchBreakIn ? moment.utc(item.lunchBreakIn).format("HH:mm:ss") : null,
+                                                                        item.eveningBreakOut ? moment.utc(item.eveningBreakOut).format("HH:mm:ss") : null,
+                                                                        item.eveningBreakIn ? moment.utc(item.eveningBreakIn).format("HH:mm:ss") : null,
+                                                                    ]
+                                                                        .filter(Boolean) // remove null or empty values
+                                                                        .join(" , ")} // join only existing values
+                                                                    className={`w-full bg-transparent text-left pl-1 focus:outline-none focus:border-transparent `}
+                                                                    title="Open Modal"
+                                                                />
+                                                            </td>
+                                                        </>
+                                                    )}
+
+
+
+
+
+
+
+                                                </tr>
+
+                                                {/* Row 2 - Evening + Out */}
                                                 {reportView === "Seperate" && (
-                                                    <>
+                                                    <>    <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
 
-                                                        <td className=" border  border-gray-300 text-[11px] py-0.5 " onClick={() => clickevent(item)}>
+                                                        <td className=" border border-gray-300 text-[11px] py-0.5 item-center" onClick={() => clickevent(item)}>
                                                             <input
                                                                 type="text"
-                                                                value={"OUT"}
-                                                                className={`w-full text-center bg-transparent  focus:outline-none focus:border-transparent `}
+                                                                value={"IN"}
+                                                                className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
                                                                 title="Open Modal"
+
                                                             />
                                                         </td>
+                                                        {/* Morning Break In */}
                                                         <td className="border border-gray-300 text-[11px] py-0.5 item-center" onClick={() => clickevent(item)}>
                                                             <input
-                                                                min="0"
                                                                 type="text"
                                                                 value={
-                                                                    item.firstBreakOut
-                                                                        ? moment
-                                                                            .utc(item.firstBreakOut)
-                                                                            .format("HH:mm:ss")
+                                                                    item.firstBreakIn
+                                                                        ? moment.utc(item.firstBreakIn).format("HH:mm:ss")
                                                                         : ""
                                                                 }
-                                                                onFocus={(e) => e.target.select()}
-                                                                className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                                                                className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
                                                                 title="Open Modal"
-
                                                             />
                                                         </td>
-                                                        <td className="border border-gray-300 text-[11px] text-center px-1" onClick={() => clickevent(item)}>
+
+                                                        <td className="  border border-gray-300 text-[11px] py-0.5 item-center" onClick={() => clickevent(item)}>
                                                             <input
                                                                 type="text"
                                                                 value={
-                                                                    item.lunchBreakOut
+                                                                    item.lunchBreakIn
                                                                         ? moment
-                                                                            .utc(item.lunchBreakOut)
+                                                                            .utc(item.lunchBreakIn)
                                                                             .format("HH:mm:ss")
                                                                         : ""
                                                                 }
@@ -605,13 +1032,13 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                                                 title="Open Modal"
                                                             />
                                                         </td>
-                                                        <td className="border border-gray-300 text-[11px] text-center px-1" onClick={() => clickevent(item)}>
+                                                        <td className="  border border-gray-300 text-[11px] py-0.5 item-center" onClick={() => clickevent(item)}>
                                                             <input
                                                                 type="text"
                                                                 value={
-                                                                    item.eveningBreakOut
+                                                                    item.eveningBreakIn
                                                                         ? moment
-                                                                            .utc(item.eveningBreakOut)
+                                                                            .utc(item.eveningBreakIn)
                                                                             .format("HH:mm:ss")
                                                                         : ""
                                                                 }
@@ -619,113 +1046,19 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                                                 title="Open Modal"
                                                             />
                                                         </td>
-                                                    </>
-                                                )}
-                                                {reportView === "Single" && (
-                                                    <>
-                                                        <td colSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center" onClick={() => clickevent(item)}>
-                                                            <input
-                                                                type="text"
-
-                                                                value={[
-                                                                    item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
-                                                                    item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
-                                                                    item.lunchBreakOut ? moment.utc(item.lunchBreakOut).format("HH:mm:ss") : null,
-                                                                    item.lunchBreakIn ? moment.utc(item.lunchBreakIn).format("HH:mm:ss") : null,
-                                                                    item.eveningBreakOut ? moment.utc(item.eveningBreakOut).format("HH:mm:ss") : null,
-                                                                    item.eveningBreakIn ? moment.utc(item.eveningBreakIn).format("HH:mm:ss") : null,
-                                                                ]
-                                                                    .filter(Boolean) // remove null or empty values
-                                                                    .join(" , ")} // join only existing values
-                                                                className={`w-full bg-transparent text-left pl-1 focus:outline-none focus:border-transparent `}
-                                                                title="Open Modal"
-                                                            />
-                                                        </td>
+                                                    </tr>
                                                     </>
                                                 )}
 
+                                                <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>{/* Evening Break In */}</tr>
+                                            </React.Fragment>
+                                        ))
+                                    )}
 
-
-
-
-
-
-                                            </tr>
-
-                                            {/* Row 2 - Evening + Out */}
-                                            {reportView === "Seperate" && (
-                                                <>    <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
-
-                                                    <td className=" border border-gray-300 text-[11px] py-0.5 item-center" onClick={() => clickevent(item)}>
-                                                        <input
-                                                            type="text"
-                                                            value={"IN"}
-                                                            className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                                                            title="Open Modal"
-
-                                                        />
-                                                    </td>
-                                                    {/* Morning Break In */}
-                                                    <td className="border border-gray-300 text-[11px] py-0.5 item-center" onClick={() => clickevent(item)}>
-                                                        <input
-                                                            type="text"
-                                                            value={
-                                                                item.firstBreakIn
-                                                                    ? moment.utc(item.firstBreakIn).format("HH:mm:ss")
-                                                                    : ""
-                                                            }
-                                                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                                                            title="Open Modal"
-                                                        />
-                                                    </td>
-
-                                                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center" onClick={() => clickevent(item)}>
-                                                        <input
-                                                            type="text"
-                                                            value={
-                                                                item.lunchBreakIn
-                                                                    ? moment
-                                                                        .utc(item.lunchBreakIn)
-                                                                        .format("HH:mm:ss")
-                                                                    : ""
-                                                            }
-                                                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                                                            title="Open Modal"
-                                                        />
-                                                    </td>
-                                                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center" onClick={() => clickevent(item)}>
-                                                        <input
-                                                            type="text"
-                                                            value={
-                                                                item.eveningBreakIn
-                                                                    ? moment
-                                                                        .utc(item.eveningBreakIn)
-                                                                        .format("HH:mm:ss")
-                                                                    : ""
-                                                            }
-                                                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                                                            title="Open Modal"
-                                                        />
-                                                    </td>
-                                                </tr>
-                                                </>
-                                            )}
-
-                                            <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>{/* Evening Break In */}</tr>
-                                        </React.Fragment>
-                                    ))}
 
 
                                 </tbody>
                             </table>
-
-                            <p className="mt-3 text-sm font-semibold">Miss Punch</p>
-
-
-
-
-
-
                         </div>
 
 
@@ -775,7 +1108,8 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                         <table className="w-full text-[12px] mt-4  border">
                                             <thead className="bg-gray-200">
                                                 <tr>
-                                                    <th className="border px-2 py-1 w-24">Time</th>
+                                                    <th className="border px-2 py-1 w-12">Type</th>
+                                                    <th className="border px-2 py-1 w-12">Time</th>
                                                 </tr>
                                             </thead>
 
@@ -786,6 +1120,9 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                                             key={idx}
                                                             className={`${idx % 2 === 0 ? "bg-white" : "bg-gray-100"} text-center`}
                                                         >
+                                                            <td className="border px-2 py-1">
+                                                                {`${idx % 2 === 0 ? "IN" : "OUT"}`}
+                                                            </td>
                                                             <td className="border px-2 py-1">
                                                                 {moment(p.timestamp).format("HH:mm:ss")}
                                                             </td>
@@ -831,8 +1168,8 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                         <table className="w-[200px] text-[12px] border">
                                             <thead className="bg-gray-200">
                                                 <tr>
-                                                    <th className="border px-2 py-1 w-24">Time</th>
-                                                </tr>
+                                                    <th className="border px-2 py-1 w-12">Type</th>
+                                                    <th className="border px-2 py-1 w-12">Time</th>                                                </tr>
                                             </thead>
 
                                             <tbody>
@@ -841,13 +1178,16 @@ const AbsentTable = ({ selectedShiftType, absentData, reportView, onClose, onUpd
                                                         <tr key={i} className={`${i % 2 === 0 ? "bg-white" : "bg-gray-100"} text-center`}
                                                         >
                                                             <td className="border px-2 py-1">
+                                                                {`${i % 2 === 0 ? "IN" : "OUT"}`}
+                                                            </td>
+                                                            <td className="border px-2 py-1">
                                                                 {moment(p.timestamp).format("HH:mm:ss")}
                                                             </td>
                                                         </tr>
                                                     ))
                                                 ) : (
                                                     <tr>
-                                                        <td className="text-gray-500 py-2 text-center">No new punches added</td>
+                                                        <td colSpan={2} className="text-gray-500 py-2 text-center">No new punches added</td>
                                                     </tr>
                                                 )}
 
