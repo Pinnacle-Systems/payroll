@@ -237,7 +237,7 @@ SELECT
   (
     SELECT JSON_ARRAYAGG(
       JSON_OBJECT(
-        'timestamp', p.timestamp ,'isPermission', p.isPermission 
+        'timestamp', p.timestamp ,'isPermission', p.isPermission ,'machineType',p.machineType
       )
     )
     FROM PythonPunchData p
