@@ -45,6 +45,7 @@ import {
   attendenceReportApi,
   attendenceGenerationApi,
   BreakReportApi,
+  leaveRequestApi,
   
 
 } from "./services"
@@ -85,6 +86,7 @@ import CertificateMasterApi from "./uniformService/CertificateMasterService";
 import UnitOfMeasurementMasterApi from "./uniformService/UnitOfMeasurementServices";
 import partyMasterNewApi from "./services/PartyMasterNewService";
 import PayFrequencyMasterApi from "./services/PayFrequencyService";
+import { LeaveRequest } from "../Basic/components";
 
 
 
@@ -204,6 +206,7 @@ const commonReducers = {
   [attendenceGenerationApi.reducerPath] : attendenceGenerationApi.reducer,
   [shiftTypeApi.reducerPath] : shiftTypeApi.reducer,
   [BreakReportApi.reducerPath] : BreakReportApi.reducer,
+  [leaveRequestApi.reducerPath] : leaveRequestApi.reducer,
 
 
 }
@@ -319,6 +322,7 @@ attendenceReportApi.middleware,
 attendenceGenerationApi.middleware,
 shiftTypeApi.middleware,
 BreakReportApi.middleware,
+leaveRequestApi.middleware,
 ];
 
 

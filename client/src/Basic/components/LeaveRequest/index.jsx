@@ -1,129 +1,121 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 
-
-import {
-
-  ReusableTable,
-  
-} from "../../../Inputs";
-
-
-
-import { useGetCompanyQuery } from "../../../redux/services/CompanyMasterService";
-
+import { ReusableTable } from "../../../Inputs";
 
 import { getCommonParams } from "../../../Utils/helper";
 import {
-  useAddCompanyPayCodeMutation,
-  useDeleteCompanyPayCodeMutation,
-  useGetCompanyPayCodeByIdQuery,
-  useGetCompanyPayCodeQuery,
-  useUpdateCompanyPayCodeMutation,
-} from "../../../redux/services/CompanyPayCodeService";
-import {
-  useAddPayStructureMutation,
-  useDeletePayStructureMutation,
-  useGetPayStructureByIdQuery,
-useGetPayStructureQuery,
-useUpdatePayStructureMutation,
-
-} from "../../../redux/services/PayStructureService";
+  useGetLeaveRequestQuery,
+  useGetLeaveRequestByIdQuery,
+  useAddLeaveRequestMutation,
+  useUpdateLeaveRequestMutation,
+  useDeleteLeaveRequestMutation,
+} from "../../../redux/services/LeaveRequestService";
 
 import Table from "./Table";
 import Swal from "sweetalert2";
-import { useGetPayComponentQuery } from "../../../redux/services/PayComponentsService";
 import moment from "moment";
 import { useDispatch } from "react-redux";
-import { useGetEmployeeCategoryQuery } from "../../../redux/services/EmployeeCategoryMasterService";
-import secureLocalStorage from "react-secure-storage";
+
 import Loader from "../Loader";
+import { useGetEmployeeQuery } from "../../../redux/services/EmployeeMasterService";
+import { useGetLeaveCodeQuery } from "../../../redux/services/LeaveCode.servive";
 
 const LeaveRequest = () => {
   const today = new Date();
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
-  const [payDetailsId, setPayDetailsId] = useState("");
-
   const [docId, setDocId] = useState("New");
-
   const [form, setForm] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
-  const [payStructure, setPayStructure] = useState([]);
-  const[category,setCategory] = useState('')
-  const [employeeCategoryId, setEmployeeCategoryId] = useState("");
+  const [leaveDetails, setLeaveDetails] = useState([]);
   const [date, setDate] = useState(moment.utc(today).format("YYYY-MM-DD"));
+  const [employeeId, setEmployeeId] = useState("");
+  const [employeeName, setEmployeeName] = useState("");
+  const [designation, setDesignation] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [department, setDepartment] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [totalDays, setTotalDays] = useState('')
   const dispatch = useDispatch();
-
   const params = getCommonParams();
+  const { branchId, companyId, finYearId, userId } = params;
+  const { data: allData, isLoading, isFetching, refetch } = useGetLeaveRequestQuery({ params, searchParams: searchValue, });
 
-  const { branchId ,companyId,finYearId} = params;
+  const { data: employee } = useGetEmployeeQuery({ params });
+  const { data: LeaveType } = useGetLeaveCodeQuery({ params });
 
-  const { data: company } = useGetCompanyQuery({ params });
-  const [companyCode, setCompanyCode] = useState(company?.data[0].code);
 
-  const { data: allData, isLoading,
-    isFetching,  refetch } = useGetPayStructureQuery({
-    params,
-    searchParams: searchValue,
-  });
-    const { data: employeeCategoryList } = useGetEmployeeCategoryQuery({
-      params
-    });
-
-  const { data: companyPayCode } = useGetCompanyPayCodeQuery({
-    params,
-    searchParams: searchValue,
-  });
   const {
     data: singleData,
     isFetching: isSingleFetching,
     isLoading: isSingleLoading,
-  } = useGetPayStructureByIdQuery(id, { skip: !id });
+  } = useGetLeaveRequestByIdQuery(id, { skip: !id });
 
-  const [addData] = useAddPayStructureMutation();
-  const [updateData] = useUpdatePayStructureMutation();
-  const [removeData] = useDeletePayStructureMutation();
+  const [addData] = useAddLeaveRequestMutation();
+  const [updateData] = useUpdateLeaveRequestMutation();
+  const [removeData] = useDeleteLeaveRequestMutation();
 
-  
 
- 
 
-  useEffect(() => {
-    if (payStructure?.length >= 1) return;
-    setPayStructure((prev) => {
-      let newArray = Array?.from({ length: 1 - prev?.length }, () => {
-        return {
-          payDetailsId:''
-        };
+
+
+  const generateLeaveRows = (from, to) => {
+    if (!from || !to) return;
+
+    const start = new Date(from);
+    const end = new Date(to);
+
+    if (end < start) return;
+
+    let temp = [];
+    let current = new Date(start);
+
+    while (current <= end) {
+      temp.push({
+        startDate: current.toISOString().split("T")[0],
+        leaveId: "",
       });
-      return [...prev, ...newArray];
-    });
-  }, [payStructure,setPayStructure ]);
 
-const syncFormWithDb = useCallback(
-  (data) => {
-    setDocId(data?.docId || "New");
-    setDate(
-      data?.date
-        ? moment.utc(data.date).format("YYYY-MM-DD")
-        : moment.utc(today).format("YYYY-MM-DD")
-    );
-    setEmployeeCategoryId(data?.employeeCategoryId);
-    setCategory(data?.category || "");
+      current.setDate(current.getDate() + 1);
+    }
 
-    // Map PayStructure to include payDescription and pickFrom
-    const enrichedPayStructure = data?.PayStructure?.map((ps) => ({
-      ...ps,
-      
-      payDescription: ps?.PayDetails?.payComponent?.payDescription || "",
-      pickFrom: ps?.PayDetails?.pickFrom || "",
-    })) || [];
+    setLeaveDetails(temp);
+  };
 
-    setPayStructure(enrichedPayStructure);
-  },
-  [id]
-);
+
+
+  const syncFormWithDb = useCallback(
+    (data) => {
+      setDocId(data?.docId || "New");
+      setDate(
+        data?.date
+          ? moment.utc(data.date).format("YYYY-MM-DD")
+          : moment.utc(today).format("YYYY-MM-DD")
+      );
+      setEmployeeId(data?.employee.id)
+      setEmployeeName(data?.employee.firstName)
+      setDepartment(data?.employee.department?.name)
+      setDesignation(data?.employee.designation.name)
+      setFromDate(data?.fromDate
+        ? moment.utc(data.fromDate).format("YYYY-MM-DD")
+        : moment.utc(today).format("YYYY-MM-DD"))
+      setToDate(data?.toDate
+        ? moment.utc(data.toDate).format("YYYY-MM-DD")
+        : moment.utc(today).format("YYYY-MM-DD"))
+
+      const formatted = data?.leaveDetails?.map((val) => ({
+        leaveId: val?.leaveId,
+        startDate: val?.startDate ? moment.utc(val?.startDate).format("YYYY-MM-DD") : null,
+        shiftTime: val?.shiftTime || '',
+        notes: val?.notes || ''
+
+      }))
+      setLeaveDetails(formatted);
+    },
+    [id]
+  );
 
 
   useEffect(() => {
@@ -133,37 +125,40 @@ const syncFormWithDb = useCallback(
   const data = {
     date,
     docId,
-    category,
-    employeeCategoryId,
     finYearId,
     id,
     branchId,
-    payStructure,
-     companyId,
+    userId,
+    leaveDetails,
+    companyId,
+    employeeId,
+    fromDate,
+    toDate,
+    totalDays
   };
 
-  
-const validateData = (data) => {
-  if (!data?.employeeCategoryId || !data?.category) {
-    Swal.fire({
-      icon: "error",
-      title: "Submission error",
-      text: "Employee Category and category are required",
-    });
-    return false;
-  }
 
-  if (payStructure?.some((i) => !i.payDetailsId || i.payDetailsId === "")) {
-    Swal.fire({
-      icon: "error",
-      title: "Submission error",
-      text: "Pay Details is missing in one or more rows",
-    });
-    return false;
-  }
+  const validateData = (data) => {
+    if (!data?.employeeId || !data?.fromDate || !data?.toDate) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Employee Id  and Date are required",
+      });
+      return false;
+    }
 
-  return true;
-};
+    if (leaveDetails?.some((i) => !i.leaveId || i.leaveId === "")) {
+      Swal.fire({
+        icon: "error",
+        title: "Submission error",
+        text: "Leave Details is missing in one or more rows",
+      });
+      return false;
+    }
+
+    return true;
+  };
 
 
   const handleSubmitCustom = async (callback, data, text) => {
@@ -196,10 +191,10 @@ const validateData = (data) => {
     }
   };
 
- 
+
 
   const saveData = () => {
-   
+
     if (!validateData(data)) {
       return;
     }
@@ -234,10 +229,10 @@ const validateData = (data) => {
           timer: 1000,
         });
         setForm(false);
-         dispatch({
-        type: `companyPayCode/invalidateTags`,
-        payload: ["companyPayCode"],
-      });
+        dispatch({
+          type: `companyPayCode/invalidateTags`,
+          payload: ["companyPayCode"],
+        });
       } catch (error) {
         Swal.fire({
           icon: "error",
@@ -258,26 +253,19 @@ const validateData = (data) => {
 
   console.log(allData, "alldata");
 
-  // const getNextDocId = useCallback(() => {
-  //   if (id) return;
-  //   if (allData?.nextDocId) {
-  //     setDocId(allData?.nextDocId);
-  //   }
-  // }, [allData, id]);
-
-  // useEffect(getNextDocId, [getNextDocId]);
-  console.log(allData, "alldata");
   const onNew = () => {
-   
+    setEmployeeId('')
     setId("");
-    setEmployeeCategoryId('')
-    setCategory('')
+    setEmployeeName('')
+    setDesignation('')
+    setDepartment('')
+    setMobileNumber('')
     setReadOnly(false);
     setSearchValue("");
-    // setCompanyCode(company?.data[0]?.code);
-    setPayStructure([]);
-      setDate(moment.utc(new Date(today)).format("YYYY-MM-DD"));
-    
+    setLeaveDetails([]);
+    setDate(moment.utc(new Date(today)).format("YYYY-MM-DD"));
+    setFromDate('')
+    setToDate('')
     refetch();
   };
   const handleView = (id) => {
@@ -312,6 +300,18 @@ const validateData = (data) => {
       //   cellClass: () => "  text-gray-900",
       className: " text-gray-900 text-center uppercase w-32",
     },
+    {
+      header: "Emp Name",
+      accessor: (item) => item?.employee.firstName,
+      //   cellClass: () => "  text-gray-900",
+      className: " text-gray-900 text-left pl-2 uppercase w-44",
+    },
+    {
+      header: "Emp Id Card No",
+      accessor: (item) => item?.employee.idNumber,
+      //   cellClass: () => "  text-gray-900",
+      className: " text-gray-900 text-left pl-2 uppercase w-44",
+    },
   ];
   if (isLoading || isFetching) return <Loader />;
 
@@ -321,43 +321,42 @@ const validateData = (data) => {
         <div onKeyDown={handleKeyDown} className="p-1 ">
           {form === true ? (
             <Table
-              saveData={saveData}
-              setForm={setForm}
-              setReadOnly={setReadOnly}
-              setId={setId}
-              setCategory={setCategory}
-              category={category}
-              
-              readOnly={readOnly}
-              payStructure={payStructure}
-              setPayStructure={setPayStructure}
-              id={id}
-              companyCode={companyCode}
-              setCompanyCode={setCompanyCode}
+              saveData={saveData} employeeName={employeeName}
+              setForm={setForm} setEmployeeName={setEmployeeName}
+              setReadOnly={setReadOnly} designation={designation}
+              setId={setId} setDesignation={setDesignation}
+              mobileNumber={mobileNumber}
+              setMobileNumber={setMobileNumber}
+              employee={employee} department={department}
+              readOnly={readOnly} setDepartment={setDepartment}
+              leaveDetails={leaveDetails}
+              setLeaveDetails={setLeaveDetails}
+              id={id} LeaveType={LeaveType} setToDate={setToDate}
+              fromDate={fromDate} setFromDate={setFromDate} toDate={toDate}
               docId={docId}
               setDate={setDate}
               date={date}
               setDocId={setDocId}
-              employeeCategoryId={employeeCategoryId}
-              setEmployeeCategoryId={setEmployeeCategoryId}
+              generateLeaveRows={generateLeaveRows}
               childRecord={childRecord}
-              companyPayCode = {companyPayCode}
-              setPayDetailsId={setPayDetailsId}
-              payDetailsId={payDetailsId}
+
+
               onClose={() => {
                 setForm(false);
                 onNew();
               }}
               onNew={onNew}
               refetch={refetch}
-              employeeCategoryList={employeeCategoryList}
+
               form={form}
+              employeeId={employeeId}
+              setEmployeeId={setEmployeeId}
             />
           ) : (
             <>
               <div className="w-full flex bg-white p-1 justify-between  items-center">
                 <h1 className="master-header">
-                 Leave Request
+                  Leave Request
                 </h1>
                 <div className="flex items-center gap-4">
                   <button

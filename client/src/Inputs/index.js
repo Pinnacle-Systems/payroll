@@ -1184,7 +1184,7 @@ export const TextInput = forwardRef(
           readOnly={readOnly}
           disabled={disabled}
           tabIndex={tabIndex ?? undefined}
-          className={`w-full px-2 py-1 text-xs text-[12px]  border input-font border-gray-300 rounded-lg
+          className={`w-full px-2 py-1.5 text-xs text-[12px]  border input-font border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
           ${
@@ -1778,7 +1778,7 @@ export const DateInput = forwardRef(
             value={value}
             onChange={(e) => setValue(e.target.value)}
             className={`
-         w-[120px] px-2 py-0.5 text-xs text-[12px]  border input-font border-gray-300 rounded-lg
+         w-[120px] px-2 py-[5px] text-xs text-[12px]  border input-font border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
             ${
@@ -2395,7 +2395,7 @@ export const customSelectStyles = {
     ...base,
     minHeight: "13px",
     height: "13px",
-    padding: "12px 4px",
+    padding: "14px 4px",
     fontSize: "12px",
     borderRadius: "8px",
     fontFamily: 'Poppins',

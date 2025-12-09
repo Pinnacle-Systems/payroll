@@ -68,6 +68,7 @@ import {
   AttendenceGeneration,
   shiftType,
   BreakReport,
+  leaveRequest,
 } from "./src/routes/index.js";
 
 import { socketMain } from "./src/sockets/socket.js";
@@ -169,6 +170,10 @@ app.use('/attendenceReport', AttendanceReport)
 app.use('/attendenceGeneration', AttendenceGeneration)
 app.use('/shiftType', shiftType)
 app.use('/breakReport',BreakReport)
+app.use('/leaveRequest',leaveRequest)
+
+
+
 app.get("/retreiveFile/:fileName", (req, res) => {
   const { fileName } = req.params;
   res.sendFile(__dirname + "/uploads/" + fileName);

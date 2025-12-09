@@ -82,6 +82,7 @@ model Company {
   EmployeeResign      EmployeeResign[]
   Attendance          Attendance[]
   ShiftType           ShiftType[]
+  leaveRequests       leaveRequest[]
 }
 
 model Subscription {
@@ -147,6 +148,7 @@ model Branch {
   EmployeeResign      EmployeeResign[]
   Attendance          Attendance[]
   ShiftType           ShiftType[]
+  leaveRequests       leaveRequest[]
 }
 
 model UserOnBranch {
@@ -285,6 +287,8 @@ model User {
   AttendanceupdatedBy          Attendance[]          @relation(name: "updatedBy")
   ShiftTypeCreatedBy           ShiftType[]           @relation(name: "createdBy")
   ShiftTypeupdatedBy           ShiftType[]           @relation(name: "updatedBy")
+  leaveRequestsCreatedBy       leaveRequest[]        @relation(name: "createdBy")
+  leaveRequestsupdatedBy       leaveRequest[]        @relation(name: "updatedBy")
 }
 
 model Employee {
@@ -378,6 +382,7 @@ model Employee {
   PunchData             PunchData[]
   mIdCard               Int?                  @unique
   PythonPunchData       PythonPunchData[]
+  leaveRequests         leaveRequest[]
 }
 
 model EmployeeBankDetails {
@@ -430,6 +435,7 @@ model FinYear {
   updatedById         Int?
   LeaveOPeningBalance LeaveOPeningBalance[]
   Employee            Employee[]
+  leaveRequests       leaveRequest[]
 }
 
 model EmployeeCategory {
@@ -1727,6 +1733,7 @@ model LeaveCode {
   code                String
   active              Boolean               @default(true)
   LeaveOPeningBalance LeaveOPeningBalance[]
+  leaveDetails        LeaveDetails[]
 }
 
 model LeaveOPeningBalance {
@@ -1898,4 +1905,39 @@ model ShiftType {
   updatedBy         User?    @relation("updatedBy", fields: [updatedById], references: [id])
   updatedById       Int?
   selectedShiftType String?
+}
+
+model leaveRequest {
+  id           Int            @id @default(autoincrement())
+  createdAt    DateTime?      @default(now())
+  updatedAt    DateTime?      @updatedAt
+  Company      Company?       @relation(fields: [companyId], references: [id])
+  companyId    Int?
+  branch       Branch?        @relation(fields: [branchId], references: [id])
+  branchId     Int?
+  createdBy    User?          @relation("createdBy", fields: [createdById], references: [id])
+  createdById  Int?
+  updatedBy    User?          @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById  Int?
+  finYear      FinYear?       @relation(fields: [finYearId], references: [id])
+  finYearId    Int?
+  employee     Employee?      @relation(fields: [employeeId], references: [id])
+  employeeId   Int?
+  docId        String?
+  date         DateTime?
+  fromDate     DateTime?
+  toDate       DateTime?
+  totalDays    Int?
+  leaveDetails LeaveDetails[]
+}
+
+model LeaveDetails {
+  id             Int           @id @default(autoincrement())
+  leaveRequest   leaveRequest? @relation(fields: [leaveRequestId], references: [id], onDelete: Cascade)
+  leaveRequestId Int?
+  leave          LeaveCode     @relation(fields: [leaveId], references: [id])
+  leaveId        Int
+  startDate      DateTime?
+  shiftTime      String?
+  notes          String?
 }
