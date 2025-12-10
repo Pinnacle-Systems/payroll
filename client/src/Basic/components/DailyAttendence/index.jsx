@@ -458,8 +458,9 @@ const Form = () => {
       ...item,
     }));
 
-    setHalfDay(halfDayData)
 
+    setHalfDay(halfDayData)
+    console.log(halfDay, "halfDay");
 
     const singlePunchFiltered = allData?.data?.filter((item) => {
       return item?.punches?.length === 1;
@@ -971,8 +972,8 @@ const Form = () => {
                 </th>
 
                 <th
-                  colSpan={reportView === "Seperate" ? 4 : 2}
-                  className={`${reportView === "Single" ? "w-32" : "w-36"} py-2 text-center font-medium text-[12px]  border border-gray-300`}                >
+                  colSpan={reportView === "Seperate" ? 5 : 2}
+                  className={`${reportView === "Single" ? "w-36" : "w-36"} py-2 text-center font-medium text-[12px]  border border-gray-300`}                >
                   Other Punches
                 </th>
                 <th className={`w-8 py-2 item-center font-medium text-[12px]  border border-gray-300`}>
@@ -1033,724 +1034,626 @@ const Form = () => {
             <p className=" z-10 w-[100px] text-sm px-1 py-0.5  ">REGULAR</p>
 
             <tbody >
-              {regularData?.map((item, index) => (
-                <React.Fragment key={index}>
-                  {/* Row 1 - In + Morning */}
-                  <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
-                    {/* S.No rowspan */}
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 py-1.5 text-[11px]  text-center px-1"
-                    >
-                      {index + 1}
-                    </td>
+              {regularData?.map((item, index) => {
+                let punches = item?.punches || [];
+                // Ignore first and last punch
+                if (punches.length > 2) {
+                  punches = punches.slice(1, punches.length - 1);
+                } else {
+                  punches = []; // Not enough punches, ignore all
+                }
+                const MAX_PUNCHES = 4;
+                // --- SEPARATE MODE LOGIC ---
+                let outPunches = [];
+                let inPunches = [];
 
-                    {/* Employee Id rowspan */}
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[11px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.mIdCard}
-                        className={`w-full  text-right pr-1 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[11px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.firstName}
-                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[11px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.shiftType}
-                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[11px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.departmentName
-                        }
-                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[11px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.designationName}
-                        className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
+                const hasCleanTypes = punches?.some(
+                  (p) => p.machineType === "IN" || p.machineType === "OUT" || p.machineType === "MANUAL"
+                );
 
-                    {/* In Date */}
-                    <td
-                      rowSpan={2}
-                      className=" border border-gray-300 text-[11px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={
-                          item.inTime
-                            ? moment.utc(item.inTime).format("DD-MM-YYYY")
-                            : ""
-                        }
-                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-
-                    {/* In Time */}
-                    <td
-                      rowSpan={2}
-                      className=" border border-gray-300 text-[11px] py-0.5 item-center"
-                    >
-                      <input
-                        min="0"
-                        type="text"
-                        value={
-                          item.inTime
-                            ? moment.utc(item.inTime).format("HH:mm:ss")
-                            : ""
-                        }
-                        onFocus={(e) => e.target.select()}
-                        className={`w-full bg-transparent  text-center focus:outline-none focus:border-transparent  `}
-                      />
-                    </td>
-                    {/* Out Date */}
-                    <td
-                      rowSpan={2}
-                      className="  border border-gray-300 text-[11px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={
-                          item.outTime
-                            ? moment.utc(item.outTime).format("DD-MM-YYYY")
-                            : ""
-                        }
-                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                      />
-                    </td>
-                    {/* Out Time*/}
-
-                    <td
-                      rowSpan={2}
-                      className="  border border-gray-300 text-[11px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={
-                          item.outTime
-                            ? moment.utc(item.outTime).format("HH:mm:ss")
-                            : ""
-                        }
-                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                      />
-                    </td>
-
-                    {reportView === "Seperate" && (
-                      <>
-
-                        <td className=" border  border-gray-300 text-[11px] py-0.5 ">
-                          <input
-                            type="text"
-                            value={"OUT"}
-                            className={`w-full text-center bg-transparent  focus:outline-none focus:border-transparent `}
-                          />
-                        </td>
-                        <td className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            min="0"
-                            type="text"
-                            value={
-                              item.firstBreakOut
-                                ? moment
-                                  .utc(item.firstBreakOut)
-                                  .format("HH:mm:ss")
-                                : ""
-                            }
-                            onFocus={(e) => e.target.select()}
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                          />
-                        </td>
-                        <td className="border border-gray-300 text-[11px] text-center px-1">
-                          <input
-                            type="text"
-                            value={
-                              item.lunchBreakOut
-                                ? moment
-                                  .utc(item.lunchBreakOut)
-                                  .format("HH:mm:ss")
-                                : ""
-                            }
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                            disabled
-                          />
-                        </td>
-                        <td className="border border-gray-300 text-[11px] text-center px-1">
-                          <input
-                            type="text"
-                            value={
-                              item.eveningBreakOut
-                                ? moment
-                                  .utc(item.eveningBreakOut)
-                                  .format("HH:mm:ss")
-                                : ""
-                            }
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                            disabled
-                          />
-                        </td>
-                      </>
-                    )}
-                    {reportView === "Single" && (
-                      <>
-                        <td colSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            type="text"
-
-                            value={[
-                              item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
-                              item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
-                              item.lunchBreakOut ? moment.utc(item.lunchBreakOut).format("HH:mm:ss") : null,
-                              item.lunchBreakIn ? moment.utc(item.lunchBreakIn).format("HH:mm:ss") : null,
-                              item.eveningBreakOut ? moment.utc(item.eveningBreakOut).format("HH:mm:ss") : null,
-                              item.eveningBreakIn ? moment.utc(item.eveningBreakIn).format("HH:mm:ss") : null,
-                            ]
-                              .filter(Boolean) // remove null or empty values
-                              .join(" , ")} // join only existing values
-                            className={`w-full bg-transparent text-left pl-1 focus:outline-none focus:border-transparent `}
-                            disabled
-                          />
-                        </td>
-                      </>
-                    )}
-
-
-                    <td
-                      rowSpan={2}
-                      className="  border border-gray-300 text-[11px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.permissionHrs || ''}
-                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                      />
-                    </td>
-                    {selectedShiftType === "Hourly" && (
-                      <>
-
-
-                        {/* 2. worked Hours (without Break and OT) → hourlyWorkedTime */}
-                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            type="text"
-                            value={item.hourlyWorkedTime || ""}
-                            className="w-full bg-transparent text-center focus:outline-none"
-                          />
-                        </td>
+                if (hasCleanTypes) {
+                  // CASE 1 → Use machineType
+                  outPunches = punches.filter((p) => p.machineType === "OUT" || p.machineType === "MANUAL");
+                  inPunches = punches.filter((p) => p.machineType === "IN" || p.machineType === "MANUAL");
+                } else {
+                  // CASE 2 → machineType is "IN / OUT" → Use index rule
+                  outPunches = punches?.filter((_, i) => i % 2 === 0);
+                  inPunches = punches?.filter((_, i) => i % 2 !== 0);
+                }
+                outPunches = [...outPunches?.slice(0, MAX_PUNCHES), ...Array(MAX_PUNCHES - outPunches.length)?.fill(null)];
+                inPunches = [...inPunches?.slice(0, MAX_PUNCHES), ...Array(MAX_PUNCHES - inPunches.length)?.fill(null)];
 
 
 
-                        {/* 4. Actual Worked Hours (LAST) → rawWorkedTime */}
-                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            type="text"
-                            value={item.rawWorkedTime || ""}
-                            className="w-full bg-transparent text-center focus:outline-none"
-                          />
-                        </td>
-                        {/* 3. OT Hours */}
-                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            type="text"
-                            value={item.otHours || ""}
-                            className="w-full bg-transparent text-center focus:outline-none"
-                          />
-                        </td>
-                        {/* 1. worked Hours (with Break) → actualWorkedTime */}
-                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            type="text"
-                            value={item.actualWorkedTime || ""}
-                            className="w-full bg-transparent text-center focus:outline-none"
-                          />
-                        </td>
-                      </>
-                    )}
-
-                    {/* ================================
-    NON-HOURLY COLUMNS (3 columns)
-================================== */}
-                    {selectedShiftType !== "Hourly" && (
-                      <>
-                        {/* 1. worked Hours */}
-                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            type="text"
-                            value={item.totalWorkedTime || ""}
-                            className="w-full bg-transparent text-center focus:outline-none"
-                          />
-                        </td>
-
-                        {/* 2. OT Hours */}
-                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            type="text"
-                            value={item.otHours || ""}
-                            className="w-full bg-transparent text-center focus:outline-none"
-                          />
-                        </td>
-
-                        {/* 3. Shift Count */}
-                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            type="number"
-                            value={item.formulaResult || ""}
-                            className="w-full bg-transparent text-right pr-2 focus:outline-none"
-                          />
-                        </td>
-                      </>
-                    )}
+                const formatTime = (ts) => ts ? moment(ts).format("HH:mm:ss") : "";
+                const formatDate = (ts) => ts ? moment(ts).format("DD-MM-YYYY") : "";
 
 
+                return (
+                  <React.Fragment key={index}>
 
-                  </tr>
+                    <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
 
-                  {/* Row 2 - Evening + Out */}
-                  {reportView === "Seperate" && (
-                    <>    <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
+                      <td
+                        rowSpan={2}
+                        className="border border-gray-300 py-1.5 text-[11px]  text-center px-1"
+                      >
+                        {index + 1}
+                      </td>
 
-                      <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
+
+                      <td
+                        rowSpan={2}
+                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                      >
                         <input
                           type="text"
-                          value={"IN"}
+                          value={item?.mIdCard}
+                          className={`w-full  text-right pr-1 bg-transparent   focus:outline-none focus:border-transparent `}
+                        />
+                      </td>
+                      <td
+                        rowSpan={2}
+                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                      >
+                        <input
+                          type="text"
+                          value={item?.firstName}
+                          className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                        />
+                      </td>
+                      <td
+                        rowSpan={2}
+                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                      >
+                        <input
+                          type="text"
+                          value={item?.shiftType}
+                          className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                        />
+                      </td>
+                      <td
+                        rowSpan={2}
+                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                      >
+                        <input
+                          type="text"
+                          value={item?.departmentName
+                          }
+                          className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                        />
+                      </td>
+                      <td
+                        rowSpan={2}
+                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                      >
+                        <input
+                          type="text"
+                          value={item?.designationName}
+                          className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                        />
+                      </td>
+
+
+                      <td
+                        rowSpan={2}
+                        className=" border border-gray-300 text-[11px] py-0.5 item-center"
+                      >
+                        <input
+                          type="text"
+                          value={
+                            item.inTime
+                              ? moment.utc(item.inTime).format("DD-MM-YYYY")
+                              : ""
+                          }
                           className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
                         />
                       </td>
-                      {/* Morning Break In */}
-                      <td className="border border-gray-300 text-[11px] py-0.5 item-center">
+
+                      {/* In Time */}
+                      <td
+                        rowSpan={2}
+                        className=" border border-gray-300 text-[11px] py-0.5 item-center"
+                      >
+                        <input
+                          min="0"
+                          type="text"
+                          value={
+                            item.inTime
+                              ? moment.utc(item.inTime).format("HH:mm:ss")
+                              : ""
+                          }
+                          onFocus={(e) => e.target.select()}
+                          className={`w-full bg-transparent  text-center focus:outline-none focus:border-transparent  `}
+                        />
+                      </td>
+                      {/* Out Date */}
+                      <td
+                        rowSpan={2}
+                        className="  border border-gray-300 text-[11px] py-0.5 item-center"
+                      >
                         <input
                           type="text"
                           value={
-                            item.firstBreakIn
-                              ? moment.utc(item.firstBreakIn).format("HH:mm:ss")
+                            item.outTime
+                              ? moment.utc(item.outTime).format("DD-MM-YYYY")
                               : ""
                           }
-                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                          disabled
+                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                        />
+                      </td>
+                      {/* Out Time*/}
+
+                      <td
+                        rowSpan={2}
+                        className="  border border-gray-300 text-[11px] py-0.5 item-center"
+                      >
+                        <input
+                          type="text"
+                          value={
+                            item.outTime
+                              ? moment.utc(item.outTime).format("HH:mm:ss")
+                              : ""
+                          }
+                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                         />
                       </td>
 
-                      <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                      {reportView === "Seperate" && (
+                        <>
+
+                          <td className="border text-[11px] text-center">OUT</td>
+
+                          {/* Map inside a single TD for OUT punches */}
+                          {outPunches?.map((p, i) => (
+                            <td key={i} className="border text-[11px] text-center">
+                              {p ? formatTime(p.timestamp) : ""}
+                            </td>
+                          ))}
+                        </>
+                      )}
+
+
+                      {/* SINGLE VIEW */}
+                      {reportView === "Single" && (
+                        <td colSpan={2} className="border text-[11px]">
+                          <input
+                            className="w-full bg-transparent pl-1"
+                            value={punches?.map((p) => moment.utc(p.timestamp).format("HH:mm:ss"))
+                              .join(" , ")
+                            }
+                          />
+                        </td>
+                      )}
+
+
+                      <td
+                        rowSpan={2}
+                        className="  border border-gray-300 text-[11px] py-0.5 item-center"
+                      >
                         <input
                           type="text"
-                          value={
-                            item.lunchBreakIn
-                              ? moment
-                                .utc(item.lunchBreakIn)
-                                .format("HH:mm:ss")
-                              : ""
-                          }
-                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                          disabled
+                          value={item?.permissionHrs || ''}
+                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
                         />
                       </td>
-                      <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
-                        <input
-                          type="text"
-                          value={
-                            item.eveningBreakIn
-                              ? moment
-                                .utc(item.eveningBreakIn)
-                                .format("HH:mm:ss")
-                              : ""
-                          }
-                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                          disabled
-                        />
-                      </td>
+                      {selectedShiftType === "Hourly" && (
+                        <>
+
+
+                          {/* 2. worked Hours (without Break and OT) → hourlyWorkedTime */}
+                          <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
+                            <input
+                              type="text"
+                              value={item.hourlyWorkedTime || ""}
+                              className="w-full bg-transparent text-center focus:outline-none"
+                            />
+                          </td>
+
+
+
+                          {/* 4. Actual Worked Hours (LAST) → rawWorkedTime */}
+                          <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
+                            <input
+                              type="text"
+                              value={item.rawWorkedTime || ""}
+                              className="w-full bg-transparent text-center focus:outline-none"
+                            />
+                          </td>
+                          {/* 3. OT Hours */}
+                          <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
+                            <input
+                              type="text"
+                              value={item.otHours || ""}
+                              className="w-full bg-transparent text-center focus:outline-none"
+                            />
+                          </td>
+                          {/* 1. worked Hours (with Break) → actualWorkedTime */}
+                          <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
+                            <input
+                              type="text"
+                              value={item.actualWorkedTime || ""}
+                              className="w-full bg-transparent text-center focus:outline-none"
+                            />
+                          </td>
+                        </>
+                      )}
+
+
+                      {selectedShiftType !== "Hourly" && (
+                        <>
+                          {/* 1. worked Hours */}
+                          <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
+                            <input
+                              type="text"
+                              value={item.totalWorkedTime || ""}
+                              className="w-full bg-transparent text-center focus:outline-none"
+                            />
+                          </td>
+
+                          {/* 2. OT Hours */}
+                          <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
+                            <input
+                              type="text"
+                              value={item.otHours || ""}
+                              className="w-full bg-transparent text-center focus:outline-none"
+                            />
+                          </td>
+
+                          {/* 3. Shift Count */}
+                          <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
+                            <input
+                              type="number"
+                              value={item.formulaResult || ""}
+                              className="w-full bg-transparent text-right pr-2 focus:outline-none"
+                            />
+                          </td>
+                        </>
+                      )}
+
+
+
                     </tr>
-                    </>
-                  )}
 
-                  <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>{/* Evening Break In */}</tr>
-                </React.Fragment>
-              ))}
-            </tbody>
-            <p className=" z-10 w-[100px] text-sm px-1 py-0.5 ">IRREGULAR</p>
-            <tbody>
-              {irregularData?.map((item, index) => (
-                <React.Fragment key={index}>
-                  {/* Row 1 - In + Morning */}
-                  <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
-                    {/* S.No rowspan */}
-                    <td
-                      rowSpan={2}
-                      className="border  border-gray-300 py-1.5 text-[11px]  text-center px-1"
-                    >
-                      {index + 1}
-                    </td>
-
-                    {/* Employee Id rowspan */}
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[11px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.mIdCard}
-                        className={`w-full   text-right pr-1 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[11px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.firstName}
-                        className={`w-full text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[11px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.shiftType}
-                        className={`w-full text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[11px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.departmentName}
-                        className={`w-full text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-                    <td
-                      rowSpan={2}
-                      className="border border-gray-300 text-[11px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.designationName}
-                        className={`w-full text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-
-                    {/* In Date */}
-                    <td
-                      rowSpan={2}
-                      className=" border border-gray-300 text-[11px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={
-                          item.inTime
-                            ? moment.utc(item.inTime).format("DD-MM-YYYY")
-                            : ""
-                        }
-                        className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                      />
-                    </td>
-
-                    {/* In Time */}
-                    <td
-                      rowSpan={2}
-                      className=" border border-gray-300 text-[11px] py-0.5 item-center"
-                    >
-                      <input
-                        min="0"
-                        type="text"
-                        value={
-                          item.inTime
-                            ? moment.utc(item.inTime).format("HH:mm:ss")
-                            : ""
-                        }
-                        onFocus={(e) => e.target.select()}
-                        className={`w-full bg-transparent  text-center focus:outline-none focus:border-transparent`}
-                      />
-                    </td>
-                    {/* Out Date */}
-                    <td
-                      rowSpan={2}
-                      className="  border border-gray-300 text-[11px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={
-                          item.outTime
-                            ? moment.utc(item.outTime).format("DD-MM-YYYY")
-                            : ""
-                        }
-                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent`}
-                      />
-                    </td>
-                    {/* Out Time*/}
-
-                    <td
-                      rowSpan={2}
-                      className="  border border-gray-300 text-[11px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={
-                          item.outTime
-                            ? moment.utc(item.outTime).format("HH:mm:ss")
-                            : ""
-                        }
-                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                      />
-                    </td>
-
+                    {/* Row 2 - Evening + Out */}
                     {reportView === "Seperate" && (
                       <>
-                        <td className=" border border-gray-300 text-[11px] py-0.5 ">
-                          <input
-                            type="text"
-                            value={"OUT"}
-                            className={`w-full text-center bg-transparent  focus:outline-none focus:border-transparent `}
-                          />
-                        </td>
-                        <td className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            min="0"
-                            type="text"
-                            value={
-                              item.firstBreakOut
-                                ? moment
-                                  .utc(item.firstBreakOut)
-                                  .format("HH:mm:ss")
-                                : ""
-                            }
-                            onFocus={(e) => e.target.select()}
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                          />
-                        </td>
-                        <td className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            min="0"
-                            type="text"
-                            value={
-                              item.lunchBreakOut
-                                ? moment
-                                  .utc(item.lunchBreakOut)
-                                  .format("HH:mm:ss")
-                                : ""
-                            }
-                            onFocus={(e) => e.target.select()}
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                          />
-                        </td>
-                        <td className="border border-gray-300 text-[11px] text-center px-1">
-                          <input
-                            type="text"
-                            value={
-                              item.eveningBreakOut
-                                ? moment
-                                  .utc(item.eveningBreakOut)
-                                  .format("HH:mm:ss")
-                                : ""
-                            }
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                            disabled
-                          />
-                        </td>
-                      </>
-                    )}
-                    {reportView === "Single" && (
-                      <>
-                        <td colSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            type="text"
+                        <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
+                          <td className="border text-[11px] text-center">IN</td>
 
-                            value={[
-                              item.firstBreakOut ? moment.utc(item.firstBreakOut).format("HH:mm:ss") : null,
-                              item.firstBreakIn ? moment.utc(item.firstBreakIn).format("HH:mm:ss") : null,
-                              item.lunchBreakOut ? moment.utc(item.lunchBreakOut).format("HH:mm:ss") : null,
-                              item.lunchBreakIn ? moment.utc(item.lunchBreakIn).format("HH:mm:ss") : null,
-                              item.eveningBreakOut ? moment.utc(item.eveningBreakOut).format("HH:mm:ss") : null,
-                              item.eveningBreakIn ? moment.utc(item.eveningBreakIn).format("HH:mm:ss") : null,
-                            ]
-                              .filter(Boolean) // remove null or empty values
-                              .join(" , ")} // join only existing values
-                            className={`w-full bg-transparent text-left pl-1 focus:outline-none focus:border-transparent `}
-                            disabled
-                          />
-                        </td>
+                          {inPunches?.map((p, i) => (
+                            <td key={i} className="border text-[11px] text-center">
+                              {p ? formatTime(p.timestamp) : ""}
+                            </td>
+                          ))}
+                        </tr>
                       </>
                     )}
 
-                    <td
-                      rowSpan={2}
-                      className="  border border-gray-300 text-[11px] py-0.5 item-center"
-                    >
-                      <input
-                        type="text"
-                        value={item?.permissionHrs || ''}
 
-                        className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
-                      />
-                    </td>
-                    {selectedShiftType === "Hourly" && (
-                      <>
+                    <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}></tr>
+                  </React.Fragment>)
 
-
-                        {/* 2. worked Hours (without Break and OT) → hourlyWorkedTime */}
-                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            type="text"
-                            value={item.hourlyWorkedTime || ""}
-                            className="w-full bg-transparent text-center focus:outline-none"
-                          />
-                        </td>
-
-
-
-                        {/* 4. Actual Worked Hours (LAST) → rawWorkedTime */}
-                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            type="text"
-                            value={item.rawWorkedTime || ""}
-                            className="w-full bg-transparent text-center focus:outline-none"
-                          />
-                        </td>
-                        {/* 3. OT Hours */}
-                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            type="text"
-                            value={item.otHours || ""}
-                            className="w-full bg-transparent text-center focus:outline-none"
-                          />
-                        </td>
-                        {/* 1. worked Hours (with Break) → actualWorkedTime */}
-                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            type="text"
-                            value={item.actualWorkedTime || ""}
-                            className="w-full bg-transparent text-center focus:outline-none"
-                          />
-                        </td>
-                      </>
-                    )}
-
-                    {/* ================================
-    NON-HOURLY COLUMNS (3 columns)
-================================== */}
-                    {selectedShiftType !== "Hourly" && (
-                      <>
-                        {/* 1. worked Hours */}
-                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            type="text"
-                            value={item.totalWorkedTime || ""}
-                            className="w-full bg-transparent text-center focus:outline-none"
-                          />
-                        </td>
-
-                        {/* 2. OT Hours */}
-                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            type="text"
-                            value={item.otHours || ""}
-                            className="w-full bg-transparent text-center focus:outline-none"
-                          />
-                        </td>
-
-                        {/* 3. Shift Count */}
-                        <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            type="number"
-                            value={item.formulaResult || ""}
-                            className="w-full bg-transparent text-right pr-2 focus:outline-none"
-                          />
-                        </td>
-                      </>
-                    )}
-                  </tr>
-
-                  {/* Row 2 - Evening + Out */}
-                  {reportView === "Seperate" && (
-
-                    <>
-                      <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
-
-                        <td className=" border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            type="text"
-                            value={"IN"}
-                            className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
-                          />
-                        </td>
-                        {/* Morning Break In */}
-                        <td className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            type="text"
-                            value={
-                              item.firstBreakIn
-                                ? moment.utc(item.firstBreakIn).format("HH:mm:ss")
-                                : ""
-                            }
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                            disabled
-                          />
-                        </td>
-                        <td className="border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            type="text"
-                            value={
-                              item.lunchBreakIn
-                                ? moment.utc(item.lunchBreakIn).format("HH:mm:ss")
-                                : ""
-                            }
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                            disabled
-                          />
-                        </td>
-
-                        <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
-                          <input
-                            type="text"
-                            value={
-                              item.eveningBreakIn
-                                ? moment
-                                  .utc(item.eveningBreakIn)
-                                  .format("HH:mm:ss")
-                                : ""
-                            }
-                            className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent `}
-                            disabled
-                          />
-                        </td>
-                      </tr>
-                    </>
-                  )}
-
-                  <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>{/* Evening Break In */}</tr>
-                </React.Fragment>
-              ))}
+              })}
             </tbody>
+
+
+
+
+
+
+
+
+
+            <p className=" z-10 w-[100px] text-sm px-1 py-0.5 ">IRREGULAR</p>
+
+            <tbody >
+              {irregularData?.map((item, index) => {
+                let punches = item?.punches || [];
+                // Ignore first and last punch
+                if (punches.length > 2) {
+                  punches = punches?.slice(1, punches.length - 1);
+                } else {
+                  punches = []; 
+                }
+                const MAX_PUNCHES = 4;
+                // --- SEPARATE MODE LOGIC ---
+                let outPunches = [];
+                let inPunches = [];
+
+                const hasCleanTypes = punches?.some(
+                  (p) => p.machineType === "IN" || p.machineType === "OUT" || p.machineType === "MANUAL"
+                );
+
+                if (hasCleanTypes) {
+                  // CASE 1 → Use machineType
+                  outPunches = punches?.filter((p) => p.machineType === "OUT" || p.machineType === "MANUAL");
+                  inPunches = punches?.filter((p) => p.machineType === "IN" || p.machineType === "MANUAL");
+                } else {
+                  // CASE 2 → machineType is "IN / OUT" → Use index rule
+                  outPunches = punches?.filter((_, i) => i % 2 === 0);
+                  inPunches = punches?.filter((_, i) => i % 2 !== 0);
+                }
+                outPunches = [...outPunches?.slice(0, MAX_PUNCHES), ...Array(MAX_PUNCHES - outPunches.length)?.fill(null)] 
+                inPunches = [...inPunches?.slice(0, MAX_PUNCHES), ...Array(MAX_PUNCHES - inPunches.length)?.fill(null)]
+
+               
+                const formatTime = (ts) => ts ? moment(ts).format("HH:mm:ss") : "";
+                const formatDate = (ts) => ts ? moment(ts).format("DD-MM-YYYY") : "";
+
+
+                return (
+                  <React.Fragment key={index}>
+
+                    <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
+
+                      <td
+                        rowSpan={2}
+                        className="border border-gray-300 py-1.5 text-[11px]  text-center px-1"
+                      >
+                        {index + 1}
+                      </td>
+
+
+                      <td
+                        rowSpan={2}
+                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                      >
+                        <input
+                          type="text"
+                          value={item?.mIdCard}
+                          className={`w-full  text-right pr-1 bg-transparent   focus:outline-none focus:border-transparent `}
+                        />
+                      </td>
+                      <td
+                        rowSpan={2}
+                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                      >
+                        <input
+                          type="text"
+                          value={item?.firstName}
+                          className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                        />
+                      </td>
+                      <td
+                        rowSpan={2}
+                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                      >
+                        <input
+                          type="text"
+                          value={item?.shiftType}
+                          className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                        />
+                      </td>
+                      <td
+                        rowSpan={2}
+                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                      >
+                        <input
+                          type="text"
+                          value={item?.departmentName
+                          }
+                          className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                        />
+                      </td>
+                      <td
+                        rowSpan={2}
+                        className="border border-gray-300 text-[11px] py-0.5 item-center"
+                      >
+                        <input
+                          type="text"
+                          value={item?.designationName}
+                          className={`w-full  text-left pl-2 bg-transparent   focus:outline-none focus:border-transparent `}
+                        />
+                      </td>
+
+
+                      <td
+                        rowSpan={2}
+                        className=" border border-gray-300 text-[11px] py-0.5 item-center"
+                      >
+                        <input
+                          type="text"
+                          value={
+                            item.inTime
+                              ? moment.utc(item.inTime).format("DD-MM-YYYY")
+                              : ""
+                          }
+                          className={`w-full text-center bg-transparent   focus:outline-none focus:border-transparent `}
+                        />
+                      </td>
+
+                      {/* In Time */}
+                      <td
+                        rowSpan={2}
+                        className=" border border-gray-300 text-[11px] py-0.5 item-center"
+                      >
+                        <input
+                          min="0"
+                          type="text"
+                          value={
+                            item.inTime
+                              ? moment.utc(item.inTime).format("HH:mm:ss")
+                              : ""
+                          }
+                          onFocus={(e) => e.target.select()}
+                          className={`w-full bg-transparent  text-center focus:outline-none focus:border-transparent  `}
+                        />
+                      </td>
+                      {/* Out Date */}
+                      <td
+                        rowSpan={2}
+                        className="  border border-gray-300 text-[11px] py-0.5 item-center"
+                      >
+                        <input
+                          type="text"
+                          value={
+                            item.outTime
+                              ? moment.utc(item.outTime).format("DD-MM-YYYY")
+                              : ""
+                          }
+                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                        />
+                      </td>
+                      {/* Out Time*/}
+
+                      <td
+                        rowSpan={2}
+                        className="  border border-gray-300 text-[11px] py-0.5 item-center"
+                      >
+                        <input
+                          type="text"
+                          value={
+                            item.outTime
+                              ? moment.utc(item.outTime).format("HH:mm:ss")
+                              : ""
+                          }
+                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                        />
+                      </td>
+
+                      {reportView === "Seperate" && (
+                        <>
+
+                          <td className="border text-[11px] text-center">OUT</td>
+
+                          {/* Map inside a single TD for OUT punches */}
+                          {outPunches?.map((p, i) => (
+                            <td key={i} className="border text-[11px] text-center">
+                              {p ? formatTime(p.timestamp) : ""}
+                            </td>
+                          ))}
+                        </>
+                      )}
+
+
+                      {/* SINGLE VIEW */}
+                      {reportView === "Single" && (
+                        <td colSpan={2} className="border text-[11px]">
+                          <input
+                            className="w-full bg-transparent pl-1"
+                            value={punches?.map((p) => moment.utc(p.timestamp).format("HH:mm:ss"))
+                              .join(" , ")
+                            }
+                          />
+                        </td>
+                      )}
+
+
+                      <td
+                        rowSpan={2}
+                        className="  border border-gray-300 text-[11px] py-0.5 item-center"
+                      >
+                        <input
+                          type="text"
+                          value={item?.permissionHrs || ''}
+                          className={`w-full bg-transparent text-center focus:outline-none focus:border-transparent  `}
+                        />
+                      </td>
+                      {selectedShiftType === "Hourly" && (
+                        <>
+
+
+                          {/* 2. worked Hours (without Break and OT) → hourlyWorkedTime */}
+                          <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
+                            <input
+                              type="text"
+                              value={item.hourlyWorkedTime || ""}
+                              className="w-full bg-transparent text-center focus:outline-none"
+                            />
+                          </td>
+
+
+
+                          {/* 4. Actual Worked Hours (LAST) → rawWorkedTime */}
+                          <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
+                            <input
+                              type="text"
+                              value={item.rawWorkedTime || ""}
+                              className="w-full bg-transparent text-center focus:outline-none"
+                            />
+                          </td>
+                          {/* 3. OT Hours */}
+                          <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
+                            <input
+                              type="text"
+                              value={item.otHours || ""}
+                              className="w-full bg-transparent text-center focus:outline-none"
+                            />
+                          </td>
+                          {/* 1. worked Hours (with Break) → actualWorkedTime */}
+                          <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
+                            <input
+                              type="text"
+                              value={item.actualWorkedTime || ""}
+                              className="w-full bg-transparent text-center focus:outline-none"
+                            />
+                          </td>
+                        </>
+                      )}
+
+
+                      {selectedShiftType !== "Hourly" && (
+                        <>
+                          {/* 1. worked Hours */}
+                          <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
+                            <input
+                              type="text"
+                              value={item.totalWorkedTime || ""}
+                              className="w-full bg-transparent text-center focus:outline-none"
+                            />
+                          </td>
+
+                          {/* 2. OT Hours */}
+                          <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
+                            <input
+                              type="text"
+                              value={item.otHours || ""}
+                              className="w-full bg-transparent text-center focus:outline-none"
+                            />
+                          </td>
+
+                          {/* 3. Shift Count */}
+                          <td rowSpan={2} className="border border-gray-300 text-[11px] py-0.5 item-center">
+                            <input
+                              type="number"
+                              value={item.formulaResult || ""}
+                              className="w-full bg-transparent text-right pr-2 focus:outline-none"
+                            />
+                          </td>
+                        </>
+                      )}
+
+
+
+                    </tr>
+
+                    {/* Row 2 - Evening + Out */}
+                    {reportView === "Seperate" && (
+                      <>
+                        <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}>
+                          <td className="border text-[11px] text-center">IN</td>
+
+                          {inPunches?.map((p, i) => (
+                            <td key={i} className="border text-[11px] text-center">
+                              {p ? formatTime(p.timestamp) : ""}
+                            </td>
+                          ))}
+                        </tr>
+                      </>
+                    )}
+
+
+                    <tr className={index % 2 === 0 ? "bg-white" : "bg-gray-100"}></tr>
+                  </React.Fragment>)
+
+              })}
+            </tbody>
+
+
+
+
+
             <p className="z-10 w-[100px] text-sm px-1 py-0.5 ">ABSENT</p>
             <tbody>
               {absentTable?.map((item, index) => (
@@ -1782,6 +1685,11 @@ const Form = () => {
               ))}
             </tbody>
           </table>
+
+
+
+
+
           {showModal && selectedBreakSummary && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-800 bg-opacity-50 overscroll-y-hidden">
               <div className={`relative bg-white rounded-lg p-7 w-[700px] h-[250px]`}>

@@ -73,8 +73,13 @@ WITH Punches AS (
 Attendance AS (
   SELECT
     mIdCard,
-
+   MIN(ts) AS firstPunch,
+    MAX(ts) AS lastPunch,
+    COUNT(*) AS totalPunches,
    
+MIN(CASE WHEN rn_asc = 1 THEN machineType END) AS firstPunchType,
+MAX(CASE WHEN rn_desc = 1 THEN machineType END) AS lastPunchType,
+
   -- IN punches (IN + MANUAL treated as IN)
 MIN(CASE WHEN machineType IN ('IN','MANUAL') AND rn_asc=1 THEN ts END) AS inTimeIn,
 MIN(CASE WHEN machineType IN ('IN','MANUAL') AND rn_asc=2 THEN ts END) AS firstBreakInIn,
@@ -97,16 +102,9 @@ MIN(CASE WHEN machineType IN ('IN / OUT','MANUAL') AND rn_asc=4 THEN ts END) AS 
 MIN(CASE WHEN machineType IN ('IN / OUT','MANUAL') AND rn_asc=5 THEN ts END) AS lunchBreakInBoth,
 MIN(CASE WHEN machineType IN ('IN / OUT','MANUAL') AND rn_asc=6 THEN ts END) AS eveningBreakOutBoth,
 MIN(CASE WHEN machineType IN ('IN / OUT','MANUAL') AND rn_asc=7 THEN ts END) AS eveningBreakInBoth,
-MAX(CASE WHEN machineType IN ('IN / OUT','MANUAL') THEN ts END) AS outTimeBoth,
+MAX(CASE WHEN machineType IN ('IN / OUT','MANUAL') THEN ts END) AS outTimeBoth
 
-
-
-    -- ✅ first & last punch for total worked time (regardless of category)
-    MIN(ts) AS firstPunch,
-    MAX(ts) AS lastPunch,
-    COUNT(*) AS totalPunches
-
-  FROM Punches
+  FROM Punches p1
   GROUP BY mIdCard
 )
 SELECT
@@ -119,15 +117,24 @@ SELECT
   sh.name AS shiftName,
   sti.id AS shiftTemplateId,   -- <<< add this
 
-
-  -- ✅ In-time: always take first available punch
-  COALESCE(a.inTimeIn, a.inTimeBoth, a.firstPunch) AS inTime,
+   -- choose inTime based on the machine type of the first chronological punch
+  CASE
+    WHEN a.firstPunchType IN ('IN / OUT', 'MANUAL') THEN a.inTimeBoth
+    WHEN a.firstPunchType IN ('IN', 'MANUAL') THEN a.inTimeIn
+    ELSE a.firstPunch
+  END AS inTime,
 
   -- ✅ Out-time: only if there’s more than one punch
-  CASE
-    WHEN a.totalPunches > 1 THEN COALESCE(a.outTimeOut, a.outTimeBoth, a.lastPunch)
-    ELSE NULL
-  END AS outTime,
+  -- CASE
+  --   WHEN a.totalPunches > 1 THEN COALESCE(a.outTimeOut, a.outTimeBoth, a.lastPunch)
+  --   ELSE NULL
+  -- END AS outTime,
+ 
+CASE 
+WHEN a.totalPunches > 1 
+THEN CASE WHEN a.lastPunchType IN ('IN / OUT', 'MANUAL') 
+THEN a.outTimeBoth WHEN a.lastPunchType IN ('OUT', 'MANUAL') 
+THEN a.outTimeOut ELSE a.lastPunch END ELSE NULL END AS outTime,
 
   COALESCE(a.firstBreakOutOut, a.firstBreakOutBoth) AS firstBreakOut,
   COALESCE(a.firstBreakInIn, a.firstBreakInBoth) AS firstBreakIn,
@@ -136,7 +143,42 @@ SELECT
   COALESCE(a.eveningBreakOutOut, a.eveningBreakOutBoth) AS eveningBreakOut,
   COALESCE(a.eveningBreakInIn, a.eveningBreakInBoth) AS eveningBreakIn,
 
-  -- ✅ Worked time logic
+  CASE 
+    WHEN a.mIdCard IS NULL THEN 'Absent'
+    WHEN EXISTS (
+      SELECT 1
+      FROM ShiftTemplateItems s
+      WHERE s.shiftCommonTemplateId = e.shiftCommonTemplateId
+        AND TIME_FORMAT(COALESCE(a.inTimeIn, a.inTimeBoth), '%H:%i:%s')
+            BETWEEN TIME_FORMAT(s.toleranceInBeforeStart, '%H:%i:%s')
+                AND TIME_FORMAT(s.toleranceInAfterEnd, '%H:%i:%s')
+        AND (
+            ( s.inNextDay = 'No'
+              AND TIME(COALESCE(a.outTimeOut, a.outTimeBoth))
+                  > TIME(s.toleranceOutBeforeStart)
+              AND COALESCE(a.outTimeOut, a.outTimeBoth)
+                  < (
+                       SELECT CONCAT(
+                         DATE_ADD(${date}, INTERVAL 1 DAY), ' ',
+                         TIME_FORMAT(next_s.toleranceInBeforeStart, '%H:%i:%s')
+                       )
+                       FROM ShiftTemplateItems next_s
+                       WHERE next_s.shiftCommonTemplateId = s.shiftCommonTemplateId
+                       LIMIT 1
+                     )
+            )
+             OR
+             ( s.inNextDay = 'Yes'
+               AND TIME_FORMAT(COALESCE(a.outTimeOut, a.outTimeBoth), '%H:%i:%s')
+                   BETWEEN TIME_FORMAT(s.toleranceOutBeforeStart, '%H:%i:%s')
+                       AND TIME_FORMAT(s.toleranceOutAfterEnd, '%H:%i:%s')
+             )
+        )
+    ) THEN 'Regular'
+    ELSE 'Irregular'
+    
+  END AS status ,
+   -- ✅ Worked time logic
   CASE
     WHEN a.totalPunches > 1 THEN
       TIME_FORMAT(
@@ -196,43 +238,6 @@ SELECT
       )
     ELSE NULL
   END AS otHours,
-
-
-  CASE 
-    WHEN a.mIdCard IS NULL THEN 'Absent'
-    WHEN EXISTS (
-      SELECT 1
-      FROM ShiftTemplateItems s
-      WHERE s.shiftCommonTemplateId = e.shiftCommonTemplateId
-        AND TIME_FORMAT(COALESCE(a.inTimeIn, a.inTimeBoth), '%H:%i:%s')
-            BETWEEN TIME_FORMAT(s.toleranceInBeforeStart, '%H:%i:%s')
-                AND TIME_FORMAT(s.toleranceInAfterEnd, '%H:%i:%s')
-        AND (
-            ( s.inNextDay = 'No'
-              AND TIME(COALESCE(a.outTimeOut, a.outTimeBoth))
-                  > TIME(s.toleranceOutBeforeStart)
-              AND COALESCE(a.outTimeOut, a.outTimeBoth)
-                  < (
-                       SELECT CONCAT(
-                         DATE_ADD(${date}, INTERVAL 1 DAY), ' ',
-                         TIME_FORMAT(next_s.toleranceInBeforeStart, '%H:%i:%s')
-                       )
-                       FROM ShiftTemplateItems next_s
-                       WHERE next_s.shiftCommonTemplateId = s.shiftCommonTemplateId
-                       LIMIT 1
-                     )
-            )
-             OR
-             ( s.inNextDay = 'Yes'
-               AND TIME_FORMAT(COALESCE(a.outTimeOut, a.outTimeBoth), '%H:%i:%s')
-                   BETWEEN TIME_FORMAT(s.toleranceOutBeforeStart, '%H:%i:%s')
-                       AND TIME_FORMAT(s.toleranceOutAfterEnd, '%H:%i:%s')
-             )
-        )
-    ) THEN 'Regular'
-    ELSE 'Irregular'
-    
-  END AS status ,
     -- ✅ NEW: Collect all punches into JSON array
   (
     SELECT JSON_ARRAYAGG(

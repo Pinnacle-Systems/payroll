@@ -1908,26 +1908,27 @@ model ShiftType {
 }
 
 model leaveRequest {
-  id           Int            @id @default(autoincrement())
-  createdAt    DateTime?      @default(now())
-  updatedAt    DateTime?      @updatedAt
-  Company      Company?       @relation(fields: [companyId], references: [id])
-  companyId    Int?
-  branch       Branch?        @relation(fields: [branchId], references: [id])
-  branchId     Int?
-  createdBy    User?          @relation("createdBy", fields: [createdById], references: [id])
-  createdById  Int?
-  updatedBy    User?          @relation("updatedBy", fields: [updatedById], references: [id])
-  updatedById  Int?
-  finYear      FinYear?       @relation(fields: [finYearId], references: [id])
-  finYearId    Int?
-  employee     Employee?      @relation(fields: [employeeId], references: [id])
-  employeeId   Int?
-  docId        String?
-  date         DateTime?
-  fromDate     DateTime?
-  toDate       DateTime?
-  totalDays    Int?
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
+  Company     Company?  @relation(fields: [companyId], references: [id])
+  companyId   Int?
+  branch      Branch?   @relation(fields: [branchId], references: [id])
+  branchId    Int?
+  createdBy   User?     @relation("createdBy", fields: [createdById], references: [id])
+  createdById Int?
+  updatedBy   User?     @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById Int?
+  finYear     FinYear?  @relation(fields: [finYearId], references: [id])
+  finYearId   Int?
+  employee    Employee? @relation(fields: [employeeId], references: [id])
+  employeeId  Int?
+  docId       String?
+  date        DateTime?
+  fromDate    DateTime?
+  toDate      DateTime?
+
+  totalDays    String?
   leaveDetails LeaveDetails[]
 }
 
@@ -1940,4 +1941,5 @@ model LeaveDetails {
   startDate      DateTime?
   shiftTime      String?
   notes          String?
+  count          String?
 }

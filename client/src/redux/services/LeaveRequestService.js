@@ -74,6 +74,18 @@ const leaveRequestApi = createApi({
       }),
       invalidatesTags: ["leaveRequest"],
     }),
+    getEmployeeLeaveCount:builder.query({
+      query: (employeeId) => {
+        return {
+          url: `${LEAVE_REQUEST}/${employeeId}/leavecount`,
+          method: "GET",
+          headers: {
+            "Content-type": "application/json; charset=UTF-8",
+          },
+        };
+      },
+      providesTags: ["leaveRequest"],
+    }),
   }),
 });
 
@@ -83,6 +95,7 @@ export const {
   useAddLeaveRequestMutation,
   useUpdateLeaveRequestMutation,
   useDeleteLeaveRequestMutation,
+  useGetEmployeeLeaveCountQuery
 } = leaveRequestApi;
 
 export default leaveRequestApi;

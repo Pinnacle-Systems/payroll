@@ -9,6 +9,7 @@ import {
   useAddLeaveRequestMutation,
   useUpdateLeaveRequestMutation,
   useDeleteLeaveRequestMutation,
+  useGetEmployeeLeaveCountQuery
 } from "../../../redux/services/LeaveRequestService";
 
 import Table from "./Table";
@@ -38,11 +39,17 @@ const LeaveRequest = () => {
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
   const [totalDays, setTotalDays] = useState('')
+  const [leaveSummary, setLeaveSummary] = useState([])
   const dispatch = useDispatch();
+
+
   const params = getCommonParams();
   const { branchId, companyId, finYearId, userId } = params;
   const { data: allData, isLoading, isFetching, refetch } = useGetLeaveRequestQuery({ params, searchParams: searchValue, });
-
+  const {data : employeeLeaveCount} = useGetEmployeeLeaveCountQuery(employeeId,{ skip: !employeeId })
+  console.log(employeeLeaveCount,"employeeLeaveCount");
+  console.log(employeeId,"employeeId");
+  
   const { data: employee } = useGetEmployeeQuery({ params });
   const { data: LeaveType } = useGetLeaveCodeQuery({ params });
 
@@ -56,9 +63,6 @@ const LeaveRequest = () => {
   const [addData] = useAddLeaveRequestMutation();
   const [updateData] = useUpdateLeaveRequestMutation();
   const [removeData] = useDeleteLeaveRequestMutation();
-
-
-
 
 
   const generateLeaveRows = (from, to) => {
@@ -80,10 +84,23 @@ const LeaveRequest = () => {
 
       current.setDate(current.getDate() + 1);
     }
-
+    const totalDays = temp.length;
     setLeaveDetails(temp);
-  };
+    setTotalDays(String(totalDays));
 
+  };
+useEffect(() => {
+  if (employeeId) {
+    // When employeeId changes and is valid, update state from API response
+    if (employeeLeaveCount?.data) {
+      setLeaveSummary(employeeLeaveCount.data || []);
+    } else {
+      setLeaveSummary([]);
+    }
+  } else {
+    setLeaveSummary([]);
+  }
+}, [employeeId, employeeLeaveCount]);
 
 
   const syncFormWithDb = useCallback(
@@ -104,15 +121,22 @@ const LeaveRequest = () => {
       setToDate(data?.toDate
         ? moment.utc(data.toDate).format("YYYY-MM-DD")
         : moment.utc(today).format("YYYY-MM-DD"))
-
+      setTotalDays(data?.totalDays || '')
       const formatted = data?.leaveDetails?.map((val) => ({
         leaveId: val?.leaveId,
         startDate: val?.startDate ? moment.utc(val?.startDate).format("YYYY-MM-DD") : null,
         shiftTime: val?.shiftTime || '',
-        notes: val?.notes || ''
+        notes: val?.notes || '',
+        count: val?.count || 0
 
       }))
       setLeaveDetails(formatted);
+
+      // const leaveAvailable = data?.leaveSummary?.map((val) => ({
+      //   leaveName: val?.leaveName,
+      //   totalCount: val?.totalCount
+      // }))
+      // setLeaveSummary(leaveAvailable)
     },
     [id]
   );
@@ -263,22 +287,24 @@ const LeaveRequest = () => {
     setReadOnly(false);
     setSearchValue("");
     setLeaveDetails([]);
+    setLeaveSummary([])
     setDate(moment.utc(new Date(today)).format("YYYY-MM-DD"));
     setFromDate('')
     setToDate('')
+    setTotalDays('')
     refetch();
   };
   const handleView = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(true);
-    console.log("view");
+
   };
   const handleEdit = (id) => {
     setId(id);
     setForm(true);
     setReadOnly(false);
-    console.log("Edit");
+
   };
 
   const columns = [
@@ -325,7 +351,7 @@ const LeaveRequest = () => {
               setForm={setForm} setEmployeeName={setEmployeeName}
               setReadOnly={setReadOnly} designation={designation}
               setId={setId} setDesignation={setDesignation}
-              mobileNumber={mobileNumber}
+              mobileNumber={mobileNumber} totalDays={totalDays} setTotalDays={setTotalDays}
               setMobileNumber={setMobileNumber}
               employee={employee} department={department}
               readOnly={readOnly} setDepartment={setDepartment}
@@ -333,12 +359,13 @@ const LeaveRequest = () => {
               setLeaveDetails={setLeaveDetails}
               id={id} LeaveType={LeaveType} setToDate={setToDate}
               fromDate={fromDate} setFromDate={setFromDate} toDate={toDate}
-              docId={docId}
+              docId={docId} leaveSummary={leaveSummary}
               setDate={setDate}
               date={date}
               setDocId={setDocId}
               generateLeaveRows={generateLeaveRows}
               childRecord={childRecord}
+
 
 
               onClose={() => {
