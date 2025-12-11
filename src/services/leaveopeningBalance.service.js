@@ -18,14 +18,11 @@ async function get(req) {
           joiningDate: true,
           payCategory: true,
           idNumber: true,
+          department: true,
+          designation: true
         },
       },
-      leave:{
-        select:{
-          id:true,
-          name:true
-        }
-      }
+      LeaveOPeningBalanceGrid: true
     },
   });
   return { statusCode: 0, data };
@@ -45,8 +42,11 @@ async function getOne(id) {
           joiningDate: true,
           payCategory: true,
           idNumber: true,
+          department: true,
+          designation: true
         },
       },
+      LeaveOPeningBalanceGrid: true
     },
   });
   if (!data) return NoRecordFound("leaveOPeningBalance");
@@ -80,29 +80,33 @@ async function getSearch(req) {
 async function create(body) {
   const {
     finYearId,
-    leaveId,
+    userId,
     employeeId,
-    openingBalance,
-
     companyId,
-
     branchId,
+    leaveopeningBalanceGrid
   } = await body;
   const data = await prisma.leaveOPeningBalance.create({
     data: {
       branchId: branchId ? parseInt(branchId) : undefined,
       companyId: companyId ? parseInt(companyId) : undefined,
-      leaveId: leaveId ? parseInt(leaveId) : undefined,
+      createdById: userId ? parseInt(userId) : undefined,
       finYearId: finYearId ? parseInt(finYearId) : undefined,
       employeeId: employeeId ? parseInt(employeeId) : undefined,
-      openingBalance: openingBalance ? parseInt(openingBalance) : 0,
+      LeaveOPeningBalanceGrid: leaveopeningBalanceGrid?.length > 0 ? {
+        create: leaveopeningBalanceGrid?.map((data) => ({
+          leaveId: data?.leaveId ? parseInt(data?.leaveId) : undefined,
+          openingBalance: data?.openingBalance ? parseInt(data?.openingBalance) : 0,
+
+        }))
+      } : undefined
     },
   });
   return { statusCode: 0, data };
 }
 
 async function update(id, body) {
-  const { finYearId, leaveId, employeeId, openingBalance } = await body;
+  const { finYearId, employeeId, leaveopeningBalanceGrid, userId } = await body;
   const dataFound = await prisma.leaveOPeningBalance.findUnique({
     where: {
       id: parseInt(id),
@@ -114,10 +118,39 @@ async function update(id, body) {
       id: parseInt(id),
     },
     data: {
-      leaveId: leaveId ? parseInt(leaveId) : undefined,
+      updatedById: userId ? parseInt(userId) : undefined,
       finYearId: finYearId ? parseInt(finYearId) : undefined,
       employeeId: employeeId ? parseInt(employeeId) : undefined,
-      openingBalance: openingBalance ? parseInt(openingBalance) : 0,
+      LeaveOPeningBalanceGrid: leaveopeningBalanceGrid?.length
+        ? {
+          // Delete removed rows
+          deleteMany: {
+            id: {
+              notIn: leaveopeningBalanceGrid
+                .filter((item) => item.id)
+                .map((item) => parseInt(item.id)),
+            },
+          },
+          // Update existing rows
+          update: leaveopeningBalanceGrid
+            .filter((item) => item.id)
+            .map((item) => ({
+              where: { id: parseInt(item.id) },
+              data: {
+                leaveId: item?.leaveId ? parseInt(item?.leaveId) : undefined,
+                openingBalance: item?.openingBalance ? parseInt(item?.openingBalance) : 0,
+              },
+            })),
+          // Create new rows
+          create: leaveopeningBalanceGrid
+            .filter((item) => !item.id)
+            .map((item) => ({
+                  leaveId: item?.leaveId ? parseInt(item?.leaveId) : undefined,
+                openingBalance: item?.openingBalance ? parseInt(item?.openingBalance) : 0,
+            })),
+        }
+        : undefined,
+
     },
   });
   return { statusCode: 0, data };

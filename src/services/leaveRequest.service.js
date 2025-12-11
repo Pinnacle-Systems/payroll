@@ -59,7 +59,8 @@ async function get(req) {
                         }
                     }
                 }
-            }, employee: {
+            },
+             employee: {
                 select: {
                     id: true,
                     idNumber: true,
@@ -297,43 +298,71 @@ async function update(id, body) {
 
 async function getleavecount(employeeId) {
     if (!employeeId) throw new Error("EmployeeId is required");
+    employeeId = parseInt(employeeId);
 
-    // Fetch all leaveDetails for this employee
+    // 1️⃣ Fetch all leave types
+    const allLeaves = await prisma.leaveCode.findMany({
+        select: { id: true, name: true, days: true }
+    });
+
+    // 2️⃣ Fetch all leave usage (usedDays)
     const allLeaveDetails = await prisma.leaveDetails.findMany({
         where: {
-            leaveRequest: {
-                employeeId: parseInt(employeeId),
-            },
+            leaveRequest: { employeeId }
         },
-        include: {
-            leave: {
-                select: { id: true, name: true },
-            },
-        },
-    });
-
-
-    const summary = {};
-
-    allLeaveDetails.forEach((item) => {
-        const leaveName = item.leave?.name;
-        if (!leaveName) return;
-
-        const count = parseFloat(item.count) || 0;
-
-        if (!summary[leaveName]) {
-            summary[leaveName] = {
-                leaveName: leaveName,
-                totalCount: 0,
-            };
+        select: {
+            leaveId: true,
+            count: true
         }
-
-        summary[leaveName].totalCount += count;
     });
 
-    const summaryMap = Object.values(summary);
-    return { statusCode: 0, data: summaryMap };
+    // Build usedDays map
+    const usedMap = {};
+    allLeaveDetails.forEach(item => {
+        const leaveId = item.leaveId;
+        if (!usedMap[leaveId]) usedMap[leaveId] = 0;
+        usedMap[leaveId] += parseFloat(item.count || 0);
+    });
+
+    // 3️⃣ Fetch opening balance parent
+    const openingBalanceParent = await prisma.leaveOPeningBalance.findFirst({
+        where: { employeeId },
+        include: {
+            LeaveOPeningBalanceGrid: true
+        }
+    });
+
+    const openingMap = {};
+
+    // If opening exists, map it for quick access
+    if (openingBalanceParent) {
+        openingBalanceParent.LeaveOPeningBalanceGrid.forEach(item => {
+            openingMap[item.leaveId] = item.openingBalance || 0;
+        });
+    }
+
+    // 4️⃣ Build final summary for every leave type
+    const summary = allLeaves.map(leave => {
+        const leaveId = leave.id;
+
+        const allowedDays = leave.days || 0;
+        const openingBalance = openingMap[leaveId] || 0;
+        const usedDays = usedMap[leaveId] || 0;
+
+        return {
+            leaveId,
+            leaveName: leave.name,
+            allowedDays,
+            openingBalance,
+            usedDays,
+            remainingDays: allowedDays + openingBalance - usedDays
+        };
+    });
+
+    return { statusCode: 0, data: summary };
 }
+
+
 
 async function remove(id) {
     const data = await prisma.leaveRequest.delete({

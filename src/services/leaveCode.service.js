@@ -15,7 +15,7 @@ async function get(req) {
 }
 
 async function getOne(id) {
-  const childRecord = await prisma.leaveOPeningBalance.count({
+  const childRecord = await prisma.leaveOPeningBalanceGrid.count({
     where: { leaveId: parseInt(id) },
   });
   const data = await prisma.leaveCode.findUnique({
@@ -52,21 +52,24 @@ async function getSearch(req) {
 }
 
 async function create(body) {
-  const { name, code, companyId, active, branchId } = await body;
+  const { name, code, days, companyId, active, branchId, userId, finYearId } = await body;
   const data = await prisma.leaveCode.create({
     data: {
       name,
       code,
       active,
+      days: days ? parseInt(days) : undefined,
       branchId: branchId ? parseInt(branchId) : undefined,
       companyId: companyId ? parseInt(companyId) : undefined,
+      finYearId: finYearId ? parseInt(finYearId) : undefined,
+      createdById: userId ? parseInt(userId) : undefined,
     },
   });
   return { statusCode: 0, data };
 }
 
 async function update(id, body) {
-  const { name, code, active } = await body;
+  const { name, code, active, days, userId } = await body;
   const dataFound = await prisma.leaveCode.findUnique({
     where: {
       id: parseInt(id),
@@ -81,6 +84,9 @@ async function update(id, body) {
       name,
       code,
       active,
+      days: days ? parseInt(days) : undefined,
+      updatedById: userId ? parseInt(userId) : undefined,
+
     },
   });
   return { statusCode: 0, data };

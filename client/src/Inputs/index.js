@@ -986,17 +986,17 @@ export const handleOnChange = (event, setValue) => {
 
   setValue(
     valueBeforeCursor +
-      inputValue.slice(inputSelectionStart, inputSelectionEnd) +
-      valueAfterCursor
+    inputValue.slice(inputSelectionStart, inputSelectionEnd) +
+    valueAfterCursor
   );
 
   // Set the cursor position to the end of the input value
   setTimeout(() => {
     event.target.setSelectionRange(
       valueBeforeCursor.length +
-        inputValue.slice(inputSelectionStart, inputSelectionEnd).length,
+      inputValue.slice(inputSelectionStart, inputSelectionEnd).length,
       valueBeforeCursor.length +
-        inputValue.slice(inputSelectionStart, inputSelectionEnd).length
+      inputValue.slice(inputSelectionStart, inputSelectionEnd).length
     );
   });
 };
@@ -1004,9 +1004,8 @@ export const FancyCheckBox = ({ label, value, onChange, readOnly }) => {
   return (
     <label
       style={{ fontSize: 11 }}
-      className={`flex items-center gap-2 p-3 border rounded-lg cursor-pointer w-full text-xs font-medium text-gray-700 ${
-        readOnly ? "bg-gray-100 cursor-not-allowed" : "hover:bg-gray-50"
-      }`}
+      className={`flex items-center gap-2 p-3 border rounded-lg cursor-pointer w-full text-xs font-medium text-gray-700 ${readOnly ? "bg-gray-100 cursor-not-allowed" : "hover:bg-gray-50"
+        }`}
     >
       <input
         type="checkbox"
@@ -1031,17 +1030,17 @@ export const handleOnChangeforpassword = (event, setValue) => {
 
   setValue(
     valueBeforeCursor +
-      inputValue.slice(inputSelectionStart, inputSelectionEnd) +
-      valueAfterCursor
+    inputValue.slice(inputSelectionStart, inputSelectionEnd) +
+    valueAfterCursor
   );
 
   // Set the cursor position to the end of the input value
   setTimeout(() => {
     event.target.setSelectionRange(
       valueBeforeCursor.length +
-        inputValue.slice(inputSelectionStart, inputSelectionEnd).length,
+      inputValue.slice(inputSelectionStart, inputSelectionEnd).length,
       valueBeforeCursor.length +
-        inputValue.slice(inputSelectionStart, inputSelectionEnd).length
+      inputValue.slice(inputSelectionStart, inputSelectionEnd).length
     );
   });
 };
@@ -1107,7 +1106,7 @@ export const MultiSelectDropdown = ({
       <MultiSelect
         options={options}
         value={selected}
-        onChange={readOnly ? () => {} : setSelected}
+        onChange={readOnly ? () => { } : setSelected}
         labelledBy="Select"
         hasSelectAll={false}
         styles={{
@@ -1187,11 +1186,10 @@ export const TextInput = forwardRef(
           className={`w-full px-2 py-1.5 text-xs text-[12px]  border input-font border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
-          ${
-            readOnly || disabled
+          ${readOnly || disabled
               ? "bg-gray-100 text-gray-500 cursor-not-allowed"
               : "bg-white hover:border-gray-400"
-          }
+            }
           ${className}`}
         />
       </div>
@@ -1443,10 +1441,9 @@ export const TextArea = ({
         className={`w-full px-1.5 py-1.5 text-xs border border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm resize-none
-          ${
-            readOnly || disabled
-              ? "bg-gray-100 text-gray-500 cursor-not-allowed"
-              : "bg-white hover:border-gray-400"
+          ${readOnly || disabled
+            ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+            : "bg-white hover:border-gray-400"
           }
           ${inputClass}`}
       ></textarea>
@@ -1458,7 +1455,7 @@ export const DropdownInput = forwardRef(
   (
     {
       name,
-      beforeChange = () => {},
+      beforeChange = () => { },
       onBlur = null,
       options,
       value,
@@ -1499,14 +1496,13 @@ export const DropdownInput = forwardRef(
           defaultValue={defaultValue}
           required={required}
           readOnly={readOnly}
-          className={`w-full px-1 py-0.5 text-xs text-[12px] border border-gray-300 rounded-lg
+          className={`w-full px-1 py-[5px] text-xs text-[12px] border border-gray-300 rounded-lg
     focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
     transition-all duration-150 shadow-sm
-    ${
-      isDisabled
-        ? "bg-gray-100 text-gray-500 cursor-not-allowed"
-        : "bg-white text-gray-900 hover:border-gray-400"
-    }
+    ${isDisabled
+              ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+              : "bg-white text-gray-900 hover:border-gray-400"
+            }
     ${className}`}
           value={value}
           onChange={(e) => {
@@ -1539,7 +1535,7 @@ export const DropdownInput = forwardRef(
 
 export const DropdownInputForm = ({
   name,
-  beforeChange = () => {},
+  beforeChange = () => { },
   onBlur = null,
   options,
   value,
@@ -1750,6 +1746,7 @@ export const DateInput = forwardRef(
       tabIndex = null,
       inputClass = "",
       inputHead = null,
+      onKeyDown
     },
     ref
   ) => {
@@ -1776,16 +1773,15 @@ export const DateInput = forwardRef(
             required={required}
             readOnly={readOnly}
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onKeyDown={onKeyDown} onChange={(e) => setValue(e.target.value)}
             className={`
          w-[120px] px-2 py-[5px] text-xs text-[12px]  border input-font border-gray-300 rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm
-            ${
-              readOnly
+            ${readOnly
                 ? "bg-gray-100 text-gray-500 cursor-not-allowed"
                 : "bg-white"
-            }
+              }
             ${disabled ? "opacity-50 bg-gray-100 cursor-not-allowed" : ""}
             ${inputClass}
           `}
@@ -1970,7 +1966,7 @@ export const DropdownWithSearch = ({
     });
 
     return () => {
-      dropDownElement.removeEventListener("keydown", () => {});
+      dropDownElement.removeEventListener("keydown", () => { });
     };
   }, [currentIndex]);
 
@@ -1985,8 +1981,7 @@ export const DropdownWithSearch = ({
         // className="border border-gray-300 rounded-md px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-400 w-full"
         className={`w-full px-2 py-1 text-xs border border-slate-300 rounded-md 
           focus:border-indigo-300 focus:outline-none transition-all duration-200
-          hover:border-slate-400 ${
-            readOnly || disabled ? "bg-slate-100" : ""
+          hover:border-slate-400 ${readOnly || disabled ? "bg-slate-100" : ""
           } ${className}`}
         disabled={disabled}
         readOnly={readOnly}
@@ -2079,17 +2074,17 @@ export const ToggleButton = ({
             />
             {/* <div className="w-12 h-6 bg-gray-300 rounded-full peer-checked:bg-green-500 peer transition duration-300"></div>
             <div className="absolute left-1 top-1 bg-white w-4 h-4 rounded-full peer-checked:translate-x-6 transition-transform duration-300 shadow-sm"></div> */}
-              <div
-            className={`w-12 h-6 rounded-full transition duration-300 
+            <div
+              className={`w-12 h-6 rounded-full transition duration-300 
               ${isToggled ? "bg-green-500" : "bg-red-500"}`}
-          ></div>
+            ></div>
 
-          {/* slider knob */}
-          <div
-            className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full 
+            {/* slider knob */}
+            <div
+              className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full 
               transition-transform duration-300 shadow-sm
               ${isToggled ? "translate-x-6" : "translate-x-0"}`}
-          ></div>
+            ></div>
           </label>
 
           <span className="ml-2 block text-xs font-bold text-gray-600">
@@ -2152,11 +2147,10 @@ export const ReusableTable = ({
           <button
             onClick={() => handlePageChange(currentPage - 1)}
             disabled={currentPage === 1}
-            className={`px-3 py-1 rounded-md ${
-              currentPage === 1
+            className={`px-3 py-1 rounded-md ${currentPage === 1
                 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                 : "bg-white text-gray-600 hover:bg-gray-100"
-            }`}
+              }`}
           >
             <FaChevronLeft className="inline" />
           </button>
@@ -2177,11 +2171,10 @@ export const ReusableTable = ({
               <button
                 key={pageNum}
                 onClick={() => handlePageChange(pageNum)}
-                className={`px-3 py-1 rounded-md ${
-                  currentPage === pageNum
+                className={`px-3 py-1 rounded-md ${currentPage === pageNum
                     ? "bg-indigo-800 text-white"
                     : "bg-white text-gray-600 hover:bg-gray-100"
-                }`}
+                  }`}
               >
                 {pageNum}
               </button>
@@ -2195,11 +2188,10 @@ export const ReusableTable = ({
           {totalPages > 5 && currentPage < totalPages - 2 && (
             <button
               onClick={() => handlePageChange(totalPages)}
-              className={`px-3 py-1 rounded-md ${
-                currentPage === totalPages
+              className={`px-3 py-1 rounded-md ${currentPage === totalPages
                   ? "bg-indigo-800 text-white"
                   : "bg-white text-gray-600 hover:bg-gray-100"
-              }`}
+                }`}
             >
               {totalPages}
             </button>
@@ -2208,11 +2200,10 @@ export const ReusableTable = ({
           <button
             onClick={() => handlePageChange(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className={`px-3 py-1 rounded-md ${
-              currentPage === totalPages
+            className={`px-3 py-1 rounded-md ${currentPage === totalPages
                 ? "bg-gray-100 text-gray-400 cursor-not-allowed"
                 : "bg-white text-gray-600 hover:bg-gray-100"
-            }`}
+              }`}
           >
             <FaChevronRight className="inline" />
           </button>
@@ -2230,9 +2221,8 @@ export const ReusableTable = ({
               {columns?.map((column, index) => (
                 <th
                   key={index}
-                  className={` font-medium text-gray-900 py-2 text-[12px] px-8 text-center uppercase  ${
-                    column.header !== "" ? "border-r border-white/50" : ""
-                  } `}
+                  className={` font-medium text-gray-900 py-2 text-[12px] px-8 text-center uppercase  ${column.header !== "" ? "border-r border-white/50" : ""
+                    } `}
                 >
                   {column.header}
                 </th>
@@ -2258,18 +2248,15 @@ export const ReusableTable = ({
               currentItems?.map((item, index) => (
                 <tr
                   key={item.id}
-                  className={`hover:bg-gray-50 transition-colors border-b   border-gray-200 text-[12px] ${
-                    index % 2 === 0 ? "bg-white" : "bg-gray-100"
-                  }`}
+                  className={`hover:bg-gray-50 transition-colors border-b   border-gray-200 text-[12px] ${index % 2 === 0 ? "bg-white" : "bg-gray-100"
+                    }`}
                 >
                   {columns?.map((column, colIndex) => (
                     <td
                       key={colIndex}
-                      className={` ${
-                        column.className ? column.className : ""
-                      } ${
-                        column.header !== "" ? "border-r  border-white/50" : ""
-                      } h-8 `}
+                      className={` ${column.className ? column.className : ""
+                        } ${column.header !== "" ? "border-r  border-white/50" : ""
+                        } h-8 `}
                     >
                       {column.accessor(item, index)}
                     </td>
@@ -2391,7 +2378,7 @@ export const TextAreaInput = ({
 };
 
 export const customSelectStyles = {
-  control: (base,state) => ({
+  control: (base, state) => ({
     ...base,
     minHeight: "13px",
     height: "13px",
@@ -2400,7 +2387,7 @@ export const customSelectStyles = {
     borderRadius: "8px",
     fontFamily: 'Poppins',
     color: state.isDisabled ? "#6b7280" : "black",
-     backgroundColor: state.isDisabled ? "#f3f4f6" : "white", // bg-gray-100 vs bg-white
+    backgroundColor: state.isDisabled ? "#f3f4f6" : "white", // bg-gray-100 vs bg-white
     cursor: state.isDisabled ? "not-allowed" : "default",
     borderColor: state.isFocused ? "#3b82f6" : "#d1d5db",    // blue-500 vs gray-300
     boxShadow: state.isFocused ? "0 0 0 1px #3b82f6" : base.boxShadow,
@@ -2408,7 +2395,7 @@ export const customSelectStyles = {
       borderColor: state.isDisabled ? "#d1d5db" : "#9ca3af", // keep gray when disabled
     },
   }),
-  valueContainer: (base,state) => ({
+  valueContainer: (base, state) => ({
     ...base,
     padding: "0 3px",
     marginTop: "-8px",
@@ -2416,7 +2403,7 @@ export const customSelectStyles = {
     fontFamily: 'Poppins',
     color: state.isDisabled ? "#6b7280" : "black"
   }),
-  input: (base,state) => ({
+  input: (base, state) => ({
     ...base,
     margin: 0,
     fontSize: "12px",
@@ -2424,7 +2411,7 @@ export const customSelectStyles = {
     fontFamily: 'Poppins',
     color: state.isDisabled ? "#6b7280" : "black"
   }),
-  singleValue: (base,state) => ({
+  singleValue: (base, state) => ({
     ...base,
     fontFamily: 'Poppins',
     fontSize: "12px",
@@ -2436,7 +2423,7 @@ export const customSelectStyles = {
     color: "black",
     fontSize: "12px",
   }),
-  menu: (base,state) => ({
+  menu: (base, state) => ({
     ...base,
     fontFamily: 'Poppins',
     maxHeight: 140,
@@ -2444,12 +2431,12 @@ export const customSelectStyles = {
     fontSize: "12px",
     color: state.isDisabled ? "#6b7280" : "black"
   }),
-  option: (base,state) => ({
+  option: (base, state) => ({
     ...base,
     fontFamily: 'Poppins',
     fontSize: "12px",
     color: state.isDisabled ? "#6b7280" : "black",
-    padding:'6px 8px'
+    padding: '6px 8px'
   }),
   dropdownIndicator: (base) => ({
     ...base,

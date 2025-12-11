@@ -25,7 +25,7 @@ import Loader from "../Loader";
 
 
 export default function Form() {
- 
+
 
   const [readOnly, setReadOnly] = useState(false);
   const [id, setId] = useState("");
@@ -34,17 +34,18 @@ export default function Form() {
   const [active, setActive] = useState(true);
   const [errors, setErrors] = useState({});
   const [form, setForm] = useState(false);
+  const [days, setDays] = useState('')
   const [searchValue, setSearchValue] = useState("");
   const childRecord = useRef(0);
- const departmentNameref = useRef(null);
-   const params = getCommonParams();
- 
-   const { branchId,companyId } = params;;
-  const { data: allData , isLoading,
-    isFetching,} = useGetLeaveCodeQuery({
-    params,
-    searchParams: searchValue,
-  });
+  const departmentNameref = useRef(null);
+  const params = getCommonParams();
+
+  const { branchId, companyId,finYearId,userId } = params;;
+  const { data: allData, isLoading,
+    isFetching, } = useGetLeaveCodeQuery({
+      params,
+      searchParams: searchValue,
+    });
   const {
     data: singleData,
     isFetching: isSingleFetching,
@@ -60,6 +61,7 @@ export default function Form() {
       // setReadOnly(true);
       setName(data?.name || "");
       setCode(data?.code || "");
+      setDays(data?.days ? parseInt(data?.days) : '')
       setActive(id ? data?.active ?? false : true);
       childRecord.current = data?.childRecord ? data?.childRecord : 0;
     },
@@ -77,20 +79,23 @@ export default function Form() {
     active,
     companyId,
     id,
-    branchId
+    branchId,
+    days,
+    finYearId,
+    userId
   };
 
   const validateData = (data) => {
-    if (data?.name) {
+    if (data?.name && data?.days) {
       return true;
     }
     return false;
   };
-   useEffect(() => {
-     if (form && !readOnly && departmentNameref.current) {
-       departmentNameref.current.focus();
-     }
-   }, [form, readOnly]);
+  useEffect(() => {
+    if (form && !readOnly && departmentNameref.current) {
+      departmentNameref.current.focus();
+    }
+  }, [form, readOnly]);
   const handleSubmitCustom = async (callback, data, text) => {
     try {
       let returnData = await callback(data).unwrap();
@@ -120,7 +125,7 @@ export default function Form() {
       Swal.fire({
         icon: "error",
         title: "Submission error",
-        text: "Please fill all required fields...!",
+        text: "Please fill Leave Description and Days!",
       });
       return;
     }
@@ -132,7 +137,7 @@ export default function Form() {
     }
   };
 
- const deleteData = async (id) => {
+  const deleteData = async (id) => {
     if (id) {
       if (!window.confirm("Are you sure to delete...?")) {
         return;
@@ -225,9 +230,9 @@ export default function Form() {
     setId(id);
     setForm(true);
     setReadOnly(false);
-    
+
   };
-    if (isLoading || isFetching) return <Loader />;
+  if (isLoading || isFetching) return <Loader />;
 
   return (
     <div onKeyDown={handleKeyDown} className="p-1">
@@ -245,7 +250,7 @@ export default function Form() {
           </button>
         </div>
       </div>
-    
+
       <div className="bg-white rounded-xl shadow-sm overflow-hidden mt-3">
         <ReusableTable
           columns={columns}
@@ -319,7 +324,7 @@ export default function Form() {
                             required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
-                             ref={departmentNameref}
+                            ref={departmentNameref}
                           />
                         </div>
                         <div className="mb-3 w-20 ml-6">
@@ -331,7 +336,19 @@ export default function Form() {
                             // required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
+
+                          />
+                        </div>
+                        <div className="mb-3 w-20 ml-6">
+                          <TextInput
+                            name="Days"
+                            type="number"
+                            value={days}
+                            setValue={setDays}
+                            // required={true}
+                            readOnly={readOnly}
                             
+
                           />
                         </div>
                       </div>

@@ -17,12 +17,11 @@ import {
 } from "../../../redux/services/LeaveopeningBalanceService";
 
 import Modal from "../../../UiComponents/Modal";
-import { Check, Power } from "lucide-react";
+import { Check } from "lucide-react";
 import Swal from "sweetalert2";
 import { getCommonParams } from "../../../Utils/helper";
 import { dropDownFinYear } from "../../../Utils/contructObject";
 import { useGetFinYearQuery } from "../../../redux/services/FinYearMasterService";
-import { useGetBranchQuery } from "../../../redux/services/BranchMasterService";
 import { useGetEmployeeQuery } from "../../../redux/services/EmployeeMasterService";
 import Select from "react-select";
 import { useGetLeaveCodeQuery } from "../../../redux/services/LeaveCode.servive";
@@ -37,15 +36,12 @@ const Designation = () => {
   const [employeeName, setEmployeeName] = useState("");
   const [joinedDate, setJoinedDate] = useState(null);
   const [payCategory, setPayCategory] = useState("");
-  const [leaveId, setLeaveId] = useState("");
-  const [name, setName] = useState("");
-  const [code, setCode] = useState("");
-  const [openingBalance, setOpeningBalance] = useState("");
-  const [active, setActive] = useState(true);
-  const dispatch = useDispatch();
+  const [contextMenu, setContextMenu] = useState(null);
 
+  const dispatch = useDispatch();
   const [form, setForm] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [leaveopeningBalanceGrid, setLeaveopeningBalanceGrid] = useState([])
   const childRecord = useRef(0);
 
   const params = getCommonParams();
@@ -56,7 +52,7 @@ const Designation = () => {
     }
   }, [form, readOnly]);
 
-  const { branchId, companyId } = params;
+  const { branchId, companyId, userId } = params;
   const designationRef = useRef(null);
 
   const { data: allData, isLoading,
@@ -69,8 +65,7 @@ const Designation = () => {
     searchParams: searchValue,
   });
 
-  // const { data : branchData} = useGetBranchQuery({ params,
-  //   searchParams: searchValue,})
+
 
   const { data: employee } = useGetEmployeeQuery({ params });
   const { data: LeaveType } = useGetLeaveCodeQuery({ params });
@@ -83,22 +78,36 @@ const Designation = () => {
   const [addData] = useAddLeaveOpeningBalanceMutation();
   const [updateData] = useUpdateLeaveOpeningBalanceMutation();
   const [removeData] = useDeleteLeaveOpeningBalanceMutation();
+  useEffect(() => {
+    if (leaveopeningBalanceGrid.length >= 1) return;
+    setLeaveopeningBalanceGrid((prev) => {
+      let newArray =
+        Array?.from({ length: 1 - prev?.length }, () => {
+          return {
+            leaveId: "",
+          };
+        }) || [];
+      return [...prev, ...newArray];
+    })
+  }, [leaveopeningBalanceGrid, setLeaveopeningBalanceGrid])
 
   const syncFormWithDb = useCallback(
     (data) => {
       setFinYearId(data?.finYearId);
       setEmployeeId(data?.employeeId);
-      setLeaveId(data?.leaveId);
       setEmployeeName(data?.Employee?.firstName);
       setJoinedDate(data?.Employee?.joiningDate);
-
       setJoinedDate(
         data?.Employee?.joiningDate
           ? new Date(data?.Employee?.joiningDate).toISOString().split("T")[0]
           : null
       );
       setPayCategory(data?.Employee?.payCategory);
-      setOpeningBalance(data?.openingBalance);
+      const formatted = data?.LeaveOPeningBalanceGrid?.map((val)=>({
+        leaveId:val?.leaveId ? parseInt(val?.leaveId) : undefined,
+        openingBalance : val?.openingBalance ? parseInt(val?.openingBalance) : undefined
+      })) || []
+      setLeaveopeningBalanceGrid(formatted)
       childRecord.current = data?.childRecord ? data?.childRecord : 0;
     },
     [id]
@@ -110,17 +119,16 @@ const Designation = () => {
 
   const data = {
     finYearId,
-    leaveId,
     employeeId,
-    openingBalance,
-
     companyId,
     id,
     branchId,
+    userId,
+    leaveopeningBalanceGrid
   };
 
   const validateData = (data) => {
-    if (data?.employeeId && data?.finYearId && data?.leaveId) {
+    if (data?.employeeId && data?.finYearId ) {
       return true;
     }
     return false;
@@ -229,18 +237,14 @@ const Designation = () => {
 
   const onNew = () => {
     setId("");
-    setName("");
-    setCode("");
-    setActive(true);
     setEmployeeName("");
     setJoinedDate(null);
     setFinYearId("");
-    setOpeningBalance("");
     setPayCategory("");
     setEmployeeId("");
-    setLeaveId("");
     setReadOnly(false);
     setForm(true);
+    setLeaveopeningBalanceGrid([])
     setSearchValue("");
   };
   const handleView = (id) => {
@@ -294,6 +298,46 @@ const Designation = () => {
   }));
   if (isLoading || isFetching) return <Loader />;
 
+
+
+
+  const handleInputChange = (value, index, field) => {
+    const updated = structuredClone(leaveopeningBalanceGrid)
+    updated[index][field] = value
+    setLeaveopeningBalanceGrid(updated)
+  }
+  const handleRightClick = (event, rowIndex, type) => {
+    event.preventDefault();
+    setContextMenu({
+      mouseX: event.clientX,
+      mouseY: event.clientY,
+      rowId: rowIndex,
+      type,
+    });
+  }
+  const handleCloseContextMenu = () => {
+    setContextMenu(null);
+  };
+  const addNewRow = () => {
+    const newRow = { leaveId: "" };
+    setLeaveopeningBalanceGrid([...leaveopeningBalanceGrid, newRow]);
+  };
+
+  const handleDeleteRow = (id) => {
+    setLeaveopeningBalanceGrid((yarnBlend) => {
+      if (yarnBlend.length <= 1) {
+        return yarnBlend;
+      }
+      return yarnBlend.filter((_, index) => index !== parseInt(id));
+    });
+  };
+  const handleDeleteAllRows = () => {
+    setLeaveopeningBalanceGrid((prevRows) => {
+      if (prevRows.length <= 1) return prevRows;
+      return [prevRows[0]];
+    });
+  };
+
   return (
     <div>
       <div onKeyDown={handleKeyDown} className="p-1 ">
@@ -326,7 +370,7 @@ const Designation = () => {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[60%]  h-[50%]"}
+            widthClass={"w-[80%]  h-[60%]"}
             onClose={() => {
               setForm(false);
 
@@ -418,7 +462,7 @@ const Designation = () => {
                               }}
                               placeholder="Select Id Number"
                               isClearable={false} // same as required
-                              isDisabled={readOnly || childRecord.current > 0}
+                              isDisabled={!finYearId || readOnly || childRecord.current > 0}
                               isSearchable
                               menuShouldScrollIntoView={false}
                               maxMenuHeight={150} // <-- Reduce height here
@@ -433,7 +477,7 @@ const Designation = () => {
                             name="Employee Name"
                             type="text"
                             value={employeeName}
-                            setValue={setEmployeeName}
+                            // setValue={setEmployeeName}
                             // required={true}
                             readOnly={readOnly}
                             disabled={childRecord.current > 0}
@@ -443,64 +487,226 @@ const Designation = () => {
                               name="Joined Date"
                               type="date"
                               value={joinedDate}
-                              setValue={setJoinedDate}
-                              // required={true}
+                              inputClass={`w-[120px] px-2 py-[5px] text-xs text-[12px]  border input-font border-gray-300 rounded-lg
+          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 ${readOnly
+                ? "bg-gray-100 text-gray-500 cursor-not-allowed"
+                : "bg-white"
+              }
+          transition-all duration-150 shadow-sm bg-white appearance-none [&::-webkit-calendar-picker-indicator]:hidden`}
+                              onKeyDown={(e) => e.preventDefault()}
                               readOnly={readOnly}
-                              disabled={childRecord.current > 0}
                             />
                           </div>
-
-                          <div className="mb-3 w-40 ">
-                            <label className="block text-xs font-semibold text-slate-700 mb-1">
-                              Leave Type
-                              <span className="text-red-500">*</span>
-                            </label>
-                            <Select
-                              options={LeaveOptions}
-                              value={
-                                LeaveOptions.find(
-                                  (opt) => opt.value === leaveId
-                                ) || null
-                              }
-                              onChange={(selected) =>
-                                setLeaveId(selected?.value || "")
-                              }
-                              placeholder="Select Leave Type"
-                              isClearable={false} // same as required
-                              isDisabled={readOnly || childRecord.current > 0}
-                              isSearchable
-                              menuShouldScrollIntoView={false}
-                              maxMenuHeight={150} // <-- Reduce height here
-                              onInputChange={(value) => value.toUpperCase()}
-                              className="w-full px-1 -ml-1 text-xs rounded-lg
-          focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-          transition-all duration-150 shadow-sm"
-                              styles={customSelectStyles}
-                            />
-                          </div>
-
-                          <TextInput
-                            name="Pay Category"
-                            type="text"
-                            value={payCategory}
-                            setValue={setPayCategory}
-                            // required={true}
-                            readOnly={readOnly}
-                            disabled={childRecord.current > 0}
-                          />
-                          <div className="w-28">
+                          <div className="w-32">
                             <TextInput
-                              name="Opening Balance"
-                              type="number"
-                              value={openingBalance}
-                              setValue={setOpeningBalance}
+                              name="Pay Category"
+                              type="text"
+                              value={payCategory}
+                              // setValue={setPayCategory}
                               // required={true}
                               readOnly={readOnly}
                               disabled={childRecord.current > 0}
-                            />
-                          </div>
+                            /></div>
+
+
+
+                        </div>
+
+                        <div className=" max-h-[300px] overflow-y-auto ">
+                          <h2>Leave Entry</h2>
+                          <table className="w-[480px] border-collapse table-fixed max-h-[300px]">
+                            <thead className="bg-gray-200 text-gray-800">
+                              <tr>
+                                <th
+                                  className={`w-[6px] px-1 text-center font-medium text-[13px] `}
+                                >
+                                  S.No
+                                </th>
+
+                                <th
+                                  className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
+                                >
+                                  Leave Type
+                                </th>
+                                <th
+                                  className={`w-8 py-2 item-center font-medium text-[13px] `}
+                                >
+                                  Count (Days)
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {
+                                leaveopeningBalanceGrid?.map((item, index) => (
+                                  <tr className=" w-full table-row">
+                                    <td className="border border-gray-300 py-1.5  text-center px-1">
+                                      {index + 1}
+                                    </td>
+
+
+                                    <td className=" border border-gray-300 text-[11px] py-0.5 px-1 item-center ">
+
+                                      <Select
+                                        options={LeaveOptions}
+                                        value={
+                                          LeaveOptions.find(
+                                            (opt) => opt.value === item?.leaveId
+                                          ) || null
+                                        }
+
+                                        onChange={(selected) =>
+                                          handleInputChange(
+                                            selected?.value || "",
+                                            index,
+                                            "leaveId"
+                                          )
+                                        }
+                                        isDisabled={!employeeId || readOnly}
+                                        placeholder="Select"
+                                        menuPlacement="auto"
+                                        menuPosition="fixed"
+                                        styles={{
+                                          control: (base) => ({
+                                            ...base,
+                                            border: "none", // remove border
+                                            boxShadow: "none", // remove focus ring
+                                            backgroundColor: "transparent",
+                                            minHeight: "unset",
+                                            height: "20px", // match table row height
+                                            color: "black",
+                                          }),
+                                          placeholder: (base) => ({
+                                            ...base,
+                                            color: "black", // gray placeholder like Tailwind `text-gray-400`
+                                          }),
+                                          singleValue: (base) => ({
+                                            ...base,
+                                            color: readOnly ? "gray" : "black",
+                                            fontSize: "11px", // optional: adjust font size
+                                            // textTransform: "uppercase",
+                                          }),
+
+                                          dropdownIndicator: (base) => ({
+                                            ...base,
+                                            padding: 2, // smaller padding
+                                            svg: {
+                                              width: 14, // icon width
+                                              height: 14, // icon height
+                                            },
+                                            color: "black",
+                                          }),
+
+                                          indicatorSeparator: () => ({ display: "none" }), // remove line
+                                          valueContainer: (base) => ({
+                                            ...base,
+                                            padding: "0 2px", // tighten padding
+                                            color: "black",
+                                            // textTransform: "uppercase",
+                                          }),
+                                          input: (base) => ({
+                                            ...base,
+                                            margin: 0,
+                                            padding: 0,
+                                            color: "black",
+                                            // textTransform: "uppercase",
+                                          }),
+                                          option: (base, state) => ({
+                                            ...base,
+                                          }),
+                                          menu: (base) => ({
+                                            ...base,
+                                            zIndex: 9999, // keep menu on top
+                                          }),
+                                        }}
+                                        onInputChange={(value, { action }) => {
+                                          if (action === "input-change") {
+                                            return value.toUpperCase(); //  force uppercase typing
+                                          }
+                                          return value;
+                                        }}
+                                        components={{
+
+                                          IndicatorSeparator: () => null, // remove separator
+                                        }}
+                                      />
+                                    </td>
+
+                                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center"
+                                      onContextMenu={(e) => {
+                                        if (!readOnly) {
+                                          handleRightClick(e, index, "openingBalance");
+                                        }
+                                      }}
+
+                                    >
+                                      <input
+                                        type="number"
+                                        value={item?.openingBalance || ""}
+                                        className={`w-full bg-transparent pl-2 focus:outline-none ${readOnly ? "text-gray-600" : "text-black"
+                                          }`}
+                                        onChange={(e) =>
+                                          handleInputChange(e.target.value, index, "openingBalance")
+                                        }
+                                        onKeyDown={(e) => {
+                                          if (e.key === "Enter") {
+                                            e.preventDefault();
+
+                                            if (item?.leaveId) {
+                                              addNewRow();
+                                            }
+                                          }
+                                        }}
+                                        disabled={readOnly}
+                                      />
+                                    </td>
+
+                                  </tr>
+                                ))
+                              }
+
+
+                            </tbody>
+                          </table>
                         </div>
                       </div>
+                      {contextMenu && (
+                        <div
+                          style={{
+                            position: "absolute",
+                            top: `${contextMenu.mouseY - 50}px`,
+                            left: `${contextMenu.mouseX + 20}px`,
+
+                            // background: "gray",
+                            boxShadow: "0px 0px 5px rgba(0,0,0,0.3)",
+                            padding: "8px",
+                            borderRadius: "4px",
+                            zIndex: 1000,
+                          }}
+                          className="bg-gray-100"
+                          onMouseLeave={handleCloseContextMenu} // Close when the mouse leaves
+                        >
+                          <div className="flex flex-col gap-1">
+                            <button
+                              className=" text-black text-[12px] text-left rounded px-1"
+                              onClick={() => {
+                                handleDeleteRow(contextMenu.rowId);
+                                handleCloseContextMenu();
+                              }}
+                            >
+                              Delete{" "}
+                            </button>
+                            <button
+                              className=" text-black text-[12px] text-left rounded px-1"
+                              onClick={() => {
+                                handleDeleteAllRows();
+                                handleCloseContextMenu();
+                              }}
+                            >
+                              Delete All
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

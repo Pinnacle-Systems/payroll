@@ -5,6 +5,8 @@ import {
 
 import Select from "react-select";
 import { ShiftTime } from "../../../Utils/DropdownData";
+import { toast } from "react-toastify";
+import Swal from "sweetalert2";
 
 
 const Table = ({
@@ -43,8 +45,16 @@ const Table = ({
       payref.current.focus();
     }
   }, [form, readOnly]);
+  const resetLeaveId = (rowIndex) => {
+    setLeaveDetails((prev) => {
+      const clone = structuredClone(prev);
+      clone[rowIndex].leaveId = "";
+      return clone;
+    });
+  };
 
   const handleInputChange = (value, index, field) => {
+
     const newBlend = structuredClone(leaveDetails);
     newBlend[index][field] = value;
     if (field === "shiftTime") {
@@ -58,6 +68,57 @@ const Table = ({
       }
       else {
         newBlend[index].count = "";
+      }
+    }
+    // helper to safely parse and scale to integer (cents)
+    const toInt = (v) => {
+      const n = parseFloat(v);
+      if (Number.isNaN(n)) return 0;
+      return Math.round(n * 100); // scale by 100 to preserve two decimals
+    };
+
+    // sum requested (scaled) for a leaveId across newBlend
+    const sumRequestedForLeaveInt = (lid) =>
+      newBlend.reduce((sum, row) => {
+        if (!row) return sum;
+        if (row.leaveId === lid) return sum + toInt(row.count);
+        return sum;
+      }, 0);
+
+    // validate when relevant fields change
+    if (["count", "leaveId", "shiftTime"].includes(field)) {
+      const leaveId = newBlend[index].leaveId;
+      if (leaveId) {
+        const requestedTotalInt = sumRequestedForLeaveInt(leaveId);
+
+        const leave = (leaveSummary || []).find((l) => l.leaveId === leaveId);
+        const remaining = Number((leave && leave.remainingDays) || 0);
+        const remainingInt = Math.round(remaining * 100);
+
+        if (remainingInt <= 0) {
+          Swal.fire({
+            icon: "error",
+            title: "No Remaining Days",
+            text: `${leave ? leave.leaveName : "Selected leave"} has no remaining days`,
+          });
+          resetLeaveId(index);
+          return; // block update
+        }
+
+        if (requestedTotalInt > remainingInt) {
+          const requested = (requestedTotalInt / 100).toString();
+          const remainingStr = (remainingInt / 100).toString();
+          Swal.fire({
+            icon: "error",
+            title: "Leave Limit Exceeded",
+            html: `
+      You requested <b>${requested}</b> days.<br>
+      Only <b>${remainingStr}</b> day(s) available for <b>${leave.leaveName}</b>.
+    `,
+          });
+          resetLeaveId(index);
+          return; // block update
+        }
       }
     }
     setLeaveDetails(newBlend);
@@ -76,15 +137,11 @@ const Table = ({
         aadharNo: val?.aadharNo,
         mobileNumber: val?.mobileNumber,
       })) || [];
-  const leaveTypeRows = [
-    { key: "CL", label: "Casual Leave" },
-    { key: "SL", label: "Special Leave" },
-    { key: "ML", label: "Medical Leave" }
-  ];
+
 
   return (
     <>
-      <div className="flex bg-white  mx-auto px-2 py-1 justify-between items-center mb-1">
+      <div className="flex bg-white     mx-auto px-2 py-1 justify-between items-center mb-1">
         <h1 className="master-header">Leave Request</h1>
         <div className="flex gap-2">
           {readOnly && (
@@ -299,20 +356,21 @@ const Table = ({
                 <thead className="bg-gray-200 text-gray-800">
                   <tr>
 
-                    <th className="w-8  py-2 text-center font-medium text-[13px]">
+                    <th className="w-12  py-2 text-center font-medium text-[13px]">
                       Leave Type
                     </th>
+                    <th
+                      className={`w-6 py-2 item-center font-medium text-[13px] `}
+                    >
+                      Days Available
+                    </th>
+
                     <th
                       className={`w-8  py-2 text-center font-medium text-[13px] `}
                     >
                       Leave Taken (Days)
                     </th>
 
-                    <th
-                      className={`w-6 py-2 item-center font-medium text-[13px] `}
-                    >
-                      Days Available
-                    </th>
 
 
 
@@ -339,28 +397,28 @@ const Table = ({
                             }`} />
 
                         </td>
-
+                        {/* DAYS AVAILABLE */}
+                        <td className="border border-gray-300 text-[11px] py-0.5 text-center">
+                          <input
+                            type="number"
+                            value={type?.remainingDays}
+                            className={` text-right w-full pr-2  bg-transparent text-[11px] focus:outline-none 
+            ${readOnly ? "text-gray-600" : "text-black"}`}
+                            readOnly
+                          />
+                        </td>
                         {/* LEAVE TAKEN */}
                         <td className="border border-gray-300">
                           <input
                             type="number"
-                            value={type?.totalCount}
+                            value={type?.usedDays}
                             className={` text-right w-full pr-2  bg-transparent text-[11px] focus:outline-none 
             ${readOnly ? "text-gray-600" : "text-black"}`}
                             readOnly
                           />
                         </td>
 
-                        {/* DAYS AVAILABLE */}
-                        <td className="border border-gray-300 text-[11px] py-0.5 text-center">
-                          <input
-                            type="text"
 
-                            className={` text-right w-full pr-2  bg-transparent text-[11px] focus:outline-none 
-            ${readOnly ? "text-gray-600" : "text-black"}`}
-                            readOnly
-                          />
-                        </td>
 
                       </tr>
                     )))
@@ -421,7 +479,7 @@ const Table = ({
 
                         className="border border-gray-300 py-1.5 text-[11px]  text-center px-1"
                       >
-                        No Data Available
+                        Choose from and to date first
 
                       </td>
                     </tr>) : (
@@ -565,7 +623,7 @@ const Table = ({
                             <input
                               type="text"
                               value={item?.count || ""}
-                              className={`w-full bg-transparent pl-2 focus:outline-none ${readOnly ? "text-gray-600" : "text-black"
+                              className={`w-full text-right pr-2 bg-transparent  focus:outline-none ${readOnly ? "text-gray-600" : "text-black"
                                 }`}
                               onChange={(e) =>
                                 handleInputChange(e.target.value, index, "count")
