@@ -16,7 +16,6 @@ import Table from "./Table";
 import Swal from "sweetalert2";
 import moment from "moment";
 import { useDispatch } from "react-redux";
-
 import Loader from "../Loader";
 import { useGetEmployeeQuery } from "../../../redux/services/EmployeeMasterService";
 import { useGetLeaveCodeQuery } from "../../../redux/services/LeaveCode.servive";
@@ -41,7 +40,7 @@ const LeaveRequest = () => {
   const [totalDays, setTotalDays] = useState('')
   const [leaveSummary, setLeaveSummary] = useState([])
   const dispatch = useDispatch();
-
+ 
 
   const params = getCommonParams();
   const { branchId, companyId, finYearId, userId } = params;
