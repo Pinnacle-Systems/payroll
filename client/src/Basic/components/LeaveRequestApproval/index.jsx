@@ -118,6 +118,7 @@ const LeaveRequestApproval = () => {
                 notes: val?.notes || '',
                 count: val?.count || 0,
                 isApproved: val?.isApproved === true ? true : val?.isApproved === false ? false : null,
+                remarks:val?.remarks || ''
             }))
             setLeaveDetails(formatted);
 

@@ -345,7 +345,7 @@ const Table = ({
 
                         <div className=" max-h-[300px] overflow-y-auto ">
                             <h2>Leave Entry</h2>
-                            <table className="w-[860px] border-collapse table-fixed max-h-[300px]">
+                            <table className={` w-[1200px]    border-collapse table-fixed max-h-[300px]`}>
                                 <thead className="bg-gray-200 text-gray-800">
                                     <tr>
                                         <th
@@ -362,9 +362,6 @@ const Table = ({
                                             Leave Type
                                         </th>
 
-
-
-
                                         <th
                                             className={`w-8 py-2 item-center font-medium text-[13px] `}
                                         >
@@ -379,7 +376,7 @@ const Table = ({
 
 
                                         <th
-                                            className={`w-20 py-2 item-center font-medium text-[13px] `}
+                                            className={`w-16 py-2 item-center font-medium text-[13px] `}
                                         >
                                             Reason
                                         </th>
@@ -393,6 +390,15 @@ const Table = ({
                                         >
                                             Reject
                                         </th>
+
+                                        <th
+                                            className={`w-16 py-2 item-center font-medium text-[13px] `}
+                                        >
+                                            Remarks
+                                        </th>
+
+
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -601,6 +607,26 @@ const Table = ({
                                                             disabled={readOnly}
                                                         />
                                                     </td>
+
+                                                    <td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                                                            <input
+                                                                type="text"
+                                                                value={item.remarks}
+                                                                className={`w-full bg-transparent pl-2 focus:outline-none ${readOnly ? "text-gray-600" : "text-black"
+                                                                    }`}
+                                                                onChange={(e) =>
+                                                                    handleInputChange(
+                                                                        e.target.value,
+                                                                        index,
+                                                                        "remarks"
+                                                                    )
+                                                                }
+
+                                                                disabled={readOnly}
+                                                            />
+                                                        </td>
+                                                    
+
                                                 </tr>
                                             )))
                                     }

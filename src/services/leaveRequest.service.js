@@ -291,6 +291,7 @@ async function update(id, body) {
                                         : item.isApproved === false
                                             ? false
                                             : null,
+                                remarks : item?.remarks || ''
                             })),
                     }
                     : undefined,
