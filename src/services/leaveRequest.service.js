@@ -60,7 +60,7 @@ async function get(req) {
                     }
                 }
             },
-             employee: {
+            employee: {
                 select: {
                     id: true,
                     idNumber: true,
@@ -285,6 +285,12 @@ async function update(id, body) {
                                 shiftTime: item?.shiftTime ? item?.shiftTime : "",
                                 notes: item?.notes ? item?.notes : "",
                                 count: item?.count || '',
+                                isApproved:
+                                    item.isApproved === true
+                                        ? true
+                                        : item.isApproved === false
+                                            ? false
+                                            : null,
                             })),
                     }
                     : undefined,
@@ -300,7 +306,6 @@ async function getleavecount(employeeId) {
     if (!employeeId) throw new Error("EmployeeId is required");
     employeeId = parseInt(employeeId);
 
-    // 1️⃣ Fetch all leave types
     const allLeaves = await prisma.leaveCode.findMany({
         select: { id: true, name: true, days: true }
     });
@@ -308,6 +313,7 @@ async function getleavecount(employeeId) {
     // 2️⃣ Fetch all leave usage (usedDays)
     const allLeaveDetails = await prisma.leaveDetails.findMany({
         where: {
+            isApproved: true,
             leaveRequest: { employeeId }
         },
         select: {
@@ -324,7 +330,6 @@ async function getleavecount(employeeId) {
         usedMap[leaveId] += parseFloat(item.count || 0);
     });
 
-    // 3️⃣ Fetch opening balance parent
     const openingBalanceParent = await prisma.leaveOPeningBalance.findFirst({
         where: { employeeId },
         include: {
@@ -334,14 +339,12 @@ async function getleavecount(employeeId) {
 
     const openingMap = {};
 
-    // If opening exists, map it for quick access
     if (openingBalanceParent) {
-        openingBalanceParent.LeaveOPeningBalanceGrid.forEach(item => {
-            openingMap[item.leaveId] = item.openingBalance || 0;
+        openingBalanceParent.LeaveOPeningBalanceGrid?.forEach(item => {
+            openingMap[item?.leaveId] = item?.openingBalance || 0;
         });
     }
 
-    // 4️⃣ Build final summary for every leave type
     const summary = allLeaves.map(leave => {
         const leaveId = leave.id;
 

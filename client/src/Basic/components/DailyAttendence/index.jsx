@@ -1218,7 +1218,7 @@ const Form = () => {
                       {reportView === "Single" && (
                         <td colSpan={2} className="border text-[11px]">
                           <input
-                            className="w-full bg-transparent pl-1"
+                            className="w-full bg-transparent pl-1 focus:outline-none focus:border-transparent"
                             value={punches?.map((p) => moment.utc(p.timestamp).format("HH:mm:ss"))
                               .join(" , ")
                             }
@@ -1336,14 +1336,6 @@ const Form = () => {
 
               })}
             </tbody>
-
-
-
-
-
-
-
-
 
             <p className=" z-10 w-[100px] text-sm px-1 py-0.5 ">IRREGULAR</p>
 
@@ -1519,7 +1511,7 @@ const Form = () => {
 
                           {/* Map inside a single TD for OUT punches */}
                           {outPunches?.map((p, i) => (
-                            <td key={i} className="border text-[11px] text-center">
+                            <td key={i} className="border text-[11px] text-center ">
                               {p ? formatTime(p.timestamp) : ""}
                             </td>
                           ))}
@@ -1531,7 +1523,7 @@ const Form = () => {
                       {reportView === "Single" && (
                         <td colSpan={2} className="border text-[11px]">
                           <input
-                            className="w-full bg-transparent pl-1"
+                            className="w-full bg-transparent pl-1 focus:outline-none focus:border-transparent"
                             value={punches?.map((p) => moment.utc(p.timestamp).format("HH:mm:ss"))
                               .join(" , ")
                             }

@@ -1743,21 +1743,21 @@ model LeaveCode {
 }
 
 model LeaveOPeningBalance {
-  id                       Int                       @id @default(autoincrement())
-  createdAt                DateTime?                 @default(now())
-  updatedAt                DateTime?                 @updatedAt
-  Company                  Company?                  @relation(fields: [companyId], references: [id])
-  companyId                Int?
-  branch                   Branch?                   @relation(fields: [branchId], references: [id])
-  branchId                 Int?
-  createdBy                User?                     @relation("createdBy", fields: [createdById], references: [id])
-  createdById              Int?
-  updatedBy                User?                     @relation("updatedBy", fields: [updatedById], references: [id])
-  updatedById              Int?
-  Employee                 Employee                  @relation(fields: [employeeId], references: [id])
-  employeeId               Int
-  finYear                  FinYear                   @relation(fields: [finYearId], references: [id])
-  finYearId                Int
+  id                      Int                       @id @default(autoincrement())
+  createdAt               DateTime?                 @default(now())
+  updatedAt               DateTime?                 @updatedAt
+  Company                 Company?                  @relation(fields: [companyId], references: [id])
+  companyId               Int?
+  branch                  Branch?                   @relation(fields: [branchId], references: [id])
+  branchId                Int?
+  createdBy               User?                     @relation("createdBy", fields: [createdById], references: [id])
+  createdById             Int?
+  updatedBy               User?                     @relation("updatedBy", fields: [updatedById], references: [id])
+  updatedById             Int?
+  Employee                Employee                  @relation(fields: [employeeId], references: [id])
+  employeeId              Int
+  finYear                 FinYear                   @relation(fields: [finYearId], references: [id])
+  finYearId               Int
   LeaveOPeningBalanceGrid LeaveOPeningBalanceGrid[]
 }
 
@@ -1942,7 +1942,6 @@ model leaveRequest {
   date        DateTime?
   fromDate    DateTime?
   toDate      DateTime?
-
   totalDays    String?
   leaveDetails LeaveDetails[]
 }
@@ -1957,4 +1956,5 @@ model LeaveDetails {
   shiftTime      String?
   notes          String?
   count          String?
+  isApproved     Boolean?
 }

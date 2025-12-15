@@ -5,7 +5,6 @@ import {
 
 import Select from "react-select";
 import { ShiftTime } from "../../../Utils/DropdownData";
-import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 
 
@@ -356,17 +355,17 @@ const Table = ({
                 <thead className="bg-gray-200 text-gray-800">
                   <tr>
 
-                    <th className="w-12  py-2 text-center font-medium text-[13px]">
+                    <th className="w-12  py-2 text-center font-medium text-[12px]">
                       Leave Type
                     </th>
                     <th
-                      className={`w-6 py-2 item-center font-medium text-[13px] `}
+                      className={`w-6 py-2 item-center font-medium text-[12px] `}
                     >
                       Days Available
                     </th>
 
                     <th
-                      className={`w-8  py-2 text-center font-medium text-[13px] `}
+                      className={`w-8  py-2 text-center font-medium text-[12px] `}
                     >
                       Leave Taken (Days)
                     </th>
@@ -432,19 +431,19 @@ const Table = ({
 
             <div className=" max-h-[300px] overflow-y-auto ">
               <h2>Leave Entry</h2>
-              <table className="w-[780px] border-collapse table-fixed max-h-[300px]">
+              <table className={`${id ? "w-[840px]" : "w-[820px]"} border-collapse table-fixed max-h-[300px]`}>
                 <thead className="bg-gray-200 text-gray-800">
                   <tr>
                     <th
-                      className={`w-[6px] px-1 text-center font-medium text-[13px] `}
+                      className={`w-[6px] px-1 text-center font-medium text-[12px] `}
                     >
                       S.No
                     </th>
-                    <th className="w-8 px-2 py-2 text-center font-medium text-[13px]">
+                    <th className="w-6 px-2 py-2 text-center font-medium text-[12px]">
                       Date
                     </th>
                     <th
-                      className={`w-12 px-4 py-2 text-center font-medium text-[13px] `}
+                      className={`w-12 px-4 py-2 text-center font-medium text-[12px] `}
                     >
                       Leave Type
                     </th>
@@ -453,23 +452,30 @@ const Table = ({
 
 
                     <th
-                      className={`w-8 py-2 item-center font-medium text-[13px] `}
+                      className={`w-8 py-2 item-center font-medium text-[12px] `}
                     >
                       Duration
                     </th>
 
                     <th
-                      className={`w-8 py-2 item-center font-medium text-[13px] `}
+                      className={`w-8 py-2 item-center font-medium text-[12px] `}
                     >
                       Count (Days)
                     </th>
 
 
                     <th
-                      className={`w-12 py-2 item-center font-medium text-[13px] `}
+                      className={`w-16 py-2 item-center font-medium text-[12px] `}
                     >
                       Reason
                     </th>
+                    {
+                      id ? (<th
+                        className={`w-8 py-2 item-center font-medium text-[12px] `}
+                      >
+                        Status
+                      </th>) : ''
+                    }
                   </tr>
                 </thead>
                 <tbody>
@@ -657,6 +663,24 @@ const Table = ({
                               disabled={readOnly}
                             />
                           </td>
+                          {
+                            id ? (<td className="  border border-gray-300 text-[11px] py-0.5 item-center">
+                              <input
+                                type="text"
+                                value={item?.isApproved}
+                                className={`w-full text-left pl-1 bg-transparent  focus:outline-none ${readOnly ? "text-gray-600" : ""
+                                  } ${item?.isApproved === "Approved"
+                                    ? "text-green-600"
+                                    : item?.isApproved === "Rejected"
+                                      ? "text-red-600"
+                                      : "text-orange-400"
+                                  }`}
+
+                                disabled={readOnly}
+                              />
+                            </td>) : ''
+                          }
+
                         </tr>
                       )))
                   }

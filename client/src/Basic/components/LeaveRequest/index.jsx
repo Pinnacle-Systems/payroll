@@ -46,10 +46,8 @@ const LeaveRequest = () => {
   const params = getCommonParams();
   const { branchId, companyId, finYearId, userId } = params;
   const { data: allData, isLoading, isFetching, refetch } = useGetLeaveRequestQuery({ params, searchParams: searchValue, });
-  const {data : employeeLeaveCount} = useGetEmployeeLeaveCountQuery(employeeId,{ skip: !employeeId })
-  console.log(employeeLeaveCount,"employeeLeaveCount");
-  console.log(employeeId,"employeeId");
-  
+  const { data: employeeLeaveCount } = useGetEmployeeLeaveCountQuery(employeeId, { skip: !employeeId })
+
   const { data: employee } = useGetEmployeeQuery({ params });
   const { data: LeaveType } = useGetLeaveCodeQuery({ params });
 
@@ -89,18 +87,18 @@ const LeaveRequest = () => {
     setTotalDays(String(totalDays));
 
   };
-useEffect(() => {
-  if (employeeId) {
-    // When employeeId changes and is valid, update state from API response
-    if (employeeLeaveCount?.data) {
-      setLeaveSummary(employeeLeaveCount.data || []);
+  useEffect(() => {
+    if (employeeId) {
+      // When employeeId changes and is valid, update state from API response
+      if (employeeLeaveCount?.data) {
+        setLeaveSummary(employeeLeaveCount.data || []);
+      } else {
+        setLeaveSummary([]);
+      }
     } else {
       setLeaveSummary([]);
     }
-  } else {
-    setLeaveSummary([]);
-  }
-}, [employeeId, employeeLeaveCount]);
+  }, [employeeId, employeeLeaveCount]);
 
 
   const syncFormWithDb = useCallback(
@@ -127,7 +125,8 @@ useEffect(() => {
         startDate: val?.startDate ? moment.utc(val?.startDate).format("YYYY-MM-DD") : null,
         shiftTime: val?.shiftTime || '',
         notes: val?.notes || '',
-        count: val?.count || 0
+        count: val?.count || 0,
+        isApproved: val?.isApproved === true ? "Approved" : val?.isApproved === false ? "Rejected" : "Pending",
 
       }))
       setLeaveDetails(formatted);
@@ -192,7 +191,7 @@ useEffect(() => {
 
       // toast.success(text + "Successfully");
       Swal.fire({
-        title: text + "  " + "Successfully",
+        title: "Request Submitted Successfully",
         icon: "success",
         draggable: true,
         timer: 1000,
