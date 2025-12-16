@@ -46,7 +46,8 @@ import {
   PythonPunchFetch,
   BreakReport,
   LeaveRequest,
-  LeaveRequestApproval
+  LeaveRequestApproval,
+  UpdatedLeaveRequest
 
  
   
@@ -148,6 +149,7 @@ const ActiveTabList = () => {
     "DATE WISE BREAK REPORT" : <BreakReport/>,
     "LEAVE REQUEST":<LeaveRequest/>,
     "LEAVE REQEUST APPROVAL":<LeaveRequestApproval/>,
+    "UPDATED LEAVE REQUEST":<UpdatedLeaveRequest/>
 
 
 

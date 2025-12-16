@@ -2,12 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import {
   DateInput, TextInput, customSelectStyles,
 } from "../../../Inputs";
+import dayjs from "dayjs";
 
 import Select from "react-select";
 import { ShiftTime } from "../../../Utils/DropdownData";
 import Swal from "sweetalert2";
 
-import LeaveApplicationForm from './Modal'
+
 
 const Table = ({
   saveData, mobileNumber, setMobileNumber, department,
@@ -142,22 +143,11 @@ const Table = ({
   return (
     <>
 
-    { 
-      modal && (<LeaveApplicationForm/>)
-    }
+    
       <div className="flex bg-white     mx-auto px-2 py-1 justify-between items-center mb-1">
         <h1 className="master-header">Leave Request</h1>
         <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => {
-              setModal(true);
-              
-            }}
-            className="px-3 py-1 text-red-600 hover:bg-red-600 hover:text-white border border-red-600 text-xs rounded"
-          >
-            open
-          </button>
+      
           {readOnly && (
             <button
               type="button"
@@ -711,6 +701,7 @@ const Table = ({
 
 
       </div>
+   
     </>
   );
 };

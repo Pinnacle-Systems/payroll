@@ -204,7 +204,7 @@ async function create(body) {
                     leaveDetails?.length > 0
                         ? {
                             create: leaveDetails?.map((item) => ({
-                                startDate: item?.startDate ? new Date(item?.startDate) : null,
+                                date: item?.date ? new Date(item?.date) : null,
                                 leaveId: item?.leaveId
                                     ? parseInt(item?.leaveId)
                                     : undefined,
@@ -265,7 +265,7 @@ async function update(id, body) {
                             .map((item) => ({
                                 where: { id: parseInt(item.id) },
                                 data: {
-                                    startDate: item?.startDate ? new Date(item?.startDate) : null,
+                                    date: item?.date ? new Date(item?.date) : null,
                                     leaveId: item?.leaveId
                                         ? parseInt(item?.leaveId)
                                         : undefined,
@@ -278,7 +278,7 @@ async function update(id, body) {
                         create: leaveDetails
                             .filter((item) => !item.id)
                             .map((item) => ({
-                                startDate: item?.startDate ? new Date(item?.startDate) : null,
+                                date: item?.date ? new Date(item?.date) : null,
                                 leaveId: item?.leaveId
                                     ? parseInt(item?.leaveId)
                                     : undefined,

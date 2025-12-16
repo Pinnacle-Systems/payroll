@@ -1952,7 +1952,7 @@ model LeaveDetails {
   leaveRequestId Int?
   leave          LeaveCode     @relation(fields: [leaveId], references: [id])
   leaveId        Int
-  startDate      DateTime?
+  date      DateTime?
   shiftTime      String?
   notes          String?
   count          String?

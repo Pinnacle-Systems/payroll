@@ -16,7 +16,7 @@
     "@material-tailwind/react": "^2.1.9",
     "@mui/icons-material": "^5.14.8",
     "@mui/material": "^5.18.0",
-    "@mui/x-date-pickers": "^8.22.0",
+    "@mui/x-date-pickers": "^6.20.2",
     "@react-pdf/renderer": "^3.4.5",
     "@reduxjs/toolkit": "^1.9.2",
     "@syncfusion/ej2-base": "^31.2.5",
@@ -88,7 +88,7 @@
     "xlsx-js-style": "^1.2.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "cross-env NODE_OPTIONS=--max-old-space-size=4096 react-scripts start",
     "build": "cross-env NODE_OPTIONS='--max_old_space_size=8192' react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -112,6 +112,7 @@
     ]
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "tailwindcss": "^3.2.4"
   }
 }
