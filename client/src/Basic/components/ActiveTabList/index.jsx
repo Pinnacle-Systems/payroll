@@ -147,9 +147,10 @@ const ActiveTabList = () => {
     "PUNCH DATA":<Attendance/>,
     "PUNCH DOWNLOAD":<PythonPunchFetch/>,
     "DATE WISE BREAK REPORT" : <BreakReport/>,
-    "LEAVE REQUEST":<LeaveRequest/>,
+    // "LEAVE REQUEST":<LeaveRequest/>,
     "LEAVE REQEUST APPROVAL":<LeaveRequestApproval/>,
-    "UPDATED LEAVE REQUEST":<UpdatedLeaveRequest/>
+    // "UPDATED LEAVE REQUEST":<UpdatedLeaveRequest/>,
+    "LEAVE REQUEST":<UpdatedLeaveRequest/>,
 
 
 

@@ -129,7 +129,8 @@ const LeaveRequest = () => {
 
             }))
             setLeaveDetails(formatted);
-
+            console.log(leaveDetails,"hafhnasklfasl");
+            
             // const leaveAvailable = data?.leaveSummary?.map((val) => ({
             //   leaveName: val?.leaveName,
             //   totalCount: val?.totalCount
@@ -345,16 +346,7 @@ console.log(leaveDetails,"chekcing`");
             <div>
                 <div onKeyDown={handleKeyDown} className="p-1 ">
                     {form === true ? (
-                        <Modal
-                            isOpen={form}
-                            form={form}
-                            widthClass={"w-[95%] h-[80%]"}
-                            onClose={() => {
-                                setForm(false);
-
-                                setId("");
-                            }}
-                        >
+                     
                             <Table
                                 saveData={saveData} employeeName={employeeName}
                                 setForm={setForm} setEmployeeName={setEmployeeName}
@@ -391,7 +383,7 @@ console.log(leaveDetails,"chekcing`");
 
 
 
-                        </Modal>
+                        
 
                     ) : (
                         <>
