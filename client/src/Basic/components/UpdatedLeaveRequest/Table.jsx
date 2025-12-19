@@ -937,6 +937,8 @@ export default function LeaveCalendarModal({
   onClose
 }) {
   const [currentMonth, setCurrentMonth] = useState(dayjs());
+  const [openLeaveModal, setOpenLeaveModal] = useState(false);
+
   const payref = useRef(null);
 
   useEffect(() => {
@@ -1107,14 +1109,14 @@ export default function LeaveCalendarModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-[95vw] max-h-[90vh] flex flex-col overflow-hidden">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-[95vw] max-h-[95vh] flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
+        <div className="flex items-center justify-between p-4 py-2 border-b bg-gradient-to-r from-blue-50 to-indigo-50">
           <div className="flex items-center gap-3">
             <CalendarDays className="w-6 h-6 text-blue-600" />
             <div>
               <h2 className="text-xl font-bold text-gray-800">Leave Request</h2>
-              <p className="text-sm text-gray-600">Manage employee leave applications</p>
+
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -1122,7 +1124,7 @@ export default function LeaveCalendarModal({
               <button
                 type="button"
                 onClick={() => setReadOnly(false)}
-                className="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 border border-red-200 rounded-lg transition-colors flex items-center gap-2"
+                className="px-4 py-1 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors flex items-center gap-2"
               >
                 <span>Edit</span>
               </button>
@@ -1130,10 +1132,10 @@ export default function LeaveCalendarModal({
             <button
               type="button"
               onClick={saveData}
-              className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors flex items-center gap-2"
+              className="px-4 py-1 text-sm font-medium text-white bg-blue-600 hover:bg-green-700 rounded-lg transition-colors flex items-center gap-2"
             >
               <Check size={16} />
-              {id ? "Update" : "Save"}
+              {id ? "Update" : "Submit Leave Request"}
             </button>
             <button
               type="button"
@@ -1208,9 +1210,15 @@ export default function LeaveCalendarModal({
                   </div>
                 </div>
               </div>
-
+              {/* {!employeeId && (
+                <div className=" p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <p className="text-sm text-yellow-700 text-center">
+                    Please select an employee first to choose dates
+                  </p>
+                </div>
+              )} */}
               {/* Calendar - Increased Height */}
-              <div className="bg-white rounded-lg border shadow-sm p-4 h-[400px] flex flex-col">
+              <div className={`${!employeeId ? "h-[430px]" : "h-[430px]"}   bg-white rounded-lg border shadow-sm p-4  flex flex-col`}>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-semibold text-gray-700 flex items-center gap-2">
                     <Calendar size={18} />
@@ -1281,7 +1289,7 @@ export default function LeaveCalendarModal({
 
                         {showPopup && (
                           <div
-                            className="absolute top-14 left-0 bg-white border shadow-xl rounded-lg p-4 w-64 z-20"
+                            className="absolute -top-16 h-56  left-32 bg-white border shadow-xl rounded-lg p-4 w-64 z-20"
                             onMouseDown={(e) => e.stopPropagation()}
                           >
                             <div className="flex justify-between items-center mb-3">
@@ -1313,7 +1321,7 @@ export default function LeaveCalendarModal({
                                   onChange={(e) =>
                                     setPopupLeave((p) => ({ ...p, leaveId: e.target.value }))
                                   }
-                                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  className="w-full border text-[11px] py-1 border-gray-300 rounded px-3   focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
                                   <option value="">Select Leave Type</option>
                                   {LeaveType?.data?.map((t) => (
@@ -1333,7 +1341,7 @@ export default function LeaveCalendarModal({
                                   onChange={(e) =>
                                     setPopupLeave((p) => ({ ...p, shiftTime: e.target.value }))
                                   }
-                                  className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  className="w-full border text-[11px] py-1 border-gray-300 rounded px-3   focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
                                   <option value="">Select Shift</option>
                                   {ShiftTime.map((st) => (
@@ -1402,7 +1410,7 @@ export default function LeaveCalendarModal({
                                   setPopupOpen(false);
                                   // setHighlighted([]);
                                 }}
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                                className="px-4 py-1 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2"
                               >
                                 Apply Leave
                               </button>
@@ -1414,13 +1422,7 @@ export default function LeaveCalendarModal({
                   })}
                 </div>
 
-                {!employeeId && (
-                  <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p className="text-sm text-yellow-700 text-center">
-                      Please select an employee first to choose dates
-                    </p>
-                  </div>
-                )}
+
               </div>
             </div>
 
@@ -1435,15 +1437,16 @@ export default function LeaveCalendarModal({
 
                 <div className="space-y-4">
                   <div className="flex gap-4">
-                    <TextInput
-                      name="Employee Name"
-                      type="text"
-                      value={employeeName}
-                      // setValue={setEmployeeName}
-                      // required={true}
-                      readOnly={readOnly}
-                      disabled={childRecord.current > 0}
-                    />
+                    <div className="w-[200px]">
+                      <TextInput
+                        name="Employee Name"
+                        type="text"
+                        value={employeeName}
+                        // setValue={setEmployeeName}
+                        // required={true}
+                        readOnly={readOnly}
+                        disabled={childRecord.current > 0}
+                      /></div>
 
                     <div className="w-52">
                       <TextInput
@@ -1468,116 +1471,119 @@ export default function LeaveCalendarModal({
                       />
                     </div>
                     {/* Modal Button for Leave Availability */}
-                    <button
-                      type="button"
-                      onClick={() => document.getElementById('leave-availability-modal').showModal()}
-                      className="px-3 py-2 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-1"
-                      title="View Leave Availability"
-                    >
-                      <Clock size={12} />
-                      <span>View Leaves</span>
-                    </button>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Leave Availability
+                      <button
+                        type="button"
+                        // onClick={() => document.getElementById('leave-availability-modal').showModal()}
+                        onClick={() => setOpenLeaveModal(true)}
+                        className="px-4 py-2 h-7 mt-1 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors flex items-center gap-2 "
+                        title="View Leave Availability"
+                      >
+
+                        <span>open</span>
+                      </button></label>
 
                   </div>
 
                   {/* Leave Availability inside Employee Details */}
-                  <dialog id="leave-availability-modal" className="modal">
-                    <div className="modal-box max-w-2xl">
-                      <form method="dialog">
-                        <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-                      </form>
-                      <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                        <Clock size={20} />
-                        Leave Availability
-                      </h3>
-                      <div className="overflow-auto max-h-[400px]">
-                        <table className="w-full border-collapse">
-                          <thead className="bg-gray-100 sticky top-0">
-                            <tr>
-                              <th className="py-3 px-4 text-left text-sm font-semibold text-gray-700 border-b">
-                                Leave Type
-                              </th>
-                              <th className="py-3 px-4 text-center text-sm font-semibold text-gray-700 border-b">
-                                Total Days
-                              </th>
-                              <th className="py-3 px-4 text-center text-sm font-semibold text-gray-700 border-b">
-                                Used Days
-                              </th>
-                              <th className="py-3 px-4 text-center text-sm font-semibold text-gray-700 border-b">
-                                Available Days
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {leaveSummary?.length === 0 ? (
-                              <tr>
-                                <td colSpan={4} className="py-8 text-center text-sm text-gray-500">
-                                  No leave data available
-                                </td>
+                  {openLeaveModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+
+                      {/* MODAL */}
+                      <div className="bg-white w-full max-w-3xl p-8 rounded-2xl shadow-2xl flex flex-col">
+
+                        {/* HEADER (fixed) */}
+                        <div className="flex items-center justify-between px-2 py-2 border-b bg-gray-50">
+                          <h3 className="text-[16px] font-semibold flex items-center gap-2">
+                            <Clock size={20} />
+                            Leave Availability
+                          </h3>
+
+                          <button
+                            onClick={() => setOpenLeaveModal(false)}
+                            className="text-gray-500 hover:text-black text-xl"
+                          >
+                            ✕
+                          </button>
+                        </div>
+
+                        {/* TABLE SCROLL AREA (ONLY THIS SCROLLS) */}
+                        <div className="h-[350px] overflow-y-auto mt-4">
+
+                          <table className="w-full border border-gray-300 border-collapse">
+                            <thead className="sticky top-0 bg-gray-200 z-10">
+                              <tr className="border border-gray-300">
+                                <th className=" py-2 w-28 text-center text-sm font-semibold border border-gray-300">
+                                  Leave Type
+                                </th>
+                                {/* <th className=" py-2 text-center text-sm font-semibold border border-gray-300">
+                                  Total
+                                </th> */}
+                                <th className=" w-8 py-2 text-center text-sm font-semibold border border-gray-300">
+                                  Leave Taken Days 
+                                </th>
+                                <th className=" w-8 py-2 text-center text-sm font-semibold border border-gray-300">
+                                  Available Days
+                                </th>
                               </tr>
-                            ) : (
-                              leaveSummary?.map((type, index) => (
-                                <tr key={index} className="hover:bg-gray-50 even:bg-gray-50">
-                                  <td className="py-3 px-4 text-sm border-b">
-                                    <div className="flex items-center gap-2">
-                                      <div className={`w-3 h-3 rounded-full ${type?.remainingDays > 0 ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                                      <span>{type?.leaveName}</span>
-                                    </div>
-                                  </td>
-                                  <td className="py-3 px-4 text-center text-sm border-b">
-                                    <span className="font-medium">{type?.totalDays || 0}</span>
-                                  </td>
-                                  <td className="py-3 px-4 text-center text-sm border-b">
-                                    <span className="font-medium text-amber-600">
-                                      {type?.usedDays || 0}
-                                    </span>
-                                  </td>
-                                  <td className="py-3 px-4 text-center text-sm border-b">
-                                    <span className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-semibold ${type?.remainingDays > 0
-                                        ? 'bg-green-100 text-green-800'
-                                        : 'bg-red-100 text-red-800'
-                                      }`}>
-                                      {type?.remainingDays || 0}
-                                    </span>
+                            </thead>
+
+                            <tbody>
+                              {leaveSummary?.length === 0 ? (
+                                <tr>
+                                  <td colSpan={4} className="py-10 text-center text-sm text-gray-500">
+                                    No leave data available
                                   </td>
                                 </tr>
-                              ))
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
-                      <div className="modal-action">
-                        <form method="dialog">
-                          <button className="btn">Close</button>
-                        </form>
+                              ) : (
+                                leaveSummary?.map((type, index) => (
+                                  <tr key={index} className="even:bg-gray-100 text-[12px] border border-gray-300">
+                                    <td className="px-4 py-2 border border-gray-300 text-[12px]">
+                                      <div className="flex items-center gap-2">
+                                        <span
+                                          className={`w-3 h-3 text-[12px] rounded-full ${type.remainingDays > 0
+                                              ? "bg-green-500"
+                                              : "bg-red-500"
+                                            }`}
+                                        />
+                                        {type.leaveName}
+                                      </div>
+                                    </td>
+
+                                    {/* <td className="px-4  text-[12px] text-center border border-gray-300">
+                                      {type.totalDays || 0}
+                                    </td> */}
+
+                                    <td className="px-4  text-[12px] text-right pr-2 border border-gray-300  text-amber-600 font-medium">
+                                      <span className="bg-amber-100 px-3 py-1 rounded-full text-xs font-semibold">{type.usedDays || 0}</span>
+                                      
+                                    </td>
+
+                                    <td className="px-4  text-[12px] text-right pr-2 border border-gray-300">
+                                      <span
+                                        className={`px-3 py-1 rounded-full text-xs font-semibold ${type.remainingDays > 0
+                                            ? "bg-green-100 text-green-700"
+                                            : "bg-red-100 text-red-700"
+                                          }`}
+                                      >
+                                        {type.remainingDays || 0}
+                                      </span>
+                                    </td>
+                                  </tr>
+                                ))
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+
+                    
+
                       </div>
                     </div>
-                    <form method="dialog" className="modal-backdrop">
-                      <button>close</button>
-                    </form>
-                  </dialog>
-
-
-
+                  )}
 
                 </div>
               </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
               {/* Leave Entry Details */}
               <div className="bg-white rounded-lg border shadow-sm p-4 flex-1">
@@ -1752,8 +1758,8 @@ export default function LeaveCalendarModal({
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="border-t p-4 bg-gray-50 flex justify-between items-center">
+
+        {/* <div className="border-t p-4 py-2 bg-gray-50 flex justify-between items-center">
           <div className="text-sm text-gray-600">
             Total Selected Days: <span className="font-semibold">{leaveDetails?.length || 0}</span>
           </div>
@@ -1764,20 +1770,20 @@ export default function LeaveCalendarModal({
                 setId("");
                 setForm(false);
               }}
-              className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 border border-gray-300 rounded-lg transition-colors"
+              className="px-4 py-1 text-sm font-medium text-gray-700 hover:bg-gray-100 border border-gray-300 rounded-lg transition-colors"
             >
               Cancel
             </button>
             <button
               type="button"
               onClick={saveData}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2"
+              className="px-4 py-1 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2"
             >
               <Check size={16} />
               {id ? "Update Request" : "Submit Request"}
             </button>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );
