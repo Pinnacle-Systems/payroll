@@ -113,7 +113,7 @@ const LeaveRequestApproval = () => {
             setTotalDays(data?.totalDays || '')
             const formatted = data?.leaveDetails?.map((val) => ({
                 leaveId: val?.leaveId,
-                startDate: val?.startDate ? moment.utc(val?.startDate).format("YYYY-MM-DD") : null,
+                date: val?.date ? moment.utc(val?.date).format("YYYY-MM-DD") : null,
                 shiftTime: val?.shiftTime || '',
                 notes: val?.notes || '',
                 count: val?.count || 0,

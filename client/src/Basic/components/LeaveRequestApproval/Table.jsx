@@ -209,7 +209,7 @@ const Table = ({
                             </div>
 
                         </div>
-                        <div className="border border-slate-200 p-2 bg-white rounded-md shadow-sm col-span-2">
+                        <div className="border border-slate-200 p-2 bg-white rounded-md shadow-sm col-span-3">
                             <h2 className="font-medium text-slate-700 mb-2">Employee Details</h2>
                             <div className="flex gap-4 gap-x-6">
 
@@ -287,7 +287,7 @@ const Table = ({
                             </div>
 
                         </div>
-                        <div className="border border-slate-200 p-2 bg-white rounded-md shadow-sm col-span-1">
+                        {/* <div className="border border-slate-200 p-2 bg-white rounded-md shadow-sm col-span-1">
                             <h2 className="font-medium text-slate-700 mb-2">Leave Details</h2>
                             <div className="flex gap-4 gap-x-4">
 
@@ -335,7 +335,7 @@ const Table = ({
 
                             </div>
 
-                        </div>
+                        </div> */}
                     </div>
 
 
@@ -421,7 +421,7 @@ const Table = ({
                                                     <td className="border border-gray-300">
                                                         <input
                                                             type="date"
-                                                            value={item?.startDate}
+                                                            value={item?.date}
 
                                                             className={`pl-2 appearance-none pr-2 bg-transparent w-[110px] text-[11px] focus:outline-none focus:border-transparent ${readOnly || childRecord.current > 0
                                                                 ? "text-gray-600"

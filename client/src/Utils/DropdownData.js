@@ -341,6 +341,6 @@ export const ShiftType = [
 export const ShiftTime = [
   { show: "l & ll", value: "Fully" },
   { show: "l", value: "FirstHalf" },
-  { show: "ll", value: "secondHalf" },
+  { show: "ll", value: "SecondHalf" },
 ]
 

@@ -946,6 +946,19 @@ export default function LeaveCalendarModal({
       payref.current.focus();
     }
   }, [form, readOnly]);
+  useEffect(() => {
+    if (!id) {
+      setActiveRange([]);
+      setHighlighted([]);
+      setPopupOpen(false);
+      setPopupLeave({ leaveId: "", shiftTime: "" });
+
+      // reset leave table
+      setLeaveDetails([]);
+    }
+
+  }, [employeeId]);
+
 
   const today = dayjs();
   const startOfMonth = currentMonth.startOf("month");
@@ -1060,7 +1073,7 @@ export default function LeaveCalendarModal({
     if (field === "shiftTime") {
       const shift = value;
       if (shift === "Fully") newBlend[index].count = "1";
-      else if (shift === "FirstHalf" || shift === "secondHalf") newBlend[index].count = "0.5";
+      else if (shift === "FirstHalf" || shift === "SecondHalf") newBlend[index].count = "0.5";
       else newBlend[index].count = "";
     }
 
@@ -1250,7 +1263,7 @@ export default function LeaveCalendarModal({
                       {day}
                     </div>
                   ))}
-                  {Array.from({ length: startOfMonth.day() }).map((_, i) => (
+                  {Array?.from({ length: startOfMonth.day() }).map((_, i) => (
                     <div key={`empty-${i}`} className="h-12"></div>
                   ))}
                   {allDays.map((date, index) => {
@@ -1259,6 +1272,39 @@ export default function LeaveCalendarModal({
                     const showPopup = popupOpen && activeRange.length > 0 && index === allDays.indexOf(activeRange[0]);
                     const isWeekend = day.day() === 0 || day.day() === 6;
                     const isToday = date === today.format("YYYY-MM-DD");
+                    const leaveRow = leaveDetails?.find(l => l?.date === date);
+                    const shift = leaveRow?.shiftTime;
+                    const getDateBg = ({ date, shift, isDragging, highlighted, popupOpen, activeRange }) => {
+                      // 🔴 TEMP selection (dragging OR popup open but not applied)
+                      if (
+                        (isDragging && highlighted.includes(date)) 
+                        // || (popupOpen && activeRange.includes(date) && !shift)
+                      ) {
+                        return "bg-red-600";
+                      }
+                       if (activeRange.includes(date) && !shift) {
+    return "bg-red-600";
+  }
+                      // 🎨 APPLIED leave colors
+                      if (shift === "Fully") {
+                        return "bg-red-600";
+                      }
+
+                      if (shift === "FirstHalf") {
+                        return "bg-[linear-gradient(135deg,#dc2626_50%,#dcfce7_50%)]";
+                      }
+
+                      if (shift === "SecondHalf") {
+                        return "bg-[linear-gradient(135deg,#dcfce7_50%,#dc2626_50%)]";
+                      }
+
+                      // 🟢 Default
+                      return "bg-green-100";
+                    };
+
+
+
+
 
                     return (
                       <div
@@ -1270,26 +1316,34 @@ export default function LeaveCalendarModal({
                       >
                         <div
                           className={`
-                            h-12 flex items-center justify-center rounded-lg cursor-pointer transition-all
-                            ${isHighlighted
-                              ? "bg-blue-600 text-white shadow-md"
-                              : isToday
-                                ? "bg-blue-100 border border-blue-300 text-blue-700"
-                                : isWeekend
-                                  ? "bg-gray-50 text-gray-500"
-                                  : "hover:bg-blue-50 text-gray-700"
-                            }
-                            ${!employeeId ? "opacity-50 cursor-not-allowed" : ""}
-                          `}
+    h-12 rounded-lg cursor-pointer flex items-center justify-center transition-all
+${getDateBg({
+                            date,
+                            shift,
+                            isDragging,
+                            highlighted,
+                            popupOpen,
+                            activeRange,
+                          })}
+    ${!employeeId ? "opacity-50 cursor-not-allowed" : ""}
+  `}
                         >
-                          <span className="text-sm font-medium">
+                          <span
+                            className={`text-sm font-medium ${(isDragging && highlighted.includes(date)) ||
+                              (popupOpen && activeRange.includes(date) && !shift) ||
+                              shift === "Fully"
+                              ? "text-white"
+                              : "text-green-800"
+                              }`}
+                          >
                             {day.date()}
                           </span>
+
                         </div>
 
                         {showPopup && (
                           <div
-                            className="absolute -top-16 h-56  left-32 bg-white border shadow-xl rounded-lg p-4 w-64 z-20"
+                            className="absolute -top-24 h-44  left-32 bg-white border shadow-xl rounded-lg p-4 w-64 z-20"
                             onMouseDown={(e) => e.stopPropagation()}
                           >
                             <div className="flex justify-between items-center mb-3">
@@ -1299,59 +1353,6 @@ export default function LeaveCalendarModal({
                                   : `${dayjs(activeRange[0]).format("DD MMM")} - ${dayjs(activeRange[activeRange.length - 1]).format("DD MMM")}`
                                 }
                               </p>
-                              <button
-                                onClick={() => {
-                                  setPopupOpen(false);
-                                  // setHighlighted([]);
-                                  setPopupLeave({ leaveId: "", shiftTime: "" });
-                                }}
-                                className="text-gray-400 hover:text-gray-600"
-                              >
-                                <X size={16} />
-                              </button>
-                            </div>
-
-                            <div className="space-y-3">
-                              <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1">
-                                  Leave Type
-                                </label>
-                                <select
-                                  value={popupLeave.leaveId}
-                                  onChange={(e) =>
-                                    setPopupLeave((p) => ({ ...p, leaveId: e.target.value }))
-                                  }
-                                  className="w-full border text-[11px] py-1 border-gray-300 rounded px-3   focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                >
-                                  <option value="">Select Leave Type</option>
-                                  {LeaveType?.data?.map((t) => (
-                                    <option key={t.id} value={t.id}>
-                                      {t.name}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
-
-                              <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1">
-                                  Shift Time
-                                </label>
-                                <select
-                                  value={popupLeave.shiftTime}
-                                  onChange={(e) =>
-                                    setPopupLeave((p) => ({ ...p, shiftTime: e.target.value }))
-                                  }
-                                  className="w-full border text-[11px] py-1 border-gray-300 rounded px-3   focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                >
-                                  <option value="">Select Shift</option>
-                                  {ShiftTime.map((st) => (
-                                    <option key={st.value} value={st.value}>
-                                      {st.show}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
-
                               <button
                                 onClick={() => {
                                   if (!popupLeave.leaveId) {
@@ -1410,10 +1411,66 @@ export default function LeaveCalendarModal({
                                   setPopupOpen(false);
                                   // setHighlighted([]);
                                 }}
-                                className="px-4 py-1 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors flex items-center gap-2"
+                                className="px-4 py-1 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors flex items-center gap-2"
                               >
-                                Apply Leave
+                                Apply
                               </button>
+                              <button
+                                onClick={() => {
+                                  setPopupOpen(false);
+                                  // setHighlighted([]);
+                                  setPopupLeave({ leaveId: "", shiftTime: "" });
+                                }}
+                                className="text-gray-400 bg-red-600 p-1 text-white hover:text-gray-600"
+                              >
+                                <X size={16} />
+                              </button>
+                            </div>
+
+                            <div className="space-y-3">
+                              <div>
+                                <label className="block text-xs font-medium text-gray-700 mb-1">
+                                  Leave Type
+                                </label>
+                                <select
+                                  value={popupLeave.leaveId}
+                                  onChange={(e) =>
+                                    setPopupLeave((p) => ({ ...p, leaveId: e.target.value }))
+                                  }
+                                  className="w-full border text-[11px] py-1 border-gray-300 rounded px-3   focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  disabled={readOnly}
+                                >
+                                  <option value="">Select Leave Type</option>
+                                  {LeaveType?.data?.map((t) => (
+                                    <option key={t.id} value={t.id}>
+                                      {t.name}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              <div>
+                                <label className="block text-xs font-medium text-gray-700 mb-1">
+                                  Shift Time
+                                </label>
+                                <select
+                                  value={popupLeave.shiftTime}
+                                  onChange={(e) =>
+                                    setPopupLeave((p) => ({ ...p, shiftTime: e.target.value }))
+                                  }
+                                  disabled={!popupLeave.leaveId || readOnly}
+                                  className="w-full border text-[11px] py-1 border-gray-300 rounded px-3   focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                  <option value="">Select Shift</option>
+                                  {ShiftTime.map((st) => (
+                                    <option key={st.value} value={st.value}>
+                                      {st.show}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+
+                              
                             </div>
                           </div>
                         )}
@@ -1520,7 +1577,7 @@ export default function LeaveCalendarModal({
                                   Total
                                 </th> */}
                                 <th className=" w-8 py-2 text-center text-sm font-semibold border border-gray-300">
-                                  Leave Taken Days 
+                                  Leave Taken Days
                                 </th>
                                 <th className=" w-8 py-2 text-center text-sm font-semibold border border-gray-300">
                                   Available Days
@@ -1542,8 +1599,8 @@ export default function LeaveCalendarModal({
                                       <div className="flex items-center gap-2">
                                         <span
                                           className={`w-3 h-3 text-[12px] rounded-full ${type.remainingDays > 0
-                                              ? "bg-green-500"
-                                              : "bg-red-500"
+                                            ? "bg-green-500"
+                                            : "bg-red-500"
                                             }`}
                                         />
                                         {type.leaveName}
@@ -1556,14 +1613,14 @@ export default function LeaveCalendarModal({
 
                                     <td className="px-4  text-[12px] text-right pr-2 border border-gray-300  text-amber-600 font-medium">
                                       <span className="bg-amber-100 px-3 py-1 rounded-full text-xs font-semibold">{type.usedDays || 0}</span>
-                                      
+
                                     </td>
 
                                     <td className="px-4  text-[12px] text-right pr-2 border border-gray-300">
                                       <span
                                         className={`px-3 py-1 rounded-full text-xs font-semibold ${type.remainingDays > 0
-                                            ? "bg-green-100 text-green-700"
-                                            : "bg-red-100 text-red-700"
+                                          ? "bg-green-100 text-green-700"
+                                          : "bg-red-100 text-red-700"
                                           }`}
                                       >
                                         {type.remainingDays || 0}
@@ -1576,7 +1633,7 @@ export default function LeaveCalendarModal({
                           </table>
                         </div>
 
-                    
+
 
                       </div>
                     </div>
@@ -1586,36 +1643,36 @@ export default function LeaveCalendarModal({
               </div>
 
               {/* Leave Entry Details */}
-              <div className="bg-white rounded-lg border shadow-sm p-4 flex-1">
+              <div className="bg-white rounded-lg border shadow-sm p-4  flex-1">
                 <h3 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
                   <FileText size={18} />
                   Leave Entry
                 </h3>
 
-                <div className="max-h-[280px] overflow-auto">
-                  <table className="w-full border-collapse">
-                    <thead className="bg-gray-50 sticky top-0">
+                <div className="max-h-[355px] overflow-auto">
+                  <table className="w-full border-collapse table-fixed ">
+                    <thead className="bg-gray-200 sticky top-0 border border-gray-300">
                       <tr>
-                        <th className="py-2 px-2 text-center text-xs font-medium text-gray-700 w-8">
+                        <th className="py-2  text-center text-xs font-medium  w-4">
                           S.No
                         </th>
-                        <th className="py-2 px-2 text-center text-xs font-medium text-gray-700">
+                        <th className="py-2  text-center text-xs font-medium  w-[40px]">
                           Date
                         </th>
-                        <th className="py-2 px-2 text-center text-xs font-medium text-gray-700">
+                        <th className="py-2  text-center text-xs font-medium  w-20">
                           Leave Type
                         </th>
-                        <th className="py-2 px-2 text-center text-xs font-medium text-gray-700">
+                        <th className="py-2  text-center text-xs font-medium  w-8">
                           Duration
                         </th>
-                        <th className="py-2 px-2 text-center text-xs font-medium text-gray-700">
+                        <th className="py-2  text-center text-xs font-medium  w-8">
                           Count
                         </th>
-                        <th className="py-2 px-2 text-center text-xs font-medium text-gray-700">
+                        <th className="py-2  text-center text-xs font-medium  w-24">
                           Reason
                         </th>
                         {id && (
-                          <th className="py-2 px-2 text-center text-xs font-medium text-gray-700">
+                          <th className="py-2  text-center text-xs font-medium  w-8">
                             Status
                           </th>
                         )}
@@ -1624,26 +1681,26 @@ export default function LeaveCalendarModal({
                     <tbody>
                       {leaveDetails?.length === 0 ? (
                         <tr>
-                          <td colSpan={id ? 7 : 6} className="py-8 text-center text-sm text-gray-500">
+                          <td colSpan={id ? 7 : 6} className="py-8 text-center text-sm text-black">
                             Select dates from calendar to add leave entries
                           </td>
                         </tr>
                       ) : (
                         leaveDetails?.map((item, index) => (
                           <tr key={index} className="hover:bg-gray-50">
-                            <td className="border border-gray-200 py-1.5 px-2 text-center text-xs text-gray-700">
+                            <td className="border border-gray-300  text-center text-xs text-black">
                               {index + 1}
                             </td>
-                            <td className="border border-gray-200 py-1.5 px-2">
+                            <td className="border border-gray-300  item-center">
                               <input
                                 type="date"
-                                value={item.date}
-                                className="w-full bg-transparent text-xs text-gray-700 focus:outline-none focus:border-transparent"
+                                value={item?.date}
+                                className={`w-full text-center bg-transparent text-xs  focus:outline-none ${readOnly ? "text-gray-600" : "text-black"}`}
                                 readOnly
                                 disabled={readOnly || childRecord.current > 0}
                               />
                             </td>
-                            <td className="border border-gray-200 py-1 px-1">
+                            <td className="border border-gray-300 ">
                               <Select
                                 options={LeaveType?.data?.map((val) => ({
                                   label: val?.name,
@@ -1652,12 +1709,14 @@ export default function LeaveCalendarModal({
                                 value={LeaveType?.data?.map((val) => ({
                                   label: val?.name,
                                   value: val?.id,
-                                })).find((opt) => opt.value === item?.leaveId) || null}
+                                })).find((opt) => opt?.value === item?.leaveId) || null}
                                 onChange={(selected) =>
                                   handleInputChange(selected?.value || "", index, "leaveId")
                                 }
+                                menuPortalTarget={document.body}
+
                                 isDisabled={!employeeId || readOnly}
-                                placeholder="Select"
+                                placeholder="Select Leave Type"
                                 menuPlacement="auto"
                                 styles={{
                                   control: (base) => ({
@@ -1668,6 +1727,11 @@ export default function LeaveCalendarModal({
                                     minHeight: "28px",
                                     fontSize: "12px",
                                   }),
+                                  placeholder: (base) => ({
+                                    ...base,
+                                    color: readOnly ? "#4b5563" : "#000000", // gray-600 : gray-400
+                                    fontSize: "12px",
+                                  }),
                                   dropdownIndicator: (base) => ({
                                     ...base,
                                     padding: 2,
@@ -1676,26 +1740,42 @@ export default function LeaveCalendarModal({
                                       height: 12,
                                     },
                                   }),
+                                  input: (base) => ({
+                                    ...base,
+                                    color: readOnly ? "#4b5563" : "#000000",
+                                    fontSize: "12px",
+                                  }),
+                                  singleValue: (base) => ({
+                                    ...base,
+                                    color: readOnly ? "#4b5563" : "#000000", // gray-600 : black
+                                    fontSize: "12px",
+                                  }),
                                   indicatorSeparator: () => ({ display: "none" }),
                                   valueContainer: (base) => ({
                                     ...base,
                                     padding: "0 2px",
+                                    color: readOnly ? "#4b5563" : "#000000",
                                   }),
                                   input: (base) => ({
                                     ...base,
                                     margin: 0,
                                     padding: 0,
                                     fontSize: "12px",
+                                    color: readOnly ? "#4b5563" : "#000000",
                                   }),
                                   menu: (base) => ({
                                     ...base,
                                     fontSize: "12px",
-                                    zIndex: 9999,
+                                    // zIndex: 99999,
+                                  }),
+                                  menuPortal: (base) => ({
+                                    ...base,
+                                    zIndex: 999999,
                                   }),
                                 }}
                               />
                             </td>
-                            <td className="border border-gray-200 py-1.5 px-2">
+                            <td className="border border-gray-300 ">
                               <select
                                 className="w-full bg-transparent text-xs focus:outline-none"
                                 value={item.shiftTime || ""}
@@ -1710,22 +1790,22 @@ export default function LeaveCalendarModal({
                                 ))}
                               </select>
                             </td>
-                            <td className="border border-gray-200 py-1.5 px-2">
+                            <td className="border border-gray-300 ">
                               <input
                                 type="text"
                                 value={item?.count || ""}
-                                className={`w-full bg-transparent text-xs text-right focus:outline-none ${readOnly ? "text-gray-600" : "text-black"}`}
+                                className={`w-full pr-1 bg-transparent text-xs text-right focus:outline-none ${readOnly ? "text-gray-600" : "text-black"}`}
                                 onChange={(e) =>
                                   handleInputChange(e.target.value, index, "count")
                                 }
                                 disabled={readOnly}
                               />
                             </td>
-                            <td className="border border-gray-200 py-1.5 px-2">
+                            <td className="border border-gray-300 ">
                               <input
                                 type="text"
                                 value={item?.notes || ""}
-                                className={`w-full bg-transparent text-xs focus:outline-none ${readOnly ? "text-gray-600" : "text-black"}`}
+                                className={`w-full pl-1 text-left bg-transparent text-xs focus:outline-none ${readOnly ? "text-gray-600" : "text-black"}`}
                                 onChange={(e) =>
                                   handleInputChange(e.target.value, index, "notes")
                                 }
@@ -1733,11 +1813,11 @@ export default function LeaveCalendarModal({
                               />
                             </td>
                             {id && (
-                              <td className="border border-gray-200 py-1.5 px-2">
+                              <td className="border border-gray-300 ">
                                 <input
                                   type="text"
                                   value={item?.isApproved}
-                                  className={`w-full bg-transparent text-xs focus:outline-none ${readOnly ? "text-gray-600" : ""} ${item?.isApproved === "Approved"
+                                  className={`w-full text-left pl-1 font-semibold bg-transparent text-xs focus:outline-none ${readOnly ? "text-gray-600" : ""} ${item?.isApproved === "Approved"
                                     ? "text-green-600"
                                     : item?.isApproved === "Rejected"
                                       ? "text-red-600"
