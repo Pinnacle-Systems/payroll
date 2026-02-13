@@ -358,7 +358,7 @@ export default function Form() {
           <Modal
             isOpen={form}
             form={form}
-            widthClass={"w-[40%] h-[60%]"}
+            widthClass={"w-[40%] h-[48%]"}
             onClose={() => {
               setForm(false);
               setErrors({});
@@ -409,7 +409,7 @@ export default function Form() {
                     <div className="bg-white py-3 rounded-md border border-gray-200 h-full">
                       <div className="space-y-4 px-3">
                         <div className="flex gap-x-3 font-sans">
-                          <div className="w-72 font-sans">
+                          <div className="w-80 font-sans">
                             <label className="block text-xs font-semibold text-slate-700 mb-1">
                               Country Name
                               <span className="text-red-500">*</span>
@@ -430,60 +430,7 @@ export default function Form() {
                               className={`w-full px-1 -ml-1   text-xs rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm `}
-                              // styles={{
-                              //   control: (base) => ({
-                              //     ...base,
-                              //     minHeight: "16px", // Reduce overall height
-                              //     height: "16px", // Force height
-                              //     padding: "13px 4px", // Adjust padding inside
-                              //     fontSize: "12px", // Make text smaller
-                              //     borderRadius: "8px",
-                              //     fontFamily: "Poppins",
-                              //   }),
-                              //   valueContainer: (base) => ({
-                              //     ...base,
-                              //     padding: "0 6px", // Space for text
-                              //     marginTop: "-8px",
-                              //     fontFamily: "Poppins",
-                              //   }),
-                              //   input: (base) => ({
-                              //     ...base,
-                              //     margin: 0,
-                              //     padding: 0,
-                              //     fontFamily: "Poppins",
-                              //         fontSize: "12px",
-
-                              //   }),
-                              //   singleValue: (base) => ({
-                              //     ...base,
-                              //     fontFamily: "Poppins",
-                              //         fontSize: "12px",
-
-                              //   }),
-                              //   placeholder: (base) => ({
-                              //     ...base,
-                              //     fontFamily: "Poppins",
-                              //         fontSize: "12px",
-
-                              //   }),
-                              //   menu: (base) => ({
-                              //     ...base,
-                              //     fontFamily: "Poppins",
-                              //         fontSize: "12px",
-
-                              //   }),
-                              //   option: (base) => ({
-                              //     ...base,
-                              //     fontFamily: "Poppins",
-                              //     fontSize: "12px",
-                              //   }),
-                              //   indicatorsContainer: (base) => ({
-                              //     ...base,
-                              //     display: "none",
-                              //     height: "28px", // Align dropdown arrow
-                              //     marginTop: "-12px",
-                              //   }),
-                              // }}
+                            
                               styles={customSelectStyles}
                             />
                           </div>

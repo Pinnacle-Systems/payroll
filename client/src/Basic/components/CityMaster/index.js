@@ -353,7 +353,7 @@ export default function Form() {
             <Modal
               isOpen={form}
               form={form}
-              widthClass={"w-[50%] h-[70%]"}
+              widthClass={"w-[50%] h-[50%]"}
               onClose={() => {
                 setForm(false);
                 setErrors({});
@@ -403,8 +403,8 @@ export default function Form() {
                       <div className="bg-white p-3 rounded-md border border-gray-200 h-full">
                         <div className="space-y-4 ">
                           <div className="">
-                            <div className="flex flex-wrap w-full gap-x-4 mb-3">
-                              <div className="w-64">
+                            <div className="flex flex-wrap w-full  gap-x-4 mb-3">
+                              <div className="w-72">
                                 <label className="block text-xs font-semibold text-slate-700 mb-1">
                                   Country Name
                                   <span className="text-red-500">*</span>
@@ -418,19 +418,20 @@ export default function Form() {
                                   isDisabled={
                                     readOnly || childRecord.current > 0
                                   }
+                                  ref={cityNameRef}
                                   isSearchable
                                   isClearable={false}
                                   menuShouldScrollIntoView={false}
                                   maxMenuHeight={150} // <-- Reduce height here
                                   onInputChange={(value) => value.toUpperCase()}
-                                  className="w-full px-1 -ml-1  text-xs rounded-lg
+                                  className="w-72 px-1 -ml-1  text-xs rounded-lg
           focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
           transition-all duration-150 shadow-sm"
                                   placeholder="Select Country"
                                   styles={customSelectStyles}
                                 />
                               </div>
-                              <div className="w-60">
+                              <div className="w-72">
                                 <label className="block text-xs  font-semibold text-slate-700 mb-1">
                                   State Name{" "}
                                   <span className="text-red-500">*</span>
@@ -459,7 +460,7 @@ export default function Form() {
                             </div>
 
                             <div className="flex flex-wrap w-full gap-x-6 pt-3">
-                              <div className="mb-3 w-[248px]">
+                              <div className="mb-3 w-[280px]">
                                 <TextInput
                                   name="City Name"
                                   type="text"
@@ -470,7 +471,7 @@ export default function Form() {
                                   disabled={
                                     childRecord.current > 0 ? true : undefined
                                   }
-                                  ref={cityNameRef}
+                                  
                                 />
                               </div>
                               <div className="mb-3 w-[90px] ">
